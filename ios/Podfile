@@ -13,7 +13,7 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
-target 'loopin' do
+target 'SearchTalent' do
   config = use_native_modules!
   use_react_native!(
     :path => config[:reactNativePath],
