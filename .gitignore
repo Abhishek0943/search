@@ -1,0 +1,83 @@
+# ===================================
+# System files
+# ===================================
+.DS_Store
+Thumbs.db
+
+# ===================================
+# Editor directories & temp files
+# ===================================
+.idea/
+*.iml
+*.xcuserstate
+*.xccheckout
+*.moved-aside
+*.hmap
+**/.xcode.env.local
+
+# ===================================
+# Node.js (Backend & React frontend)
+# ===================================
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.env
+dist/
+build/
+coverage/
+tmp/
+*.tmp
+
+# ===================================
+# Yarn Plug'n'Play (if used)
+# ===================================
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# ===================================
+# React Native — Android
+# ===================================
+/android/.gradle/
+/android/build/
+/android/app/build/
+/android/local.properties
+
+# ===================================
+# React Native — iOS
+# ===================================
+build/
+DerivedData/
+*.xcworkspace
+xcuserdata/
+Pods/
+
+# ===================================
+# Gradle & IntelliJ caches
+# ===================================
+.gradle/
+.cxx/
+*.hprof
+
+# ===================================
+# Metro & packager caches
+# ===================================
+metro-cache/
+react-native-packager-cache-*
+
+# ===================================
+# Xcode project user/state files
+# ===================================
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+!default.mode1v3
+!default.mode2v3
+!default.perspectivev3
+.xcworkspacedata
+xcuserdata/

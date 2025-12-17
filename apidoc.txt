@@ -1,0 +1,6 @@
+api for welcome screen 
+
+get array of {title , description , imageUrl}
+add api {title , description , imageUrl}
+delete api with 
+update api 
