@@ -2,7 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '../store';
 import { routes } from '../constants/values';
-import { ApplyJob, Chat, Company, CompanyDetails, CV, Education, ForgotPassword, Home, Jobdetail, Language, LanguageForm, Login, PersonalInfo, Profile, Project, ProjectForm, RecentJob, Search, Setting, Signup, Skill, SkillAdd, Splash, SuggestedJob, Welcome, WelcomeTwo, WorkExperience, WorkExperienceForm } from '../pages';
+import { Apply, ApplyJob, Chat, Company, CompanyDetails, CV, Education, ForgotPassword, Home, Jobdetail, Language, LanguageForm, Login, Notification, PersonalInfo, Profile, Project, ProjectForm, RecentJob, Search, Setting, Signup, Skill, SkillAdd, Splash, SuggestedJob, Welcome, WelcomeTwo, WorkExperience, WorkExperienceForm } from '../pages';
 import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import EducationForm from '../pages/PersonalInfo/EducationForm';
@@ -60,6 +60,8 @@ const Routes = () => {
               <Stack.Screen name={routes.SKILLFORM} component={SkillAdd} options={{ headerShown: false, animation: 'none' }} />
               <Stack.Screen name={routes.LANGUAGE} component={Language} options={{ headerShown: false, animation: 'none' }} />
               <Stack.Screen name={routes.LANGUAGEFORM} component={LanguageForm} options={{ headerShown: false, animation: 'none' }} />
+              <Stack.Screen name={routes.APPLY} component={Apply} options={{ headerShown: false, animation: 'none' }} />
+              <Stack.Screen name={routes.NOTIFICATION} component={Notification} options={{ headerShown: false, animation: 'none' }} />
             </>
         }
 

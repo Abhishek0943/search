@@ -44,7 +44,6 @@ const Search = () => {
   const dispatch = useAppDispatch()
   const [job, setJob] = useState<Job[]>([])
   const [dataFilter, setDataFilter] = useState<{ filter: string, option: string[] | { id: number, name: string }[] }[]>([])
-  const [rotated, setRotated] = useState(false);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [temFilter, setTemFilter] = useState<FilterState>({});
   const [filter, setFilter] = useState<FilterState>({});

@@ -12,11 +12,11 @@ import { formatDate } from './PersonalInfo'
 
 const CV = () => {
     const { colors } = useContext(ThemeContext);
-    const { user } = useAppSelector(state => state.userStore)
     const navigation = useNavigation();
     const dispatch = useAppDispatch()
     const [cvs, setCvs] = useState([])
     const [active, setActive] = useState(0)
+    const { user } = useAppSelector(state => state.userStore)
     useFocusEffect(useCallback(
         () => {
 

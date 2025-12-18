@@ -28,7 +28,7 @@ export interface ThemeContextType {
 const STORAGE_KEY = 'themeMode';
 
 export const ThemeContext = createContext<ThemeContextType>({
-  mode: 'system',
+  mode: 'light',
   isDark: false,
   colors: lightColors ,
   setMode: () => { },
@@ -40,7 +40,7 @@ interface ThemeProviderProps {
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const systemScheme = useColorScheme();
-  const [mode, setMode] = useState<ThemeMode>('system');
+  const [mode, setMode] = useState<ThemeMode>('light');
   useEffect(() => {
     AsyncStorage.getItem(STORAGE_KEY).then(saved => {
       if (saved === 'light' || saved === 'dark' || saved === 'system') {

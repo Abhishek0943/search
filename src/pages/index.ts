@@ -63,4 +63,6 @@ export {default as Skill} from "./PersonalInfo/Skill"
 export {default as SkillAdd} from "./PersonalInfo/SkillAdd"
 export {default as Language} from "./PersonalInfo/Language"
 export {default as LanguageForm} from "./PersonalInfo/LanguageForm"
+export {default as Apply} from "./Apply/ApplyJob"
+export {default as Notification} from "./Notification/Notification"
 

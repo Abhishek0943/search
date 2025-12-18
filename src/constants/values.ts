@@ -7,6 +7,7 @@ export const routes: RoutesType = {
     LOGIN: "LOGIN",
     HOME: "HOME",
     PROJECT: "PROJECT",
+    NOTIFICATION: "NOTIFICATION",
     SIGNUP: "SIGNUP",
     FORGOTPASSWORD: "FORGOTPASSWORD",
     SUGGESTEDJOB: "SUGGESTEDJOB",
@@ -25,6 +26,7 @@ export const routes: RoutesType = {
     RECENTJOB: "RECENTJOB",
     APPLYJOB: "APPLYJOB",
     PROJECTFORM: "PROJECTFORM",
+    APPLY: "APPLY",
     SKILL: "SKILL",
     SKILLFORM: "SKILLFORM",
     LANGUAGE: "LANGUAGE",
@@ -35,6 +37,7 @@ export default interface RoutesType {
     SPLASH: "SPLASH",
     EDUCATION: "EDUCATION",
     EDUCATIONFORM: "EDUCATIONFORM",
+    NOTIFICATION: "NOTIFICATION",
     LANGUAGE: "LANGUAGE",
     LANGUAGEFORM: "LANGUAGEFORM",
     CVADD: "CVADD",
@@ -61,6 +64,8 @@ export default interface RoutesType {
     FORGOTPASSWORD: "FORGOTPASSWORD",
     SEARCH: "SEARCH",
     PROJECTFORM: "PROJECTFORM",
+    APPLY: "APPLY",
+
 
 }
 export const HOST = `192.168.1.2`

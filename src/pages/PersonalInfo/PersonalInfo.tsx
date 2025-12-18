@@ -91,10 +91,17 @@ const PersonalInfo = () => {
       phoneNumber: data.phone ?? '',
       mobileNumber: data.phone ?? '',
       dateOfBirth: data.date_of_birth
-        ? new Date(data.date_of_birth) // "2009-12-11"
+        ? new Date(data.date_of_birth) 
         : null,
       currentSalary: data.current_salary ?? '',
       expectedSalary: data.expected_salary ?? '',
+      streetAddress:data.street_address,
+     videoProfileUrl:data. video_link,
+     experience:data.job_experience.id,
+     careerLevel:data.career_level.id,
+     industry:data.industry.id,
+     functionalArea:data.functional_area.id,
+     salaryCurrency:data.salary_currency
     }));
      if (data.country_id) {
           dispatch(GetState({ id: data.country_id }))

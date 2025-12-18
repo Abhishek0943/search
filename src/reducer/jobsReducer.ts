@@ -24,12 +24,36 @@ export const UploadCV = createAsyncThunk<
     return postApiCall<{ success: true, data: Job[] }>('/jobseekers/cv-save', body, { as: "form" });
   }
 );
+export const GetJobApplication = createAsyncThunk<
+  { success: true, data: Job[] } | ErrorResponse
+>(
+  'GetJobApplication',
+  (body) => {
+    return getApiCall<{ success: true, data: Job[] }>('/jobseekers/my-job-applications');
+  }
+);
 export const GetCv = createAsyncThunk<
   { success: true, data: Job[] } | ErrorResponse, { id: number }
 >(
   'GetCv',
   ({ id }) => {
     return getApiCall<{ success: true, data: Job[] }>('/jobseekers/get-cvs?user_id=' + id,);
+  }
+);
+export const GetNotification = createAsyncThunk<
+  { success: true, data: Job[] } | ErrorResponse
+>(
+  'GetNotification',
+  () => {
+    return getApiCall<{ success: true, data: Job[] }>('/jobseekers/get-notifications' ,);
+  }
+);
+export const ApplyJobs = createAsyncThunk<
+  { success: true, data: Job[] } | ErrorResponse, { }
+>(
+  'ApplyJobs',
+  (body) => {
+    return postApiCall<{ success: true, data: Job[] }>('/jobs/apply' , body);
   }
 );
 export const GetUserLanguages = createAsyncThunk<

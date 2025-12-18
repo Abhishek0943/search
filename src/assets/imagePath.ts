@@ -51,6 +51,11 @@ export default {
     profileUpdateButton: require('./images/profileUpdateButton.png'),
     workExperience: require('./images/workExperience.png'),
     educationImage: require('./images/educationImage.png'),
+    success: require('./images/success.png'),
+    notificationEmptyImage: require('./images/notification.png'),
+    homeBackGround: require('./images/Home.png'),
+    transparent: require('./images/homeBG.png'),
+    homeText: require('./images/homeText.png'),
 
 
 // dummy
