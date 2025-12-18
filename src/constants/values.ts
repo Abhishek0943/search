@@ -16,6 +16,7 @@ export const routes: RoutesType = {
     COMPANY: "COMPANY",
     COMPANYDETAILS: "COMPANYDETAILS",
     PROFILE: "PROFILE",
+    ADDJOB: "ADDJOB",
     PERSONALINFO: "PERSONALINFO",
     WORKEXPERIENCE: "WORKEXPERIENCE",
     WORKEXPERIENCEFORM: "WORKEXPERIENCEFORM",
@@ -31,6 +32,8 @@ export const routes: RoutesType = {
     SKILLFORM: "SKILLFORM",
     LANGUAGE: "LANGUAGE",
     LANGUAGEFORM: "LANGUAGEFORM",
+    ACTIVECANDIDATE: "ACTIVECANDIDATE",
+
 
 }
 export default interface RoutesType {
@@ -42,6 +45,7 @@ export default interface RoutesType {
     LANGUAGEFORM: "LANGUAGEFORM",
     CVADD: "CVADD",
     RECENTJOB: "RECENTJOB",
+    ADDJOB: "ADDJOB",
     APPLYJOB: "APPLYJOB",
     PROJECT: "PROJECT",
     SKILL: "SKILL",
@@ -65,6 +69,7 @@ export default interface RoutesType {
     SEARCH: "SEARCH",
     PROJECTFORM: "PROJECTFORM",
     APPLY: "APPLY",
+    ACTIVECANDIDATE: "ACTIVECANDIDATE",
 
 
 }

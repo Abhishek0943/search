@@ -35,6 +35,12 @@ export default {
     edit: require('./Icon/edit.png'),
     education: require('./Icon/education.png'),
     camera2: require('./Icon/camera2.png'),
+    myJob: require('./Icon/myJob.png'),
+    clock2: require('./Icon/clock2.png'),
+    candidate: require('./Icon/candidate.png'),
+    activeCandidate: require('./Icon/activeCandidate.png'),
+    addJob: require('./Icon/addJob.png'),
+    activeAddJob: require('./Icon/activeAddJob.png'),
 
 
     // images
@@ -56,6 +62,9 @@ export default {
     homeBackGround: require('./images/Home.png'),
     transparent: require('./images/homeBG.png'),
     homeText: require('./images/homeText.png'),
+    button: require('./images/button.png'),
+    recruterBanner: require('./images/recruterBanner.png'),
+    recruterHomeText: require('./images/recruterHomeText.png'),
 
 
 // dummy

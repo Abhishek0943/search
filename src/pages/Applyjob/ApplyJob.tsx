@@ -48,12 +48,6 @@ const ApplyJob = () => {
             paddingHorizontal: responsiveScreenWidth(5),
           }}
         >
-          {/* <Pressable >
-                             <Image
-                               source={imagePath.backIcon}
-                               style={{ resizeMode: 'contain' }}
-                             />
-                           </Pressable> */}
           <Text
             style={{
               flex: 1,
@@ -66,7 +60,6 @@ const ApplyJob = () => {
             Your Application
           </Text>
           <TouchableHighlight onPress={() => navigation.navigate(routes.NOTIFICATION)}>
-
             <Image
               source={imagePath.notification}
               style={{ opacity: 1, resizeMode: 'contain' }}

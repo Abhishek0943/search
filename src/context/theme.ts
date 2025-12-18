@@ -6,6 +6,7 @@ const commonColors = {
   mediumGray: "#BEBEBE",
   gray: "#DEDEDE",
   darkGray: "#494949",
+  darkGrayNatural: "#a9a9a9",
   hardGray:"#222222",
   lightBlue:"#EEF4FF",
   black:"black",
@@ -58,6 +59,7 @@ export interface ColorPalette {
   onPrimary: string;
   hardGray: string;
   darkGray: string;
+  darkGrayNatural: string;
   surfaces: string;
   secondary: string;
   textPrimary: string;

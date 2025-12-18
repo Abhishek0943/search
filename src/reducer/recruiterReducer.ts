@@ -32,13 +32,21 @@ export const RecruiterCompleteSteps = createAsyncThunk<{ success: true, recruite
   'CompleteSteps',
   ({ step, ...body }) => patchApiCall<{ success: true, recruiter: Recruiter, token: string }>('recruiter/' + step, body),
 );
-export const RecruiterGetTopics = createAsyncThunk<{ success: true, topic: TopicItem[], } | ErrorResponse>(
-  'GetTopics',
-  () => getApiCall<{ success: true, topic: TopicItem[], token: string }>('topic'),
+export const RecruiterProfile = createAsyncThunk<{ success: true, topic: TopicItem[], } | ErrorResponse>(
+  'RecruiterProfile',
+  () => getApiCall<{ success: true, topic: TopicItem[], token: string }>('/auth/companies/me'),
 );
 export const RecruiterLoginByPassword = createAsyncThunk<{ success: true, recruiter: Recruiter, token: string } | ErrorResponse, { email: string, password: string }>(
-  'LoginByPassword',
-  (body) => postApiCall<{ success: true, recruiter: Recruiter, token: string }>('/auth/jobseekers/login', body),
+  'RecruiterLoginByPassword',
+  (body) => postApiCall<{ success: true, recruiter: Recruiter, token: string }>('/auth/companies/login', body),
+);
+export const GetCandidates = createAsyncThunk<
+  { success: true, data: User } | ErrorResponse
+>(
+  'GetCandidates',
+  () => {
+    return getApiCall<{ success: true, data: User }>('/company/candidate-filters');
+  }
 );
 const initialState: RecruiterInitialState = {
   isAuth: false,

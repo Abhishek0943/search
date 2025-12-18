@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { getApiCall, patchApiCall, postApiCall } from '../api';
 import { ProfileData } from './jobsReducer';
+import { RecruiterLoginByPassword, RecruiterProfile } from './recruiterReducer';
 
 export const GetWelcomeScreen = createAsyncThunk<WelcomeScreenResponse | ErrorResponse>(
   'GetWelcomeScreen',
@@ -10,7 +11,7 @@ export const GetCountries = createAsyncThunk<GetCountriesResponse | ErrorRespons
   'GetCountries',
   () => getApiCall<GetCountriesResponse>('country'),
 );
-export const UserRegister = createAsyncThunk<{ success: true, token: string } | ErrorResponse, {first_name:string, last_name:string, email:string, password:string, password_confirmation:string, terms_of_use:boolean}>(
+export const UserRegister = createAsyncThunk<{ success: true, token: string } | ErrorResponse, { first_name: string, last_name: string, email: string, password: string, password_confirmation: string, terms_of_use: boolean }>(
   'UserRegister',
   (body) => postApiCall<{ success: true, token: string }>('/auth/jobseekers/register', body),
 );
@@ -27,7 +28,7 @@ export const UserReSentOtp = createAsyncThunk<{ success: true, user: User, token
 
 export const TokenLogin = createAsyncThunk<{ success: true, user: User, } | ErrorResponse, { token: string, }>(
   'TokenLogin',
-  (body) => postApiCall<{ success: true, user: User  }>('user/tokenLogin', body),
+  (body) => postApiCall<{ success: true, user: User }>('user/tokenLogin', body),
 );
 export const CompleteSteps = createAsyncThunk<{ success: true, user: User, } | ErrorResponse, { id: string, dob?: string, gender?: string, phone?: string, name?: string, step: number, countryId?: string, topics?: string[] }>(
   'CompleteSteps',
@@ -37,9 +38,9 @@ export const GetTopics = createAsyncThunk<{ success: true, topic: TopicItem[], }
   'GetTopics',
   () => getApiCall<{ success: true, topic: TopicItem[], token: string }>('topic'),
 );
-export const LoginByPassword = createAsyncThunk<{success: true,data:{user: User, token: string } } | ErrorResponse, {email:string, password:string}>(
+export const LoginByPassword = createAsyncThunk<{ success: true, data: { user: User, token: string } } | ErrorResponse, { email: string, password: string }>(
   'LoginByPassword',
-  (body) => postApiCall<{ success: true, data:{user: User, token: string } }>('/auth/jobseekers/login', body),
+  (body) => postApiCall<{ success: true, data: { user: User, token: string } }>('/auth/jobseekers/login', body),
 );
 const initialState: UserInitialState = {
   isAuth: false,
@@ -64,18 +65,32 @@ export const userSlice = createSlice({
     }).addCase(ProfileData.fulfilled, (state, { payload }) => {
       if (payload.success) {
         state.user = payload.data;
-      
+
       }
     }).addCase(LoginByPassword.fulfilled, (state, { payload }) => {
       if (payload.success) {
         state.user = payload.data.user;
         state.isAuth = true
-        
+
       }
     })
+      .addCase(RecruiterLoginByPassword.fulfilled, (state, { payload }) => {
+        if (payload.success) {
+
+          state.user = payload.data.company;
+          state.isAuth = true
+
+        }
+      })
+      .addCase(RecruiterProfile.fulfilled, (state, { payload }) => {
+        if (payload.success) {
+          state.user = payload.data.company;
+          state.isAuth = true
+        }
+      })
       .addCase(CompleteSteps.fulfilled, (state, { payload }) => {
         if (payload.success) {
-          
+
         }
       })
       .addCase(UserVerification.fulfilled, (state, { payload }) => {

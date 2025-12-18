@@ -20,8 +20,6 @@ const Login = () => {
   const [userData, setUserData] = useState({
     username: "",
     password: "",
-    ACN: "",
-    ABN: "",
     passwordVisible: false,
     rememberMe: false
   })
@@ -56,28 +54,7 @@ const Login = () => {
         placeholder='Type your Email'
         isRequired
       />
-      {
-        role === "recruiter" && <>
-          <InPutWithLabel
-            onChangeText={function (text: string): void {
-              setUserData({ ...userData, ABN: text })
-            }}
-            value={userData.ABN}
-            label={'ABN Number'}
-            placeholder='Type your abn number'
-            isRequired
-          />
-          <InPutWithLabel
-            onChangeText={function (text: string): void {
-              setUserData({ ...userData, ACN: text })
-            }}
-            value={userData.ACN}
-            label={'ACN Number'}
-            placeholder='Type your acn number'
-            isRequired
-          />
-        </>
-      }
+   
 
       <InPutWithLabel
         onChangeText={function (text: string): void {
@@ -113,7 +90,7 @@ const Login = () => {
         if (role === "recruiter") {
           dispatch(RecruiterLoginByPassword({ email: userData.username, password: userData.password })).unwrap().then((res) => {
             if (res.success) {
-              AsyncStorage.setItem("token", res.token)
+              AsyncStorage.setItem("token", res.data.token)
             }
             else {
               Alert.alert(res.message)

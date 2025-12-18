@@ -9,6 +9,7 @@ import { TokenLogin } from '../../reducer/userReducer'
 import { ThemeContext } from '../../context/ThemeProvider'
 import { EnvContext } from '../../context/EnvProvider'
 import { ProfileData } from '../../reducer/jobsReducer'
+import { RecruiterProfile } from '../../reducer/recruiterReducer'
 const Splash = () => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>()
   const dispatch = useAppDispatch()
@@ -23,9 +24,15 @@ const Splash = () => {
         navigation.navigate(routes.WELCOME)
       }
       else {
-        if (role==="recruiter"){
-
-        }else{
+        if (role === "recruiter") {
+          dispatch(RecruiterProfile()).unwrap().then((res) => {
+            if (res.success) {
+              navigation.navigate(routes.HOME)
+            } else {
+              navigation.navigate(routes.WELCOME)
+            }
+          })
+        } else {
           dispatch(ProfileData()).unwrap().then((res) => {
             if (res.success) {
               navigation.navigate(routes.HOME)

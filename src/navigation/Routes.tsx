@@ -2,7 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '../store';
 import { routes } from '../constants/values';
-import { Apply, ApplyJob, Chat, Company, CompanyDetails, CV, Education, ForgotPassword, Home, Jobdetail, Language, LanguageForm, Login, Notification, PersonalInfo, Profile, Project, ProjectForm, RecentJob, Search, Setting, Signup, Skill, SkillAdd, Splash, SuggestedJob, Welcome, WelcomeTwo, WorkExperience, WorkExperienceForm } from '../pages';
+import { AddJob, Apply, ApplyJob, Candidate, Chat, Company, CompanyDetails, CV, Education, ForgotPassword, Home, Jobdetail, Language, LanguageForm, Login, Notification, PersonalInfo, Profile, Project, ProjectForm, RecentJob, RecruiterHome, Search, Setting, Signup, Skill, SkillAdd, Splash, SuggestedJob, Welcome, WelcomeTwo, WorkExperience, WorkExperienceForm } from '../pages';
 import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import EducationForm from '../pages/PersonalInfo/EducationForm';
@@ -35,6 +35,11 @@ const Routes = () => {
 
         {
           role === "recruiter" ? <>
+              <Stack.Screen name={routes.HOME} component={RecruiterHome} options={{ headerShown: false, animation: 'none' }} />
+              <Stack.Screen name={routes.ACTIVECANDIDATE} component={Candidate} options={{ headerShown: false, animation: 'none' }} />
+              <Stack.Screen name={routes.ADDJOB} component={AddJob} options={{ headerShown: false, animation: 'none' }} />
+              {/* <Stack.Screen name={routes.CHAT} component={Chat} options={{ headerShown: false, animation: 'none' }} /> */}
+
           </> :
             <>
               <Stack.Screen name={routes.HOME} component={Home} options={{ headerShown: false, animation: 'none' }} />
