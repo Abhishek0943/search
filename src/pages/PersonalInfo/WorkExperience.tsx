@@ -1,4 +1,4 @@
-import { FlatList, Image, Pressable, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
+import { FlatList, Image, TouchableOpacity, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native'
 import React, { useCallback, useContext, useState } from 'react'
 import { NavigationBar } from '../../components'
 import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions'
@@ -9,6 +9,7 @@ import { routes } from '../../constants/values'
 import { useAppDispatch, useAppSelector } from '../../store'
 import { DeleteExperience, GetCv, GetExperience } from '../../reducer/jobsReducer'
 import { styles } from './CV'
+import Text from '../../components/Text'
 
 const WorkExperience = () => {
   const { colors } = useContext(ThemeContext);
@@ -56,9 +57,9 @@ const WorkExperience = () => {
             paddingHorizontal: responsiveScreenWidth(5)
           }}
         >
-          <Pressable onPress={() => navigation.goBack()}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
             <Image source={imagePath.backIcon} style={{ resizeMode: 'contain' }} />
-          </Pressable>
+          </TouchableOpacity>
           <Text
             style={{
               flex: 1,
@@ -70,7 +71,6 @@ const WorkExperience = () => {
           >
             Work Experience
           </Text>
-          {/* Invisible icon to balance layout */}
           <Image source={imagePath.backIcon} style={{ opacity: 0, resizeMode: 'contain' }} />
         </View>
         <View>
@@ -91,7 +91,7 @@ const WorkExperience = () => {
           </> :
             <Image source={imagePath.workExperience} style={{ resizeMode: "contain", width: "100%" }} />
         }
-        <Pressable
+        <TouchableOpacity
           onPress={() => navigation.navigate(routes.WORKEXPERIENCEFORM)}
           style={{
             width: '90%',
@@ -112,9 +112,9 @@ const WorkExperience = () => {
               fontSize: responsiveScreenFontSize(1.8),
             }}
           >
-            Apply Now
+            Add Work Experience
           </Text>
-        </Pressable>
+        </TouchableOpacity>
       </ScrollView>
 
     </NavigationBar>
@@ -136,15 +136,15 @@ function CvCard({
     <TouchableWithoutFeedback style={{ flex: 1 }} onPress={() => setActive(0)}>
       <View style={[styles.card, { marginTop: responsiveScreenHeight(2), borderColor: colors.surfaces, backgroundColor: colors.lightGrayNatural, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(1), borderWidth: 1 }]}>
         <View style={styles.topRow}>
-          <Text style={[styles.title, { fontSize: responsiveScreenFontSize(2.5), fontWeight: "600", color: colors.textPrimary }]} numberOfLines={1}>
+          <Text style={[styles.title, { fontSize: responsiveScreenFontSize(2.2), fontWeight: "800", color: colors.textPrimary }]} numberOfLines={1}>
             {item.title}
           </Text>
 
           <View style={styles.actions}>
-            <Pressable onPress={() => {navigation.navigate(routes.WORKEXPERIENCEFORM, {...item}) }} hitSlop={10} style={styles.iconBtn}>
+            <TouchableOpacity onPress={() => { navigation.navigate(routes.WORKEXPERIENCEFORM, { ...item }) }} hitSlop={10} style={styles.iconBtn}>
               <Image source={imagePath.edit} />
-            </Pressable>
-            <Pressable onPress={() => setActive(id)} hitSlop={10} style={styles.iconBtn}>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setActive(id)} hitSlop={10} style={styles.iconBtn}>
               <Image source={imagePath.threeDot} />
               {
                 id === active &&
@@ -163,11 +163,10 @@ function CvCard({
                     },
                   ]}
                 >
-                  <Pressable
+                  <TouchableOpacity
                     onPress={() => {
 
                       dispatch(DeleteExperience({ id: id, })).unwrap().then((res) => {
-                        console.log("hiiii", res)
                         refresh()
                       })
                     }}
@@ -177,26 +176,26 @@ function CvCard({
                     <Text style={[{ color: colors.textPrimary }]}>
                       Delete
                     </Text>
-                  </Pressable>
+                  </TouchableOpacity>
                 </View>
               }
 
-            </Pressable>
+            </TouchableOpacity>
           </View>
         </View>
 
 
-        <View style={[styles.metaRow, { gap: responsiveScreenWidth(2), marginTop: responsiveScreenHeight(1) }]}>
+        <View style={[styles.metaRow, { gap: responsiveScreenWidth(2), marginTop: responsiveScreenHeight(1.5), }]}>
           <Image source={imagePath.location2} />
-          <Text style={[styles.metaText, { fontSize: responsiveScreenFontSize(1.8), color: colors.textSecondary, fontWeight: "600", }]}>{item.city}</Text>
+          <Text style={[styles.metaText, { fontSize: responsiveScreenFontSize(1.8), color: colors.darkGray, fontWeight: "600", }]}>{item.city}</Text>
         </View>
-        <View style={[styles.metaRow, { gap: responsiveScreenWidth(2) }]}>
+        <View style={[styles.metaRow, { gap: responsiveScreenWidth(2), marginTop: responsiveScreenHeight(1), }]}>
           <Image source={imagePath.company3} />
-          <Text style={[styles.metaText, { fontSize: responsiveScreenFontSize(1.8), color: colors.textSecondary, fontWeight: "600", }]}>{item.company}</Text>
+          <Text style={[styles.metaText, { fontSize: responsiveScreenFontSize(1.8), color: colors.darkGray, fontWeight: "600", }]}>{item.company}</Text>
         </View>
-        <View style={[styles.metaRow, {}]}>
+        <View style={[styles.metaRow, { marginTop: responsiveScreenHeight(1),}]}>
           <Image source={imagePath.calender2} />
-          <Text style={[styles.metaText, { fontSize: responsiveScreenFontSize(1.8), color: colors.textSecondary, fontWeight: "600", }]}>  {formatDateRange(item.date_start, item.date_end)}</Text>
+          <Text style={[styles.metaText, { fontSize: responsiveScreenFontSize(1.8), color: colors.darkGray, fontWeight: "600", }]}>  {formatDateRange(item.date_start, item.date_end)}</Text>
         </View>
 
       </View>
@@ -212,7 +211,7 @@ export const formatDisplayDate = (isoDate: string) => {
     year: 'numeric',
   });
 };
- const formatDateRange = (
+const formatDateRange = (
   date_start?: string | null,
   date_end?: string | null
 ) => {

@@ -1,4 +1,4 @@
-import { View, Text, TouchableWithoutFeedback, ScrollView, Image, Pressable } from 'react-native'
+import { View, Text, TouchableWithoutFeedback, ScrollView, Image, TouchableOpacity } from 'react-native'
 import React, { useCallback, useContext, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../store'
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native'
@@ -69,12 +69,12 @@ const ApplyJob = () => {
               paddingHorizontal: responsiveScreenWidth(5),
             }}
           >
-            <Pressable onPress={() => navigation.goBack()}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
               <Image
                 source={imagePath.backIcon}
                 style={{ resizeMode: 'contain' }}
               />
-            </Pressable>
+            </TouchableOpacity>
             <Text
               style={{
                 flex: 1,
@@ -99,15 +99,15 @@ const ApplyJob = () => {
               <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
                 <Image source={imagePath.success} />
                 <Text style={{ fontSize: responsiveScreenFontSize(3), marginTop: responsiveScreenHeight(3), textAlign: "center", fontWeight: "600" }}>You’ve Applied</Text>
-                <Text style={{ fontSize: responsiveScreenFontSize(2), color: colors.textSecondary, marginTop: responsiveScreenHeight(.2), textAlign: "center", fontWeight: "600" }}>You have successfully applied to this job vacancy.</Text>
+                <Text style={{ fontSize: responsiveScreenFontSize(2),textTransform:"capitalize", color: colors.textSecondary, marginTop: responsiveScreenHeight(.2), textAlign: "center", fontWeight: "600" }}>You have successfully applied to this job vacancy.</Text>
               </View>
-              <Pressable
+              <TouchableOpacity
                 onPress={() => navigation.goBack()}
                 style={{
                   width: '100%',
                   justifyContent: 'center',
                   marginTop: responsiveScreenHeight(2),
-                  borderRadius: 6,
+                  borderRadius: 15,
                   gap: responsiveScreenWidth(1),
                   flexDirection: 'row',
                   alignItems: 'center',
@@ -124,14 +124,14 @@ const ApplyJob = () => {
                 >
                   Back Home 
                 </Text>
-              </Pressable>
-              <Pressable
+              </TouchableOpacity>
+              <TouchableOpacity
                 onPress={() => navigation.goBack()}
                 style={{
                   width: '100%',
                   justifyContent: 'center',
                   marginTop: responsiveScreenHeight(2),
-                  borderRadius: 6,
+                  borderRadius: 15,
                   gap: responsiveScreenWidth(1),
                   flexDirection: 'row',
                   alignItems: 'center',
@@ -148,7 +148,7 @@ const ApplyJob = () => {
                 >
                   See Applied Job
                 </Text>
-              </Pressable>
+              </TouchableOpacity>
 
 
             </> :
@@ -181,7 +181,7 @@ const ApplyJob = () => {
 
                   {cvs && cvs.length > 0 ? (
                     cvs.map(cv => (
-                      <Pressable
+                      <TouchableOpacity
                         key={cv.id}
                         onPress={() => setSelectedCvId(cv.id)}
                         style={{
@@ -250,7 +250,7 @@ const ApplyJob = () => {
                             </Text>
                           )}
                         </View>
-                      </Pressable>
+                      </TouchableOpacity>
                     ))
                   ) : (
                     <Text
@@ -265,7 +265,7 @@ const ApplyJob = () => {
                   )}
                 </View>
                 <View style={{ flex: 1 }}></View>
-                <Pressable
+                <TouchableOpacity
                   onPress={handleApply}
                   disabled={!selectedCvId}
                   style={{
@@ -273,7 +273,7 @@ const ApplyJob = () => {
                     width: '100%',
                     alignSelf: 'center',
                     paddingVertical: responsiveScreenHeight(1.8),
-                    borderRadius: 8,
+                    borderRadius: 15,
                     backgroundColor: selectedCvId
                       ? colors.primary
                       : colors.textDisabled,
@@ -288,9 +288,9 @@ const ApplyJob = () => {
                       fontWeight: '600',
                     }}
                   >
-                    Apply with selected resume
+                    Apply with resume
                   </Text>
-                </Pressable>
+                </TouchableOpacity>
 
               </>
           }

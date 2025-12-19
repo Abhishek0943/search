@@ -1,4 +1,4 @@
-import { View, Text, Pressable, Image } from 'react-native'
+import { View,  Pressable, Image } from 'react-native'
 import React, { useContext } from 'react'
 import { responsiveScreenHeight } from 'react-native-responsive-dimensions'
 import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native'
@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemeContext } from '../../context/ThemeProvider';
 import RoutesType, { routes } from '../../constants/values';
 import imagePath from '../../assets/imagePath';
+import Text from '../../components/Text';
 
 const NavigationBar = ({ children,statusbar=true, name, navigationBar=true }: {navigationBar?:boolean,statusbar?:boolean, children: React.JSX.Element, name?: RoutesType["HOME"] | RoutesType["ADDJOB"] | RoutesType["PROFILE"]|RoutesType["ACTIVECANDIDATE"]}) => {
     const { colors } = useContext(ThemeContext)

@@ -41,6 +41,10 @@ export default {
     activeCandidate: require('./Icon/activeCandidate.png'),
     addJob: require('./Icon/addJob.png'),
     activeAddJob: require('./Icon/activeAddJob.png'),
+    check: require('./Icon/check.png'),
+    chat: require('./Icon/chat.png'),
+    chat2: require('./Icon/chat2.png'),
+    angle: require('./Icon/angle.png'),
 
 
     // images
@@ -69,4 +73,11 @@ export default {
 
 // dummy
     companyDummy: require('./Icon/company-dummy.png'),
+}
+export const Fonts = {
+    GilroyBold: 'Gilroy-Bold',
+    GilroyLight: 'Gilroy-Light',
+    GilroyMedium: 'Gilroy-Medium',
+    GilroyRegular: 'Gilroy-Regular',
+    GilroySemiBold: 'Gilroy-SemiBold',
 }

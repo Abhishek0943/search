@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useMemo, useRef, useState, useCallback } 
 import {
   FlatList,
   StyleSheet,
-  Text,
   View,
   ListRenderItemInfo,
   Image,
@@ -22,22 +21,25 @@ import { capitalizeFirstLetter } from '../../helper';
 import LinearGradient from 'react-native-linear-gradient';
 import { EnvContext } from '../../context/EnvProvider';
 import Icon from '../../utils/Icon';
+import Text from '../../components/Text';
 
 const WelcomeItem = React.memo(({ item }: { item: WelcomeScreenItem }) => {
   const { colors } = useContext(ThemeContext);
   return (
     <View style={[styles.itemContainer, {}]}>
-      {/* <Image
-        source={{ uri: item.imageUrl.replace('localhost', HOST) }}
-        style={styles.image}
-        resizeMode='cover'
-      /> */}
+
       <Text style={[styles.title, { color: colors.white }]}>
         {capitalizeFirstLetter(item.title)}
       </Text>
       <Text style={[styles.description, { color: colors.white }]}>
         {capitalizeFirstLetter(item.description)}
       </Text>
+
+      <Image
+        source={item.imageUrl}
+        style={styles.image}
+        resizeMode='contain'
+      />
     </View>
   );
 });
@@ -52,8 +54,8 @@ const Indicators = React.memo(({ length, activeIndex }: { length: number; active
           key={i}
           style={[
             styles.dot,
-            { backgroundColor: colors.white, },
-            (activeIndex === i && { width: responsiveScreenWidth(7) })
+            { backgroundColor: colors.white,opacity:.7 },
+            (activeIndex === i && { width: responsiveScreenWidth(9), opacity:1 } )
           ]}
         />
       )),
@@ -69,22 +71,24 @@ export const Footer = React.memo(
   ({
     onNext,
     onSkip,
-    index
+    index, 
+    lastIndex
   }: {
     onNext: () => void;
     onSkip: () => void;
-    index: number
+    index: number,
+    lastIndex: number
   }) => {
     const { colors, isDark } = useContext(ThemeContext);
     return (
       <View style={[styles.footerContainer, {}]}>
         {
-          index > 0 &&
+          index > 0&& index !==lastIndex &&
           <Pressable onPress={onSkip} style={[styles.pressed, { borderRadius: "50%", aspectRatio: 1, justifyContent: "center", alignItems: "center", backgroundColor: colors.white }]}>
             <Icon icon={{ type: "Feather", name: "chevron-left" }} style={{ color: colors.primary, marginTop: responsiveScreenHeight(-.2) }} size={responsiveScreenFontSize(3)} />
           </Pressable>
         }
-        <Text onPress={onNext} style={[styles.pressed, { flex: index > 0 ? 0 : 1, paddingHorizontal: responsiveScreenWidth(18), color: colors.primary, backgroundColor: colors.white, }]}>Next</Text>
+        <Text onPress={onNext} style={[styles.pressed, { flex:  index > 0&& index !==lastIndex ? 0 : 1, paddingHorizontal: responsiveScreenWidth(18), color: colors.primary, backgroundColor: colors.white, }]}>{index !==lastIndex?"Next":"Get Started"}</Text>
       </View>
     );
   }
@@ -100,16 +104,28 @@ const Welcome = () => {
   const welcomeScreen = [
     {
       _id: "",
-      imageUrl: "",
+      imageUrl: require('./one.png'),
       title: "Search your job",
       description: "Figure out your top five priorities whether it is company culture, salary."
     },
     {
       _id: "",
-      imageUrl: "",
-      title: "Search your job121",
-      description: "Figure out your top five priorities whether it is company culture, salary."
-    }
+      imageUrl: require('./two.png'),
+      title: "Browser Job List",
+      description: "Our job list include several  industries, so you can find the best job for you."
+    },
+    {
+      _id: "",
+     imageUrl: require('./three.png'),
+      title: "Apply Best Jobs",
+      description: "You can apply to your desirable jobs very quickly and easily with ease."
+    },
+    {
+      _id: "",
+      imageUrl: require('./four.png'),
+      title: "Let’s Get Started",
+      description: "Find your next opportunity or the perfect hire today"
+    },
   ]
   useEffect(() => {
     if (index < welcomeScreen.length) {
@@ -122,7 +138,7 @@ const Welcome = () => {
   }, [index, welcomeScreen.length]);
   const keyExtractor = useCallback((item: WelcomeScreenItem, index: number) => `${routes.WELCOME},welcome,${index}`, []);
   const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<WelcomeScreenItem>) => <WelcomeItem item={item} />,
+    ({ item  }: ListRenderItemInfo<WelcomeScreenItem>) => <WelcomeItem  item={item} />,
     []
   );
   const handleNext = () => {
@@ -163,11 +179,11 @@ const Welcome = () => {
             keyExtractor={keyExtractor}
             renderItem={renderItem}
           />
-
           <Footer
             onNext={handleNext}
             onSkip={handleSkip}
             index={index}
+            lastIndex={welcomeScreen.length - 1}
           />
         </View>
 
@@ -187,7 +203,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: responsiveScreenWidth(100),
-    height: responsiveScreenHeight(60),
+    marginTop: responsiveScreenHeight(5),
   },
   title: {
     marginTop: responsiveScreenHeight(2),
@@ -199,8 +215,9 @@ const styles = StyleSheet.create({
   description: {
     maxWidth: responsiveScreenWidth(80),
     textAlign: 'center',
-    fontSize: responsiveScreenFontSize(2.2),
+    fontSize: responsiveScreenFontSize(1.95),
     fontWeight: '500',
+    textTransform: 'capitalize',
   },
   indicatorContainer: {
     flexDirection: 'row',
@@ -221,6 +238,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "stretch",
     gap: responsiveScreenWidth(3),
+    marginBottom: responsiveScreenHeight(4),
   },
   pressed: {
     textAlign: "center",

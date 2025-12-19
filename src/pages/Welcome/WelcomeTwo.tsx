@@ -2,7 +2,7 @@ import React, { ReactNode, useContext, useState } from 'react';
 import {
   Image,
   ImageSourcePropType,
-  Pressable,
+  TouchableOpacity,
   StyleSheet,
   Text,
   View,
@@ -31,7 +31,7 @@ export const SocialButton = React.memo(
   ({ logo, children, height = "auto" }: { logo: ImageSourcePropType; children?: ReactNode, height?: number | "auto" }) => {
     const { colors } = useContext(ThemeContext);
     return (
-      <Pressable style={[styles.socialButton, { backgroundColor: colors.lightBlue, maxHeight: height }]}>
+      <TouchableOpacity style={[styles.socialButton, { backgroundColor: colors.lightBlue, maxHeight: height }]}>
         <Image source={logo} style={styles.socialLogo} />
         {
           children &&
@@ -39,7 +39,7 @@ export const SocialButton = React.memo(
             {children}
           </Text>
         }
-      </Pressable>
+      </TouchableOpacity>
     );
   }
 );
@@ -61,7 +61,7 @@ const WelcomeTwo = () => {
   const [role, setRole] = useState<"seeker" | "recruiter">()
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[styles.title, { color: colors.textPrimary }]}>
+      <Text style={[styles.title, { color: colors.textPrimary, marginTop: responsiveScreenHeight(6) }]}>
         What is your Role?
       </Text>
       <Text style={[{
@@ -72,7 +72,7 @@ const WelcomeTwo = () => {
       }]}>
         select your role to personalize your journey and unlock more features.
       </Text>
-      <View style={{ marginTop: responsiveScreenHeight(2), backgroundColor: colors.surfaces, borderRadius: 10, paddingVertical: responsiveScreenHeight(1.5), paddingHorizontal: responsiveScreenWidth(4) }}>
+      <View style={{ marginTop: responsiveScreenHeight(2), backgroundColor:  colors.surfaces, borderRadius: 15, paddingVertical: responsiveScreenHeight(1.5), paddingHorizontal: responsiveScreenWidth(4), borderColor:role === "seeker"?colors.primary:colors.surfaces, borderWidth:2  }}>
         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
           <Text style={[styles.title, { marginTop: 0, color: colors.textPrimary, fontSize: responsiveScreenFontSize(2), }]}>
             Job seeker
@@ -94,7 +94,7 @@ const WelcomeTwo = () => {
           Join as a Job Seeker to explore opportunities, connect with employers, and build your successful career.
         </Text>
       </View>
-      <View style={{ marginTop: responsiveScreenHeight(2), backgroundColor: colors.surfaces, borderRadius: 10, paddingVertical: responsiveScreenHeight(1.5), paddingHorizontal: responsiveScreenWidth(4) }}>
+      <View style={{ marginTop: responsiveScreenHeight(2),borderColor:role === "recruiter"?colors.primary:colors.surfaces, borderWidth:2  , backgroundColor: colors.surfaces, borderRadius: 15, paddingVertical: responsiveScreenHeight(1.5), paddingHorizontal: responsiveScreenWidth(4) }}>
         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
           <Text style={[styles.title, { marginTop: 0, color: colors.textPrimary, fontSize: responsiveScreenFontSize(2), }]}>
             Recruiter
@@ -119,7 +119,7 @@ const WelcomeTwo = () => {
         </Text>
       </View>
       <View style={{ flex: 1 }}></View>
-      <Button label='Next' isActive={role ? true : false} onPress={() => { role ==="seeker"?navigation.navigate(routes.HOME): role&& navigation.navigate(routes.LOGIN) }} style={{ marginBottom: responsiveScreenHeight(5), }} />
+      <Button label='Next' isActive={role ? true : false} onPress={() => { role ==="seeker"?navigation.navigate(routes.HOME): role&& navigation.navigate(routes.LOGIN) }} style={{ marginBottom: responsiveScreenHeight(9), }} />
     </View>
   );
 };

@@ -6,7 +6,6 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
@@ -37,6 +36,8 @@ import {
   Update,
 } from '../../reducer/jobsReducer';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import Text from '../../components/Text';
+import Icon from '../../utils/Icon';
 
 const PersonalInfo = () => {
   const { colors } = useContext(ThemeContext);
@@ -1219,6 +1220,9 @@ export const CustomDropdown = ({
           paddingHorizontal: responsiveScreenWidth(3),
           paddingVertical: responsiveScreenHeight(1.3),
           marginTop: responsiveScreenHeight(1),
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}
       >
         <Text
@@ -1229,6 +1233,7 @@ export const CustomDropdown = ({
         >
           {selectedLabel || placeholder}
         </Text>
+        <Image source={imagePath.angle}/>
       </TouchableOpacity>
 
       <Modal visible={visible} transparent animationType="fade">

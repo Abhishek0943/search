@@ -233,7 +233,7 @@ const WorkExperienceForm = () => {
               textAlign: 'center',
               fontSize: responsiveScreenFontSize(2),
               color: colors.textPrimary,
-              fontWeight: '600',
+              fontWeight: '800',
             }}
           >
             {data?.id ? "Edit Experience" : "Add New Experience"}

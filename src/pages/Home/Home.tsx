@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { Button, FlatList, Image, ImageBackground, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Button, FlatList, Image, ImageBackground, ScrollView, TextInput, TouchableOpacity, View } from 'react-native';
 import { NavigationBar, PageSlider, PostList, UserImage } from '../../components';
 import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions';
 import { ThemeContext } from '../../context/ThemeProvider';
@@ -10,12 +10,14 @@ import { useAppDispatch, useAppSelector } from '../../store';
 import { GetRecentJobs, GetSuggestedJobs, } from '../../reducer/jobsReducer';
 import imagePath from '../../assets/imagePath';
 import { formatSalaryRange } from '../../utils';
+import Text from '../../components/Text';
 function Home() {
   const { colors } = useContext(ThemeContext)
   const navigation: NavigationProp<ParamListBase> = useNavigation()
   const { user } = useAppSelector(state => state.userStore)
   const [suggestedJob, setSuggestedJob] = useState<Job[]>([])
   const [recentJob, setRecentJob] = useState<Job[]>([])
+  const [search, setSearch] = useState<string>("")
   const dispatch = useAppDispatch()
   useEffect(() => {
     dispatch(GetSuggestedJobs()).unwrap().then(res => {
@@ -50,27 +52,27 @@ function Home() {
                 <Image source={imagePath.logo} style={{ height: "100%", width: "37%", resizeMode: "contain", }} />
               </View>
               <View style={{ position: "relative", marginHorizontal: responsiveScreenWidth(5), marginVertical: responsiveScreenHeight(2), height: responsiveScreenHeight(5), flexDirection: "row", gap: responsiveScreenWidth(3) }}>
-                <Pressable style={{ flex: 1, }} onPress={() => navigation.navigate(routes.SEARCH)}>
+                <TouchableOpacity style={{ flex: 1, }} onPress={() => navigation.navigate(routes.SEARCH)}>
                   <Image source={imagePath.homeSearch} style={{ height: "100%", width: "100%", resizeMode: "stretch", }} />
-                </Pressable>
-                <Image source={imagePath.filter} style={{ height: "100%", resizeMode: "contain", }} />
+                </TouchableOpacity>
+                {/* <Image source={imagePath.filter} style={{ height: "100%", resizeMode: "contain", }} /> */}
               </View>
               <View style={{ position: "relative", marginHorizontal: responsiveScreenWidth(5), marginVertical: responsiveScreenHeight(2), flexDirection: "row", gap: responsiveScreenWidth(3) }}>
                 <Image source={imagePath.homeText} style={{ width: "100%", }} />
               </View>
               <View style={{ marginHorizontal: responsiveScreenWidth(5), flexDirection: "row", gap: responsiveScreenHeight(2), marginTop: responsiveScreenHeight(1) }}>
-                <Pressable onPress={() => navigation.navigate(routes.SIGNUP)} style={{ flex: 1, justifyContent: "center", borderRadius: 10, gap: responsiveScreenWidth(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.primary, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(.7) }}>
+                <TouchableOpacity onPress={() => navigation.navigate(routes.SIGNUP)} style={{ flex: 1, justifyContent: "center", borderRadius: 10, gap: responsiveScreenWidth(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.primary, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(.7) }}>
                   <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Register</Text>
-                </Pressable>
-                <Pressable onPress={() => navigation.navigate(routes.LOGIN)} style={{ flex: 1, justifyContent: "center", borderWidth: 1, borderColor: colors.primary, borderRadius: 10, gap: responsiveScreenWidth(1), flexDirection: "row", alignItems: "center", backgroundColor: "transparent", paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(1.2) }}>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate(routes.LOGIN)} style={{ flex: 1, justifyContent: "center", borderWidth: 1, borderColor: colors.primary, borderRadius: 10, gap: responsiveScreenWidth(1), flexDirection: "row", alignItems: "center", backgroundColor: "transparent", paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(1.2) }}>
                   <Text style={{ color: colors.primary, fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Log In</Text>
-                </Pressable>
+                </TouchableOpacity>
               </View>
               <View style={{ backgroundColor: "white", paddingVertical: responsiveScreenHeight(2), paddingHorizontal: responsiveScreenWidth(4), borderRadius: 10, marginHorizontal: responsiveScreenWidth(5), marginTop: responsiveScreenHeight(5),elevation:6 }}>
                 <Text style={{ fontSize: responsiveScreenFontSize(2.4), fontWeight: "700" }}>Find your dream job!</Text>
                 <TextInput
-                  // value={formData.experienceTitle}
-                  // onChangeText={t => handleChange('experienceTitle', t)}
+                  value={search}
+                  onChangeText={t =>setSearch(t)}
                   style={{
                     borderWidth: 1,
                     width: '100%',
@@ -83,10 +85,11 @@ function Home() {
                     marginTop: responsiveScreenHeight(2),
                   }}
                   placeholderTextColor={colors.gray}
-                  placeholder="e.g., React Native Developer"
+                  placeholder="Enter skills, designation, companies"
                 />
-                 <Pressable
+                 <TouchableOpacity
                           // onPress={onSubmit}
+                          onPress={()=>navigation.navigate(routes.SEARCH, {search:search})}
                           style={{
                             width: '100%',
                             justifyContent: 'center',
@@ -103,7 +106,7 @@ function Home() {
                           <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8) }}>
                          Search Job
                           </Text>
-                        </Pressable>
+                        </TouchableOpacity>
               </View>
 
             </ImageBackground>
@@ -113,9 +116,9 @@ function Home() {
                 <Image source={imagePath.logo} style={{ height: "100%", width: "37%", resizeMode: "contain", }} />
               </View>
               <View style={{ position: "relative", marginVertical: responsiveScreenHeight(2), height: responsiveScreenHeight(5), flexDirection: "row", gap: responsiveScreenWidth(3) }}>
-                <Pressable style={{ flex: 1, }} onPress={() => navigation.navigate(routes.SEARCH)}>
+                <TouchableOpacity style={{ flex: 1, }} onPress={() => navigation.navigate(routes.SEARCH)}>
                   <Image source={imagePath.homeSearch} style={{ height: "100%", width: "100%", resizeMode: "stretch", }} />
-                </Pressable>
+                </TouchableOpacity>
                 <Image source={imagePath.filter} style={{ height: "100%", resizeMode: "contain", }} />
               </View>
 
@@ -124,9 +127,9 @@ function Home() {
               </View>
               <Text style={{ fontSize: responsiveScreenFontSize(2.4), fontWeight: "600", textTransform: "capitalize", marginTop: responsiveScreenHeight(1) }}>browser by jobs</Text>
               <View style={{ flexDirection: "row", marginTop: responsiveScreenHeight(1), gap: responsiveScreenWidth(2) }}>
-                <Pressable onPress={() => navigation.navigate(routes.COMPANY)} style={{ flex: 1, maxHeight: responsiveScreenHeight(13.5) }}>
+                <TouchableOpacity onPress={() => navigation.navigate(routes.COMPANY)} style={{ flex: 1, maxHeight: responsiveScreenHeight(13.5) }}>
                   <Image source={imagePath.jobtype1} style={{ height: "100%", resizeMode: "contain", width: "100%", }} />
-                </Pressable>
+                </TouchableOpacity>
                 <View style={{ flex: 1, maxHeight: responsiveScreenHeight(13.5) }}>
                   <Image source={imagePath.jobtype2} style={{ height: "100%", resizeMode: "contain", width: "100%", }} />
                 </View>
@@ -145,14 +148,14 @@ function Home() {
                 return (
                   <>
                     <View style={{ paddingVertical: responsiveScreenHeight(1.5), paddingHorizontal: responsiveScreenWidth(3), width: responsiveScreenWidth(75), backgroundColor: colors.white, elevation: 4, margin: 10, borderRadius: 15 }}>
-                      <View style={{ flexDirection: "row", gap: responsiveScreenWidth(1), justifyContent: "space-between", alignItems: "center" }}>
-                        <View style={{ borderRadius: 6, height: responsiveScreenHeight(6), overflow: "hidden", backgroundColor: "#CECECE38" }}>
+                      <View style={{ flexDirection: "row", gap: responsiveScreenWidth(2), justifyContent: "space-between", alignItems: "flex-start" }}>
+                        <View style={{ borderRadius: 6, height: responsiveScreenHeight(5), overflow: "hidden", backgroundColor: "#CECECE38" }}>
                           <Image source={{ uri: item.company_info.image }} style={{ height: "100%", aspectRatio: 1 }} />
                         </View>
-                        <Pressable onPress={() => { navigation.navigate(routes.JOBDETAIL, { id: item.id }) }} style={{ flex: 1 }}>
+                        <TouchableOpacity  onPress={() => { navigation.navigate(routes.JOBDETAIL, { id: item.id }) }} style={{ flex: 1 , gap: responsiveScreenHeight(0.5) }}>
                           <Text numberOfLines={1} style={{ textTransform: "capitalize", fontSize: responsiveScreenFontSize(1.8), fontWeight: "400" }} >{item.company_info.name}</Text>
                           <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>{item.title}</Text>
-                        </Pressable>
+                        </TouchableOpacity>
                         <View >
                           <Image source={imagePath.bookmark} />
                         </View>
@@ -188,14 +191,14 @@ function Home() {
               <FlatList scrollEnabled={false} contentContainerStyle={{ gap: responsiveScreenHeight(1), marginVertical: responsiveScreenHeight(1) }} data={recentJob} renderItem={({ item, index }) => {
                 return (
                   <>
-                    <View style={{ paddingVertical: responsiveScreenHeight(1), paddingHorizontal: responsiveScreenWidth(2), backgroundColor: "#F5F5F5", borderRadius: 15 }}>
-                      <View style={{ flexDirection: "row", gap: responsiveScreenWidth(1), justifyContent: "space-between", alignItems: "center" }}>
+                    <View style={{ paddingVertical: responsiveScreenHeight(1),height:responsiveScreenHeight(10),justifyContent:"center", paddingHorizontal: responsiveScreenWidth(2), backgroundColor: "#F5F5F5", borderRadius: 15 }}>
+                      <View style={{ flexDirection: "row", gap: responsiveScreenWidth(3), justifyContent: "space-between", alignItems: "flex-start" }}>
                         <View style={{ borderRadius: 6, height: responsiveScreenHeight(6), overflow: "hidden", backgroundColor: "#CECECE38" }}>
                           <Image source={{ uri: item.company_info.image }} style={{ height: "100%", aspectRatio: 1 }} />
                         </View>
-                        <View style={{ flex: 1 }}>
+                        <View style={{ flex: 1 , gap: responsiveScreenHeight(1.2)}}>
                           <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "700" }}>{item.title}</Text>
-                          <View style={{ flexDirection: "row", gap: responsiveScreenWidth(2) }}>
+                          <View style={{ flexDirection: "row", gap: responsiveScreenWidth(3) }}>
                             <View style={{ flexDirection: "row", gap: responsiveScreenWidth(1) }}>
                               <Image source={imagePath.box} />
                               <Text style={{ color: colors.textPrimary, fontSize: responsiveScreenFontSize(1.6) }}>{item.company_info.name}</Text>
@@ -206,9 +209,9 @@ function Home() {
                             </View>
                           </View>
                         </View>
-                        <Pressable onPress={() => { navigation.navigate(routes.JOBDETAIL, { id: item.id }) }} style={{ borderRadius: 6, gap: responsiveScreenWidth(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.primary, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(.7) }}>
+                        <TouchableOpacity onPress={() => { navigation.navigate(routes.JOBDETAIL, { id: item.id }) }} style={{alignSelf:"stretch",marginVertical: responsiveScreenHeight(0.5), borderRadius: 6, gap: responsiveScreenWidth(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.primary, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(.7) }}>
                           <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8) }}>View</Text>
-                        </Pressable>
+                        </TouchableOpacity>
                       </View>
                     </View>
                   </>

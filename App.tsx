@@ -6,6 +6,7 @@ import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-c
 import Routes from "./src/navigation/Routes";
 import { WrapperContainer } from "./src/components";
 import { enableScreens } from 'react-native-screens';
+
 enableScreens(true);
 
 const AppContent: React.FC = React.memo(() => {

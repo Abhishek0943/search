@@ -10,7 +10,6 @@ import {
   FlatList,
   Image,
   Modal,
-  Pressable,
   ScrollView,
   Text,
   TextInput,
@@ -81,12 +80,12 @@ const Search = () => {
           paddingHorizontal: responsiveScreenWidth(5)
         }}>
           {
-            activeFilter ? <Pressable onPress={() => setActiveFilter(false)}>
+            activeFilter ? <TouchableOpacity onPress={() => setActiveFilter(false)}>
               <Image source={imagePath.cross} style={{ resizeMode: "contain", }} />
-            </Pressable> :
-              <Pressable >
+            </TouchableOpacity> :
+              <TouchableOpacity >
                 <Image source={imagePath.backIcon} style={{ resizeMode: "contain", }} />
-              </Pressable>
+              </TouchableOpacity>
           }
           <Text style={{ flex: 1, textAlign: "center", fontSize: responsiveScreenFontSize(2), color: colors.textPrimary, fontWeight: "600" }}>{activeFilter ? "Filter" : "Search Job"}</Text>
           <Image source={imagePath.backIcon} style={{ opacity: 0, resizeMode: "contain", }} />
@@ -181,7 +180,7 @@ const Search = () => {
                     )
                   }} />
               }
-              <Pressable
+              <TouchableOpacity
                 onPress={() => {
                   setActiveFilter(false)
                   setFilter(temFilter)
@@ -203,11 +202,11 @@ const Search = () => {
                 <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8) }}>
                   Apply Filter
                 </Text>
-              </Pressable>
+              </TouchableOpacity>
 
             </View> : <>
               <View style={{ flexDirection: "row", marginTop: responsiveScreenHeight(1), gap: responsiveScreenWidth(2), alignItems: "center", width: responsiveScreenWidth(90), marginHorizontal: "auto" }}>
-                <Pressable
+                <TouchableOpacity
                   style={{
                     borderWidth: 1,
                     flex: 1,
@@ -220,9 +219,9 @@ const Search = () => {
                     paddingHorizontal: responsiveScreenWidth(2),
                     paddingVertical: responsiveScreenHeight(1.2),
                   }}>
-                  <Pressable onPress={() => setActiveSearch(false)}>
+                  <TouchableOpacity onPress={() => setActiveSearch(false)}>
                     <Image style={{}} source={imagePath.search} />
-                  </Pressable>
+                  </TouchableOpacity>
                   <TextInput
                     value={search}
                     onFocus={() => { setActiveSearch(true) }}
@@ -236,14 +235,14 @@ const Search = () => {
                       fontSize: responsiveScreenFontSize(1.8),
                     }}
                   />
-                </Pressable>
+                </TouchableOpacity>
 
-                <Pressable onPress={() => {
+                <TouchableOpacity onPress={() => {
                   setTemFilter(filter)
                   setActiveFilter(true)
                 }} style={{ maxHeight: responsiveScreenHeight(6) }} >
                   <Image source={imagePath.filter} style={{ height: "100%", resizeMode: "contain", }} />
-                </Pressable>
+                </TouchableOpacity>
               </View>
               {
                 activeSearch ? <>
@@ -258,15 +257,15 @@ const Search = () => {
                     <FlatList scrollEnabled={false} style={{ width: responsiveScreenWidth(94), marginHorizontal: "auto" }} data={job} renderItem={({ item, index }) => {
                       return (
                         <>
-                          <Pressable style={{ paddingVertical: responsiveScreenHeight(1.5), paddingHorizontal: responsiveScreenWidth(3), backgroundColor: colors.white, elevation: 4, margin: 10, borderRadius: 15 }}>
+                          <TouchableOpacity style={{ paddingVertical: responsiveScreenHeight(1.5), paddingHorizontal: responsiveScreenWidth(3), backgroundColor: colors.white, elevation: 4, margin: 10, borderRadius: 15 }}>
                             <View style={{ flexDirection: "row", gap: responsiveScreenWidth(1), justifyContent: "space-between", alignItems: "center" }}>
                               <View style={{ borderRadius: 6, height: responsiveScreenHeight(6), overflow: "hidden", backgroundColor: "#CECECE38" }}>
                                 <Image source={{ uri: item.company_info.image }} style={{ height: "100%", aspectRatio: 1 }} />
                               </View>
-                              <Pressable onPress={() => navigation.navigate(routes.JOBDETAIL, { id: item.id })} style={{ flex: 1 }}>
+                              <TouchableOpacity onPress={() => navigation.navigate(routes.JOBDETAIL, { id: item.id })} style={{ flex: 1 }}>
                                 <Text numberOfLines={1} style={{ textTransform: "capitalize", fontSize: responsiveScreenFontSize(1.8), fontWeight: "400" }} >{item.company_info.name}</Text>
                                 <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>{item.title}</Text>
-                              </Pressable>
+                              </TouchableOpacity>
                               <View >
                                 <Image source={imagePath.bookmark} />
                               </View>
@@ -291,7 +290,7 @@ const Search = () => {
                                 <Icon icon={{ type: "Feather", name: 'arrow-right' }} style={{ color: colors.white, fontSize: responsiveScreenFontSize(2) }} />
                               </View>
                             </View>
-                          </Pressable>
+                          </TouchableOpacity>
                         </>
                       )
                     }} />

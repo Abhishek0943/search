@@ -53,7 +53,7 @@ const Education = () => {
           }}
         >
           <Pressable onPress={() => navigation.goBack()}>
-            <Image source={imagePath.backIcon} style={{ resizeMode: 'contain' }} />
+            <Image source={imagePath.backIcon} style={{ resizeMode: 'contain', transform:[{scale:1.1}] }} />
           </Pressable>
           <Text
             style={{
@@ -66,7 +66,7 @@ const Education = () => {
           >
             Education
           </Text>
-          <Image source={imagePath.backIcon} style={{ opacity: 0, resizeMode: 'contain' }} />
+          <Image source={imagePath.backIcon} style={{ opacity: 0, resizeMode: 'contain', transform:[{scale:1.1}] }} />
         </View>
         <View>
 
@@ -177,17 +177,17 @@ function CvCard({
             </Pressable>
           </View>
         </View>
-        <Text>{item.date_completion} - {item.country.country} - {item.state.state}</Text>
+        <Text style={{ marginTop: responsiveScreenHeight(1) }}>{item.date_completion} - {item.country.country} - {item.state.state}</Text>
 
         <View style={[styles.metaRow, { gap: responsiveScreenWidth(2), marginTop: responsiveScreenHeight(1) }]}>
           <Image source={imagePath.education} />
           <Text style={[styles.metaText, { fontSize: responsiveScreenFontSize(1.8), color: colors.textSecondary, fontWeight: "600", }]}>{item.majorSubjects.map((e)=>`${e.name},`)}</Text>
         </View>
-        <View style={[styles.metaRow, { gap: responsiveScreenWidth(2), }]}>
+        <View style={[styles.metaRow, { gap: responsiveScreenWidth(2),  marginTop: responsiveScreenHeight(.8)}]}>
           <Image source={imagePath.location2} />
           <Text style={[styles.metaText, { fontSize: responsiveScreenFontSize(1.8), color: colors.textSecondary, fontWeight: "600", }]}>{item.country.country} - {item.state.state}</Text>
         </View>
-        <View style={[styles.metaRow, { gap: responsiveScreenWidth(2) }]}>
+        <View style={[styles.metaRow, { gap: responsiveScreenWidth(2),  marginTop: responsiveScreenHeight(.8) }]}>
           <Image source={imagePath.company3} />
           <Text style={[styles.metaText, { fontSize: responsiveScreenFontSize(1.8), color: colors.textSecondary, fontWeight: "600", }]}>{item.institution}</Text>
         </View>

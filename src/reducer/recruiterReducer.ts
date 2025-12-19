@@ -36,6 +36,10 @@ export const RecruiterProfile = createAsyncThunk<{ success: true, topic: TopicIt
   'RecruiterProfile',
   () => getApiCall<{ success: true, topic: TopicItem[], token: string }>('/auth/companies/me'),
 );
+export const RecruiterPlans = createAsyncThunk<{ success: true, topic: TopicItem[], } | ErrorResponse>(
+  'RecruiterPlans',
+  () => getApiCall<{ success: true, topic: TopicItem[], token: string }>('/company/plans'),
+);
 export const RecruiterLoginByPassword = createAsyncThunk<{ success: true, recruiter: Recruiter, token: string } | ErrorResponse, { email: string, password: string }>(
   'RecruiterLoginByPassword',
   (body) => postApiCall<{ success: true, recruiter: Recruiter, token: string }>('/auth/companies/login', body),
@@ -45,7 +49,7 @@ export const GetCandidates = createAsyncThunk<
 >(
   'GetCandidates',
   () => {
-    return getApiCall<{ success: true, data: User }>('/company/candidate-filters');
+    return getApiCall<{ success: true, data: User }>('/company/find-candidates');
   }
 );
 const initialState: RecruiterInitialState = {

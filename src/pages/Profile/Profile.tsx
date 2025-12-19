@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Image, Pressable, ImageBackground, TouchableOpacity } from 'react-native'
+import { View, Text, ScrollView, Image, TouchableOpacity, ImageBackground } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { routes } from '../../constants/values'
 import { NavigationBar } from '../../components'
@@ -67,12 +67,12 @@ const Profile = () => {
                             <Image source={imagePath.image1} />
                             <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "600", textAlign: "center", width: responsiveScreenWidth(80) }}>You’re not logged in. Please log in to access this feature</Text>
                             <View style={{marginHorizontal:responsiveScreenWidth(5), flexDirection: "row", gap: responsiveScreenHeight(2), marginTop: responsiveScreenHeight(2) }}>
-                                <Pressable onPress={() => navigation.navigate(routes.SIGNUP)} style={{ flex: 1, justifyContent: "center", borderRadius: 6, gap: responsiveScreenWidth(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.primary, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(.7) }}>
+                                <TouchableOpacity onPress={() => navigation.navigate(routes.SIGNUP)} style={{ flex: 1, justifyContent: "center", borderRadius: 6, gap: responsiveScreenWidth(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.primary, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(.7) }}>
                                     <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8) }}>Register</Text>
-                                </Pressable>
-                                <Pressable onPress={() => navigation.navigate(routes.LOGIN)} style={{ flex: 1, justifyContent: "center", borderWidth: 1, borderColor: colors.primary, borderRadius: 6, gap: responsiveScreenWidth(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.white, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(1.2) }}>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => navigation.navigate(routes.LOGIN)} style={{ flex: 1, justifyContent: "center", borderWidth: 1, borderColor: colors.primary, borderRadius: 6, gap: responsiveScreenWidth(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.white, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(1.2) }}>
                                     <Text style={{ color: colors.primary, fontSize: responsiveScreenFontSize(1.8) }}>Log In</Text>
-                                </Pressable>
+                                </TouchableOpacity>
                             </View>
                         </> : profile?.id &&
                         <>
@@ -109,34 +109,34 @@ const Profile = () => {
                                         </View>
                                     </View>
                                 </ImageBackground>
-                                <Pressable onPress={() => navigation.navigate(routes.PERSONALINFO, { ...profile })} style={{ width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(15), alignItems: "center", gap: responsiveScreenHeight(1) }}>
+                                <TouchableOpacity onPress={() => navigation.navigate(routes.PERSONALINFO, { ...profile })} style={{ width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(15), alignItems: "center", gap: responsiveScreenHeight(1) }}>
                                     <Image style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} tintColor={colors.textPrimary} source={imagePath.profile} />
                                     <Text style={{ fontSize: responsiveScreenFontSize(2) }}>Personal Information</Text>
-                                </Pressable>
-                                <Pressable onPress={() => navigation.navigate(routes.WORKEXPERIENCE)} style={{ width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => navigation.navigate(routes.WORKEXPERIENCE)} style={{ width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
                                     <Image tintColor={colors.textPrimary} style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} source={imagePath.bag} />
                                     <Text style={{ fontSize: responsiveScreenFontSize(2) }}>Work Experience</Text>
-                                </Pressable>
-                                <Pressable onPress={() => navigation.navigate(routes.EDUCATION)} style={{ width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => navigation.navigate(routes.EDUCATION)} style={{ width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
                                     <Image tintColor={colors.textPrimary} style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} source={imagePath.bag} />
                                     <Text style={{ fontSize: responsiveScreenFontSize(2) }}>Education</Text>
-                                </Pressable>
-                                <Pressable onPress={() => navigation.navigate(routes.CV)} style={{ width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => navigation.navigate(routes.CV)} style={{ width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
                                     <Image tintColor={colors.textPrimary} style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} source={imagePath.bag} />
                                     <Text style={{ fontSize: responsiveScreenFontSize(2) }}>Add CV</Text>
-                                </Pressable>
-                                <Pressable onPress={() => navigation.navigate(routes.PROJECT)} style={{ width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => navigation.navigate(routes.PROJECT)} style={{ width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
                                     <Image tintColor={colors.textPrimary} style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} source={imagePath.bag} />
                                     <Text style={{ fontSize: responsiveScreenFontSize(2) }}>Project</Text>
-                                </Pressable>
-                                <Pressable onPress={() => navigation.navigate(routes.SKILL)} style={{ width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => navigation.navigate(routes.SKILL)} style={{ width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
                                     <Image tintColor={colors.textPrimary} style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} source={imagePath.bag} />
                                     <Text style={{ fontSize: responsiveScreenFontSize(2) }}>Skills</Text>
-                                </Pressable>
-                                <Pressable onPress={() => navigation.navigate(routes.LANGUAGE)} style={{ width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => navigation.navigate(routes.LANGUAGE)} style={{ width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
                                     <Image tintColor={colors.textPrimary} style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} source={imagePath.bag} />
                                     <Text style={{ fontSize: responsiveScreenFontSize(2) }}>Language</Text>
-                                </Pressable>
+                                </TouchableOpacity>
 
 
                             </View>

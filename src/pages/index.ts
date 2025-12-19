@@ -31,4 +31,5 @@ export { default as Notification } from "./Notification/Notification"
 export { default as RecruiterHome } from "../recruiter/pages/Home/RecruiterHome"
 export { default as Candidate } from "../recruiter/pages/Candidate/Candidate"
 export { default as AddJob } from "../recruiter/pages/AddJob/AddJob"
+export { default as RecruiterProfile } from "../recruiter/pages/Profile/Profile"
 

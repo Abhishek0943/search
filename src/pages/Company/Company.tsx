@@ -1,4 +1,4 @@
-import { FlatList, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { FlatList, Image, TouchableOpacity, ScrollView, StyleSheet,View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { NavigationBar } from '../../components'
 import { routes } from '../../constants/values'
@@ -9,6 +9,7 @@ import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/
 import { useAppDispatch } from '../../store'
 import { GetCompanies } from '../../reducer/jobsReducer'
 import Icon from '../../utils/Icon'
+import Text from '../../components/Text'
 
 const Company = () => {
   const { colors } = useContext(ThemeContext)
@@ -21,6 +22,7 @@ const Company = () => {
       if (res.success) {
         setJob(res.data)
       }
+      console.log(res.data)
     })
   }, [])
   return (
@@ -39,9 +41,9 @@ const Company = () => {
             paddingHorizontal: responsiveScreenWidth(5)
           }}
         >
-          <Pressable onPress={() => navigation.goBack()}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
             <Image source={imagePath.backIcon} style={{ resizeMode: 'contain' }} />
-          </Pressable>
+          </TouchableOpacity>
           <Text
             style={{
               flex: 1,
@@ -62,19 +64,19 @@ const Company = () => {
         <FlatList scrollEnabled={false} contentContainerStyle={{ marginHorizontal: responsiveScreenWidth(5), gap: responsiveScreenHeight(1), marginVertical: responsiveScreenHeight(1) }} data={job.companies} renderItem={({ item, index }) => {
           return (
             <>
-              <Pressable onPress={() => navigation.navigate(routes.COMPANYDETAILS, { id: item.id })} style={{ paddingVertical: responsiveScreenHeight(1), paddingHorizontal: responsiveScreenWidth(2), backgroundColor: "#F5F5F5", borderRadius: 15, gap: responsiveScreenHeight(1) }}>
-                <View style={{ flexDirection: "row", gap: responsiveScreenWidth(1), justifyContent: "space-between", alignItems: "center" }}>
+              <TouchableOpacity onPress={() => navigation.navigate(routes.COMPANYDETAILS, { id: item.id })} style={{ paddingVertical: responsiveScreenHeight(1.5), paddingHorizontal: responsiveScreenWidth(3), backgroundColor: "#F5F5F5", borderRadius: 15, gap: responsiveScreenHeight(1) }}>
+                <View style={{ flexDirection: "row", gap: responsiveScreenWidth(2), justifyContent: "space-between", alignItems: "center" }}>
                   <View style={{ borderRadius: 6, height: responsiveScreenHeight(3), overflow: "hidden", backgroundColor: "#CECECE38" }}>
                     <Image source={{ uri: item.logo }} style={{ height: "100%", aspectRatio: 1 }} />
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "500" }}>{item.name}</Text>
                   </View>
-                  <Pressable onPress={() => { navigation.navigate(routes.JOBDETAIL, { id: item.id }) }} style={{ borderRadius: 6, gap: responsiveScreenWidth(1), flexDirection: "row", alignItems: "center", }}>
+                  <TouchableOpacity onPress={() => { navigation.navigate(routes.JOBDETAIL, { id: item.id }) }} style={{ borderRadius: 6, gap: responsiveScreenWidth(1), flexDirection: "row", alignItems: "center", }}>
                     <Icon icon={{ type: "Ionicons", name: 'heart-outline' }} style={{ color: "#A9A9A9", fontSize: responsiveScreenFontSize(2.3) }} />
-                  </Pressable>
+                  </TouchableOpacity>
                 </View>
-                <Text style={{ color: colors.textPrimary, fontSize: responsiveScreenFontSize(2.4), fontWeight: "600" }}>Solution Engineering</Text>
+                <Text style={{ color: colors.textPrimary, fontSize: responsiveScreenFontSize(2.4), fontWeight: "700" }}>Solution Engineering</Text>
                 <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(1), }}>
                   <Image source={imagePath.star} />
                   <Text style={{ fontSize: responsiveScreenFontSize(1.5) }}>4.8(340 Review)</Text>
@@ -91,11 +93,12 @@ const Company = () => {
 
                 <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(1), }}>
                   <Image style={{ transform: [{ scale: .9 }] }} source={imagePath.bag} />
-                  <Text style={{ fontSize: responsiveScreenFontSize(1.8), color: colors.darkGray }}>Job Posts : 90</Text>
+                  <Text style={{ fontSize: responsiveScreenFontSize(1.8), color: colors.darkGray, flex:1 }}>Job Posts : {item.jobs_count}</Text>
+                  <Text style={{ fontSize: responsiveScreenFontSize(1.8), color: colors.darkGray }}>{item.latestJob.posted_at} ago</Text>
                 </View>
 
 
-              </Pressable>
+              </TouchableOpacity>
             </>
           )
         }} />

@@ -1,4 +1,4 @@
-import { View, Text, Pressable, Image } from 'react-native'
+import { View, Text, TouchableOpacity, Image } from 'react-native'
 import React, { useContext } from 'react'
 import RoutesType, { routes } from '../constants/values'
 import { responsiveScreenHeight } from 'react-native-responsive-dimensions'
@@ -25,7 +25,7 @@ const NavigationBar = ({ children,statusbar=true, name, navigationBar=true }: {n
         }, {
             name: "Chat",
             path: routes.CHAT,
-            icon: <Image source={name === routes.CHAT ? imagePath.activeCompany : imagePath.company} />
+            icon: <Image source={name === routes.CHAT ? imagePath.chat : imagePath.chat2} />
         }, {
             name: "Profile",
             path: routes.PROFILE,
@@ -44,10 +44,10 @@ const NavigationBar = ({ children,statusbar=true, name, navigationBar=true }: {n
                     route.map((e, i) => {
                         return (
 
-                            <Pressable key={e.path} onPress={() => navigation.navigate(e.path)} style={{ paddingVertical: responsiveScreenHeight(1), flex: 1, alignItems: "center", height: "100%", }}>
+                            <TouchableOpacity key={e.path} onPress={() => navigation.navigate(e.path)} style={{ paddingVertical: responsiveScreenHeight(1), flex: 1, alignItems: "center", height: "100%", }}>
                                 {e.icon}
                                 <Text style={{ color: e.path === name ? colors.black : colors.darkGray, fontWeight: e.path === name ? "900" : "400", }}>{e.name}</Text>
-                            </Pressable>
+                            </TouchableOpacity>
 
                         )
                     })

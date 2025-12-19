@@ -197,7 +197,7 @@ function CvCard({
                 </View>
             </View>
 
-            <Text style={[styles.subTitle, { fontSize: responsiveScreenFontSize(1.8), color: colors.textSecondary, fontWeight: "600", marginTop: responsiveScreenHeight(1) }]}>{isDefault ? "Default" : "Not Default"}</Text>
+            <Text style={[styles.subTitle, { fontSize: responsiveScreenFontSize(1.8), color: colors.textSecondary, fontWeight: "600", marginTop: responsiveScreenHeight(.8) }]}>{isDefault ? "Default" : "Not Default"}</Text>
 
             <View style={[styles.metaRow, { gap: responsiveScreenWidth(2) }]}>
                 <Image source={imagePath.calendar} />
@@ -242,6 +242,7 @@ export const styles = StyleSheet.create({
     metaRow: {
         flexDirection: "row",
         alignItems: "center",
+        marginTop: responsiveScreenHeight(.8),
     },
     metaIcon: {
         marginRight: 10,

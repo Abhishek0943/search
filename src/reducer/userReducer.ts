@@ -84,7 +84,8 @@ export const userSlice = createSlice({
       })
       .addCase(RecruiterProfile.fulfilled, (state, { payload }) => {
         if (payload.success) {
-          state.user = payload.data.company;
+          console.log("sdfsdfasdf",payload)
+          state.user = payload.data;
           state.isAuth = true
         }
       })
