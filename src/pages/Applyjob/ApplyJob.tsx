@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, TouchableHighlight } from 'react-native'
+import { View, ScrollView, Image, Pressable, TextInput, FlatList, TouchableHighlight, TouchableOpacity } from 'react-native'
 import React, { useCallback, useContext, useState } from 'react'
 import { NavigationBar } from '../../components'
 import { routes } from '../../constants/values'
@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from '../../store'
 import { GetJobApplication } from '../../reducer/jobsReducer'
 import { formatSalaryRange } from '../../utils'
 import Routes from '../../navigation/Routes'
+import Text from '../../components/Text'
 
 const ApplyJob = () => {
   const { colors } = useContext(ThemeContext);
@@ -28,13 +29,14 @@ const ApplyJob = () => {
           if (res.success !== false) {
             setCvs(res.data);
           }
+          console.log(res.data)
         });
     }, []),
   );
   return (
     <NavigationBar name={routes.APPLYJOB}>
 
-      <ScrollView style={{ flex: 1, }} contentContainerStyle={{flex:1}}>
+      <ScrollView style={{ flex: 1, }} contentContainerStyle={{ flex: 1 }}>
         <View
           style={{
             flexDirection: 'row',
@@ -54,7 +56,7 @@ const ApplyJob = () => {
               textAlign: 'left',
               fontSize: responsiveScreenFontSize(2),
               color: colors.textPrimary,
-              fontWeight: '600',
+              fontWeight: '800',
             }}
           >
             Your Application
@@ -67,7 +69,7 @@ const ApplyJob = () => {
           </TouchableHighlight>
         </View>
         {
-          !user || !user?.id ? <View style={{alignSelf:"center", flex: 1, justifyContent: "center", alignItems: "center" }}>
+          !user || !user?.id ? <View style={{ alignSelf: "center", flex: 1, justifyContent: "center", alignItems: "center" }}>
             <Image source={imagePath.image1} />
             <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "600", textAlign: "center", width: responsiveScreenWidth(80) }}>You’re not logged in. Please log in to access this feature</Text>
             <View style={{ marginHorizontal: responsiveScreenWidth(5), flexDirection: "row", gap: responsiveScreenHeight(2), marginTop: responsiveScreenHeight(2) }}>
@@ -107,11 +109,14 @@ const ApplyJob = () => {
                 style={{
                   flex: 1,
                   margin: 0,
-                  padding: 0,
-                  fontSize: responsiveScreenFontSize(1.8),
+                  padding: 0,                 fontSize: responsiveScreenFontSize(1.8),
                 }}
               />
             </Pressable>
+            {
+                      cvs?.meta?.total_jobs > 0 &&
+                      <Text style={{ marginTop: responsiveScreenHeight(2), marginHorizontal: responsiveScreenWidth(5), fontSize: responsiveScreenFontSize(1.8), fontWeight: "700", color: colors.textPrimary, }}>{cvs?.meta?.total_jobs} Jobs Find</Text>
+                    }
             <FlatList scrollEnabled={false} contentContainerStyle={{ marginTop: responsiveScreenHeight(2), gap: responsiveScreenHeight(1), width: responsiveScreenWidth(90), marginHorizontal: "auto", marginVertical: responsiveScreenHeight(1) }} data={cvs.jobs} renderItem={({ item, index }) => {
               return (
                 <>
@@ -142,7 +147,61 @@ const ApplyJob = () => {
                       </View>
                       {/* <Pressable onPress={() => { navigation.navigate(routes.JOBDETAIL, { id: item.id }) }} style={{ borderRadius: 6, gap: responsiveScreenWidth(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.primary, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(.7) }}>
                     <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8) }}>View</Text>
-                  </Pressable> */}
+                    </Pressable> */}
+                    </View>
+                    <View style={{ flexDirection: "row", gap: responsiveScreenWidth(2), justifyContent: "flex-start" }}>
+                      <TouchableOpacity
+                        onPress={() => navigation.goBack()}
+                        style={{
+                          flex:1,  
+                          justifyContent: 'center',
+                          marginTop: responsiveScreenHeight(2),
+                          borderRadius: 15,
+                          gap: responsiveScreenWidth(1),
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          backgroundColor: colors.lightGrayNatural,
+                          paddingHorizontal: responsiveScreenWidth(3),
+                          paddingVertical: responsiveScreenHeight(1.5),
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: colors.darkGray,
+                            fontSize: responsiveScreenFontSize(1.8),
+                            textTransform: 'capitalize',
+                            fontWeight: '800',
+                          }}
+                        >
+                          {item.status}
+                        </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => navigation.goBack()}
+                        style={{
+
+flex:1,                              justifyContent: 'center',
+                          marginTop: responsiveScreenHeight(2),
+                          borderRadius: 15,
+                          gap: responsiveScreenWidth(1),
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          backgroundColor: "#E9F0FF",
+                          paddingHorizontal: responsiveScreenWidth(3),
+                          paddingVertical: responsiveScreenHeight(1.5),
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: colors.primary,
+                            fontSize: responsiveScreenFontSize(1.8),
+                            textTransform: 'capitalize',
+                            fontWeight: '800',
+                          }}
+                        >
+                          View Application
+                        </Text>
+                      </TouchableOpacity>
                     </View>
                   </View>
                 </>

@@ -15,6 +15,7 @@ import { ThemeContext } from '../../context/ThemeProvider';
 import imagePath from '../../assets/imagePath';
 import { useAppDispatch } from '../../store';
 import { GetCv, GetNotification } from '../../reducer/jobsReducer';
+import { Header } from '../Company/Company';
 
 const Notification = () => {
   const [data, setData] = useState([...new Array(10)]);
@@ -51,41 +52,7 @@ const Notification = () => {
               paddingBottom: responsiveScreenHeight(3),
             }}
           >
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                position: 'relative',
-                alignItems: 'center',
-                borderBottomColor: colors.textDisabled,
-                borderBottomWidth: 0.5,
-                paddingBottom: responsiveScreenHeight(2),
-                width: responsiveScreenWidth(100),
-                paddingHorizontal: responsiveScreenWidth(5),
-              }}
-            >
-              <Pressable onPress={() => navigation.goBack()}>
-                <Image
-                  source={imagePath.backIcon}
-                  style={{ resizeMode: 'contain' }}
-                />
-              </Pressable>
-              <Text
-                style={{
-                  flex: 1,
-                  textAlign: 'center',
-                  fontSize: responsiveScreenFontSize(2),
-                  color: colors.textPrimary,
-                  fontWeight: '600',
-                }}
-              >
-                Notification
-              </Text>
-              <Image
-                source={imagePath.backIcon}
-                style={{ opacity: 0, resizeMode: 'contain' }}
-              />
-            </View>
+           <Header title="Notifications" />
             {
               cvs.length>0?<></>:<>
               <View style={{flex:1, justifyContent:"center"}}>

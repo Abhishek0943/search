@@ -235,6 +235,14 @@ export const Currencies = createAsyncThunk<
     return getApiCall<{ success: true, data: User }>('/get-currencies');
   }
 );
+export const SalaryPeriods = createAsyncThunk<
+  { success: true, data: User } | ErrorResponse
+>(
+  'SalaryPeriods',
+  () => {
+    return getApiCall<{ success: true, data: User }>('/get-salary-periods');
+  }
+);
 export const Update = createAsyncThunk<
   { success: true, data: User } | ErrorResponse, {}
 >(

@@ -47,6 +47,7 @@
     "react-native-pell-rich-editor": "^1.10.0",
     "react-native-permissions": "^5.4.0",
     "react-native-responsive-dimensions": "^3.1.1",
+    "react-native-restart": "^0.0.27",
     "react-native-safe-area-context": "^5.4.0",
     "react-native-screens": "^4.10.0",
     "react-native-shimmer-placeholder": "^2.0.9",

@@ -20,6 +20,7 @@ import imagePath from '../../assets/imagePath';
 import { CustomDropdown } from './PersonalInfo';
 import { useAppDispatch } from '../../store';
 import { EditLanguage, EditSkill, GetLanguages, GetLanguagesLevel, PostUserLanguages } from '../../reducer/jobsReducer';
+import { Header } from '../Company/Company';
 
 
 const SkillExperienceForm = () => {
@@ -113,37 +114,7 @@ const SkillExperienceForm = () => {
           paddingBottom: responsiveScreenHeight(3),
         }}
       >
-        {/* Header */}
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            borderBottomColor: colors.textDisabled,
-            borderBottomWidth: 0.5,
-            paddingBottom: responsiveScreenHeight(2),
-            width: responsiveScreenWidth(100),
-            paddingHorizontal: responsiveScreenWidth(5),
-          }}
-        >
-          <Pressable onPress={() => navigation.goBack()}>
-            <Image source={imagePath.backIcon} style={{ resizeMode: 'contain' }} />
-          </Pressable>
-
-          <Text
-            style={{
-              flex: 1,
-              textAlign: 'center',
-              fontSize: responsiveScreenFontSize(2),
-              color: colors.textPrimary,
-              fontWeight: '600',
-            }}
-          >
-            {data?.id ? "Edit Language" : "Add New Language"}
-          </Text>
-
-          <Image source={imagePath.backIcon} style={{ opacity: 0, resizeMode: 'contain' }} />
-        </View>
+       <Header title={data?.id ? "Edit Language" : "Add Language"}  />
 
         {/* Skill */}
         <Label text="Language" />

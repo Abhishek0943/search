@@ -9,6 +9,7 @@ import { routes } from '../../constants/values'
 import { useAppDispatch, useAppSelector } from '../../store'
 import { DeleteEducation, DeleteExperience, GetEducation } from '../../reducer/jobsReducer'
 import { styles } from './CV'
+import { Header } from '../Company/Company'
 const Education = () => {
   const { colors } = useContext(ThemeContext);
   const navigation = useNavigation();
@@ -39,35 +40,7 @@ const Education = () => {
           paddingBottom: responsiveScreenHeight(3),
         }}
       >
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            position: "relative",
-            alignItems: 'center',
-            borderBottomColor: colors.textDisabled,
-            borderBottomWidth: 0.5,
-            paddingBottom: responsiveScreenHeight(2),
-            width: responsiveScreenWidth(100),
-            paddingHorizontal: responsiveScreenWidth(5)
-          }}
-        >
-          <Pressable onPress={() => navigation.goBack()}>
-            <Image source={imagePath.backIcon} style={{ resizeMode: 'contain', transform:[{scale:1.1}] }} />
-          </Pressable>
-          <Text
-            style={{
-              flex: 1,
-              textAlign: 'center',
-              fontSize: responsiveScreenFontSize(2),
-              color: colors.textPrimary,
-              fontWeight: '600',
-            }}
-          >
-            Education
-          </Text>
-          <Image source={imagePath.backIcon} style={{ opacity: 0, resizeMode: 'contain', transform:[{scale:1.1}] }} />
-        </View>
+     <Header title="Education" />
         <View>
 
         </View>
@@ -107,7 +80,7 @@ const Education = () => {
               fontSize: responsiveScreenFontSize(1.8),
             }}
           >
-            Apply Now
+          Add New Education
           </Text>
         </Pressable>
       </ScrollView>

@@ -38,6 +38,7 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Text from '../../components/Text';
 import Icon from '../../utils/Icon';
+import { Header } from '../Company/Company';
 
 const PersonalInfo = () => {
   const { colors } = useContext(ThemeContext);
@@ -224,38 +225,7 @@ const PersonalInfo = () => {
             paddingBottom: responsiveScreenHeight(3),
           }}
         >
-          {/* Header */}
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              position: "relative",
-              alignItems: 'center',
-              borderBottomColor: colors.textDisabled,
-              borderBottomWidth: 0.5,
-              paddingBottom: responsiveScreenHeight(2),
-              width: responsiveScreenWidth(100),
-              paddingHorizontal: responsiveScreenWidth(5)
-            }}
-          >
-            <Pressable onPress={() => navigation.goBack()}>
-              <Image source={imagePath.backIcon} style={{ resizeMode: 'contain' }} />
-            </Pressable>
-            <Text
-              style={{
-                flex: 1,
-                textAlign: 'center',
-                fontSize: responsiveScreenFontSize(2),
-                color: colors.textPrimary,
-                fontWeight: '600',
-              }}
-            >
-              Personal Info
-            </Text>
-            {/* Invisible icon to balance layout */}
-            <Image source={imagePath.backIcon} style={{ opacity: 0, resizeMode: 'contain' }} />
-          </View>
-
+         <Header title="Personal Information"  />
           {/* First & Last Name */}
           <View
             style={{

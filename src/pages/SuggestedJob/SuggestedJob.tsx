@@ -11,6 +11,7 @@ import { GetCompanies, GetSuggestedJobs } from '../../reducer/jobsReducer'
 import Icon from '../../utils/Icon'
 import { formatSalaryRange } from '../../utils'
 import { JobCard } from '../CompanyDetails/CompanyDetails'
+import { Header } from '../Company/Company'
 
 const SuggestedJob = () => {
   const { colors } = useContext(ThemeContext)
@@ -29,39 +30,7 @@ const SuggestedJob = () => {
   return (
     <NavigationBar navigationBar={false}>
       <ScrollView style={{ flex: 1,  }} contentContainerStyle={{ justifyContent: "flex-start" }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            position: "relative",
-            alignItems: 'center',
-            borderBottomColor: colors.textDisabled,
-            borderBottomWidth: 0.5,
-            paddingBottom: responsiveScreenHeight(2),
-            width: responsiveScreenWidth(100),
-            paddingHorizontal: responsiveScreenWidth(5)
-          }}
-        >
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Image source={imagePath.backIcon} style={{ resizeMode: 'contain' }} />
-          </TouchableOpacity>
-          <Text
-            style={{
-              flex: 1,
-              textAlign: 'center',
-              fontSize: responsiveScreenFontSize(2),
-              color: colors.textPrimary,
-              fontWeight: '600',
-            }}
-          >
-            Suggested job
-          </Text>
-          <Image source={imagePath.backIcon} style={{ opacity: 0, resizeMode: 'contain' }} />
-        </View>
-        {/* {
-          job?.meta?.total_jobs> 0 && 
-        <Text style={{marginTop:responsiveScreenHeight(2), fontSize:responsiveScreenFontSize(1.8), color:colors.textPrimary, }}>{job?.meta?.total_jobs} Company's</Text>
-        } */}
+      <Header title="Suggested Jobs" />
         <FlatList scrollEnabled={false} data={job}style={{marginHorizontal:responsiveScreenWidth(3)}} renderItem={({ item, index }) => {
           return (
             <>

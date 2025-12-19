@@ -25,6 +25,7 @@ import { GetCountry, GetState, GetCity, AddWorkExperience, UploadCV } from '../.
 import { pick, keepLocalCopy } from '@react-native-documents/picker'
 // If you use react-native-date-picker
 import DatePicker from 'react-native-date-picker';
+import { Header } from '../Company/Company';
 
 const EducationForm = () => {
     const { colors } = useContext(ThemeContext);
@@ -138,36 +139,8 @@ const EducationForm = () => {
 
                 }}
             >
-                <View
-                    style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        position: "relative",
-                        alignItems: 'center',
-                        borderBottomColor: colors.textDisabled,
-                        borderBottomWidth: 0.5,
-                        paddingBottom: responsiveScreenHeight(2),
-                        width: responsiveScreenWidth(100),
-                        paddingHorizontal: responsiveScreenWidth(5)
-                    }}
-                >
-                    <Pressable onPress={() => navigation.goBack()}>
-                        <Image source={imagePath.backIcon} style={{ resizeMode: 'contain' }} />
-                    </Pressable>
-                    <Text
-                        style={{
-                            flex: 1,
-                            textAlign: 'center',
-                            fontSize: responsiveScreenFontSize(2),
-                            color: colors.textPrimary,
-                            fontWeight: '600',
-                        }}
-                    >
-                        Add New CV
-                    </Text>
-                    <Image source={imagePath.backIcon} style={{ opacity: 0, resizeMode: 'contain' }} />
-                </View>
-
+                                              <Header title="Add New CV" />
+               
                 <Label text="CV" />
                 <TextInput
                     value={formData.cvTitle}
@@ -290,7 +263,7 @@ const EducationForm = () => {
                     }}
                 >
                     <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8) }}>
-                        Save Experience
+                        Save CV
                     </Text>
                 </Pressable>
 

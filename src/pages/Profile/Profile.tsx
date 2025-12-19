@@ -1,5 +1,7 @@
 import { View, Text, ScrollView, Image, TouchableOpacity, ImageBackground } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
+import RNRestart from 'react-native-restart';
+
 import { routes } from '../../constants/values'
 import { NavigationBar } from '../../components'
 import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions'
@@ -9,6 +11,21 @@ import imagePath from '../../assets/imagePath'
 import { ThemeContext } from '../../context/ThemeProvider'
 import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native'
 import { launchImageLibrary } from 'react-native-image-picker'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+const logoutUser = async () => {
+  try {
+    await AsyncStorage.multiRemove([
+      'token',
+      'role',
+    ]);
+  } catch (e) {
+    console.log('Logout error:', e);
+  }
+};
+const logoutAndRestart = async () => {
+  await logoutUser();
+  RNRestart.restart();
+};
 const Profile = () => {
     const { colors } = useContext(ThemeContext)
     const navigation: NavigationProp<ParamListBase> = useNavigation();
@@ -61,7 +78,7 @@ const Profile = () => {
     return (
         <>
             <NavigationBar name={routes.PROFILE} statusbar={false}>
-                <ScrollView style={{ flex: 1, }} contentContainerStyle={{ justifyContent: "center", flex: 1, alignItems: "center" }}>
+                <ScrollView style={{ flex: 1, }} contentContainerStyle={{ justifyContent: "center",  alignItems: "center" }}>
                     {
                         (!user || !user.id) ? <>
                             <Image source={imagePath.image1} />
@@ -118,24 +135,28 @@ const Profile = () => {
                                     <Text style={{ fontSize: responsiveScreenFontSize(2) }}>Work Experience</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity onPress={() => navigation.navigate(routes.EDUCATION)} style={{ width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
-                                    <Image tintColor={colors.textPrimary} style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} source={imagePath.bag} />
+                                    <Image tintColor={colors.textPrimary} style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} source={imagePath.education2} />
                                     <Text style={{ fontSize: responsiveScreenFontSize(2) }}>Education</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity onPress={() => navigation.navigate(routes.CV)} style={{ width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
-                                    <Image tintColor={colors.textPrimary} style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} source={imagePath.bag} />
+                                    <Image tintColor={colors.textPrimary} style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} source={imagePath.CV} />
                                     <Text style={{ fontSize: responsiveScreenFontSize(2) }}>Add CV</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity onPress={() => navigation.navigate(routes.PROJECT)} style={{ width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
-                                    <Image tintColor={colors.textPrimary} style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} source={imagePath.bag} />
+                                    <Image tintColor={colors.textPrimary} style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} source={imagePath.project} />
                                     <Text style={{ fontSize: responsiveScreenFontSize(2) }}>Project</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity onPress={() => navigation.navigate(routes.SKILL)} style={{ width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
-                                    <Image tintColor={colors.textPrimary} style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} source={imagePath.bag} />
+                                    <Image tintColor={colors.textPrimary} style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} source={imagePath.skill} />
                                     <Text style={{ fontSize: responsiveScreenFontSize(2) }}>Skills</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity onPress={() => navigation.navigate(routes.LANGUAGE)} style={{ width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
-                                    <Image tintColor={colors.textPrimary} style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} source={imagePath.bag} />
+                                    <Image tintColor={colors.textPrimary} style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} source={imagePath.language} />
                                     <Text style={{ fontSize: responsiveScreenFontSize(2) }}>Language</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={logoutAndRestart} style={{ marginBottom: responsiveScreenHeight(5), width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
+                                    <Image tintColor={colors.textPrimary} style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} source={imagePath.logout} />
+                                    <Text style={{ fontSize: responsiveScreenFontSize(2) }}>Log Out</Text>
                                 </TouchableOpacity>
 
 

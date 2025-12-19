@@ -9,6 +9,7 @@ import { routes } from '../../constants/values'
 import { DeleteCv, GetCv } from '../../reducer/jobsReducer'
 import { useAppDispatch, useAppSelector } from '../../store'
 import { formatDate } from './PersonalInfo'
+import { Header } from '../Company/Company'
 
 const CV = () => {
     const { colors } = useContext(ThemeContext);
@@ -35,89 +36,61 @@ const CV = () => {
     )
     return (
         <NavigationBar navigationBar={false}>
-            <TouchableWithoutFeedback onPress={()=>setActive(0)}>
-            <ScrollView
-                style={{ flex: 1 }}
-                contentContainerStyle={{
-                    width: responsiveScreenWidth(96),
-                    alignSelf: 'center',
-                    alignItems: 'center',
-                    paddingBottom: responsiveScreenHeight(3),
-                }}
-            >
-                <View
-                    style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        position: "relative",
+            <TouchableWithoutFeedback onPress={() => setActive(0)}>
+                <ScrollView
+                    style={{ flex: 1 }}
+                    contentContainerStyle={{
+                        width: responsiveScreenWidth(96),
+                        alignSelf: 'center',
                         alignItems: 'center',
-                        borderBottomColor: colors.textDisabled,
-                        borderBottomWidth: 0.5,
-                        paddingBottom: responsiveScreenHeight(2),
-                        width: responsiveScreenWidth(100),
-                        paddingHorizontal: responsiveScreenWidth(5)
+                        paddingBottom: responsiveScreenHeight(3),
                     }}
                 >
-                    <Pressable onPress={() => navigation.goBack()}>
-                        <Image source={imagePath.backIcon} style={{ resizeMode: 'contain' }} />
-                    </Pressable>
-                    <Text
-                        style={{
-                            flex: 1,
-                            textAlign: 'center',
-                            fontSize: responsiveScreenFontSize(2),
-                            color: colors.textPrimary,
-                            fontWeight: '600',
-                        }}
-                    >
-                        CV
-                    </Text>
-                    {/* Invisible icon to balance layout */}
-                    <Image source={imagePath.backIcon} style={{ opacity: 0, resizeMode: 'contain' }} />
-                </View>
-                <View>
+                               <Header title="CV" />
+                  
+                    <View>
 
-                </View>
-                {
-                    cvs?.length > 0 ? <>
-                        <FlatList data={cvs} style={{ flex: 1, width: responsiveScreenWidth(90) }} renderItem={({ item, index }) => {
-                            return (
-                                <>
-                                    <CvCard refresh={() => dispatch(GetCv({ id: user.id })).unwrap().then(res => {
-                                        setCvs(res.cvs)
-                                        console.log(res.cvs)
-                                    })} setActive={setActive} active={active} id={item.id} title={item.title} dateText={item.created_at} isDefault={item.is_default} />
-                                </>
-                            )
-                        }} />
-                    </> :
-                        <Image source={imagePath.workExperience} style={{ resizeMode: "contain", width: "100%" }} />
-                }
-                <Pressable
-                    onPress={() => navigation.navigate(routes.CVADD)}
-                    style={{
-                        width: '90%',
-                        justifyContent: 'center',
-                        marginTop: responsiveScreenHeight(2),
-                        borderRadius: 6,
-                        gap: responsiveScreenWidth(1),
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        backgroundColor: colors.primary,
-                        paddingHorizontal: responsiveScreenWidth(3),
-                        paddingVertical: responsiveScreenHeight(1.5),
-                    }}
-                >
-                    <Text
+                    </View>
+                    {
+                        cvs?.length > 0 ? <>
+                            <FlatList data={cvs} style={{ flex: 1, width: responsiveScreenWidth(90) }} renderItem={({ item, index }) => {
+                                return (
+                                    <>
+                                        <CvCard refresh={() => dispatch(GetCv({ id: user.id })).unwrap().then(res => {
+                                            setCvs(res.cvs)
+                                            console.log(res.cvs)
+                                        })} setActive={setActive} active={active} id={item.id} title={item.title} dateText={item.created_at} isDefault={item.is_default} />
+                                    </>
+                                )
+                            }} />
+                        </> :
+                            <Image source={imagePath.workExperience} style={{ resizeMode: "contain", width: "100%" }} />
+                    }
+                    <Pressable
+                        onPress={() => navigation.navigate(routes.CVADD)}
                         style={{
-                            color: colors.white,
-                            fontSize: responsiveScreenFontSize(1.8),
+                            width: '90%',
+                            justifyContent: 'center',
+                            marginTop: responsiveScreenHeight(2),
+                            borderRadius: 6,
+                            gap: responsiveScreenWidth(1),
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            backgroundColor: colors.primary,
+                            paddingHorizontal: responsiveScreenWidth(3),
+                            paddingVertical: responsiveScreenHeight(1.5),
                         }}
                     >
-                        Add New CV
-                    </Text>
-                </Pressable>
-            </ScrollView>
+                        <Text
+                            style={{
+                                color: colors.white,
+                                fontSize: responsiveScreenFontSize(1.8),
+                            }}
+                        >
+                            Add New CV
+                        </Text>
+                    </Pressable>
+                </ScrollView>
             </TouchableWithoutFeedback>
         </NavigationBar>
     )
@@ -136,7 +109,7 @@ function CvCard({
     const { user } = useAppSelector(state => state.userStore)
 
     return (
-        
+
 
         <View style={[styles.card, { marginTop: responsiveScreenHeight(2), borderColor: colors.surfaces, backgroundColor: colors.lightGrayNatural, paddingHorizontal: responsiveScreenWidth(2), paddingVertical: responsiveScreenHeight(1), borderWidth: 1 }]}>
             <View style={styles.topRow}>
@@ -209,7 +182,7 @@ function CvCard({
             </View>
 
         </View>
-        
+
     );
 }
 

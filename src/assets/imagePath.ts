@@ -45,6 +45,12 @@ export default {
     chat: require('./Icon/chat.png'),
     chat2: require('./Icon/chat2.png'),
     angle: require('./Icon/angle.png'),
+    logout: require('./Icon/logout.png'),
+    language: require('./Icon/language.png'),
+    skill: require('./Icon/skill.png'),
+    project: require('./Icon/project.png'),
+    CV: require('./Icon/cv.png'),
+    education2: require('./Icon/education2.png'),
 
 
     // images

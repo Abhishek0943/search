@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from '../../store'
 import { GetEducation, GetProject } from '../../reducer/jobsReducer'
 import { styles } from './CV'
 import {  formatDisplayDate } from './WorkExperience'
+import { Header } from '../Company/Company'
 const Education = () => {
     const { colors } = useContext(ThemeContext);
     const navigation = useNavigation();
@@ -40,35 +41,7 @@ const Education = () => {
                     paddingBottom: responsiveScreenHeight(3),
                 }}
             >
-                <View
-                    style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        position: "relative",
-                        alignItems: 'center',
-                        borderBottomColor: colors.textDisabled,
-                        borderBottomWidth: 0.5,
-                        paddingBottom: responsiveScreenHeight(2),
-                        width: responsiveScreenWidth(100),
-                        paddingHorizontal: responsiveScreenWidth(5)
-                    }}
-                >
-                    <Pressable onPress={() => navigation.goBack()}>
-                        <Image source={imagePath.backIcon} style={{ resizeMode: 'contain' }} />
-                    </Pressable>
-                    <Text
-                        style={{
-                            flex: 1,
-                            textAlign: 'center',
-                            fontSize: responsiveScreenFontSize(2),
-                            color: colors.textPrimary,
-                            fontWeight: '600',
-                        }}
-                    >
-                        Project
-                    </Text>
-                    <Image source={imagePath.backIcon} style={{ opacity: 0, resizeMode: 'contain' }} />
-                </View>
+                <Header title="Project" />
                 <View>
                 </View>
                 {
@@ -107,7 +80,7 @@ const Education = () => {
                             fontSize: responsiveScreenFontSize(1.8),
                         }}
                     >
-                        Apply Now
+                        Add New Project
                     </Text>
                 </Pressable>
             </ScrollView>
@@ -183,7 +156,14 @@ function CvCard({
                     <Image source={imagePath.calendar} />
                     <Text style={[styles.metaText, { fontSize: responsiveScreenFontSize(1.8), color: colors.textSecondary, fontWeight: "600", }]}> {formatDateRange(item.date_start, item.date_end)}</Text>
                 </View>
+                {
+                    item.description &&
+                <View style={[styles.metaRow, { gap: responsiveScreenWidth(1), marginTop: responsiveScreenHeight(1) }]}>
+                    {/* <Image source={imagePath.calendar} /> */}
+                    <Text style={[styles.metaText, { fontSize: responsiveScreenFontSize(1.8), color: colors.textSecondary, fontWeight: "600", }]}> {item.description}</Text>
+                </View>
                 
+                }
                     {/* <Text style={[styles.metaText, { fontSize: responsiveScreenFontSize(1.8), color: colors.textSecondary, fontWeight: "600", }]}>  {formatDateRange(item.date_start, item.date_end)}</Text> */}
 
             </View>

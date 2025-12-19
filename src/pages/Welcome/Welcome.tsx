@@ -14,8 +14,7 @@ import {
 } from 'react-native-responsive-dimensions';
 import { useNavigation, NavigationProp, ParamListBase } from '@react-navigation/native';
 import { HOST, routes } from '../../constants/values';
-import { useAppDispatch, useAppSelector } from '../../store';
-import { GetWelcomeScreen } from '../../reducer/userReducer';
+import { useAppDispatch, } from '../../store';
 import { ThemeContext } from '../../context/ThemeProvider';
 import { capitalizeFirstLetter } from '../../helper';
 import LinearGradient from 'react-native-linear-gradient';
@@ -26,15 +25,13 @@ import Text from '../../components/Text';
 const WelcomeItem = React.memo(({ item }: { item: WelcomeScreenItem }) => {
   const { colors } = useContext(ThemeContext);
   return (
-    <View style={[styles.itemContainer, {}]}>
-
+    <View style={[styles.itemContainer, {borderWidth:1,borderColor:"transparent"}]}>
       <Text style={[styles.title, { color: colors.white }]}>
         {capitalizeFirstLetter(item.title)}
       </Text>
       <Text style={[styles.description, { color: colors.white }]}>
         {capitalizeFirstLetter(item.description)}
       </Text>
-
       <Image
         source={item.imageUrl}
         style={styles.image}

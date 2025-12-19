@@ -28,6 +28,7 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import DatePicker from 'react-native-date-picker';
 import { CustomMultiDropdown } from '../Search/Search';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Header } from '../Company/Company';
 
 const addProjectWithFetch = async (fd: FormData, navigation: any) => {
   try {
@@ -215,38 +216,7 @@ const ProjectForm = () => {
           paddingBottom: responsiveScreenHeight(3),
         }}
       >
-        {/* Header */}
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            borderBottomColor: colors.textDisabled,
-            borderBottomWidth: 0.5,
-            paddingBottom: responsiveScreenHeight(2),
-            width: responsiveScreenWidth(100),
-            paddingHorizontal: responsiveScreenWidth(5),
-          }}
-        >
-          <Pressable onPress={() => navigation.goBack()}>
-            <Image source={imagePath.backIcon} style={{ resizeMode: 'contain' }} />
-          </Pressable>
-
-          <Text
-            style={{
-              flex: 1,
-              textAlign: 'center',
-              fontSize: responsiveScreenFontSize(2),
-              color: colors.textPrimary,
-              fontWeight: '600',
-            }}
-          >
-            {data?.id ? 'Edit Project' : 'Add New Project'}
-          </Text>
-
-          <Image source={imagePath.backIcon} style={{ opacity: 0, resizeMode: 'contain' }} />
-        </View>
-
+      <Header title={data?.id ? "Edit Project" : "Add Project"}  />
         <Label text="Project name" />
         <TextInput
           value={formData.projectName}

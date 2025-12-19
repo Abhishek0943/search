@@ -12,6 +12,7 @@ import { formatSalaryRange } from '../../utils'
 import Icon from '../../utils/Icon'
 import { routes } from '../../constants/values'
 import Text from '../../components/Text'
+import { Header } from '../Company/Company'
 
 const CompanyDetails = () => {
     const { colors } = useContext(ThemeContext)
@@ -34,35 +35,7 @@ const CompanyDetails = () => {
     return (
         <NavigationBar navigationBar={false}>
             <ScrollView style={{ flex: 1, }} contentContainerStyle={{ justifyContent: "flex-start" }}>
-                <View
-                    style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        position: "relative",
-                        alignItems: 'center',
-                        borderBottomColor: colors.textDisabled,
-                        borderBottomWidth: 0.5,
-                        paddingBottom: responsiveScreenHeight(2),
-                        width: responsiveScreenWidth(100),
-                        paddingHorizontal: responsiveScreenWidth(5)
-                    }}
-                >
-                    <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <Image source={imagePath.backIcon} style={{ resizeMode: 'contain' }} />
-                    </TouchableOpacity>
-                    <Text
-                        style={{
-                            flex: 1,
-                            textAlign: 'center',
-                            fontSize: responsiveScreenFontSize(2),
-                            color: colors.textPrimary,
-                            fontWeight: '600',
-                        }}
-                    >
-                        Company Details
-                    </Text>
-                    <Image source={imagePath.backIcon} style={{ opacity: 0, resizeMode: 'contain' }} />
-                </View>
+              <Header title="Company Details" />
                 <Text style={{ paddingHorizontal: responsiveScreenWidth(5), color: colors.textPrimary, fontWeight: "900", fontSize: responsiveScreenFontSize(2.6), marginVertical: responsiveScreenHeight(1) }}>{job?.name}</Text>
                 {
                     (job?.city || job?.country) &&

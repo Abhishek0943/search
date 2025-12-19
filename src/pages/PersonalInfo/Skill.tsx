@@ -9,6 +9,7 @@ import { routes } from '../../constants/values'
 import { DeleteCv, DeleteUserSkill, GetCv, GetUserSkill } from '../../reducer/jobsReducer'
 import { useAppDispatch, useAppSelector } from '../../store'
 import { formatDate } from './PersonalInfo'
+import { Header } from '../Company/Company'
 
 const CV = () => {
     const { colors } = useContext(ThemeContext);
@@ -44,36 +45,7 @@ const CV = () => {
                     paddingBottom: responsiveScreenHeight(3),
                 }}
             >
-                <View
-                    style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        position: "relative",
-                        alignItems: 'center',
-                        borderBottomColor: colors.textDisabled,
-                        borderBottomWidth: 0.5,
-                        paddingBottom: responsiveScreenHeight(2),
-                        width: responsiveScreenWidth(100),
-                        paddingHorizontal: responsiveScreenWidth(5)
-                    }}
-                >
-                    <Pressable onPress={() => navigation.goBack()}>
-                        <Image source={imagePath.backIcon} style={{ resizeMode: 'contain' }} />
-                    </Pressable>
-                    <Text
-                        style={{
-                            flex: 1,
-                            textAlign: 'center',
-                            fontSize: responsiveScreenFontSize(2),
-                            color: colors.textPrimary,
-                            fontWeight: '600',
-                        }}
-                    >
-                        Skill
-                    </Text>
-                    {/* Invisible icon to balance layout */}
-                    <Image source={imagePath.backIcon} style={{ opacity: 0, resizeMode: 'contain' }} />
-                </View>
+            <Header title="Skills"  />
                 <View>
 
                 </View>

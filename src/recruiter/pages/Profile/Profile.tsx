@@ -169,7 +169,7 @@ const Profile = () => {
                             textAlign: 'left',
                             fontSize: responsiveScreenFontSize(2),
                             color: colors.textPrimary,
-                            fontWeight: '600',
+                            fontWeight: '800',
                         }}
                     >
                         Profile

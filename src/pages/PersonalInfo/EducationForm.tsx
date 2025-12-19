@@ -26,6 +26,7 @@ import { GetCountry, GetState, GetCity, DegreeLevel, DegreeType, Subject, Result
 // If you use react-native-date-picker
 import DatePicker from 'react-native-date-picker';
 import { CustomMultiDropdown } from '../Search/Search';
+import { Header } from '../Company/Company';
 
 const EducationForm = () => {
   const { colors } = useContext(ThemeContext);
@@ -245,37 +246,7 @@ const EducationForm = () => {
           paddingBottom: responsiveScreenHeight(3),
         }}
       >
-        {/* Header */}
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            borderBottomColor: colors.textDisabled,
-            borderBottomWidth: 0.5,
-            paddingBottom: responsiveScreenHeight(2),
-            width: responsiveScreenWidth(100),
-            paddingHorizontal: responsiveScreenWidth(5),
-          }}
-        >
-          <Pressable onPress={() => navigation.goBack()}>
-            <Image source={imagePath.backIcon} style={{ resizeMode: 'contain' }} />
-          </Pressable>
-
-          <Text
-            style={{
-              flex: 1,
-              textAlign: 'center',
-              fontSize: responsiveScreenFontSize(2),
-              color: colors.textPrimary,
-              fontWeight: '600',
-            }}
-          >
-            {data?.id ? "Edit Education" : "Add New Education"}
-          </Text>
-
-          <Image source={imagePath.backIcon} style={{ opacity: 0, resizeMode: 'contain' }} />
-        </View>
+      <Header title={data?.id ? "Edit Education" : "Add New Education"} />
 
         {/* Degree Level */}
         <Label text="Degree Level" />

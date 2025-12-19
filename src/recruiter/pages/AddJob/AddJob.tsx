@@ -9,7 +9,7 @@ import { actions, RichEditor, RichToolbar } from 'react-native-pell-rich-editor'
 import { routes } from '../../../constants/values'
 import { CustomDropdown } from '../../../pages/PersonalInfo/PersonalInfo'
 import { useAppDispatch } from '../../../store'
-import { Currencies, GetCity, GetCountry, GetSkills, GetState } from '../../../reducer/jobsReducer'
+import { Currencies, GetCity, GetCountry, GetSkills, GetState, SalaryPeriods } from '../../../reducer/jobsReducer'
 import Text from '../../../components/Text'
 const AddJob = () => {
     const { colors } = useContext(ThemeContext);
@@ -22,6 +22,7 @@ const AddJob = () => {
     const [states, setStates] = useState([]);
     const [cities, setCities] = useState([]);
     const [currencies, setCurrencies] = useState([]);
+    const [salaryPeriods, setSalaryPeriods] = useState([]);
     const [countries, setCountries] = useState([]);
     const dispatch = useAppDispatch();
 
@@ -31,6 +32,7 @@ const AddJob = () => {
         country: 0,
         state: 0,
         city: 0,
+        salaryPeriod: 0,
 
         startDate: new Date(),
         endDate: new Date(),
@@ -104,6 +106,12 @@ const AddJob = () => {
                 if (res?.success) setCurrencies(res.data || []);
             })
             .catch(() => { });
+        dispatch(SalaryPeriods())
+            .unwrap()
+            .then(res => {
+                if (res?.success) setSalaryPeriods(res.data || []);
+            })
+            .catch(() => { });
     }, []);
     const Label = ({ text }: { text: string }) => (
         <View style={{ flexDirection: 'row', width: '100%', marginTop: responsiveScreenHeight(1) }}>
@@ -144,14 +152,14 @@ const AddJob = () => {
                             textAlign: 'left',
                             fontSize: responsiveScreenFontSize(2),
                             color: colors.textPrimary,
-                            fontWeight: '700',
+                            fontWeight: '800',
                             textTransform: "capitalize"
                         }}
                     >
                         Post a job
                     </Text>
                     {/* Invisible icon to balance layout */}
-                    <Image source={imagePath.backIcon} style={{ opacity: 0, resizeMode: 'contain' }} />
+                    <Image source={imagePath.backIcon} style={{ opacity: 0, resizeMode: 'contain', transform:[{scale:1.1}] }} />
                 </View>
                 <Label text="Job Details" />
                 <TextInput
@@ -221,7 +229,6 @@ const AddJob = () => {
                     valueKey="id"
                 />
 
-                {/* State / City */}
                 <View style={{ width: '100%', flexDirection: 'row', gap: responsiveScreenWidth(3) }}>
                     <View style={{ flex: 1 }}>
                         <Label text="State" />
@@ -288,10 +295,10 @@ const AddJob = () => {
                     <View style={{ flex: 1 }}>
                         <Label text="Salary Period" />
                         <CustomDropdown
-                            // data={cities}
+                            data={salaryPeriods}
                             placeholder="Select"
-                            selectedValue={formData.city}
-                            onSelect={(val: number) => handleChange('city', val)}
+                            selectedValue={formData.salaryPeriod}
+                            onSelect={(val: number) => handleChange('salaryPeriod', val)}
                             labelKey="name"
                             valueKey="id"
                         />

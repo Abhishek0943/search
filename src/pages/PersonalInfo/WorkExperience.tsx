@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from '../../store'
 import { DeleteExperience, GetCv, GetExperience } from '../../reducer/jobsReducer'
 import { styles } from './CV'
 import Text from '../../components/Text'
+import { Header } from '../Company/Company'
 
 const WorkExperience = () => {
   const { colors } = useContext(ThemeContext);
@@ -44,35 +45,7 @@ const WorkExperience = () => {
           paddingBottom: responsiveScreenHeight(3),
         }}
       >
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            position: "relative",
-            alignItems: 'center',
-            borderBottomColor: colors.textDisabled,
-            borderBottomWidth: 0.5,
-            paddingBottom: responsiveScreenHeight(2),
-            width: responsiveScreenWidth(100),
-            paddingHorizontal: responsiveScreenWidth(5)
-          }}
-        >
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Image source={imagePath.backIcon} style={{ resizeMode: 'contain' }} />
-          </TouchableOpacity>
-          <Text
-            style={{
-              flex: 1,
-              textAlign: 'center',
-              fontSize: responsiveScreenFontSize(2),
-              color: colors.textPrimary,
-              fontWeight: '600',
-            }}
-          >
-            Work Experience
-          </Text>
-          <Image source={imagePath.backIcon} style={{ opacity: 0, resizeMode: 'contain' }} />
-        </View>
+       <Header title="Work Experience" />
         <View>
 
         </View>

@@ -1,4 +1,4 @@
-import { Image, TouchableOpacity, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Image, TouchableOpacity, ScrollView, StyleSheet,  View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { NavigationBar } from '../../components'
 import { routes } from '../../constants/values'
@@ -10,13 +10,13 @@ import { useAppDispatch } from '../../store'
 import { GetJob, } from '../../reducer/jobsReducer'
 import { WebView } from 'react-native-webview';
 import { formatSalaryRange } from '../../utils'
+import Text from '../../components/Text'
+import { Header } from '../Company/Company'
 const Jobdetail = () => {
     const { colors } = useContext(ThemeContext)
     const route = useRoute()
     const navigation = useNavigation()
     const { id } = route.params as { id: number }
-    const p = "<p></p>"
-
     const dispatch = useAppDispatch()
     const [job, setJob] = useState<Job>()
     const [pageVal, setPageVal] = useState<"dis" | "company" | "review">("dis")
@@ -32,41 +32,13 @@ const Jobdetail = () => {
     return (
         <NavigationBar name={routes.HOME}>
             <ScrollView style={{ flex: 1, paddingHorizontal: responsiveScreenWidth(2) }} contentContainerStyle={{ justifyContent: "flex-start" }}>
-                <View
-                    style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        position: "relative",
-                        alignItems: 'center',
-                        borderBottomColor: colors.textDisabled,
-                        borderBottomWidth: 0.5,
-                        paddingBottom: responsiveScreenHeight(2),
-                        width: responsiveScreenWidth(100),
-                        paddingHorizontal: responsiveScreenWidth(5)
-                    }}
-                >
-                    <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <Image source={imagePath.backIcon} style={{ resizeMode: 'contain' }} />
-                    </TouchableOpacity>
-                    <Text
-                        style={{
-                            flex: 1,
-                            textAlign: 'center',
-                            fontSize: responsiveScreenFontSize(2),
-                            color: colors.textPrimary,
-                            fontWeight: '600',
-                        }}
-                    >
-                        Job details
-                    </Text>
-                    <Image source={imagePath.backIcon} style={{ opacity: 0, resizeMode: 'contain' }} />
-                </View>
+             <Header title="Job details" />
                 <TouchableOpacity style={{ paddingVertical: responsiveScreenHeight(1.5), paddingHorizontal: responsiveScreenWidth(3), backgroundColor: colors.white, elevation: 4, margin: 10, borderRadius: 15 }}>
                     <View style={{ flexDirection: "row", gap: responsiveScreenWidth(3), justifyContent: "space-between", alignItems: "center" }}>
                         <View style={{ borderRadius: 6, height: responsiveScreenHeight(6), overflow: "hidden", backgroundColor: "#CECECE38" }}>
                             <Image source={{ uri: job.company_info.image }} style={{ height: "100%", aspectRatio: 1 }} />
                         </View>
-                        <TouchableOpacity style={{ flex: 1, gap: responsiveScreenHeight(0.5) }}>
+                        <TouchableOpacity style={{ flex: 1, gap: responsiveScreenHeight(1) }}>
                             <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>{job.title}</Text>
                             <View style={{ flexDirection: "row", gap: responsiveScreenWidth(1) }}>
                                 <Image source={imagePath.location} />
@@ -162,54 +134,86 @@ const Jobdetail = () => {
         </NavigationBar>
     )
 }
-export function AutoHeightWebView({ html, margin = 10 }: { html: string }) {
-    const [height, setHeight] = useState(50);
-    const { colors } = useContext(ThemeContext)
+export function AutoHeightWebView({ html, margin = 10 }) {
+  const [height, setHeight] = useState(50);
+  const { colors } = useContext(ThemeContext);
 
-    const wrappedHtml = (content: string) => `
-  <html>
-    <head>
-      <meta name="viewport" content="width=device-width, initial-scale=1">
-      <style>
-        body {
-          font-size:    ${responsiveScreenFontSize(2)};          /* 👈 Change this to match your app font size */
-          margin:  0 ${margin}px;
-          padding: 0;
-        }
+  const FONT_BASE64 = "PASTE_BASE64_FONT_HERE"; // 👈 font.txt content
 
-        p, span, div {
-          font-family: inherit;
-          font-size: inherit;
-          line-height: inherit;
-          color:${colors.textSecondary}
-        }
-      </style>
-    </head>
-    <body>
-      ${content}
-    </body>
-     <script>
-          setTimeout(function() {
-            var h = document.body.scrollHeight;
-            window.ReactNativeWebView.postMessage(String(h));
-          }, 100);
-        </script>
-  </html>
+  const wrappedHtml = (content: string) => `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    @font-face {
+      font-family: 'AppFont';
+      src: url(data:font/truetype;charset=utf-8;base64,${FONT_BASE64}) format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    :root {
+      --text: ${colors.textSecondary};
+      --primary: ${colors.primary};
+    }
+
+    body {
+      margin: 0 ${margin}px;
+      padding: 0;
+      font-family: 'AppFont';
+      font-size: ${responsiveScreenFontSize(2)}px;
+      line-height: 1.6;
+      color: var(--text);
+      background: transparent;
+      word-break: break-word;
+    }
+
+    h1,h2,h3,h4,h5,h6 {
+      font-family: 'AppFont';
+      font-weight: 700;
+      margin: 12px 0 6px;
+    }
+
+    p, span, div, li {
+      font-family: 'AppFont';
+      color: var(--text);
+    }
+
+    a { color: var(--primary); text-decoration: none; }
+    img { max-width: 100%; height: auto; border-radius: 10px; margin: 8px 0; }
+
+    ul, ol { padding-left: 18px; }
+    table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+    td, th { border: 1px solid rgba(0,0,0,0.15); padding: 8px; }
+  </style>
+</head>
+
+<body>
+  ${content}
+</body>
+
+<script>
+  function updateHeight() {
+    var h = document.documentElement.scrollHeight || document.body.scrollHeight;
+    window.ReactNativeWebView.postMessage(String(h));
+  }
+  window.onload = function(){ setTimeout(updateHeight, 50); };
+  setInterval(updateHeight, 300);
+</script>
+</html>
 `;
-    return (
-        <WebView
-            source={{ html: wrappedHtml(html) }}
-            onMessage={(event) => {
-                setHeight(Number(event.nativeEvent.data) || 50);
-            }}
-            style={{
-                width: "100%",
-                height,
-                backgroundColor: "transparent",
-            }}
-            scrollEnabled={false}
-        />
-    );
+
+  return (
+    <WebView
+      source={{ html: wrappedHtml(html) }}
+      onMessage={(e) => setHeight(Number(e.nativeEvent.data) || 50)}
+      style={{ width: "100%", height, backgroundColor: "transparent" }}
+      scrollEnabled={false}
+      showsVerticalScrollIndicator={false}
+    />
+  );
 }
 export default Jobdetail
 

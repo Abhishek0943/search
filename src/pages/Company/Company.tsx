@@ -10,7 +10,42 @@ import { useAppDispatch } from '../../store'
 import { GetCompanies } from '../../reducer/jobsReducer'
 import Icon from '../../utils/Icon'
 import Text from '../../components/Text'
+export const Header = ({title}) => {
+  const { colors } = useContext(ThemeContext)
+  const navigation: NavigationProp<ParamListBase> = useNavigation();
 
+  return (
+     <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            position: "relative",
+            alignItems: 'center',
+            borderBottomColor: colors.textDisabled,
+            borderBottomWidth: 0.5,
+            paddingBottom: responsiveScreenHeight(2),
+            width: responsiveScreenWidth(100),
+            paddingHorizontal: responsiveScreenWidth(5)
+          }}
+        >
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Image source={imagePath.backIcon} style={{ resizeMode: 'contain', transform:[{scale:1.1}] }} />
+          </TouchableOpacity>
+          <Text
+            style={{
+              flex: 1,
+              textAlign: 'center',
+              fontSize: responsiveScreenFontSize(2),
+              color: colors.textPrimary,
+              fontWeight: '800',
+            }}
+          >
+            {title}
+          </Text>
+          <Image source={imagePath.backIcon} style={{ opacity: 0, resizeMode: 'contain' }} />
+        </View>
+  )
+}
 const Company = () => {
   const { colors } = useContext(ThemeContext)
   const navigation: NavigationProp<ParamListBase> = useNavigation();
@@ -28,35 +63,7 @@ const Company = () => {
   return (
     <NavigationBar navigationBar={false}>
       <ScrollView style={{ flex: 1, }} contentContainerStyle={{ justifyContent: "flex-start" }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            position: "relative",
-            alignItems: 'center',
-            borderBottomColor: colors.textDisabled,
-            borderBottomWidth: 0.5,
-            paddingBottom: responsiveScreenHeight(2),
-            width: responsiveScreenWidth(100),
-            paddingHorizontal: responsiveScreenWidth(5)
-          }}
-        >
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Image source={imagePath.backIcon} style={{ resizeMode: 'contain' }} />
-          </TouchableOpacity>
-          <Text
-            style={{
-              flex: 1,
-              textAlign: 'center',
-              fontSize: responsiveScreenFontSize(2),
-              color: colors.textPrimary,
-              fontWeight: '600',
-            }}
-          >
-            Company
-          </Text>
-          <Image source={imagePath.backIcon} style={{ opacity: 0, resizeMode: 'contain' }} />
-        </View>
+        <Header title="Companies" />
         {
           job?.meta?.total_jobs > 0 &&
           <Text style={{ marginTop: responsiveScreenHeight(2), marginHorizontal: responsiveScreenWidth(5), fontSize: responsiveScreenFontSize(1.8), color: colors.textPrimary, }}>{job?.meta?.total_jobs} Company's</Text>

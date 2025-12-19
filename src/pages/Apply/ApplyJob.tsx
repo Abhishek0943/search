@@ -7,6 +7,7 @@ import { NavigationBar } from '../../components'
 import imagePath from '../../assets/imagePath'
 import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions'
 import { ThemeContext } from '../../context/ThemeProvider'
+import { Header } from '../Company/Company'
 
 const ApplyJob = () => {
   const { user } = useAppSelector(state => state.userStore);
@@ -56,44 +57,9 @@ const ApplyJob = () => {
             paddingBottom: responsiveScreenHeight(3),
           }}
         >
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              position: 'relative',
-              alignItems: 'center',
-              borderBottomColor: colors.textDisabled,
-              borderBottomWidth: 0.5,
-              paddingBottom: responsiveScreenHeight(2),
-              width: responsiveScreenWidth(100),
-              paddingHorizontal: responsiveScreenWidth(5),
-            }}
-          >
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Image
-                source={imagePath.backIcon}
-                style={{ resizeMode: 'contain' }}
-              />
-            </TouchableOpacity>
-            <Text
-              style={{
-                flex: 1,
-                textAlign: 'center',
-                fontSize: responsiveScreenFontSize(2),
-                color: colors.textPrimary,
-                fontWeight: '600',
-              }}
-            >
-              {
+          <Header title={
                 success ? "Success" : "Apply Job"
-              }
-
-            </Text>
-            <Image
-              source={imagePath.backIcon}
-              style={{ opacity: 0, resizeMode: 'contain' }}
-            />
-          </View>
+              } />
           {
             success ? <>
               <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
