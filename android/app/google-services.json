@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "254446991754",
+    "project_id": "search-talents-ae546",
+    "storage_bucket": "search-talents-ae546.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:254446991754:android:eb25fb19f72e318f06b073",
+        "android_client_info": {
+          "package_name": "com.searchtalent.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "254446991754-9b77mmf0oq97u0gshm6pjp9blhau1hfa.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.searchtalent.app",
+            "certificate_hash": "9f977f8d918288124982b352d2cac059af52439b"
+          }
+        },
+        {
+          "client_id": "254446991754-p1tg96r181r38144vnlo9ctt1jqtklrg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCY-YN0ZuO_CG7sEy8_drOBzzalyDVQ3kw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "254446991754-p1tg96r181r38144vnlo9ctt1jqtklrg.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "254446991754-fvv4g5r4ld8nvpcv3ks1gkj5gquq9j33.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.searchtalent.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
