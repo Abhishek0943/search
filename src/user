@@ -1,0 +1,201 @@
+interface User {
+  name: string;
+  email: string;
+  phone: string;
+}
+
+
+
+interface Contry {
+  id: number;
+  iso: string;
+  name: string;
+  phonecode: number;
+}
+interface Topic {
+  id: number;
+  name: string;
+  isSaved: boolean;
+}
+interface GetContryResponse {
+  success: true;
+  message: string;
+  data: Contry[];
+}
+interface NewsTopic {
+  id: number;
+  name: string;
+  isSaved: boolean;
+  profile_image:string
+}
+interface GetTopicResponse {
+  success: true;
+  message: string;
+  data: Topic[];
+}
+
+interface UserResponse {
+  success: true;
+  message: string;
+  data: {
+    user: User;
+    token?: string;
+  };
+}
+
+interface RegisterApi {
+  name: string;
+  phone_number: string;
+  email: string;
+  user_name?: string;
+  password: string;
+  country_code: string;
+}
+
+interface HomeApiResponse {
+  data: HomeData;
+  success: true;
+  message: string;
+}
+interface HomeData {
+  articles: Article[];
+  topics: Topic[];
+  trending_article: Article;
+}
+
+interface Article {
+  id: number;
+  title: string;
+  slug: string;
+  url: string;
+  image: string;
+  short_description: string;
+  created_at: string;
+  topic: string;
+  user: ArticleUser;
+}
+interface ArticleUser {
+  id: number;
+  name: string;
+  user_name: string;
+  profile_image: string;
+  country_id: number | null;
+  tick: 'none' | 'blue'; // adjust if there are more types
+  is_following: boolean;
+  follow_count: number;
+}
+
+interface GetPostsResponse {
+  data: Post[];
+  success: true;
+  message: string;
+}
+
+interface Post {
+  id: number;
+  description: string | null;
+  created_at: string;
+  likes_count: number;
+  views_count: number;
+  comments_count: number;
+  media_count: number;
+  media: Media[];
+  user: ArticleUser;
+}
+
+interface Media {
+  id: number;
+  media: string;
+  description: string | null;
+  thumbnail?:string
+}
+
+
+
+interface LikedReply {
+  id: string;
+  isLiked: boolean;
+  likesCount: number;
+}
+
+interface LikedComment {
+  id: string;
+  isLiked: boolean;
+  likesCount: number;
+}
+
+
+interface BookMarkPost {
+  post_id: string;
+  isLiked: number;
+  likesCount: number;
+}
+
+interface FollowingUsers {
+  post_id: string ;
+  is_following:boolean;
+}
+
+interface LikedPosts {
+  post_id: string;
+  isLiked: number;
+  likesCount: number;
+}
+interface CommentPosts {
+  post_id: number;
+  commentCount: number;
+}
+
+interface ComentsState {
+post_id:number, 
+commentCount:number
+}
+interface storySeenIds {
+id:number |string
+}
+
+
+
+
+ interface postsState {
+  BookMarkPost: BookMarkPost[];
+  FollowingUsers: FollowingUsers[];
+  LikedPosts:LikedPosts[],
+  LikedComment: LikedComment[];
+  LikedReply: LikedReply[];
+  Comment: ComentsState[];
+  storySeenIds?: storySeenIds[];
+  isCreateButttonPressed : boolean, 
+  isSaved:Record<number, boolean>
+  isMutedVideo:boolean,
+  isStoryPlaying: boolean
+}
+
+
+
+type RenderImagesBase = {
+  images: string[]| [media:string,thumbnail?:string ];
+};
+
+type WithRemove = RenderImagesBase & {
+  type: true;
+  removeItem: (e: number) => void;
+};
+
+type WithoutRemove = RenderImagesBase & {
+  type?: false;
+  removeItem?: undefined;
+  isActiveIndex?: number;
+};
+
+ type RenderImagesProps = WithRemove | WithoutRemove;
+
+
+interface Storie{
+  id :number
+}
+ interface SuccessResponce<D> {
+  success :true;
+  message: string;
+  data:D
+ }

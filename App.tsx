@@ -1,45 +1,40 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React from "react";
+import { Provider } from "react-redux";
+import { store } from "./src/store";
+import { ThemeProvider } from "./src/context/ThemeProvider";
+import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-context';
+import Routes from "./src/navigation/Routes";
+import { WrapperContainer } from "./src/components";
+import { enableScreens } from 'react-native-screens';
+import { AlertProvider } from "./src/context/AlertContext";
+import { StripeProvider } from '@stripe/stripe-react-native'
+import { SocketProvider } from "./src/context/SocketProvider";
+enableScreens(true);
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
-import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
-
-function App() {
-  const isDarkMode = useColorScheme() === 'dark';
-
+const AppContent: React.FC = React.memo(() => {
   return (
-    <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
+    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+      <WrapperContainer >
+        <Routes />
+      </WrapperContainer>
     </SafeAreaProvider>
   );
-}
-
-function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
-
-  return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
-      />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
 });
+
+const App: React.FC = () => (
+  <Provider store={store}>
+    <StripeProvider
+      merchantIdentifier="merchant.com.searchtalent.app"
+      publishableKey="pk_live_51RYRHEKzQ210P9pldkRm88H5hzMQQuTDgU0Q2gON2YuTb5bVZkkoX0G9Mvizl2uYMxXmNTgIXALn8rRx2bOcQtZh002vm5EeQV">
+      <ThemeProvider key={1}>
+        <SocketProvider>
+          <AlertProvider>
+            <AppContent />
+          </AlertProvider>
+        </SocketProvider>
+      </ThemeProvider>
+    </StripeProvider>
+  </Provider>
+);
 
 export default App;
