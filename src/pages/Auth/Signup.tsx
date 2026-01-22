@@ -188,7 +188,6 @@ const Signup = () => {
             startTimer();
             setCurrentStep(2)
           } else {
-            console.log(res.message)
             showAlert({
               title: "Validation",
               message: res.message,
@@ -236,8 +235,6 @@ const Signup = () => {
                 <>
                   <SocialButton onPress={async () => {
                     const a = await googleLogin()
-                    console.log(a)
-
                     const FCM = await getFCMToken()
                     const b = await postApiCall("/auth/jobseekers/social-login", {
                       device_token: FCM,
@@ -436,7 +433,7 @@ const Signup = () => {
                 Don't receive email?
               </Text>
               {
-                remainingSeconds <= 0 ? <Text onPress={() => dispatch(UserReSentOtp({ email: userData.email })).unwrap().then((res) => console.log(res))} style={[{
+                remainingSeconds <= 0 ? <Text onPress={() => dispatch(UserReSentOtp({ email: userData.email })).unwrap().then((res) => {})} style={[{
                   fontSize: responsiveScreenFontSize(1.8),
                   fontWeight: '500',
                 }, { color: colors.primary, textAlign: "center" }]}>

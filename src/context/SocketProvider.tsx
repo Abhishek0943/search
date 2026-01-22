@@ -36,8 +36,6 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             newSocket.connect()
             newSocket.on("connect", () => {
                 setIsConnected(true);
-                console.log("✅ Socket connected");
-                console.log("Socket ID:", newSocket.id);
             });
 
             newSocket.on("connect_error", (error) => {
@@ -56,7 +54,6 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             });
 
             newSocket.on("reconnect_attempt", (attempt) => {
-                console.log("🔄 Reconnect attempt:", attempt);
             });
 
             newSocket.on("reconnect_failed", () => {

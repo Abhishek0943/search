@@ -136,8 +136,6 @@ const ProjectForm = () => {
   // ✅ Edit Prefill (if you send data in params)
   useEffect(() => {
     if (!data?.id) return;
-    console.log("data", data)
-
     setFormData(prev => ({
       ...prev,
       projectName: data.name ?? prev.projectName,

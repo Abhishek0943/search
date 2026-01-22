@@ -28,7 +28,6 @@ const PaymentHistory = () => {
       if (res.success !== false) {
         setCvs(res.data)
       }
-      console.log(res.data)
       setLoading(false)
     })
   }, [])

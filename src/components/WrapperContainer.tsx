@@ -4,11 +4,12 @@ import {
   ViewStyle,
   StatusBarStyle,
   StatusBar,
+  Platform,
 } from 'react-native';
 import { ThemeContext } from '../context/ThemeProvider';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import messaging from '@react-native-firebase/messaging';
-import { useAppDispatch } from '../store';
+import { useAppDispatch, useAppSelector } from '../store';
 import { setMessageCount } from '../reducer/userReducer';
 
 interface WrapperContainerProps {
@@ -21,6 +22,7 @@ const WrapperContainer: React.FC<WrapperContainerProps> = ({
   children,
 }) => {
   const { colors } = useContext(ThemeContext);
+  const { user } = useAppSelector(state => state.userStore);
   const containerStyle: ViewStyle = {
     flex: 1,
     backgroundColor: colors.statusBar,
@@ -34,13 +36,39 @@ const WrapperContainer: React.FC<WrapperContainerProps> = ({
   };
 
   const dispatch = useAppDispatch()
-  useEffect(() => {
-    const unsubscribe = messaging().onMessage(async remoteMessage => {
-      console.log(remoteMessage)
-      dispatch(setMessageCount({ messages_count: remoteMessage?.data?.unread_message_count || 0 }))
-    });
-    return unsubscribe;
-  }, []);
+ useEffect(() => {
+  if (!user?.id) return;
+
+  // If you only want this feature on Android, keep this:
+  // if (Platform.OS !== "android") return;
+
+  let unsubscribe: undefined | (() => void);
+
+  const start = async () => {
+    try {
+      // On iOS you should request permission before listening
+      if (Platform.OS === "ios") {
+        const authStatus = await messaging().requestPermission();
+        // optional: you can check authStatus if you want
+      }
+
+      unsubscribe = messaging().onMessage(async remoteMessage => {
+        dispatch(
+          setMessageCount({
+            messages_count: remoteMessage?.data?.unread_message_count || 0,
+          })
+        );
+      });
+    } catch (e) {
+    }
+  };
+
+  start();
+
+  return () => {
+    if (unsubscribe) unsubscribe();
+  };
+}, [user?.id]);
   return (
     <View style={[containerStyle,]}>
       <StatusBar hidden={true} />

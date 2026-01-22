@@ -20,7 +20,6 @@ const Splash = () => {
     const login = async () => {
       const token = await AsyncStorage.getItem("token")
       const role = await AsyncStorage.getItem("role") as "seeker" | "recruiter"
-      console.log("token", token)
       if (!token && !role) {
         navigation.navigate(routes.WELCOME)
       }

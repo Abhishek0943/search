@@ -365,7 +365,7 @@ function CandidateProfile() {
 
                     try {
                       setSendMsgLoading(true);
-                      dispatch(SendMessage({ seeker_id: cvs.id, message: messageText })).unwrap().then((res)=>{console.log(res)})
+                      dispatch(SendMessage({ seeker_id: cvs.id, message: messageText })).unwrap().then((res)=>{})
                       setMessageText("");
                       setIsMsgModalVisible(false);
                       showAlert({
@@ -442,7 +442,6 @@ async function requestStoragePermission() {
 
 export async function downloadCV(cv: string) {
   try {
-    console.log(cv)
     // if (Platform.OS === "android") {
     //   const hasPermission = await requestStoragePermission();
     //   if (!hasPermission) {
@@ -606,7 +605,7 @@ function Selection({ data, application_id }) {
   }, [data])
 
   useEffect(() => {
-    dispatch(UpdateStatus({ status: status, application_id: application_id })).unwrap().then((res) => console.log("asdf", res))
+    dispatch(UpdateStatus({ status: status, application_id: application_id })).unwrap().then((res) => {})
   }, [status])
   return (
     <View style={[styles.card, { backgroundColor: colors.lightGrayNatural, marginTop: responsiveScreenHeight(2) }]}>

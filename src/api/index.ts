@@ -10,10 +10,9 @@ export async function postApiCall<T>(
 ): Promise<ApiResponse<T>> {
   const { as = 'json', timeoutMs = 30000 } = opts;
   const token = await AsyncStorage.getItem("token")
-console.log(body)
   const isForm = as === 'form';
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  // const controller = new AbortController();
+  // const timeout = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const headers: Record<string, string> = {
       Accept: 'application/json',
@@ -23,11 +22,12 @@ console.log(body)
     if (!isForm) {
       headers['Content-Type'] = 'application/json';
     }
+    console.log(body)
     const res = await fetch(`${API_URL}${url}`, {
       method: 'POST',
       headers,
       body: isForm ? (body as FormData) : JSON.stringify(body),
-      signal: controller.signal,
+      // signal: controller.signal,
     });
     const text = await res.text(); // <-- better than res.json() first
     let data: any = null;

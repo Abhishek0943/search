@@ -25,7 +25,6 @@ const WorkExperience = () => {
     () => {
       dispatch(GetExperience()).unwrap().then(res => {
         setLoading(false)
-        console.log(res)
         if (res.success !== false) {
           setCvs(res.data)
         }

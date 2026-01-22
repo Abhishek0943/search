@@ -46,7 +46,6 @@ const Notification = () => {
           if (res.success !== false) {
             setCvs(res.data.notifications);
           }
-          console.log(res.data)
           setLoading(false)
         });
     }, []),

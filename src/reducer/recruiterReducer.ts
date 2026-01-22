@@ -119,7 +119,6 @@ export const SendMessage = createAsyncThunk<
 >(
   'SendMessage',
   (body) => {
-    console.log(body)
     return postApiCall<{ success: true, data: User }>('/company/messages',body);
   }
 );

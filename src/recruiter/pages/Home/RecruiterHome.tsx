@@ -28,7 +28,6 @@ function RecruiterHome() {
                 currency,
             });
             const clientSecret = json?.data?.client_secret;
-            console.log(clientSecret)
             if (!clientSecret) {
                 return;
             }
@@ -70,7 +69,6 @@ function RecruiterHome() {
             }
             const { error: payError, } = await presentPaymentSheet();
             if (payError) {
-                console.log(payError)
                 return;
             }
             dispatch(RecruiterProfile())
@@ -84,7 +82,6 @@ function RecruiterHome() {
                 message: "Successfully Activate Plan",
             })
         } catch (error) {
-            console.log(error)
         }
 
     }
@@ -113,7 +110,6 @@ function RecruiterHome() {
                 })
             }
         } catch (error) {
-            console.log(error)
         }
 
     }

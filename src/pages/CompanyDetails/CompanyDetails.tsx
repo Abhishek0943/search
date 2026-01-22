@@ -31,7 +31,6 @@ const CompanyDetails = () => {
             if (res.success) {
                 setJob(res.data)
             }
-            console.log(res.data)
             setLoading(false)
         })
     }, [id])

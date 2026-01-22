@@ -45,6 +45,7 @@ export const UploadCV = createAsyncThunk<
 >(
   'UploadCV',
   (body) => {
+    console.log(body)
     return postApiCall<{ success: true, data: Job[] }>('/jobseekers/cv-save', body, { as: "form" });
   }
 );
@@ -737,7 +738,6 @@ const jobSlice = createSlice({
       // if (payload.success) {
       //   const jobObject: Record<string, Job> = {}
       //   const jobIds: string[] = []
-      //   console.log(payload.jobs);
       //   payload.jobs.forEach((job) => {
       //     jobIds.push(job._id)
       //     jobObject[job._id] = job

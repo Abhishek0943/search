@@ -23,7 +23,7 @@ import imagePath from '../../assets/imagePath';
 import { CustomDropdown, formatDate } from './PersonalInfo';
 import { useAppDispatch } from '../../store';
 import { GetCountry, GetState, GetCity, AddWorkExperience, UploadCV } from '../../reducer/jobsReducer';
-import { pick, keepLocalCopy } from '@react-native-documents/picker'
+import { pick, types, keepLocalCopy,  } from '@react-native-documents/picker';
 // If you use react-native-date-picker
 import DatePicker from 'react-native-date-picker';
 import { Header } from '../Company/Company';
@@ -65,63 +65,77 @@ const EducationForm = () => {
             <Text style={{ color: colors.red, fontSize: responsiveScreenFontSize(1.8) }}> *</Text>
         </View>
     );
-    const pickPdf = async () => {
-        try {
-            const res = await pick({
-                type: ["application/pdf"],
-                copyTo: 'cachesDirectory',
-            });
-            setFormData(prev => ({
-                ...prev,
-                cvFile: {
-                    uri: res[0].fileCopyUri || res[0].uri,
-                    name: res[0].name || 'cv.pdf',
-                    type: res[0].type || 'application/pdf',
-                    size: res[0].size,
-                },
-            }));
-        } catch (e) {
-        }
-    };
-    const onSubmit = () => {
-        if (!formData.cvTitle?.trim()) {
-            showAlert({
-                title: "CV Title Required",
-                message: "Please enter a title for your CV.",
-            });
-            return;
-        }
+const normalizeFileUri = (u?: string) => {
+  if (!u) return '';
+  if (u.startsWith('/')) return `file://${u}`;
+  return u;
+};
 
-        if (!formData.cvFile?.uri) {
-            showAlert({
-                title: "CV File Required",
-                message: "Please select and upload your CV in PDF format.",
-            });
-            return;
-        }
+const pickPdf = async () => {
+  try {
+    const [doc] = await pick({
+      type: [types.pdf],
+      allowMultiSelection: false,
+      mode: 'import',
+      copyTo: 'documentDirectory',   // ✅ important (not caches)
+    });
 
-        const fd = new FormData();
+    const uri = normalizeFileUri(doc.fileCopyUri || doc.uri);  // ✅ prefer fileCopyUri
 
-        fd.append('title', formData.cvTitle);
-        fd.append('is_default', formData.isDefault ? '1' : '0');
+    setFormData(prev => ({
+      ...prev,
+      cvFile: {
+        uri,
+        name: doc.name ?? 'cv.pdf',
+        type: 'application/pdf',
+        size: doc.size,
+      },
+    }));
+  } catch (e) {
+    console.log('pickPdf error:', e);
+  }
+};
 
-        fd.append('cv_file', {
-            uri: formData.cvFile.uri,
-            name: formData.cvFile.name || 'cv.pdf',
-            type: formData.cvFile.type || 'application/pdf',
-        } as any);
-        setLoading(true)
-        dispatch(UploadCV(fd))
-            .unwrap()
-            .then(res => {
-                setLoading(false)
-                if (res.success) {
-                    navigation.goBack();
-                }
-            })
-            .catch(err => {
-            });
-    };
+
+const onSubmit = () => {
+  if (!formData.cvTitle?.trim()) {
+    showAlert({ title: "CV Title Required", message: "Please enter a title for your CV." });
+    return;
+  }
+
+  if (!formData.cvFile?.uri) {
+    showAlert({ title: "CV File Required", message: "Please select and upload your CV in PDF format." });
+    return;
+  }
+
+  const uri = normalizeFileUri(formData.cvFile.uri);
+
+  // Debug once on iOS to confirm it is file://...
+  console.log('Uploading CV uri:', uri);
+
+  const fd = new FormData();
+  fd.append('title', formData.cvTitle.trim());
+  fd.append('is_default', formData.isDefault ? '1' : '0');
+
+  fd.append('cv_file', {
+    uri,
+    name: formData.cvFile.name || 'cv.pdf',
+    type: 'application/pdf',
+  } as any);
+
+  setLoading(true);
+  dispatch(UploadCV(fd))
+    .unwrap()
+    .then(res => {
+      setLoading(false);
+      if (res.success) navigation.goBack();
+    })
+    .catch(err => {
+      setLoading(false);
+      console.log('UploadCV error:', err);
+    });
+};
+
     const inputStyle = {
         borderWidth: 1,
         width: '100%',

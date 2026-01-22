@@ -58,12 +58,10 @@ const Profile = () => {
             } as any);
 
             setProfile({ ...profile, [field]: image.path });
-console.log(fd)
             dispatch(UpdateProfile(fd))
                 .unwrap()
                 .then((res) => {
                     if (res.success) {
-                        console.log(res)
                         dispatch(ProfileData())
                     }
                     else {
@@ -74,7 +72,6 @@ console.log(fd)
 
 
         } catch (e) {
-            console.log('Image pick cancelled or error', e);
         }
     };
     const [refreshing, setRefreshing] = useState(false);

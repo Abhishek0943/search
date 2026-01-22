@@ -18,7 +18,6 @@ const logoutUser = async () => {
             'role',
         ]);
     } catch (e) {
-        console.log('Logout error:', e);
     }
 };
 const logoutAndRestart = async () => {

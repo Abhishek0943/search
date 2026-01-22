@@ -213,7 +213,6 @@ const AddJob = () => {
         if (jobData) {
             editorRef.current.setContentHTML(jobData.description);
             benefitsRef.current.setContentHTML(jobData.benefits);
-            console.log(jobData, "sdfdfsdf")
             setFormData({
                 jobTitle: jobData.title || '',
                 description: jobData.description || '',
@@ -515,7 +514,6 @@ const AddJob = () => {
                     placeholder="Select"
                     onSelect={(arr: number[]) => {
 
-                        console.log(arr)
                         setFormData(prev => ({ ...prev, skills: arr }))
                     }}
                     selectedValues={formData.skills}

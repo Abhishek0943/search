@@ -191,7 +191,7 @@ const ForgotPassword = () => {
                 Didn’t see your email?
               </Text>
               {
-                remainingSeconds <= 0 ? <Text onPress={() => dispatch(UserReSentOtp({ email: userData.username })).unwrap().then((res) => console.log(res))} style={[{
+                remainingSeconds <= 0 ? <Text onPress={() => dispatch(UserReSentOtp({ email: userData.username })).unwrap().then((res) => {})} style={[{
                   fontSize: responsiveScreenFontSize(1.8),
                   fontWeight: '500',
                 }, { color: colors.primary, textAlign: "center" }]}>

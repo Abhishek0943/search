@@ -10,7 +10,6 @@ import { AlertProvider } from "./src/context/AlertContext";
 import { StripeProvider } from '@stripe/stripe-react-native'
 import { SocketProvider } from "./src/context/SocketProvider";
 enableScreens(true);
-
 const AppContent: React.FC = React.memo(() => {
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
@@ -20,7 +19,6 @@ const AppContent: React.FC = React.memo(() => {
     </SafeAreaProvider>
   );
 });
-
 const App: React.FC = () => (
   <Provider store={store}>
     <StripeProvider

@@ -68,14 +68,12 @@ const Chat = () => {
                 dispatch(GetChats({})).unwrap().then((res) => {
                     if (res.success) {
                         setData(res.data)
-                        console.log(res.data)
                     }
                 })
             } else {
                 dispatch(GetChatsSeeker({})).unwrap().then((res) => {
                     if (res.success) {
                         setData(res.data)
-                        console.log(res.data)
                     }
                 })
             }

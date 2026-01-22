@@ -27,7 +27,6 @@ const CV = () => {
                         setCvs(res.data)
 
                     }
-                    console.log(res)
                 })
             }
         },

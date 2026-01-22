@@ -22,20 +22,15 @@ export const googleLogin = async (): Promise<GoogleUser | ErrorWithCode> => {
   try {
     await GoogleSignin.signOut();
     const userInfo = await GoogleSignin.signIn();
-    console.log(userInfo, 'google login in try block');
     return userInfo;
   } catch (error: any) {
     if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-      console.log('SIGN_IN_CANCELLED');
       return error;
     } else if (error.code === statusCodes.IN_PROGRESS) {
-      console.log('IN_PROGRESS');
       return error;
     } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-      console.log('PLAY_SERVICES_NOT_AVAILABLE');
       return error;
     } else {
-      console.log(error, 'error in gmail');
       return error;
     }
   }
@@ -84,7 +79,6 @@ export const googleLogin = async (): Promise<GoogleUser | ErrorWithCode> => {
 //           );
 
 //         if (credentialState === appleAuth.State.AUTHORIZED) {
-//           console.log('checking apple login >>> ', appleAuthRequestResponse);
 //           resolve(appleAuthRequestResponse);
 //         } else {
 //           reject(credentialState);

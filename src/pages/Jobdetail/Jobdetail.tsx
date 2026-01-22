@@ -28,7 +28,6 @@ const Jobdetail = () => {
             if (res.success) {
                 setJob(res.data.jobDetail)
             }
-            console.log(res)
             setLoading(false)
         })
     }, [id])

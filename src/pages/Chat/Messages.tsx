@@ -45,7 +45,6 @@ const Messages = () => {
         // };
 
         socket.on("message_delivered", (e) => {
-            console.log(e)
         });
 
         // optional: load history
@@ -65,12 +64,10 @@ const Messages = () => {
     }, [])
     useEffect(() => {
         const a = async () => {
-            console.log(dataa)
             if (!dataa?.id) return
             if (role === "recruiter") {
                 dispatch(GetMessage({ id: dataa.id, pages })).unwrap().then((res) => {
                     if (!res.success) return;
-                    console.log(res.data)
                     const incomingGroups = res.data.groups;
                     setData((prev) => {
                         if (pages === 1) return incomingGroups;
@@ -306,8 +303,6 @@ const Messages = () => {
                                                         return [...list, { label: incomingLabel, messages: [msg] }];
                                                     });
                                                 }
-                                                console.log("hui hui", res)
-
                                                 socket?.emit("message_delivered", { to_role: "seeker", to_id: dataa.id, message: res.data }, (res: any) => {
                                                 });
                                             })

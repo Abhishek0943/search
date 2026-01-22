@@ -116,6 +116,7 @@ const Login = () => {
         setLoading(true)
         const FCM = await getFCMToken()
         if (role === "recruiter") {
+
           dispatch(RecruiterLoginByPassword({
             device_token: FCM,
             device_type: Platform.OS, email: userData.username, password: userData.password
@@ -141,7 +142,6 @@ const Login = () => {
             if (res.success) {
               AsyncStorage.setItem("token", res.data.token)
               RNRestart.restart();
-
             }
             else {
               showAlert({
@@ -150,7 +150,7 @@ const Login = () => {
               })
             }
             setLoading(false)
-          }).catch((err) => console.log(err))
+          }).catch((err) => {})
         }
 
       }} isLoading={loading} label='Login' style={{ marginTop: responsiveScreenHeight(2) }} isActive={true} />

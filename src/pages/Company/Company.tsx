@@ -70,7 +70,6 @@ const Company = () => {
         if (res.success) {
           setJob(res.data)
         }
-        console.log("res", res)
         setLoading(false)
       })
     }

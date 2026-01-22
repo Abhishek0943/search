@@ -116,7 +116,6 @@ const SkillExperienceForm = () => {
           }
         })
         .catch(err => {
-          console.log("AddSkillExperience error:", err);
           showAlert({
             title: "Error",
             message: err?.message || "Something went wrong",
