@@ -120,26 +120,7 @@ function CvCard({
                         <Pressable onPress={() => { navigation.navigate(routes.PROJECTFORM, { ...item }) }} hitSlop={10} style={styles.iconBtn}>
                             <Image source={imagePath.edit} />
                         </Pressable>
-                        <Pressable onPress={() => setActive(id)} hitSlop={10} style={styles.iconBtn}>
-                            <Image source={imagePath.threeDot} />
-                            {
-                                id === active &&
-                                <View
-                                    style={[
-                                        {
-                                            backgroundColor: colors.white,
-                                            position: "absolute",
-                                            width: responsiveScreenWidth(30),
-                                            right: 0,
-                                            top: "90%",
-                                            borderRadius: 10,
-                                            gap: responsiveScreenHeight(1),
-                                            paddingHorizontal: responsiveScreenWidth(3),
-                                            paddingVertical: responsiveScreenHeight(1)
-                                        },
-                                    ]}
-                                >
-                                    <Pressable
+                        <Pressable
                                         onPress={async () => {
                                             const ok = await showConfirm({
                                                 title: "Delete Project?",
@@ -154,17 +135,12 @@ function CvCard({
                                             }
                                         }
                                         }
-                                        style={{ flexDirection: "row", gap: responsiveScreenWidth(1) }}
+                                       style={styles.iconBtn}
                                     >
-                                        <Image source={imagePath.delete} style={{}} />
-                                        <Text style={[{ color: colors.textPrimary }]}>
-                                            Delete
-                                        </Text>
+                                        <Image source={imagePath.delete} style={{transform:[{scale:1.2}]}} />
+                                       
                                     </Pressable>
-                                </View>
-                            }
-
-                        </Pressable>
+                    
                     </View>
                 </View>
 

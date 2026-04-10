@@ -39,10 +39,10 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             });
 
             newSocket.on("connect_error", (error) => {
-                console.error("❌ connect_error");
-                console.error("Message:", error.message);
-                console.error("Name:", error.name);
-                console.error("Stack:", error.stack);
+                // console.error("❌ connect_error");
+                // console.error("Message:", error.message);
+                // console.error("Name:", error.name);
+                // console.error("Stack:", error.stack);
             });
 
             newSocket.on("error", (error) => {

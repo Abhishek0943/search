@@ -7,11 +7,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import userReducer from '../reducer/userReducer'
 import storyReducer from '../reducer/storyReducer'
 import jobsReducer from '../reducer/jobsReducer'
+import recruiterReducer from '../reducer/recruiterReducer'
 
 const rootReducer = combineReducers({
   userStore: userReducer,
   storyStore: storyReducer,
-  jobsReducer:jobsReducer
+  jobsReducer:jobsReducer,
+  recruiterReducer:recruiterReducer,
 });
 
 

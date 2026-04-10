@@ -12,8 +12,8 @@
 		16754D562BB24F539282389E /* Gilroy-Heavy.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 197B75C6978048AFBC69269E /* Gilroy-Heavy.ttf */; };
 		2B472BF9D1474820A050ED20 /* Gilroy-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 053B9724F0DA470BA83031B6 /* Gilroy-Bold.ttf */; };
 		3A1B1BF0F4134AB8B1468C27 /* Gilroy-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F75A7D7E93C74780BFE9F781 /* Gilroy-Regular.ttf */; };
+		576122552F28AA23005A9223 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 576122542F28AA23005A9223 /* StoreKit.framework */; };
 		57DFADCF2F20EE1400CEC2F6 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 57DFADCE2F20EE1400CEC2F6 /* GoogleService-Info.plist */; };
-		57DFADD12F20F06700CEC2F6 /* GoogleService-Info 2.plist in Resources */ = {isa = PBXBuildFile; fileRef = 57DFADD02F20F06700CEC2F6 /* GoogleService-Info 2.plist */; };
 		5AE26633790043EC9BD18B78 /* Gilroy-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4AB3AA562E1846B9B0E9DD0C /* Gilroy-Medium.ttf */; };
 		6A8B6E9C08564A8A87848472 /* Gilroy-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1D714AA16EE54F00BFCDF08E /* Gilroy-Light.ttf */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
@@ -32,9 +32,9 @@
 		3B4392A12AC88292D35C810B /* Pods-SearchTalent.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SearchTalent.debug.xcconfig"; path = "Target Support Files/Pods-SearchTalent/Pods-SearchTalent.debug.xcconfig"; sourceTree = "<group>"; };
 		4AB3AA562E1846B9B0E9DD0C /* Gilroy-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Gilroy-Medium.ttf"; path = "../src/assets/fonts/Gilroy-Medium.ttf"; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-SearchTalent.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SearchTalent.release.xcconfig"; path = "Target Support Files/Pods-SearchTalent/Pods-SearchTalent.release.xcconfig"; sourceTree = "<group>"; };
+		576122542F28AA23005A9223 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		57DFADCD2F20EB0400CEC2F6 /* SearchTalent.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = SearchTalent.entitlements; path = SearchTalent/SearchTalent.entitlements; sourceTree = "<group>"; };
 		57DFADCE2F20EE1400CEC2F6 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		57DFADD02F20F06700CEC2F6 /* GoogleService-Info 2.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info 2.plist"; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-SearchTalent.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SearchTalent.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = SearchTalent/AppDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = SearchTalent/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -48,6 +48,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0C80B921A6F3F58F76C31292 /* libPods-SearchTalent.a in Frameworks */,
+				576122552F28AA23005A9223 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -71,6 +72,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				576122542F28AA23005A9223 /* StoreKit.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				5DCACB8F33CDC322A6C60F78 /* libPods-SearchTalent.a */,
 			);
@@ -87,7 +89,6 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				57DFADD02F20F06700CEC2F6 /* GoogleService-Info 2.plist */,
 				13B07FAE1A68108700A75B9A /* SearchTalent */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
@@ -191,7 +192,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
-				57DFADD12F20F06700CEC2F6 /* GoogleService-Info 2.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				57DFADCF2F20EE1400CEC2F6 /* GoogleService-Info.plist in Resources */,
 				5AE26633790043EC9BD18B78 /* Gilroy-Medium.ttf in Resources */,
@@ -324,7 +324,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 3;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -356,7 +356,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 3;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

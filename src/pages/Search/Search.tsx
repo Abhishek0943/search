@@ -83,7 +83,7 @@ const Search = () => {
 
   useEffect(() => {
     if (!ready) return;
-    setLoading(true);
+    // setLoading(true);
     const payload = {
       search,
       job_type_id: filter?.jobTypes ?? [],
@@ -97,7 +97,7 @@ const Search = () => {
       career_level_id: filter?.careerLevels ?? [],
       functional_area_id: filter?.functionalAreas ?? [],
       city_id: filter?.cities ?? [],
-      pages,
+      pages: pages,
     };
     const promise = dispatch(GetJobs(payload));
     promise.unwrap()
@@ -119,6 +119,7 @@ const Search = () => {
       promise.abort?.();
     };
   }, [ready, search, filter, pages]);
+
   const onLoadMore = React.useCallback(() => {
     if (!meta?.last_page) return;
     if (meta?.current_page >= meta.last_page) return;
@@ -327,6 +328,7 @@ const Search = () => {
                       onEndReached={onLoadMore}       // ✅
                       scrollEventThrottle={16}
                       removeClippedSubviews={false}
+                      keyExtractor={(i)=>`${i.id}fasdfdasfasdfsadfdasfdasfdasfasdfsdfadsffdsafdsfasdfasdfadsferfewrqewserchitem`}
                       style={{ width: responsiveScreenWidth(94), marginHorizontal: "auto" }} data={job} renderItem={({ item, index }) => {
                         return (
                           <JobCard refresh={() => {
@@ -430,28 +432,40 @@ const inputStyle = (colors: any) => ({
 });
 export const CustomMultiDropdown = ({
   data = [],
-  placeholder = 'Select',
+  placeholder = "Select",
   selectedValues = [],
-  onSelect = (arr: any[]) => { },
-  labelKey = 'name',
-  valueKey = 'id',
+  onSelect = (arr: any[]) => {},
+  labelKey = "name",
+  valueKey = "id",
 }) => {
   const [visible, setVisible] = useState(false);
+  const [query, setQuery] = useState("");
   const { colors } = useContext(ThemeContext);
+
   const selectedLabel = useMemo(() => {
-    if (!selectedValues?.length) return '';
+    if (!selectedValues?.length) return "";
     const labels = data
       .filter((x: any) => selectedValues.includes(getOptionValue(x, valueKey)))
       .map((x: any) => getOptionLabel(x, labelKey));
 
     if (labels.length > 3) return `${labels.length} selected`;
-    return labels.join(', ');
+    return labels.join(", ");
   }, [data, selectedValues, labelKey, valueKey]);
+
+  const filteredData = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return data;
+
+    return data.filter((item: any) => {
+      const label = String(getOptionLabel(item, labelKey) ?? "").toLowerCase();
+      return label.includes(q);
+    });
+  }, [data, query, labelKey]);
 
   const toggleValue = (val: any) => {
     const exists = selectedValues.includes(val);
     const updated = exists
-      ? selectedValues.filter(v => v !== val)
+      ? selectedValues.filter((v) => v !== val)
       : [...selectedValues, val];
     onSelect(updated);
   };
@@ -459,10 +473,13 @@ export const CustomMultiDropdown = ({
   return (
     <>
       <TouchableOpacity
-        onPress={() => setVisible(true)}
+        onPress={() => {
+          setQuery("");
+          setVisible(true);
+        }}
         style={{
           borderWidth: 1,
-          width: '100%',
+          width: "100%",
           borderRadius: 6,
           borderColor: colors.mediumGray,
           paddingHorizontal: responsiveScreenWidth(3),
@@ -482,26 +499,55 @@ export const CustomMultiDropdown = ({
       </TouchableOpacity>
 
       <Modal visible={visible} transparent animationType="fade">
-        <TouchableOpacity
-          activeOpacity={1}
+        {/* overlay */}
+        <Pressable
           onPress={() => setVisible(false)}
           style={{
             flex: 1,
-            backgroundColor: 'rgba(0,0,0,0.3)',
-            justifyContent: 'center',
+            backgroundColor: "rgba(0,0,0,0.3)",
+            justifyContent: "center",
             paddingHorizontal: 20,
           }}
         >
-          <View
+          {/* modal card - stop overlay close */}
+          <Pressable
+            onPress={() => {}}
             style={{
-              backgroundColor: 'white',
+              backgroundColor: "white",
               borderRadius: 8,
               padding: 10,
-              maxHeight: '60%',
+              maxHeight: "60%",
             }}
           >
+            {/* search input */}
+            <View
+              style={{
+                borderWidth: 1,
+                borderColor: colors.mediumGray,
+                borderRadius: 8,
+                paddingHorizontal: 12,
+                paddingVertical: 8,
+                marginBottom: 10,
+              }}
+            >
+              <TextInput
+                value={query}
+                onChangeText={setQuery}
+                placeholder="Search..."
+                placeholderTextColor={colors.gray}
+                autoCapitalize="none"
+                autoCorrect={false}
+                style={{
+                  fontSize: responsiveScreenFontSize(1.8),
+                  color: colors.textPrimary,
+                  padding: 0,
+                }}
+              />
+            </View>
+
             <FlatList
-              data={data}
+              data={filteredData}
+              keyboardShouldPersistTaps="handled"
               keyExtractor={(item: any, index: number) =>
                 String(getOptionValue(item, valueKey) ?? index)
               }
@@ -509,20 +555,29 @@ export const CustomMultiDropdown = ({
                 const val = getOptionValue(item, valueKey);
                 const label = getOptionLabel(item, labelKey);
                 const isSelected = selectedValues.includes(val);
+
                 return (
                   <TouchableOpacity
                     onPress={() => toggleValue(val)}
                     style={{
                       paddingVertical: 12,
                       paddingHorizontal: 10,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
                     }}
                   >
-                    <Text style={{ fontSize: responsiveScreenFontSize(1.8), width: responsiveScreenWidth(70) }}>
+                    <Text
+                      style={{
+                        fontSize: responsiveScreenFontSize(1.8),
+                        width: responsiveScreenWidth(70),
+                        color: colors.textPrimary,
+                      }}
+                      numberOfLines={1}
+                    >
                       {label}
                     </Text>
+
                     <View
                       style={{
                         height: 18,
@@ -530,29 +585,48 @@ export const CustomMultiDropdown = ({
                         borderRadius: 4,
                         borderWidth: 2,
                         borderColor: isSelected ? colors.primary : colors.gray,
-                        backgroundColor: isSelected ? colors.primary : 'transparent',
+                        backgroundColor: isSelected
+                          ? colors.primary
+                          : "transparent",
                       }}
                     />
                   </TouchableOpacity>
                 );
               }}
+              ListEmptyComponent={
+                <Text
+                  style={{
+                    paddingVertical: 14,
+                    textAlign: "center",
+                    color: colors.gray,
+                    fontSize: responsiveScreenFontSize(1.7),
+                  }}
+                >
+                  No results
+                </Text>
+              }
             />
 
             <TouchableOpacity
               onPress={() => setVisible(false)}
               style={{
                 marginTop: 8,
-                alignSelf: 'flex-end',
+                alignSelf: "flex-end",
                 paddingVertical: 10,
                 paddingHorizontal: 14,
               }}
             >
-              <Text style={{ color: colors.primary, fontSize: responsiveScreenFontSize(1.8) }}>
+              <Text
+                style={{
+                  color: colors.primary,
+                  fontSize: responsiveScreenFontSize(1.8),
+                }}
+              >
                 Done
               </Text>
             </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
+          </Pressable>
+        </Pressable>
       </Modal>
     </>
   );

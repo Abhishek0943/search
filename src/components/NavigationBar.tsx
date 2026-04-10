@@ -9,7 +9,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Text from './Text'
 import { useAppSelector } from '../store'
 
-const NavigationBar = ({ bottomPadding = false, children, statusbar = true, name, navigationBar = true }: { navigationBar?: boolean, statusbar?: boolean, bottomPadding?: boolean, children: React.JSX.Element, name?: RoutesType["HOME"] | RoutesType["CHAT"] | RoutesType["PROFILE"] | RoutesType["APPLYJOB"] }) => {
+const NavigationBar = ({ bottomPadding = false, children, statusbar = true, name, navigationBar = true }: { navigationBar?: boolean, statusbar?: boolean, bottomPadding?: boolean, children: React.JSX.Element, name?: RoutesType["HOME"] | RoutesType["CHAT"] | RoutesType["PROFILE"] | RoutesType["APPLYJOB"] | RoutesType["BLOG"] }) => {
     const { colors } = useContext(ThemeContext)
     const navigation: NavigationProp<ParamListBase> = useNavigation();
     const { user } = useAppSelector((state) => state.userStore);
@@ -26,6 +26,11 @@ const NavigationBar = ({ bottomPadding = false, children, statusbar = true, name
             name: "Home",
             path: routes.HOME,
             icon: <Image source={name === routes.HOME ? imagePath.activeHome : imagePath.home} />
+        },
+        {
+            name: "Insights",
+            path: routes.BLOG,
+            icon: <Image source={name === routes.BLOG ? imagePath.activeBlog : imagePath.blog} />
         },
         {
             name: "Applications",

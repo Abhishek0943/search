@@ -46,4 +46,6 @@ interface JobInitialState {
     userObject: Record<string, Job>,
     userIds: string[],
   }
+  suggested:any[]
+  recent:any[]
 }

@@ -1,14 +1,12 @@
 import { View, Text, FlatList, Image, Pressable, Alert, TouchableWithoutFeedback, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { NavigationBar, PageHeaderOne } from '../../components';
+import { NavigationBar } from '../../components';
 import { routes } from '../../constants/values';
 import {
   responsiveScreenFontSize,
   responsiveScreenHeight,
   responsiveScreenWidth,
 } from 'react-native-responsive-dimensions';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useConfirm } from '../../ConfirmContext';
 import { ThemeContext } from '../../context/ThemeProvider';
@@ -17,15 +15,15 @@ import { useAppDispatch } from '../../store';
 import { DeleteNotification, GetCv, GetNotification } from '../../reducer/jobsReducer';
 import { Header } from '../Company/Company';
 import { useAlert } from '../../context/AlertContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Notification = () => {
-  const [data, setData] = useState([...new Array(10)]);
   const navigation = useNavigation();
   const { colors } = useContext(ThemeContext);
-
   const dispatch = useAppDispatch();
   const [cvs, setCvs] = useState<any[]>([]);
   const [active, setActive] = useState(0)
+  const [role, setRole] = useState("seeker")
   const [loading, setLoading] = useState(true)
   const refresh = () => {
     dispatch(GetNotification())
@@ -37,9 +35,14 @@ const Notification = () => {
         setLoading(false)
       });
   }
-  const {showConfirm} = useAlert()
+  const { showConfirm } = useAlert()
   useFocusEffect(
     useCallback(() => {
+      const a = async () => {
+        const r = await AsyncStorage.getItem("role") as "seeker" | "recruiter"
+        setRole(r)
+      }
+      a()
       dispatch(GetNotification())
         .unwrap()
         .then(res => {
@@ -53,39 +56,48 @@ const Notification = () => {
   return (
     <>
       <NavigationBar navigationBar={false}>
-        <TouchableWithoutFeedback>
-          <ScrollView
-            style={{ flex: 1 }}
-            contentContainerStyle={{
-              width: responsiveScreenWidth(100),
-              alignSelf: 'center',
-              alignItems: 'center',
-              flex: 1,
-              paddingBottom: responsiveScreenHeight(3),
-            }}
-          >
-            <Header title="Notifications" />
-            {
-              !loading ? <>
-                <FlatList data={cvs}
-                  ListEmptyComponent={() => (<View style={{ flex: 1, justifyContent: "center" }}>
-                    <Image source={imagePath.notificationEmptyImage} />
-                  </View>)}
-                  contentContainerStyle={{ flexGrow: 1 }}
-                  style={{ flex: 1 }}
-                  renderItem={({ item }) => {
-                    return (
-                      <View style={{ backgroundColor: colors.white, elevation: 5, borderWidth: 1, borderColor: "transparent", borderRadius: 16, overflow: "hidden", paddingVertical: responsiveScreenHeight(1.4), paddingHorizontal: responsiveScreenWidth(3), margin: 10, width: responsiveScreenWidth(90), gap: responsiveScreenWidth(2), flexDirection: "row" }}>
-                        <View style={{ borderRadius: 6, height: responsiveScreenHeight(4.9), padding: 10, overflow: "hidden", backgroundColor: "#CECECE38" }}>
-                          <Image source={{uri:item.from.image}} resizeMode='contain' style={{ height: "100%", aspectRatio: 1 }} />
+        <View
+          style={{
+            flex: 1,
+
+
+            alignSelf: 'center',
+            alignItems: 'center',
+            paddingBottom: responsiveScreenHeight(3),
+          }}
+  
+        >
+          <Header title="Notifications" />
+          {
+            !loading ? <>
+              <FlatList data={cvs}
+                showsVerticalScrollIndicator={false}
+                scrollEnabled={true}
+                ListEmptyComponent={() => (<View style={{ flex: 1,marginTop:responsiveScreenHeight(40), justifyContent: "center" }}>
+                  <Image source={imagePath.notificationEmptyImage} />
+                </View>)}
+                // contentContainerStyle={{ flexGrow: 1 }}
+                // style={{ }}
+                renderItem={({ item }) => {
+                  return (
+                    <TouchableWithoutFeedback onPress={() => setActive(0)} >
+                      <View style={{ backgroundColor: colors.white, borderWidth: 1, borderColor: colors.gray, marginTop: responsiveScreenHeight(2), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 16, overflow: "hidden", paddingVertical: responsiveScreenHeight(1.4), width: responsiveScreenWidth(90), gap: responsiveScreenWidth(2), flexDirection: "row" }}>
+                        <View style={{ borderRadius: 6, height: responsiveScreenHeight(4.9), overflow: "hidden", backgroundColor: "#CECECE38" }}>
+                          <Image source={{ uri: item.from.image }} resizeMode='cover' style={{ height: "100%", aspectRatio: 1, }} />
                         </View>
-                        <View style={{ flex: 1, }}>
+                        <TouchableOpacity onPress={() => {
+                          setActive(0)
+                          if (role === "seeker") {
+                            item?.job?.id && navigation.navigate(routes.JOBDETAIL, { id: item.job.id })
+                          } else {
+                            navigation.navigate(routes.CANDIDATEPROFILE, { application_id: item.application_id, })
+                          }
+                        }} style={{ flex: 1, }}>
                           <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(2) }}>
-                            <Text numberOfLines={1} style={{maxWidth:responsiveScreenWidth(30), fontWeight: "700", textTransform: "capitalize", fontSize: responsiveScreenFontSize(1.9) }}>{item.job.title}</Text>
+                            <Text numberOfLines={1} style={{ maxWidth: responsiveScreenWidth(30), fontWeight: "700", textTransform: "capitalize", fontSize: responsiveScreenFontSize(1.9) }}>{item?.job?.title}</Text>
                             <View style={{ borderRadius: 6, aspectRatio: 1, height: responsiveScreenHeight(.5), overflow: "hidden", backgroundColor: "#91E1DD" }}>
                             </View>
-                            <Text numberOfLines={1}  style={{maxWidth:responsiveScreenWidth(30), fontWeight: "400", textTransform: "capitalize", color: colors.darkGrayNatural, fontSize: responsiveScreenFontSize(1.9) }}>{item.from.name}</Text>
-
+                            <Text numberOfLines={1} style={{ maxWidth: responsiveScreenWidth(30), fontWeight: "400", textTransform: "capitalize", color: colors.darkGrayNatural, fontSize: responsiveScreenFontSize(1.9) }}>{item.from.name}</Text>
                           </View>
                           <Text
                             style={{
@@ -98,16 +110,15 @@ const Notification = () => {
                             }}
                           >
                             <Text numberOfLines={2}>
-                             {item.message}{" "}
+                              {item.message}{" "}
                             </Text>
                             <Text style={{ fontSize: responsiveScreenFontSize(2.5), color: "#F6FF73" }}>
                               •
                             </Text>
                             {" "}{item?.created_at?.split("T")[0]}
                           </Text>
-                        </View>
+                        </TouchableOpacity>
                         <Pressable onPress={() => setActive(item.id)} style={{ position: "relative", backgroundColor: "white" }}>
-
                           <Image source={imagePath.dots2} />
                           {
                             item.id === active &&
@@ -116,7 +127,8 @@ const Notification = () => {
                                 {
                                   backgroundColor: colors.white,
                                   position: "absolute",
-                                  elevation: 10,
+                               borderWidth:1,
+                               borderColor:colors.lightGray,
                                   width: responsiveScreenWidth(30),
                                   right: 0,
                                   top: "30%",
@@ -133,10 +145,9 @@ const Notification = () => {
                               <TouchableOpacity
                                 onPress={async () => {
                                   if (item?.id) {
-
                                     const ok = await showConfirm({
-                                      title: "Delete CV?",
-                                      message: "Are you sure you want to delete this record?",
+                                      title: "Delete notification?",
+                                      message: "Are you sure you want to delete this notification?",
                                       okText: "Delete",
                                       cancelText: "Cancel",
                                     })
@@ -160,15 +171,15 @@ const Notification = () => {
                           }
                         </Pressable>
                       </View>
-                    )
-                  }}
-                />
-              </> : <View style={{ flex: 1, justifyContent: "center" }}>
-                <ActivityIndicator size={responsiveScreenFontSize(3)} />
-              </View>
-            }
-          </ScrollView>
-        </TouchableWithoutFeedback>
+                    </TouchableWithoutFeedback>
+                  )
+                }}
+              />
+            </> : <View style={{ flex: 1, justifyContent: "center" }}>
+              <ActivityIndicator size={responsiveScreenFontSize(3)} />
+            </View>
+          }
+        </View>
       </NavigationBar>
     </>
   );

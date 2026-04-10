@@ -1,4 +1,4 @@
-import { Image, TouchableOpacity, StyleSheet, Text, View, TextInput, FlatList, Pressable, } from 'react-native'
+import { Image, TouchableOpacity, StyleSheet, Text, View, TextInput, FlatList, Pressable, ActivityIndicator, } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { ThemeContext } from '../../context/ThemeProvider'
 import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native'
@@ -13,6 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { GetChats, GetChatsSeeker, GetFilter, ProfileData2 } from '../../reducer/jobsReducer'
 import { useSocket } from '../../context/SocketProvider'
 import { setMessageCount } from '../../reducer/userReducer'
+import { EmptyComp } from '../../recruiter/pages/OpenJobs/OpenJobs'
 const Chat = () => {
     const { colors } = useContext(ThemeContext)
     const navigation: NavigationProp<ParamListBase> = useNavigation()
@@ -21,6 +22,7 @@ const Chat = () => {
     const dispatch = useAppDispatch()
     const [search, setSearch] = useState("")
     const { socket, isConnected } = useSocket();
+      const [loading, setLoading] = useState(false)
     useEffect(() => {
         if (!socket || !isConnected) return;
 
@@ -64,18 +66,19 @@ const Chat = () => {
     useEffect(() => {
         const a = async () => {
             const role = await AsyncStorage.getItem("role") as "seeker" | "recruiter"
+            setLoading(true)
             if (role === "recruiter") {
                 dispatch(GetChats({})).unwrap().then((res) => {
                     if (res.success) {
                         setData(res.data)
                     }
-                })
+               }).finally(() => setLoading(false))
             } else {
                 dispatch(GetChatsSeeker({})).unwrap().then((res) => {
                     if (res.success) {
                         setData(res.data)
                     }
-                })
+                }).finally(() => setLoading(false))
             }
         }
         a()
@@ -87,7 +90,7 @@ const Chat = () => {
                 <Icon style={{ color: colors.darkGray }} size={responsiveScreenFontSize(2)} icon={{ type: "Ionicons", name: "search" }} />
             </View> */}
         </View>
-        <TouchableOpacity
+        <View
             style={{
                 borderRadius: 7,
                 backgroundColor: colors.lightGrayNatural,
@@ -107,6 +110,7 @@ const Chat = () => {
                 onChangeText={e => setSearch(e)}
                 placeholder="Search"
                 placeholderTextColor={colors.textDisabled}
+                hitSlop={30}
                 style={{
                     flex: 1,
                     margin: 0,
@@ -114,7 +118,7 @@ const Chat = () => {
                     fontSize: responsiveScreenFontSize(1.8),
                 }}
             />
-        </TouchableOpacity>
+        </View>
         {
             !user || !user?.id ? <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                 <Image source={imagePath.image1} />
@@ -127,13 +131,17 @@ const Chat = () => {
                         <Text style={{ color: colors.primary, fontSize: responsiveScreenFontSize(1.8) }}>Log In</Text>
                     </TouchableOpacity>
                 </View>
-            </View> : <View style={{ paddingVertical: responsiveScreenHeight(2), paddingHorizontal: responsiveScreenWidth(3), backgroundColor: colors.white, flex: 1, alignItems: "center" }}>
+           </View> : <View style={{ paddingVertical: responsiveScreenHeight(2), paddingHorizontal: responsiveScreenWidth(3), backgroundColor: colors.white, flex: 1, alignItems: "center" }}>
+                {loading ? (
+                   <View style={{ flex: 1, marginTop: responsiveScreenHeight(40) }}><ActivityIndicator size={responsiveScreenFontSize(3)} /></View>
+                ) : (
                 <FlatList
                     onEndReachedThreshold={0.5}
                     style={{ flex: 1, }} contentContainerStyle={{ gap: responsiveScreenHeight(1) }}
                     data={data.filter(e =>
                         e?.name.toLowerCase().includes(search.toLowerCase())
                     )}
+                    ListEmptyComponent={() => <EmptyComp />}
                     keyExtractor={(item, index) => `${item}-${index}`}
                     renderItem={({ item, index }) => {
                         return (
@@ -178,16 +186,7 @@ const Chat = () => {
                             </>
                         )
                     }} />
-                {/* <View style={{ flex: 1, justifyContent: "center" }}>
-                    <Image source={imagePath.notificationEmptyImage} />
-                </View> */}
-                {/* <View style={{ elevation: 1, backgroundColor: colors.white, padding: responsiveScreenWidth(3), borderRadius: 15, flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(2) }}>
-                                <UserImage size={6} />
-                                <View>
-                                    <Text style={{ fontWeight: "600", fontSize: responsiveScreenFontSize(2.1) }}>Jenny Wilson</Text>
-                                    <Text style={{ fontWeight: "400", color: colors.darkGray, fontSize: responsiveScreenFontSize(2) }}>hii asdhfi asd f</Text>
-                                </View>
-                            </View> */}
+                )}
             </View>
         }
 

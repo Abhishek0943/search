@@ -1,5 +1,5 @@
-import { FlatList, Image, Pressable, ScrollView, StyleSheet,  TouchableWithoutFeedback, View } from 'react-native'
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import { FlatList, Image, Pressable, ScrollView, StyleSheet, TouchableWithoutFeedback, View, ActivityIndicator } from 'react-native'
+import React, { useCallback, useContext, useState } from 'react'
 import { NavigationBar } from '../../components'
 import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions'
 import imagePath from '../../assets/imagePath'
@@ -11,90 +11,113 @@ import { useAppDispatch, useAppSelector } from '../../store'
 import { Header } from '../Company/Company'
 import { useAlert } from '../../context/AlertContext'
 import Text from '../../components/Text'
+
 const CV = () => {
-    const { colors } = useContext(ThemeContext);
-    const { user } = useAppSelector(state => state.userStore)
-    const navigation = useNavigation();
-    const dispatch = useAppDispatch()
-    const [cvs, setCvs] = useState([])
-    const [active, setActive] = useState(0)
-    useFocusEffect(useCallback(
-        () => {
+  const { colors } = useContext(ThemeContext);
+  const { user } = useAppSelector(state => state.userStore)
+  const navigation = useNavigation();
+  const dispatch = useAppDispatch()
 
-            if (user && user.id) {
-                dispatch(GetUserLanguages({ id: user.id })).unwrap().then(res => {
-                    if (res.success !== false) {
-                        setCvs(res.data)
+  const [cvs, setCvs] = useState([])
+  const [active, setActive] = useState(0)
 
-                    }
-                })
-            }
-        },
-        [user],
-    )
-    )
-    return (
-        <NavigationBar navigationBar={false}>
-            <TouchableWithoutFeedback onPress={() => setActive(0)}>
-                <ScrollView
-                    style={{ flex: 1 }}
-                    contentContainerStyle={{
-                        width: responsiveScreenWidth(96),
-                        alignSelf: 'center',
-                        alignItems: 'center',
-                        paddingBottom: responsiveScreenHeight(3),
-                    }}
-                >
-                    <Header title="Languages" />
-                    <View>
+  const [loading, setLoading] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
 
-                    </View>
-                    {
-                        cvs?.length > 0 ? <>
-                            <FlatList
-                            data={cvs} style={{ flex: 1, width: responsiveScreenWidth(90) }} renderItem={({ item, index }) => {
-                                return (
-                                    <>
-                                        <CvCard refresh={() => dispatch(GetUserLanguages()).unwrap().then(res => {
-                                            setCvs(res.data)
-                                        })} id={item.id} title={item.language} item={item} isDefault={item.language_level} />
-                                    </>
-                                )
-                            }} />
-                        </> :
-                            <Image source={imagePath.workExperience} style={{ resizeMode: "contain", width: "100%" }} />
-                    }
-                    <Pressable
-                        onPress={() => navigation.navigate(routes.LANGUAGEFORM)}
-                        style={{
-                            width: '90%',
-                            justifyContent: 'center',
-                            marginTop: responsiveScreenHeight(2),
-                            borderRadius: 6,
-                            gap: responsiveScreenWidth(1),
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            backgroundColor: colors.primary,
-                            paddingHorizontal: responsiveScreenWidth(3),
-                            paddingVertical: responsiveScreenHeight(1.5),
-                        }}
-                    >
-                        <Text
-                            style={{
-                                color: colors.white,
-                                fontSize: responsiveScreenFontSize(1.8),
-                            }}
-                        >
-                            Add New Language
-                        </Text>
-                    </Pressable>
-                </ScrollView>
-            </TouchableWithoutFeedback>
-        </NavigationBar>
-    )
+  const fetchLanguages = useCallback(async ({ isRefresh = false } = {}) => {
+    if (!user?.id) return;
+
+    try {
+      if (isRefresh) setRefreshing(true);
+      else setLoading(true);
+
+      const res = await dispatch(GetUserLanguages({ id: user.id })).unwrap();
+      if (res?.success !== false) setCvs(res?.data || []);
+    } catch (e) {
+      // ignore or show alert if you want
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [dispatch, user?.id]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchLanguages();
+    }, [fetchLanguages])
+  );
+
+  return (
+    <NavigationBar navigationBar={false}>
+      <TouchableWithoutFeedback onPress={() => setActive(0)}>
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{
+            width: responsiveScreenWidth(96),
+            alignSelf: 'center',
+            alignItems: 'center',
+            paddingBottom: responsiveScreenHeight(3),
+          }}
+        >
+          <Header title="Languages" />
+
+          {/* Loader for initial fetch */}
+          {loading && (
+            <View style={{ flex: 1, marginTop: responsiveScreenHeight(40) }}><ActivityIndicator size={responsiveScreenFontSize(3)} /></View>
+          )}
+
+          {!loading && (
+            <>
+              {cvs?.length > 0 ? (
+                <FlatList
+                  data={cvs}
+                  style={{ flex: 1, width: responsiveScreenWidth(90) }}
+                  keyExtractor={(item, index) => String(item?.id ?? index)}
+                  refreshing={refreshing}
+                  onRefresh={() => fetchLanguages({ isRefresh: true })}
+                  renderItem={({ item }) => (
+                    <CvCard
+                      refresh={() => fetchLanguages({ isRefresh: true })}
+                      id={item.id}
+                      title={item.language}
+                      item={item}
+                      isDefault={item.language_level}
+                    />
+                  )}
+                />
+              ) : (
+                <Image source={imagePath.workExperience} style={{ resizeMode: "contain", width: "100%" }} />
+              )}
+
+              <Pressable
+                onPress={() => navigation.navigate(routes.LANGUAGEFORM)}
+                style={{
+                  width: '90%',
+                  justifyContent: 'center',
+                  marginTop: responsiveScreenHeight(2),
+                  borderRadius: 6,
+                  gap: responsiveScreenWidth(1),
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  backgroundColor: colors.primary,
+                  paddingHorizontal: responsiveScreenWidth(3),
+                  paddingVertical: responsiveScreenHeight(1.5),
+                }}
+              >
+                <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8) }}>
+                  Add New Language
+                </Text>
+              </Pressable>
+            </>
+          )}
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </NavigationBar>
+  )
 }
 
 export default CV
+
 function CvCard({
     title = "Developer",
     isDefault = false,

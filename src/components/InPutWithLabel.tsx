@@ -84,7 +84,7 @@ const InputWithLabel: React.FC<TextInputCompProps> = ({
       case "number":
         return (
           <>
-            <View style={[styles.inputContainer, { borderBottomColor: activeColor }]}>
+            <View style={[styles.inputContainer,{ borderColor: colors.mediumGray } ]}>
               <TextInput
                 style={[styles.input, { color: colors.textPrimary }]}
                 value={value}

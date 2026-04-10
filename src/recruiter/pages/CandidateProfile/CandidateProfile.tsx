@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react'
-import { ActivityIndicator, Alert, Image, ImageBackground, Linking, PermissionsAndroid, Platform, Pressable, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Alert, Image, ImageBackground, KeyboardAvoidingView, Linking, PermissionsAndroid, Platform, Pressable, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
 import { NavigationBar } from '../../../components'
 import { routes } from '../../../constants/values'
 import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions'
@@ -38,6 +38,7 @@ function CandidateProfile() {
       }
       else if (application) {
         setLoading(true)
+
         dispatch(CandidateProf({ id: application })).unwrap().then(res => {
           if (res.success !== false) {
             setCvs(res.data.user)
@@ -53,7 +54,9 @@ function CandidateProfile() {
   )
   return (
     <NavigationBar navigationBar={false} >
-      <>
+    <>
+    
+
 
         <ScrollView style={{ flex: 1, }} contentContainerStyle={{}}>
           <View
@@ -93,35 +96,35 @@ function CandidateProfile() {
               </View>
               :
               <>
-                <ImageBackground source={{ uri: cvs.cover_image }} style={{ width: responsiveScreenWidth(100), height: responsiveScreenHeight(20), justifyContent: 'flex-end', alignItems: 'flex-start' }}>
+                <ImageBackground source={{ uri: cvs?.cover_image }} style={{ width: responsiveScreenWidth(100), height: responsiveScreenHeight(20), justifyContent: 'flex-end', alignItems: 'flex-start' }}>
                   <View style={{ width: responsiveScreenWidth(30), height: responsiveScreenWidth(30), borderRadius: responsiveScreenWidth(15), borderWidth: 3, borderColor: "white", elevation: 2, marginHorizontal: responsiveScreenWidth(5), marginBottom: -responsiveScreenWidth(15), overflow: 'hidden' }}>
-                    <Image source={{ uri: cvs.image }} style={{ width: '100%', height: '100%' }} />
+                    <Image source={{ uri: cvs?.image }} style={{ width: '100%', height: '100%' }} />
                   </View>
                 </ImageBackground>
                 <Text style={{ marginTop: responsiveScreenWidth(18), fontSize: responsiveScreenFontSize(2.5), fontWeight: '700', color: colors.textPrimary, textAlign: 'left', marginHorizontal: responsiveScreenWidth(5) }}>{cvs?.name}</Text>
                 {
-                  cvs.location &&
+                  cvs?.location &&
                   <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(2), marginTop: responsiveScreenHeight(.5), marginHorizontal: responsiveScreenWidth(5) }}>
                     <Image source={imagePath.location} style={{ width: responsiveScreenWidth(4), height: responsiveScreenWidth(4), }} />
                     <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: '500', color: colors.darkGray, textAlign: 'left', }}>{cvs.location}</Text>
                   </View>
                 }
                 {
-                  cvs.member_since &&
+                  cvs?.member_since &&
                   <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(2), marginTop: responsiveScreenHeight(.5), marginHorizontal: responsiveScreenWidth(5) }}>
                     <Image source={imagePath.time} style={{ width: responsiveScreenWidth(4), height: responsiveScreenWidth(4), }} />
                     <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: '500', color: colors.darkGray, textAlign: 'left', }}>{formatMemberSince(cvs.member_since)}</Text>
                   </View>
                 }
                 {
-                  cvs.phone &&
+                  cvs?.phone &&
                   <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(2), marginTop: responsiveScreenHeight(.5), marginHorizontal: responsiveScreenWidth(5) }}>
                     <Image source={imagePath.phone} style={{ width: responsiveScreenWidth(4), height: responsiveScreenWidth(4), }} />
                     <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: '500', color: colors.darkGray, textAlign: 'left', }}>{cvs.phone}</Text>
                   </View>
                 }
                 {
-                  cvs.email &&
+                  cvs?.email &&
                   <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(2), marginTop: responsiveScreenHeight(.5), marginHorizontal: responsiveScreenWidth(5) }}>
                     <Image source={imagePath.email} style={{ width: responsiveScreenWidth(4), height: responsiveScreenWidth(4), }} />
                     <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: '500', color: colors.darkGray, textAlign: 'left', }}>{cvs.email}</Text>
@@ -150,7 +153,7 @@ function CandidateProfile() {
 
                 <View style={{ flexDirection: "row", rowGap: responsiveScreenHeight(3), marginTop: responsiveScreenHeight(2), marginHorizontal: responsiveScreenWidth(5), flexWrap: "wrap", justifyContent: "space-between", }}>
                   {
-                    cvs.is_verified &&
+                    cvs?.is_verified &&
                     <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
                       <Image source={imagePath.verify} style={{ transform: [{ scale: 1.3 }], }} />
                       <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Verified</Text>
@@ -164,7 +167,7 @@ function CandidateProfile() {
                     <Text style={{ color: colors.textSecondary, fontSize: responsiveScreenFontSize(2), }}>Yes</Text>
                   </View>
                   {
-                    cvs.date_of_birth &&
+                    cvs?.date_of_birth &&
                     <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
                       <Image source={imagePath.cake} style={{ transform: [{ scale: 1.3 }], }} />
                       <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Date of Birth</Text>
@@ -182,7 +185,7 @@ function CandidateProfile() {
                   }
 
                   {
-                    cvs.job_experience &&
+                    cvs?.job_experience &&
                     <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
                       <Image source={imagePath.bag} tintColor={colors.primary} style={{ transform: [{ scale: 1.3 }], }} />
                       <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Experience</Text>
@@ -190,7 +193,7 @@ function CandidateProfile() {
                     </View>
                   }
                   {
-                    cvs.career_level &&
+                    cvs?.career_level &&
                     <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
                       <Image source={imagePath.careerlevel} style={{ transform: [{ scale: 1.3 }], }} />
                       <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Career level</Text>
@@ -198,7 +201,7 @@ function CandidateProfile() {
                     </View>
                   }
                   {
-                    cvs.location &&
+                    cvs?.location &&
                     <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
                       <Image source={imagePath.location4} style={{ transform: [{ scale: 1.3 }], }} />
                       <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Location</Text>
@@ -206,7 +209,7 @@ function CandidateProfile() {
                     </View>
                   }
                   {
-                    cvs.current_salary &&
+                    cvs?.current_salary &&
                     <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
                       <Image source={imagePath.coin} style={{ transform: [{ scale: 1.3 }], }} />
                       <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Current Salary</Text>
@@ -214,7 +217,7 @@ function CandidateProfile() {
                     </View>
                   }
                   {
-                    cvs.expected_salary &&
+                    cvs?.expected_salary &&
                     <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
                       <Image source={imagePath.coin} style={{ transform: [{ scale: 1.3 }], }} />
                       <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Expected salary</Text>
@@ -222,7 +225,7 @@ function CandidateProfile() {
                     </View>
                   }
                   {
-                    cvs.organizationType &&
+                    cvs?.organizationType &&
                     <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
                       <Image source={imagePath.company2} style={{ transform: [{ scale: 1.3 }], }} />
                       <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Organization
@@ -231,7 +234,7 @@ function CandidateProfile() {
                     </View>
                   }
                   {
-                    cvs.no_of_offices &&
+                    cvs?.no_of_offices &&
                     <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
                       <Image source={imagePath.company2} style={{ transform: [{ scale: 1.3 }], }} />
                       <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Total Offices</Text>
@@ -239,7 +242,7 @@ function CandidateProfile() {
                     </View>
                   }
                   {
-                    cvs.openJobs &&
+                    cvs?.openJobs &&
                     <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
                       <Image source={imagePath.bag2} style={{ transform: [{ scale: 1.3 }], }} />
                       <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Opened Jobs</Text>
@@ -259,6 +262,7 @@ function CandidateProfile() {
 
         </ScrollView>
         {isMsgModalVisible && (
+           
           <View
             style={{
               position: "absolute",
@@ -272,7 +276,21 @@ function CandidateProfile() {
               zIndex: 999,
             }}
           >
-            {/* Background click to close */}
+             <KeyboardAvoidingView
+     style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(0,0,0,0.45)",
+              alignItems: "center",
+              paddingHorizontal: responsiveScreenWidth(5),
+              zIndex: 999,
+            }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+      >
             <Pressable
               onPress={() => {
                 if (!sendMsgLoading) setIsMsgModalVisible(false);
@@ -365,7 +383,7 @@ function CandidateProfile() {
 
                     try {
                       setSendMsgLoading(true);
-                      dispatch(SendMessage({ seeker_id: cvs.id, message: messageText })).unwrap().then((res)=>{})
+                      dispatch(SendMessage({ seeker_id: cvs.id, message: messageText })).unwrap().then((res) => { })
                       setMessageText("");
                       setIsMsgModalVisible(false);
                       showAlert({
@@ -402,9 +420,11 @@ function CandidateProfile() {
                 </Pressable>
               </View>
             </View>
+      </KeyboardAvoidingView>
           </View>
         )}
-      </>
+
+    </>
 
     </NavigationBar>
   )
@@ -513,7 +533,7 @@ function SkillCard({ data }) {
     <View style={[styles.card, { backgroundColor: colors.lightGrayNatural, marginTop: responsiveScreenHeight(2) }]}>
       <View style={styles.headerRow}>
         <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: '800' }}>Skills</Text>
-        <Image source={imagePath.circle2} style={{ width: responsiveScreenWidth(6), height: responsiveScreenWidth(6), resizeMode: 'contain' }} />
+         
       </View>
 
       <View style={{ borderBottomColor: colors.mediumGrayNatural, borderBottomWidth: 1, borderStyle: "dashed", marginVertical: responsiveScreenHeight(1) }} />
@@ -538,7 +558,7 @@ function LanguageCard({ data }) {
     <View style={[styles.card, { backgroundColor: colors.lightGrayNatural, marginTop: responsiveScreenHeight(2) }]}>
       <View style={styles.headerRow}>
         <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: '800' }}>Languages</Text>
-        <Image source={imagePath.circle2} style={{ width: responsiveScreenWidth(6), height: responsiveScreenWidth(6), resizeMode: 'contain' }} />
+         
       </View>
 
       <View style={{ borderBottomColor: colors.mediumGrayNatural, borderBottomWidth: 1, borderStyle: "dashed", marginVertical: responsiveScreenHeight(1) }} />
@@ -559,15 +579,16 @@ function EducationCard({ data }) {
     <View style={[styles.card, { backgroundColor: colors.lightGrayNatural, marginTop: responsiveScreenHeight(2) }]}>
       <View style={styles.headerRow}>
         <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: '800' }}>Education</Text>
-        <Image source={imagePath.circle2} style={{ width: responsiveScreenWidth(6), height: responsiveScreenWidth(6), resizeMode: 'contain' }} />
+         
       </View>
 
-      <View style={{ borderBottomColor: colors.mediumGrayNatural, borderBottomWidth: 1, borderStyle: "dashed", marginVertical: responsiveScreenHeight(1) }} />
+      <View style={{ borderBottomColor: colors.mediumGrayNatural, borderBottomWidth: 1, borderStyle: "dashed", marginTop: responsiveScreenHeight(1) }} />
       {
         data.map((item, index) => (
           <View style={[{
             width: "100%",
             borderRadius: 14,
+            marginTop:responsiveScreenHeight(2)
           }]}>
             <View style={styles.topRow}>
               <Text style={[styles.title, { fontSize: responsiveScreenFontSize(2.5), fontWeight: "600", color: colors.textPrimary }]} numberOfLines={1}>
@@ -605,13 +626,13 @@ function Selection({ data, application_id }) {
   }, [data])
 
   useEffect(() => {
-    dispatch(UpdateStatus({ status: status, application_id: application_id })).unwrap().then((res) => {})
+    dispatch(UpdateStatus({ status: status, application_id: application_id })).unwrap().then((res) => { })
   }, [status])
   return (
     <View style={[styles.card, { backgroundColor: colors.lightGrayNatural, marginTop: responsiveScreenHeight(2) }]}>
       <View style={styles.headerRow}>
         <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: '800' }}>Select Option</Text>
-        <Image source={imagePath.circle2} style={{ width: responsiveScreenWidth(6), height: responsiveScreenWidth(6), resizeMode: 'contain' }} />
+         
       </View>
 
       <View style={{ borderBottomColor: colors.mediumGrayNatural, borderBottomWidth: 1, borderStyle: "dashed", marginVertical: responsiveScreenHeight(1) }} />

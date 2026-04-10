@@ -21,7 +21,6 @@ export default function OpenJobs() {
     const navigation: NavigationProp<ParamListBase> = useNavigation();
     const [loading, setLoading] = useState(true)
     const { showConfirm } = useAlert();
-
     useFocusEffect(useCallback(
         () => {
             setJob({ ...job, jobs: [] })
@@ -31,7 +30,6 @@ export default function OpenJobs() {
                     setJob(res?.data)
                 }
                 setLoading(false)
-
             })
         },
         [page],
@@ -85,7 +83,7 @@ export default function OpenJobs() {
                                     </View>
                                     <View style={{ flexDirection: "row", gap: responsiveScreenWidth(2), flexWrap: "wrap", marginVertical: responsiveScreenHeight(1.5) }}>
                                         {
-                                            item?.jobType && <Text style={{ backgroundColor: "#E4EEFF", textTransform: "capitalize", borderWidth: 1, borderColor: "#E4EEFF", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>{item.jobType}</Text>
+                                            item?.jobType && <Text numberOfLines={1} style={{ backgroundColor: "#E4EEFF", textTransform: "capitalize", borderWidth: 1, borderColor: "#E4EEFF", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>{item.jobType}</Text>
                                         }
                                     </View>
                                     <View style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
@@ -98,11 +96,6 @@ export default function OpenJobs() {
                                             </>
                                         }
                                     </View>
-
-
-
-
-
                                     <View style={{ flexDirection: "row", gap: responsiveScreenWidth(2), marginVertical: responsiveScreenHeight(1) }}>
                                         <View style={{ height: responsiveScreenHeight(2.5), aspectRatio: 1 }}>
                                             <Image source={imagePath.location3} style={{ height: "100%", width: "100%" }} />
@@ -151,7 +144,6 @@ export default function OpenJobs() {
 }
 const formatDate = (isoDate) => {
     const date = new Date(isoDate);
-
     return date.toLocaleDateString("en-US", {
         month: "short",
         day: "2-digit",
@@ -161,10 +153,9 @@ const formatDate = (isoDate) => {
 export const EmptyComp =
     ({bottom, heading = "No results found", text = "Content will appear once it becomes available" }) => {
         const { colors } = useContext(ThemeContext)
-
-        return (<View style={{marginHorizontal:"auto", width: responsiveScreenWidth(90), height: responsiveScreenHeight(70), zIndex: 100, top: 0, right: 0, justifyContent: "center", alignItems: "center" }}>
-            <Text style={{ fontSize: responsiveScreenFontSize(3), fontWeight: "700" }}>{heading}</Text>
-            <Text style={{ fontSize: responsiveScreenFontSize(2), color: colors.darkGrayNatural, width: "80%", textAlign: "center", fontWeight: "600" }}>{text}</Text>
+        return (<View style={{marginHorizontal:"auto", width: responsiveScreenWidth(90), height: responsiveScreenHeight(60), zIndex: 100, top: 0, right: 0, justifyContent: "center", alignItems: "center" }}>
+            <Text style={{ fontSize: responsiveScreenFontSize(2.7), fontWeight: "700" }}>{heading}</Text>
+            <Text style={{ fontSize: responsiveScreenFontSize(1.8), color: colors.darkGrayNatural, width: "80%", textAlign: "center", fontWeight: "600" }}>{text}</Text>
             {
                 bottom&& bottom()
             }

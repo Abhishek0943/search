@@ -14,27 +14,31 @@ export async function postApiCall<T>(
   // const controller = new AbortController();
   // const timeout = setTimeout(() => controller.abort(), timeoutMs);
   try {
+    console.log("hiii1")
+
     const headers: Record<string, string> = {
       Accept: 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
+    console.log("hiii2")
 
     if (!isForm) {
       headers['Content-Type'] = 'application/json';
     }
-    console.log(body)
     const res = await fetch(`${API_URL}${url}`, {
       method: 'POST',
       headers,
       body: isForm ? (body as FormData) : JSON.stringify(body),
       // signal: controller.signal,
     });
+    console.log("hiii", res)
     const text = await res.text(); // <-- better than res.json() first
+    console.log("hiii4", text)
     let data: any = null;
     try { data = text ? JSON.parse(text) : null; } catch { data = text; }
 
     if (!res.ok) {
-      return { success: false, message: data?.message ?? res.statusText,  };
+      return { success: false, message: data?.message ?? res.statusText, };
     }
 
     return data;
@@ -131,6 +135,7 @@ export async function getApiCall<T>(url: string): Promise<ApiResponse<T>> {
       const msg = data?.message ?? res.statusText
       return { success: false, message: msg }
     }
+    console.log("data", data)
     return data as T
   } catch (err: any) {
     return {

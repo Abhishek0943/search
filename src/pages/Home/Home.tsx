@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { BackHandler, FlatList, Image, ImageBackground, Platform, Pressable, ScrollView, TextInput, TouchableHighlight, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, BackHandler, FlatList, Image, ImageBackground, Platform, Pressable, ScrollView, TextInput, TouchableHighlight, TouchableOpacity, View } from 'react-native';
 import { NavigationBar, } from '../../components';
 import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions';
 import { ThemeContext } from '../../context/ThemeProvider';
@@ -11,26 +11,36 @@ import { Bookmark, GetRecentJobs, GetSuggestedJobs, ProfileData, } from '../../r
 import imagePath from '../../assets/imagePath';
 import { formatSalaryRange } from '../../utils';
 import Text from '../../components/Text';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getFCMToken } from '../../utils/notificationService';
+import { Tokien } from '../../reducer/recruiterReducer';
 function Home() {
   const { colors } = useContext(ThemeContext)
   const navigation: NavigationProp<ParamListBase> = useNavigation()
-  const { user } = useAppSelector(state => state.userStore)
-  const [suggestedJob, setSuggestedJob] = useState<Job[]>([])
-  const [recentJob, setRecentJob] = useState<Job[]>([])
+  const { suggested, recent } = useAppSelector(state => state.jobsReducer)
+  const { user, } = useAppSelector(state => state.userStore)
   const [search, setSearch] = useState<string>("")
   const dispatch = useAppDispatch()
   useEffect(() => {
-    dispatch(GetSuggestedJobs()).unwrap().then(res => {
-      if (res.success) {
-        setSuggestedJob(res.data)
-      }
-    })
-    dispatch(GetRecentJobs()).unwrap().then(res => {
-      if (res.success) {
-        setRecentJob(res.data)
-      }
-    })
+    dispatch(GetSuggestedJobs())
+    dispatch(GetRecentJobs())
   }, [])
+  useFocusEffect(
+    useCallback(() => {
+      const set = async () => {
+        if (!user?.id) return
+        const token = await AsyncStorage.getItem("FCM") as string
+        if (token) return;
+        const FCM = await getFCMToken()
+        if (!FCM) return;
+        const a = await AsyncStorage.getItem("role") as "seeker" | "recruiter"
+        await AsyncStorage.setItem("FCM", FCM)
+        dispatch(Tokien({ device_token: FCM, device_type: Platform.OS, auth_type: a === "recruiter" ? "company" : "user", auth_id: user?.id }))
+      }
+      set()
+
+    }, [user?.id])
+  )
   useFocusEffect(useCallback(
     () => {
       dispatch(ProfileData()).unwrap()
@@ -117,19 +127,19 @@ function Home() {
           </> :
             <ScrollView style={{ flex: 1, paddingHorizontal: responsiveScreenWidth(5) }}>
               <View style={{ height: responsiveScreenHeight(5), flexDirection: "row", alignItems: "stretch", gap: responsiveScreenWidth(2), }}>
-                <View style={{ height: "100%", aspectRatio: 1, overflow: "hidden", borderRadius: 5 }}>
-                  <Image  source={{ uri: user.image }} style={{ height: "100%", resizeMode: "cover", }} />
-                </View>
-                <View style={{ flex: 1, justifyContent: "space-between", }}>
+                <Pressable onPress={() => navigation.navigate(routes.PROFILE)} style={{ height: "100%", aspectRatio: 1, overflow: "hidden", borderRadius: 5 }}>
+                  <Image source={{ uri: user.image }} style={{ height: "100%", resizeMode: "cover", }} />
+                </Pressable>
+                <Pressable onPress={() => navigation.navigate(routes.PROFILE)} style={{ flex: 1, justifyContent: "space-between", }}>
                   <Text style={{ fontSize: responsiveScreenFontSize(1.6) }}>Welcome Back!</Text>
                   <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "800", textTransform: "capitalize", }}>Hello! {user.name}👋</Text>
-                </View>
-                <TouchableHighlight style={{ alignSelf: "center" }} onPress={() => navigation.navigate(routes.NOTIFICATION)}>
+                </Pressable>
+                <TouchableOpacity style={{ alignSelf: "center" }} onPress={() => navigation.navigate(routes.NOTIFICATION)}>
                   <Image
                     source={imagePath.notification}
                     style={{ opacity: 1, resizeMode: 'contain' }}
                   />
-                </TouchableHighlight>
+                </TouchableOpacity>
               </View>
               <View style={{ position: "relative", marginVertical: responsiveScreenHeight(2), height: responsiveScreenHeight(5), flexDirection: "row", gap: responsiveScreenWidth(3) }}>
                 <TouchableOpacity
@@ -167,7 +177,7 @@ function Home() {
                   <Image source={imagePath.filter} style={{ height: "100%", resizeMode: "contain", }} />
                 </TouchableOpacity>
               </View>
-              <Pressable onPress={()=>navigation.navigate(routes.RECENTJOB)} style={{ width: "100%", aspectRatio: 2.58 }}>
+              <Pressable onPress={() => navigation.navigate(routes.RECENTJOB)} style={{ width: "100%", aspectRatio: 2.58 }}>
                 <Image source={imagePath.banner} style={{ width: "100%", height: "100%", }} />
               </Pressable>
               <Text style={{ fontSize: responsiveScreenFontSize(2.4), fontWeight: "700", textTransform: "capitalize", marginTop: responsiveScreenHeight(1.5) }}>browser by jobs</Text>
@@ -185,93 +195,101 @@ function Home() {
                   <Image source={imagePath.jobtype4} style={{ height: "100%", resizeMode: "contain", width: "100%", }} />
                 </TouchableOpacity>
               </View>
-              <View style={{ flexDirection: "row", marginVertical: responsiveScreenHeight(1), justifyContent: "space-between", alignItems: "center" }}>
-                <Text style={{ fontSize: responsiveScreenFontSize(2.4), fontWeight: "700", textTransform: "capitalize", marginTop: responsiveScreenHeight(.5) }}>Suggested Jobs</Text>
-                <Text onPress={() => navigation.navigate(routes.SUGGESTEDJOB)} style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "600", textTransform: "capitalize", color: colors.darkGray }}>see all</Text>
-              </View>
-              <FlatList showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false} horizontal data={suggestedJob} renderItem={({ item, index }) => {
-                return (
-                  <>
-                    <View style={{ paddingVertical: responsiveScreenHeight(1.5), paddingHorizontal: responsiveScreenWidth(3), width: responsiveScreenWidth(75), backgroundColor: colors.white, elevation: 4, margin: 10, borderRadius: 15 }}>
-                      <View style={{ flexDirection: "row", gap: responsiveScreenWidth(2), justifyContent: "space-between", alignItems: "flex-start" }}>
-                        <View style={{ borderRadius: 6, height: responsiveScreenHeight(5), overflow: "hidden", backgroundColor: "#CECECE38" }}>
-                          <Image resizeMode='contain' source={{ uri: item.company_info.image }} style={{ height: "100%", aspectRatio: 1 }} />
-                        </View>
-                        <TouchableOpacity onPress={() => { navigation.navigate(routes.JOBDETAIL, { id: item.id }) }} style={{ flex: 1, gap: responsiveScreenHeight(0.5) }}>
-                          <Text numberOfLines={1} style={{ textTransform: "capitalize", fontSize: responsiveScreenFontSize(1.8), fontWeight: "400" }} >{item.company_info.name}</Text>
-                          <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>{item.title}</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => dispatch(Bookmark({ id: item.id })).unwrap().then((res) => dispatch(GetSuggestedJobs()).unwrap().then(res => {
-                          if (res.success) {
-                            setSuggestedJob(res.data)
-                          }
-                        }))}>
-                          <Image source={item.is_favorited ? imagePath.activeBookmark : imagePath.bookmark} />
-                        </TouchableOpacity>
-                      </View>
-                      <View style={{ flexDirection: "row", gap: responsiveScreenWidth(2), flexWrap: "wrap", marginVertical: responsiveScreenHeight(2) }}>
-                        {
-                          item.jobType && <Text style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>{item.jobType}</Text>
-                        }
-                        {
-                          item?.functionalArea && <Text style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>{
-                            item.functionalArea}</Text>
-                        }
-                      </View>
-                      <View style={{ flexDirection: "row", alignItems: "center", }}>
-                        <Text numberOfLines={2} style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
-                          {
-                            item.salary && <>
-                              <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(2.2), fontWeight: "500" }}>{item.salary_currency}{formatSalaryRange(item.salary)}/</Text>
-                              <Text style={{ flex: 1, marginTop: responsiveScreenHeight(.3) }}>{item.salary_period}</Text>
-                            </>
-                          }
-                        </Text>
-                        {
-                          !item?.is_applied &&
-                          <TouchableOpacity onPress={() => { navigation.navigate(routes.APPLY, { id: item.id }) }} style={{ borderRadius: 6, gap: responsiveScreenWidth(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.primary, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(.7) }}>
-                            <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8) }}>Apply Now</Text>
-                            <Icon icon={{ type: "Feather", name: 'arrow-right' }} style={{ color: colors.white, fontSize: responsiveScreenFontSize(2) }} />
-                          </TouchableOpacity>
-                        }
-                      </View>
-                    </View>
-                  </>
-                )
-              }} />
-              <View style={{ backgroundColor: "transparent", flexDirection: "row", marginTop: responsiveScreenHeight(1), justifyContent: "space-between", alignItems: "center" }}>
-                <Text style={{ fontSize: responsiveScreenFontSize(2.4), fontWeight: "700", textTransform: "capitalize", marginTop: responsiveScreenHeight(.5) }}>recent jobs</Text>
-                <Text onPress={() => navigation.navigate(routes.RECENTJOB)} style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "600", textTransform: "capitalize", color: colors.darkGray }}>see all</Text>
-              </View>
-              <FlatList scrollEnabled={false} contentContainerStyle={{ gap: responsiveScreenHeight(1), marginVertical: responsiveScreenHeight(1) }} data={recentJob} renderItem={({ item, index }) => {
-                return (
-                  <>
-                    <View style={{ paddingVertical: responsiveScreenHeight(1), height: responsiveScreenHeight(10), justifyContent: "center", paddingHorizontal: responsiveScreenWidth(2), backgroundColor: "#F5F5F5", borderRadius: 15 }}>
-                      <View style={{ flexDirection: "row", gap: responsiveScreenWidth(3), justifyContent: "space-between", alignItems: "flex-start" }}>
-                        <View style={{ borderRadius: 6, height: responsiveScreenHeight(6), overflow: "hidden", backgroundColor: "#CECECE38" }}>
-                          <Image source={{ uri: item.company_info.image }} resizeMode='contain' style={{ height: "100%", aspectRatio: 1 }} />
-                        </View>
-                        <View style={{ flex: 1, gap: responsiveScreenHeight(1.2) }}>
-                          <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "700" }}>{item.title}</Text>
-                          <View style={{ flexDirection: "row", gap: responsiveScreenWidth(2), flexWrap:"wrap" }}>
-                            <View style={{ flexDirection: "row", gap: responsiveScreenWidth(1), }}>
-                              <Image source={imagePath.box} />
-                              <Text numberOfLines={1} style={{maxWidth:responsiveScreenWidth(45), color: colors.textPrimary, fontSize: responsiveScreenFontSize(1.6) }}>{item.company_info.name}</Text>
+              {
+                suggested.length > 0 && recent.length > 0 ? <>
+                  <View style={{ flexDirection: "row", marginVertical: responsiveScreenHeight(1), justifyContent: "space-between", alignItems: "center" }}>
+                    <Text style={{ fontSize: responsiveScreenFontSize(2.4), fontWeight: "700", textTransform: "capitalize", marginTop: responsiveScreenHeight(.5) }}>Suggested Jobs</Text>
+                    <Text onPress={() => navigation.navigate(routes.SUGGESTEDJOB)} style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "600", textTransform: "capitalize", color: colors.darkGray }}>see all</Text>
+                  </View>
+                  <FlatList showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false} horizontal data={suggested} renderItem={({ item, index }) => {
+                    return (
+                      <>
+                        <View style={{ borderWidth: 1, borderColor: colors.gray, paddingVertical: responsiveScreenHeight(1.5), paddingHorizontal: responsiveScreenWidth(3), width: responsiveScreenWidth(75), backgroundColor: colors.white, margin: 10, borderRadius: 15 }}>
+                          <View style={{ flexDirection: "row", gap: responsiveScreenWidth(2), justifyContent: "space-between", alignItems: "flex-start" }}>
+                            <View style={{ borderRadius: 6, height: responsiveScreenHeight(5), overflow: "hidden", backgroundColor: "#CECECE38" }}>
+                              <Image resizeMode='contain' source={{ uri: item.company_info.image }} style={{ height: "100%", aspectRatio: 1 }} />
                             </View>
-                            <View style={{ flexDirection: "row", gap: responsiveScreenWidth(1) }}>
-                              <Image source={imagePath.location} />
-                              <Text numberOfLines={1} style={{maxWidth:responsiveScreenWidth(45), color: colors.textPrimary, fontSize: responsiveScreenFontSize(1.6) }}>{item.jobLocation}</Text>
-                            </View>
+                            <TouchableOpacity onPress={() => { navigation.navigate(routes.JOBDETAIL, { id: item.id }) }} style={{ flex: 1, gap: responsiveScreenHeight(0.5) }}>
+                              <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "700" }}>{item.title}</Text>
+                              <Text numberOfLines={1} style={{ textTransform: "capitalize", fontSize: responsiveScreenFontSize(1.8), fontWeight: "400" }} >{item.company_info.name}</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => dispatch(Bookmark({ id: item.id })).unwrap().then((res) => dispatch(GetSuggestedJobs()))}>
+                              <Image source={item.is_favorited ? imagePath.activeBookmark : imagePath.bookmark} />
+                            </TouchableOpacity>
+                          </View>
+                          <View style={{ flexDirection: "row", gap: responsiveScreenWidth(2), flexWrap: "wrap", marginVertical: responsiveScreenHeight(2) }}>
+                            {
+                              item.jobType && <Text numberOfLines={1} style={{
+                                backgroundColor: "#F5F5F5", textTransform: "capitalize",
+                                borderWidth: 1, borderColor: "#F5F5F5",
+                                paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8)
+                              }}>{item.jobType}</Text>
+                            }
+                            {
+                              item?.functionalArea && <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>{
+                                item.functionalArea}</Text>
+                            }
+                          </View>
+                          <View style={{ flexDirection: "row", alignItems: "center", }}>
+                            <Text numberOfLines={2} style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
+                              {
+                                item.salary && item.salary_period && <>
+                                  <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(2.2), fontWeight: "500" }}>{item.salary_currency}{formatSalaryRange(item.salary)}/</Text>
+                                  <Text style={{ flex: 1, marginTop: responsiveScreenHeight(.3) }}>{item.salary_period}</Text>
+                                </>
+                              }
+                            </Text>
+                            {
+                              !item?.is_applied &&
+                              <TouchableOpacity onPress={() => { navigation.navigate(routes.APPLY, { id: item.id }) }} style={{ borderRadius: 6, gap: responsiveScreenWidth(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.primary, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(.7) }}>
+                                <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8) }}>Apply Now</Text>
+                                <Icon icon={{ type: "Feather", name: 'arrow-right' }} style={{ color: colors.white, fontSize: responsiveScreenFontSize(2) }} />
+                              </TouchableOpacity>
+                            }
                           </View>
                         </View>
-                        <TouchableOpacity onPress={() => { navigation.navigate(routes.JOBDETAIL, { id: item.id }) }} style={{ alignSelf: "center", marginVertical: responsiveScreenHeight(0.5), borderRadius: 6, gap: responsiveScreenWidth(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.primary, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(1.8) }}>
-                          <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8) }}>View</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </View>
+                      </>
+                    )
+                  }} />
+                  <View style={{ backgroundColor: "transparent", flexDirection: "row", marginTop: responsiveScreenHeight(1), justifyContent: "space-between", alignItems: "center" }}>
+                    <Text style={{ fontSize: responsiveScreenFontSize(2.4), fontWeight: "700", textTransform: "capitalize", marginTop: responsiveScreenHeight(.5) }}>recent jobs</Text>
+                    <Text onPress={() => navigation.navigate(routes.RECENTJOB)} style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "600", textTransform: "capitalize", color: colors.darkGray }}>see all</Text>
+                  </View>
+                  <FlatList scrollEnabled={false} contentContainerStyle={{ gap: responsiveScreenHeight(1), marginVertical: responsiveScreenHeight(1) }} data={recent} renderItem={({ item, index }) => {
+                    return (
+                      <>
+                        <View style={{ paddingVertical: responsiveScreenHeight(1), height: responsiveScreenHeight(10), justifyContent: "center", paddingHorizontal: responsiveScreenWidth(2), backgroundColor: "#F5F5F5", borderRadius: 15 }}>
+                          <View style={{ flexDirection: "row", gap: responsiveScreenWidth(3), justifyContent: "space-between", alignItems: "center" }}>
+                            <View style={{ borderRadius: 6, height: responsiveScreenHeight(6), overflow: "hidden", backgroundColor: "#CECECE38" }}>
+                              <Image source={{ uri: item.company_info.image }} resizeMode='contain' style={{ height: "100%", aspectRatio: 1 }} />
+                            </View>
+                            <View style={{ flex: 1, gap: responsiveScreenHeight(1.2) }}>
+                              <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "700" }}>{item.title}</Text>
+                              <View style={{ flexDirection: "row", gap: responsiveScreenWidth(2), flexWrap: "wrap" }}>
+                                <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(1), }}>
+                                  <Image source={imagePath.box} />
+                                  <Text numberOfLines={1} style={{ maxWidth: responsiveScreenWidth(45), color: colors.textPrimary, fontSize: responsiveScreenFontSize(1.6) }}>{item.company_info.name}</Text>
+                                </View>
+                                <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(1) }}>
+                                  <Image source={imagePath.location} />
+                                  <Text numberOfLines={1} style={{ maxWidth: responsiveScreenWidth(45), color: colors.textPrimary, fontSize: responsiveScreenFontSize(1.6) }}>{item.jobLocation}</Text>
+                                </View>
+                              </View>
+                            </View>
+                            <TouchableOpacity onPress={() => { navigation.navigate(routes.JOBDETAIL, { id: item.id }) }} style={{ alignSelf: "center", marginVertical: responsiveScreenHeight(0.5), borderRadius: 6, gap: responsiveScreenWidth(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.primary, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(1.8) }}>
+                              <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8) }}>View</Text>
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+                      </>
+                    )
+                  }} />
+                </> :
+                  <>
+                    <View style={{ flex: 1, marginTop: responsiveScreenHeight(15) }}><ActivityIndicator size={responsiveScreenFontSize(3)} /></View>
                   </>
-                )
-              }} />
+              }
+
             </ScrollView>
         }
 
@@ -288,13 +306,10 @@ export function useBlockBack() {
       const unsub = navigation.addListener('beforeRemove', (e) => {
         e.preventDefault()
       })
-
-      // ✅ Android hardware back
       let backSub: any
       if (Platform.OS === 'android') {
         backSub = BackHandler.addEventListener('hardwareBackPress', () => true)
       }
-
       return () => {
         unsub()
         backSub?.remove?.()

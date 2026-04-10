@@ -61,7 +61,7 @@ const Indicators = React.memo(({ length, activeIndex }: { length: number; active
   );
   return <View style={[styles.indicatorContainer, {}]}>
     <View style={{ flexDirection: "row", gap: responsiveScreenWidth(1) }}>{dots}</View>
-    <Text onPress={() => navigation.navigate(routes.WELCOMETWO)} style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8) }}>Skip</Text>
+    <Text onPress={() =>{ navigation.navigate(routes.WELCOMETWO)}} style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8) }}>Skip</Text>
   </View>;
 });
 

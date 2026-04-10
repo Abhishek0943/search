@@ -19,7 +19,7 @@ export const GetBookmarkJobs = createAsyncThunk<
 export const GetRecentJobs = createAsyncThunk<
   { success: true, data: Job[] } | ErrorResponse
 >(
-  'GetSuggestedJobs',
+  'GetRecentJobs',
   () => {
     return getApiCall<{ success: true, data: Job[] }>('/jobseekers/jobs');
   }
@@ -85,8 +85,8 @@ export const DeleteNotification = createAsyncThunk<
   { success: true, data: Job[] } | ErrorResponse
 >(
   'DeleteNotification',
-  ({id}) => {
-    return deleteApiCall<{ success: true, data: Job[] }>('/jobseekers/delete-notificatoin/'+id,);
+  ({ id }) => {
+    return deleteApiCall<{ success: true, data: Job[] }>('/jobseekers/delete-notificatoin/' + id,);
   }
 );
 export const ApplyJobs = createAsyncThunk<
@@ -161,20 +161,44 @@ export const GetJobs = createAsyncThunk<
     return postApiCall<{ success: true, data: { jobs: Job[] } }>('/jobseekers/search-jobs?page=' + pages, body);
   }
 );
+export const DeleteRecruter = createAsyncThunk<
+  { success: true, data: { jobs: Job[] } } | ErrorResponse, { search?: string, job_type_id: number[], job_skill_id: number[], company_id: number[], job_title: string[], job_experience_id: number[], degree_level_id: number[], job_shift_id: number[], gender_id: number[], career_level_id: number[], functional_area_id: number[], city_id: number[], salary_from: number, salary_to: number }
+>(
+  'DeleteRecruter',
+  ({ ...body }) => {
+    return postApiCall<{ success: true, data: { jobs: Job[] } }>('/company/delete-profile', body);
+  }
+);
+export const DeleteSesdkfjds = createAsyncThunk<
+  { success: true, data: { jobs: Job[] } } | ErrorResponse, { search?: string, job_type_id: number[], job_skill_id: number[], company_id: number[], job_title: string[], job_experience_id: number[], degree_level_id: number[], job_shift_id: number[], gender_id: number[], career_level_id: number[], functional_area_id: number[], city_id: number[], salary_from: number, salary_to: number }
+>(
+  'DeleteSesdkfjds',
+  ({ ...body }) => {
+    return postApiCall<{ success: true, data: { jobs: Job[] } }>('/jobseeker/delete-profile', body);
+  }
+);
 export const GetCompanies = createAsyncThunk<
-  { success: true, data: { companies: Company[] } } | ErrorResponse
+  { success: true, data: { companies: Company[] } } | ErrorResponse, { pages?: number }
 >(
   'GetCompanies',
-  () => {
-    return getApiCall<{ success: true, data: { companies: Company[] } }>('/jobseekers/company-list');
+  ({ pages }) => {
+    return getApiCall<{ success: true, data: { companies: Company[] } }>('/jobseekers/company-list?page=' + (pages || 1));
   }
 );
 export const GetFavoriteCompanies = createAsyncThunk<
   { success: true, data: { companies: Company[] } } | ErrorResponse
 >(
   'GetFavoriteCompanies',
-  () => {
-    return getApiCall<{ success: true, data: { companies: Company[] } }>('/jobseekers/my-favourite-companies');
+  ({ pages }) => {
+    return getApiCall<{ success: true, data: { companies: Company[] } }>('/jobseekers/my-favourite-companies?page=' + (pages || 1));
+  }
+);
+export const ContactT = createAsyncThunk<
+  { success: true, data: { companies: Company[] } } | ErrorResponse, {}
+>(
+  'Contact',
+  (body) => {
+    return postApiCall<{ success: true, data: { companies: Company[] } }>('/contact-us', body);
   }
 );
 export const GetCompany = createAsyncThunk<
@@ -253,6 +277,19 @@ export const ReportCompany = createAsyncThunk<
         : Job
       }
     }>('/report-abuses-company', body);
+  }
+);
+export const DeleteBlog = createAsyncThunk<
+  {
+    success: true, data: {
+      jobDetail
+      : Job
+    }
+  } | ErrorResponse, { slug: string }
+>(
+  'DeleteBlog',
+  ({ slug }) => {
+    return postApiCall('/delete-blog/' + slug, {});
   }
 );
 export const GetFilter = createAsyncThunk<
@@ -697,6 +734,8 @@ const initialState: JobInitialState = {
     jobObject: {},
     jobIds: [],
   },
+  suggested: [],
+  recent: []
 };
 const jobSlice = createSlice({
   name: 'jobs',
@@ -734,19 +773,18 @@ const jobSlice = createSlice({
     // },
   },
   extraReducers(builder) {
-    builder.addCase(GetSuggestedJobs.fulfilled, (state, { payload }) => {
-      // if (payload.success) {
-      //   const jobObject: Record<string, Job> = {}
-      //   const jobIds: string[] = []
-      //   payload.jobs.forEach((job) => {
-      //     jobIds.push(job._id)
-      //     jobObject[job._id] = job
-      //   })
-      //   state.jobs.jobIds = jobIds
-      //   state.jobs.jobObject = jobObject
-      // }
-    })
-  },
+    builder
+      .addCase(GetSuggestedJobs.fulfilled, (state, { payload }) => {
+        if (payload.success) {
+          state.suggested = payload.data
+        }
+      })
+      .addCase(GetRecentJobs.fulfilled, (state, { payload }) => {
+        if (payload.success) {
+          state.recent = payload.data
+        }
+      })
+  }
 });
 
 

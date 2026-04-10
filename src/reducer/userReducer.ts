@@ -46,6 +46,17 @@ export const LoginByPassword = createAsyncThunk<{ success: true, data: { user: U
   'LoginByPassword',
   (body) => postApiCall<{ success: true, data: { user: User, token: string } }>('/auth/jobseekers/login', body),
 );
+export const CreatorRequest = createAsyncThunk<{ success: true, message: string } | ErrorResponse>(
+  'CreatorRequest',
+  () => postApiCall<{ success: true, message: string }>('/creator-request', {}),
+);
+export const MyBlogs = createAsyncThunk<GetMyBlogsResponse | ErrorResponse, { status?: string, page?: number } | undefined>(
+  'MyBlogs',
+  (params) => {
+    const query = params ? `?status=${params.status || ''}&page=${params.page || 1}` : '';
+    return getApiCall<GetMyBlogsResponse>(`/my-blogs${query}`);
+  },
+);
 const initialState: UserInitialState = {
   isAuth: false,
   welcomeScreen: [],
@@ -77,8 +88,7 @@ export const userSlice = createSlice({
       }
     }).addCase(ProfileData.fulfilled, (state, { payload }) => {
       if (payload.success) {
-        if (!state.user?.id)
-          state.user = payload.data;
+        state.user = payload.data;
       }
     }).addCase(LoginByPassword.fulfilled, (state, { payload }) => {
       if (payload.success) {
@@ -96,6 +106,7 @@ export const userSlice = createSlice({
         }
       })
       .addCase(RecruiterProfile.fulfilled, (state, { payload }) => {
+        console.log(payload)
         if (payload.success) {
           state.user = payload.data;
         }

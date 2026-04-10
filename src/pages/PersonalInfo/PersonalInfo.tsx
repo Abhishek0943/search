@@ -1,6 +1,5 @@
 import {
   ActivityIndicator,
-  Alert,
   FlatList,
   Image,
   KeyboardAvoidingView,
@@ -1192,8 +1191,8 @@ const PersonalInfo = () => {
                 }
                 setLoading(true)
                 dispatch(Update({ first_name: formData.firstName, last_name: formData.lastName, "date_of_birth": formData.dateOfBirth.toISOString().slice(0, 19).replace('T', ' '), gender_id: formData.gender, nationality_id: formData.nationality, country_id: formData.country, state_id: formData.state, city_id: formData.city, phone: formData.phoneNumber, mobile_num: formData.mobileNumber, job_experience_id: formData.experience, career_level_id: formData.careerLevel, industry_id: formData.industry, functional_area_id: formData.functionalArea, current_salary: formData.currentSalary, expected_salary: formData.expectedSalary, salary_currency: formData.salaryCurrency, video_link: formData.videoProfileUrl, street_address: formData.streetAddress })).unwrap().then(res => {
+                  setLoading(false)
                   if (res.success) {
-                    setLoading(false)
                     dispatch(ProfileData())
                     showAlert({
                       title: "Success",
@@ -1238,6 +1237,7 @@ const PersonalInfo = () => {
               mode={"date"}
               open={dobModalOpen}
               date={formData.dateOfBirth || new Date()}
+            minimumDate={new Date(1900, 0, 1)}
               maximumDate={new Date()}
               onConfirm={(date) => {
                 setDobModalOpen(false)

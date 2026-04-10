@@ -15,6 +15,8 @@ export default {
     cross: require('./Icon/cross.png'),
     box: require('./Icon/box.png'),
     location: require('./Icon/location.png'),
+    activeBlog: require('./Icon/blog.png'),
+    blog: require('./Icon/inactiveBlog5.png'),
     star: require('./Icon/star.png'),
     bag: require('./Icon/bag.png'),
     circle: require('./Icon/circle.png'),
@@ -103,7 +105,7 @@ export default {
     recruterHomeText: require('./images/recruterHomeText.png'),
 
 
-// dummy
+    // dummy
     companyDummy: require('./Icon/company-dummy.png'),
 }
 export const Fonts = {

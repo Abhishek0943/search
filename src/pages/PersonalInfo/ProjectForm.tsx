@@ -180,7 +180,14 @@ const ProjectForm = () => {
       },
     }));
   };
-
+const isValidUrl = (url) => {
+  try {
+    const u = new URL(url);
+    return u.protocol === 'http:' || u.protocol === 'https:';
+  } catch {
+    return false;
+  }
+};
   const onSubmit = () => {
     if (!formData.projectName?.trim()) {
       showAlert({
@@ -197,7 +204,15 @@ const ProjectForm = () => {
       });
       return;
     }
-
+if (formData.projectUrl?.trim()) {
+  if (!isValidUrl(formData.projectUrl.trim())) {
+    showAlert({
+      title: "Validation",
+      message: "Please enter a valid project URL (https://example.com)",
+    });
+    return;
+  }
+}
     const fd = new FormData();
     fd.append('name', formData.projectName);
     fd.append('url', formData.projectUrl);

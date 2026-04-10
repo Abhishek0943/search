@@ -27,8 +27,11 @@ const Login = () => {
   const dispatch = useAppDispatch()
   const { showAlert } = useAlert();
   const [userData, setUserData] = useState({
+    // email: "a1@yopmail.com",
+    // password: "12121212",
+    // username: "a1@yopmail.com",
+     password: "",
     username: "",
-    password: "",
     passwordVisible: false,
     rememberMe: false
   })
@@ -116,14 +119,12 @@ const Login = () => {
         setLoading(true)
         const FCM = await getFCMToken()
         if (role === "recruiter") {
-
           dispatch(RecruiterLoginByPassword({
             device_token: FCM,
             device_type: Platform.OS, email: userData.username, password: userData.password
           })).unwrap().then((res) => {
             if (res.success) {
               AsyncStorage.setItem("token", res.data.token)
-              navigation.navigate(routes.RECRUITERHOME)
               RNRestart.restart();
             }
             else {

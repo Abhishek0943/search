@@ -38,6 +38,7 @@ const ApplyJob = () => {
       }
     }, [user, dispatch]),
   );
+  
   const { showAlert } = useAlert();
   const [success, setSuccess] = useState(false)
   const handleApply = () => {
@@ -85,7 +86,7 @@ const ApplyJob = () => {
                       <Text style={{ fontSize: responsiveScreenFontSize(2), textTransform: "capitalize", color: colors.textSecondary, marginTop: responsiveScreenHeight(.2), textAlign: "center", fontWeight: "600" }}>You have successfully applied to this job vacancy.</Text>
                     </View>
                     <TouchableOpacity
-                      onPress={() => navigation.goBack()}
+                      onPress={() => navigation.navigate(routes.HOME)}
                       style={{
                         width: '100%',
                         justifyContent: 'center',

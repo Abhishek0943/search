@@ -2,11 +2,13 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '../store';
 import { routes } from '../constants/values';
-import { AddJob, Apply, ApplyJob, Candidate, CandidateProfile, Chat, Company, CompanyDetails, CV, Education, ForgotPassword, Home, Jobdetail, Language, LanguageForm, Login, Messages, Notification, OpenJobs, PaymentHistory, PersonalInfo, Profile, Project, ProjectForm, RecentJob, RecruiterAccount, RecruiterHome, RecruiterProfile, Search,  Signup, Skill, SkillAdd, Splash, SuggestedJob, Welcome, WelcomeTwo, WorkExperience, WorkExperienceForm } from '../pages';
+import { AddJob, Apply, ApplyJob, Candidate, CandidateProfile,BlogPage, Chat, Company, CompanyDetails, CV, Education, ForgotPassword, Home, Jobdetail, Language, LanguageForm, Login, Messages, Notification, OpenJobs, PaymentHistory, PersonalInfo, Profile, Project, ProjectForm, RecentJob, RecruiterAccount, RecruiterHome, RecruiterProfile, Search,  Signup, Skill, SkillAdd, Splash, SuggestedJob, Welcome, WelcomeTwo, WorkExperience, WorkExperienceForm } from '../pages';
 import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import EducationForm from '../pages/PersonalInfo/EducationForm';
 import CVAdd from '../pages/PersonalInfo/CVAdd';
+import Contact from '../pages/PersonalInfo/Contact';
+import Blog from '../pages/Blog';
 
 const Stack = createNativeStackNavigator();
 const Routes = () => {
@@ -49,6 +51,7 @@ const Routes = () => {
         <Stack.Screen name={routes.ACTIVECANDIDATE} component={Candidate} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.ADDJOB} component={AddJob} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.MESSAGE} component={Messages} options={{ headerShown: false, animation: 'none' }} />
+        <Stack.Screen name={routes.BLOG} component={Blog} options={{ headerShown: false, animation: 'none' }} />
 
         <Stack.Screen name={routes.RECRUITERPROFILE} component={RecruiterProfile} options={{ headerShown: false, animation: 'none' }} />
 
@@ -59,6 +62,7 @@ const Routes = () => {
         <Stack.Screen name={routes.ACCOUNT} component={RecruiterAccount} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.CANDIDATEPROFILE} component={CandidateProfile} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.HOME} component={Home} options={{ headerShown: false, animation: 'none' }} />
+        <Stack.Screen name={routes.BLOGPAGE} component={BlogPage} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.CHAT} component={Chat} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.SEARCH} component={Search} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.JOBDETAIL} component={Jobdetail} options={{ headerShown: false, animation: 'none' }} />
@@ -83,6 +87,7 @@ const Routes = () => {
         <Stack.Screen name={routes.LANGUAGEFORM} component={LanguageForm} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.APPLY} component={Apply} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.NOTIFICATION} component={Notification} options={{ headerShown: false, animation: 'none' }} />
+        <Stack.Screen name={routes.CONTACT} component={Contact} options={{ headerShown: false, animation: 'none' }} />
 
 
       </Stack.Navigator>

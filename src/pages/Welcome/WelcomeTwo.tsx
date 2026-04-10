@@ -7,6 +7,8 @@ import {
   View,
   BackHandler,
   Platform,
+  Pressable,
+  Linking
 } from 'react-native';
 import { ThemeContext } from '../../context/ThemeProvider';
 import {
@@ -54,6 +56,21 @@ const WelcomeTwo = () => {
   const { colors } = useContext(ThemeContext);
   const navigation = useNavigation<NavigationProp<ParamListBase>>()
   const [role, setRole] = useState<"seeker" | "recruiter">()
+
+  const openURL = async (url: string) => {
+    if (!url) return;
+    try {
+      const canOpen = await Linking.canOpenURL(url);
+      if (canOpen) {
+        Linking.openURL(url).catch(err => console.error("Failed to open URL:", err));
+      } else {
+        console.log(`Can't open URL: ${url}`);
+      }
+    } catch (error: any) {
+      console.error("Failed to open URL:", error.message);
+    }
+  };
+
   useFocusEffect(
     useCallback(() => {
       const backHandler = BackHandler.addEventListener(
@@ -77,17 +94,17 @@ const WelcomeTwo = () => {
       }]}>
         select your role to personalize your journey and unlock more features.
       </Text>
-      <View style={{ marginTop: responsiveScreenHeight(2), backgroundColor: colors.surfaces, borderRadius: 15, paddingVertical: responsiveScreenHeight(1.5), paddingHorizontal: responsiveScreenWidth(4), borderColor: role === "seeker" ? colors.primary : colors.surfaces, borderWidth: 2 }}>
+      <Pressable onPress={() => {
+        AsyncStorage.setItem("role", "seeker")
+        setRole("seeker")
+      }} style={{ marginTop: responsiveScreenHeight(2), backgroundColor: colors.surfaces, borderRadius: 15, paddingVertical: responsiveScreenHeight(1.5), paddingHorizontal: responsiveScreenWidth(4), borderColor: role === "seeker" ? colors.primary : colors.surfaces, borderWidth: 2 }}>
         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
           <Text style={[styles.title, { marginTop: 0, color: colors.textPrimary, fontSize: responsiveScreenFontSize(2), }]}>
             Job seeker
           </Text>
           {
             role === "seeker" ?
-              <Icon icon={{ type: "Ionicons", name: "radio-button-on" }} style={{ color: colors.primary, fontSize: responsiveScreenFontSize(2.4) }} /> : <Icon onPress={() => {
-                AsyncStorage.setItem("role", "seeker")
-                setRole("seeker")
-              }} icon={{ type: "Ionicons", name: "radio-button-off" }} style={{ color: colors.mediumGray, fontSize: responsiveScreenFontSize(2.4) }} />
+              <Icon icon={{ type: "Ionicons", name: "radio-button-on" }} style={{ color: colors.primary, fontSize: responsiveScreenFontSize(2.4) }} /> : <Icon icon={{ type: "Ionicons", name: "radio-button-off" }} style={{ color: colors.mediumGray, fontSize: responsiveScreenFontSize(2.4) }} />
           }
         </View>
         <Text style={[{
@@ -98,21 +115,20 @@ const WelcomeTwo = () => {
         }]}>
           Join as a Job Seeker to explore opportunities, connect with employers, and build your successful career.
         </Text>
-      </View>
-      <View style={{ marginTop: responsiveScreenHeight(2), borderColor: role === "recruiter" ? colors.primary : colors.surfaces, borderWidth: 2, backgroundColor: colors.surfaces, borderRadius: 15, paddingVertical: responsiveScreenHeight(1.5), paddingHorizontal: responsiveScreenWidth(4) }}>
+      </Pressable>
+      <Pressable onPress={() => {
+        AsyncStorage.setItem("role", "recruiter")
+        setRole("recruiter")
+      }} style={{ marginTop: responsiveScreenHeight(2), borderColor: role === "recruiter" ? colors.primary : colors.surfaces, borderWidth: 2, backgroundColor: colors.surfaces, borderRadius: 15, paddingVertical: responsiveScreenHeight(1.5), paddingHorizontal: responsiveScreenWidth(4) }}>
         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
           <Text style={[styles.title, { marginTop: 0, color: colors.textPrimary, fontSize: responsiveScreenFontSize(2), }]}>
-            Recruiter
+            Company
           </Text>
           {
             role === "recruiter" ?
               <Icon icon={{ type: "Ionicons", name: "radio-button-on" }} style={{ color: colors.primary, fontSize: responsiveScreenFontSize(2.4) }} />
               :
-              <Icon onPress={() => {
-                AsyncStorage.setItem("role", "recruiter")
-
-                setRole("recruiter")
-              }} icon={{ type: "Ionicons", name: "radio-button-off" }} style={{ color: colors.mediumGray, fontSize: responsiveScreenFontSize(2.4) }} />
+              <Icon icon={{ type: "Ionicons", name: "radio-button-off" }} style={{ color: colors.mediumGray, fontSize: responsiveScreenFontSize(2.4) }} />
           }</View>
         <Text style={[{
           textAlign: 'left',
@@ -120,9 +136,32 @@ const WelcomeTwo = () => {
           fontWeight: '600',
           textTransform: 'capitalize', color: colors.textSecondary
         }]}>
-          Join as a Recruiter to discover top talent, streamline hiring, and grow your organization effortlessly.
+          Join as a Company to discover top talent, streamline hiring, and grow your organization effortlessly.
         </Text>
-      </View>
+      </Pressable>
+      <Pressable onPress={() => {
+        openURL("https://searchtalents.co/recruiter/login")
+      }} style={{ marginTop: responsiveScreenHeight(2), borderColor: colors.surfaces, borderWidth: 2, backgroundColor: colors.surfaces, borderRadius: 15, paddingVertical: responsiveScreenHeight(1.5), paddingHorizontal: responsiveScreenWidth(4) }}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+          <Text style={[styles.title, { marginTop: 0, color: colors.textPrimary, fontSize: responsiveScreenFontSize(2), }]}>
+            Recruiter
+          </Text>
+          {/* {
+            role === "recruiter" ?
+              <Icon icon={{ type: "Ionicons", name: "radio-button-on" }} style={{ color: colors.primary, fontSize: responsiveScreenFontSize(2.4) }} />
+              :
+              <Icon icon={{ type: "Ionicons", name: "radio-button-off" }} style={{ color: colors.mediumGray, fontSize: responsiveScreenFontSize(2.4) }} />
+          } */}
+        </View>
+        <Text style={[{
+          textAlign: 'left',
+          fontSize: responsiveScreenFontSize(1.7),
+          fontWeight: '600',
+          textTransform: 'capitalize', color: colors.textSecondary
+        }]}>
+          Join as a recruiter to source top talent, manage placements, and grow your network effortlessly.
+        </Text>
+      </Pressable>
       <View style={{ flex: 1 }}></View>
       <Button label='Next' isActive={role ? true : false} onPress={() => { role === "seeker" ? navigation.navigate(routes.HOME) : role && navigation.navigate(routes.LOGIN) }} style={{ marginBottom: responsiveScreenHeight(9), }} />
     </View>

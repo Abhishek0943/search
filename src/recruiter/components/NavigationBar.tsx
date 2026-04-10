@@ -22,11 +22,7 @@ const NavigationBar = ({ children,statusbar=true, name, navigationBar=true }: {n
             icon: <Image source={name === routes.RECRUITERHOME ? imagePath.myJob : imagePath.home} />
         },
         
-        //  {
-        //     name: "Chat",
-        //     path: routes.CHAT,
-        //     icon: <Image source={name === routes.CHAT ? imagePath.activeCompany : imagePath.company} />
-        // }, 
+   
          {
             name: "Add Job",
             path: routes.ADDJOB,

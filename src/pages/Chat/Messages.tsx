@@ -11,9 +11,10 @@ import Text from '../../components/Text'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useSocket } from '../../context/SocketProvider'
 import { SendMessage, SendMessageSeeker } from '../../reducer/recruiterReducer'
-import { pick } from '@react-native-documents/picker'
+import { pick, types } from '@react-native-documents/picker'
 import Icon from '../../utils/Icon'
 import { setMessageCount } from '../../reducer/userReducer'
+import { downloadCV } from '../../recruiter/pages/CandidateProfile/CandidateProfile'
 
 const Messages = () => {
     const route = useRoute()
@@ -122,13 +123,60 @@ const Messages = () => {
         };
     }, [socket, isConnected, item.id]);
     const [document, setDocument] = useState({})
+    const [sending, setSending] = useState(false);
+
+    const onSend = async () => {
+        if (sending) return;            
+        const a = (comment || "").trim();
+        
+        if (!a && !document?.cvFile?.name) return; 
+        setSending(true);
+        try {
+            setComment("");
+            const { cvFile, ...b } = document || {};
+            const action =
+                role === "seeker"
+                    ? SendMessageSeeker({ company_id: dataa.id, message: a, ...b })
+                    : SendMessage({ seeker_id: dataa.id, message: a, ...b });
+            const res = await dispatch(action).unwrap();
+            if (res?.success) {
+                setDocument({});
+                const msg = res?.data;
+                setData((prev) => {
+                    const incomingLabel = "Today";
+                    const list = Array.isArray(prev) ? prev : [];
+                    if (list.length === 0) return [{ label: incomingLabel, messages: [msg] }];
+                    const lastIndex = list.length - 1;
+                    const lastGroup = list[lastIndex];
+                    const existsAnywhere = list.some(g => (g.messages || []).some(m => m.id === msg.id));
+                    if (existsAnywhere) return prev;
+
+                    if (lastGroup?.label === incomingLabel) {
+                        return [
+                            ...list.slice(0, lastIndex),
+                            { ...lastGroup, messages: [...(lastGroup.messages || []), msg] },
+                        ];
+                    }
+                    return [...list, { label: incomingLabel, messages: [msg] }];
+                });
+
+                socket?.emit("message_delivered", {
+                    to_role: role === "seeker" ? "company" : "seeker",
+                    to_id: dataa.id,
+                    message: msg,
+                });
+            }
+        } finally {
+            setSending(false);
+        }
+    };
 
     return (
         <NavigationBar navigationBar={false}>
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
-                keyboardVerticalOffset={Platform.OS === "ios" ? 50 : 0} // adjust if needed
+                keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0} 
             >
                 <View style={{ paddingHorizontal: responsiveScreenWidth(5), flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(3), paddingBottom: responsiveScreenHeight(1) }}>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -146,9 +194,9 @@ const Messages = () => {
 
                 <View style={{ flex: 1, borderTopWidth: .5, paddingHorizontal: responsiveScreenWidth(5) }}>
                     <FlatList
-                    style={{paddingVertical:responsiveScreenHeight(2)}}
-                        onEndReachedThreshold={0.3}    
-                        onEndReached={onLoadMore}       
+                        style={{ paddingVertical: responsiveScreenHeight(2) }}
+                        onEndReachedThreshold={0.3}
+                        onEndReached={onLoadMore}
                         scrollEventThrottle={16}
                         removeClippedSubviews={false}
                         inverted showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: responsiveScreenHeight(1) }} data={[...data].reverse()} renderItem={({ item }) => {
@@ -156,21 +204,22 @@ const Messages = () => {
                                 <>
                                     {
                                         item.messages && [...item.messages].reverse().map((e) => {
+                                            console.log(e)
                                             if (role === "recruiter") {
                                                 return (
                                                     <>
                                                         {e.message && <Text style={{ backgroundColor: e.type === "reply" ? colors.primary : colors.lightGray, maxWidth: responsiveScreenWidth(70), alignSelf: e.type === "reply" ? "flex-end" : "flex-start", color: e.type === "reply" ? colors.white : colors.darkGray, paddingHorizontal: responsiveScreenWidth(4), paddingVertical: responsiveScreenHeight(1.3), borderTopRightRadius: e.type === "reply" ? 0 : 20, borderTopLeftRadius: e.type === "reply" ? 20 : 0, borderRadius: 20, fontSize: responsiveScreenFontSize(1.8), }}>{e.message}</Text>}
                                                         {
                                                             e.attachment_type === "file" &&
-                                                            <View style={{ alignSelf: e.type === "reply" ? "flex-end" : "flex-start", borderRadius: 16, marginVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), paddingVertical: responsiveScreenHeight(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.lightGrayNatural, maxWidth: responsiveScreenWidth(70) }}>
+                                                            <Pressable onPress={()=>downloadCV(e.url)} style={{ alignSelf: e.type === "reply" ? "flex-end" : "flex-start", borderRadius: 16, marginVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), paddingVertical: responsiveScreenHeight(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.lightGrayNatural, maxWidth: responsiveScreenWidth(70) }}>
                                                                 <Icon icon={{ type: "Ionicons", name: "document-outline" }} /> <Text>{e.name}</Text>
-                                                            </View>
+                                                            </Pressable>
                                                         }
                                                         {
                                                             e.attachment_type === "image" &&
-                                                            <View style={{ overflow: "hidden", alignSelf: e.type === "reply" ? "flex-end" : "flex-start", borderRadius: 16, marginVertical: responsiveScreenHeight(.5), }}>
+                                                            <Pressable onPress={()=>downloadCV(e.url)} style={{ overflow: "hidden", alignSelf: e.type === "reply" ? "flex-end" : "flex-start", borderRadius: 16, marginVertical: responsiveScreenHeight(.5), }}>
                                                                 <Image source={{ uri: e.url }} style={{ height: responsiveScreenWidth(50), aspectRatio: 1 }} />
-                                                            </View>
+                                                            </Pressable>
                                                         }
                                                         <Text style={{ marginTop: responsiveScreenHeight(1), alignSelf: e.type === "reply" ? "flex-end" : "flex-start", color: colors.darkGrayNatural, fontSize: responsiveScreenFontSize(1.5), }}>{new Date(e.created_at).toLocaleTimeString("en", { hour: "numeric", minute: "numeric" })}</Text>
                                                     </>
@@ -182,15 +231,15 @@ const Messages = () => {
                                                     {e.message && <Text style={{ backgroundColor: e.type !== "reply" ? colors.primary : colors.lightGray, maxWidth: responsiveScreenWidth(70), alignSelf: e.type !== "reply" ? "flex-end" : "flex-start", color: e.type !== "reply" ? colors.white : colors.darkGray, paddingHorizontal: responsiveScreenWidth(4), paddingVertical: responsiveScreenHeight(1.3), borderTopRightRadius: e.type !== "reply" ? 0 : 20, borderTopLeftRadius: e.type !== "reply" ? 20 : 0, borderRadius: 20, fontSize: responsiveScreenFontSize(1.8), }}>{e.message}</Text>}
                                                     {
                                                         e.attachment_type === "file" &&
-                                                        <View style={{ alignSelf: e.type !== "reply" ? "flex-end" : "flex-start", borderRadius: 16, marginVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), paddingVertical: responsiveScreenHeight(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.lightGrayNatural, maxWidth: responsiveScreenWidth(70) }}>
+                                                        <Pressable onPress={()=>downloadCV(e.url)} style={{ alignSelf: e.type !== "reply" ? "flex-end" : "flex-start", borderRadius: 16, marginVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), paddingVertical: responsiveScreenHeight(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.lightGrayNatural, maxWidth: responsiveScreenWidth(70) }}>
                                                             <Icon icon={{ type: "Ionicons", name: "document-outline" }} /> <Text>{e.name}</Text>
-                                                        </View>
+                                                        </Pressable>
                                                     }
                                                     {
                                                         e.attachment_type === "image" &&
-                                                        <View style={{ overflow: "hidden", alignSelf: e.type !== "reply" ? "flex-end" : "flex-start", borderRadius: 16, marginVertical: responsiveScreenHeight(.5), }}>
+                                                        <Pressable onPress={()=>downloadCV(e.url)} style={{ overflow: "hidden", alignSelf: e.type !== "reply" ? "flex-end" : "flex-start", borderRadius: 16, marginVertical: responsiveScreenHeight(.5), }}>
                                                             <Image source={{ uri: e.url }} style={{ height: responsiveScreenWidth(50), aspectRatio: 1 }} />
-                                                        </View>
+                                                        </Pressable>
                                                     }
                                                     <Text style={{ marginTop: responsiveScreenHeight(1), alignSelf: e.type !== "reply" ? "flex-end" : "flex-start", color: colors.darkGrayNatural, fontSize: responsiveScreenFontSize(1.5), }}>{new Date(e.created_at).toLocaleTimeString("en", { hour: "numeric", minute: "numeric" })}</Text>
                                                 </>
@@ -244,71 +293,11 @@ const Messages = () => {
                                 (comment || document?.attachment) &&
                                 <>
 
-                                    <Pressable onPress={() => {
-                                        const a = comment
-                                        setComment("")
-                                        const { cvFile, ...b } = document
-                                        if (role === "seeker") {
-                                            dispatch(SendMessageSeeker({ company_id: dataa.id, message: a, ...b })).unwrap().then((res) => {
-                                                if (res.success) {
-                                                    setDocument({})
-                                                    const msg = res?.data
-                                                    setData((prev) => {
-                                                        const incomingLabel = "Today"; // or "Today" if you really want
-                                                        const list = Array.isArray(prev) ? prev : [];
-                                                        if (list.length === 0) {
-                                                            return [{ label: incomingLabel, messages: [msg] }];
-                                                        }
-                                                        const lastIndex = list.length - 1;
-                                                        const lastGroup = list[lastIndex];
-                                                        const alreadyExists = lastGroup?.messages.find((m: any) => m.id === msg.id)
-                                                        if (alreadyExists) return prev;
-                                                        if (lastGroup?.label === incomingLabel) {
-                                                            const updatedLastGroup = {
-                                                                ...lastGroup,
-                                                                messages: [...(lastGroup.messages || []), msg],
-                                                            };
-                                                            return [...list.slice(0, lastIndex), updatedLastGroup];
-                                                        }
-                                                        return [...list, { label: incomingLabel, messages: [msg] }];
-                                                    });
-                                                }
-                                                socket?.emit("message_delivered", { to_role: "company", to_id: dataa.id, message: res.data }, (res: any) => {
-                                                });
-                                            })
-                                        }
-                                        else {
-                                            dispatch(SendMessage({ seeker_id: dataa.id, message: a, ...b })).unwrap().then((res) => {
-                                                if (res.success) {
-                                                    const msg = res?.data
-                                                    setDocument({})
-
-                                                    setData((prev) => {
-                                                        const incomingLabel = "Today"; // or "Today" if you really want
-                                                        const list = Array.isArray(prev) ? prev : [];
-                                                        if (list.length === 0) {
-                                                            return [{ label: incomingLabel, messages: [msg] }];
-                                                        }
-                                                        const lastIndex = list.length - 1;
-                                                        const lastGroup = list[lastIndex];
-                                                        const alreadyExists = lastGroup?.messages.find((m: any) => m.id === msg.id)
-                                                        if (alreadyExists) return prev;
-                                                        if (lastGroup?.label === incomingLabel) {
-                                                            const updatedLastGroup = {
-                                                                ...lastGroup,
-                                                                messages: [...(lastGroup.messages || []), msg],
-                                                            };
-                                                            return [...list.slice(0, lastIndex), updatedLastGroup];
-                                                        }
-                                                        return [...list, { label: incomingLabel, messages: [msg] }];
-                                                    });
-                                                }
-                                                socket?.emit("message_delivered", { to_role: "seeker", to_id: dataa.id, message: res.data }, (res: any) => {
-                                                });
-                                            })
-                                        }
-
-                                    }} style={{ alignSelf: "stretch", aspectRatio: 1, overflow: "hidden" }}>
+                                    <Pressable
+                                        onPress={onSend}
+                                        disabled={sending}
+                                        style={{ alignSelf: "stretch", aspectRatio: 1, overflow: "hidden", opacity: sending ? 0.5 : 1 }}
+                                    >
                                         <Image source={require("./button.png")} style={{ height: "100%", width: "100%" }} />
                                     </Pressable>
                                 </>
@@ -319,27 +308,30 @@ const Messages = () => {
                     {
                         !comment && !document?.cvFile?.name && <>
                             <Pressable onPress={async () => {
-                                const res = await pick({
-                                    type: ["application/pdf"],
-                                    copyTo: 'cachesDirectory',
+                                const [res] = await pick({
+                                    type: [types.pdf],
+                                    allowMultiSelection: false,
+                                    mode: 'import',
+                                    copyTo: 'documentDirectory',   // ✅ important (not caches)
                                 });
                                 setDocument({
                                     cvFile: {
-                                        uri: res[0].fileCopyUri || res[0].uri,
-                                        name: res[0].name || 'cv.pdf',
-                                        type: res[0].type || 'application/pdf',
-                                        size: res[0].size,
+                                        uri: res?.fileCopyUri || res.uri,
+                                        name: res?.name || 'cv.pdf',
+                                        type: res?.type || 'application/pdf',
+                                        size: res?.size,
                                     },
                                 });
                                 const fd = new FormData();
                                 fd.append('attachment', {
-                                    uri: res[0].fileCopyUri || res[0].uri,
-                                    name: res[0].name || 'cv.pdf',
-                                    type: res[0].type || 'application/pdf',
+                                    uri: res?.fileCopyUri || res.uri,
+                                    name: res.name || 'cv.pdf',
+                                    type: res.type || 'application/pdf',
                                 } as any);
                                 dispatch(UploadDocument(fd))
                                     .unwrap()
                                     .then(res => {
+                                        console.log(res.success)
                                         if (res.success) {
                                             setDocument((prev) => ({ ...prev, ...res.data }))
                                         }
@@ -351,32 +343,36 @@ const Messages = () => {
                             </Pressable>
                             <Pressable
                                 onPress={async () => {
-                                    const res = await pick({
-                                        type: ["image/*"],
-                                        copyTo: 'cachesDirectory',
+                                    const [res] = await pick({
+                                        type: [types.images],
+                                        allowMultiSelection: false,
+                                        mode: 'import',
+                                        copyTo: 'documentDirectory',   // ✅ important (not caches)
                                     });
                                     setDocument({
                                         cvFile: {
-                                            uri: res[0].fileCopyUri || res[0].uri,
-                                            name: res[0].name || 'image.jpg',
-                                            type: res[0].type || 'application/octet-stream',
-                                            size: res[0].size,
+                                            uri: res.fileCopyUri || res.uri,
+                                            name: res.name || 'image.jpg',
+                                            type: res.type || 'application/octet-stream',
+                                            size: res.size,
                                         },
                                     });
                                     const fd = new FormData();
                                     fd.append('attachment', {
-                                        uri: res[0].fileCopyUri || res[0].uri,
-                                        name: res[0].name || 'image.jpg',
-                                        type: res[0].type || 'application/octet-stream',
+                                        uri: res.fileCopyUri || res.uri,
+                                        name: res.name || 'image.jpg',
+                                        type: res.type || 'application/octet-stream',
                                     } as any);
                                     dispatch(UploadDocument(fd))
                                         .unwrap()
                                         .then(res => {
+                                            console.log("okk", res)
                                             if (res.success) {
                                                 setDocument((prev) => ({ ...prev, ...res.data }))
                                             }
                                         })
                                         .catch(err => {
+                                            console.log(err)
                                         });
                                 }}
 

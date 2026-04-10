@@ -59,7 +59,17 @@ const Signup = () => {
     cPasswordVisible: boolean;
     isRemember: boolean;
   }>({
-    lastName: "",
+    // lastName: "",
+    // firstName: "312321312",
+    // email: "a1@yopmail.com",
+    // password: "12121212",
+    // ACN: "123123213",
+    // ABN: "12321312312",
+    // confirmPassword: "12121212",
+    // passwordVisible: false,
+    // cPasswordVisible: false,
+    // isRemember: false,
+      lastName: "",
     firstName: "",
     email: "",
     password: "",

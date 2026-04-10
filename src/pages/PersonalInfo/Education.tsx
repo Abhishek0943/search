@@ -53,16 +53,16 @@ const Education = () => {
             {
               cvs?.length > 0 ? <>
                 <FlatList
-                scrollEnabled={false} data={cvs} style={{ flex: 1, width: responsiveScreenWidth(90) }} renderItem={({ item, index }) => {
-                  return (
-                    <>
-                      <CvCard refresh={() => dispatch(GetEducation()).unwrap().then(res => {
-                        if (res.success)
-                          setCvs(res.data)
-                      })} setActive={setActive} active={active} id={item.id} item={item} />
-                    </>
-                  )
-                }} />
+                  scrollEnabled={false} data={cvs} style={{ flex: 1, width: responsiveScreenWidth(90) }} renderItem={({ item, index }) => {
+                    return (
+                      <>
+                        <CvCard refresh={() => dispatch(GetEducation()).unwrap().then(res => {
+                          if (res.success)
+                            setCvs(res.data)
+                        })} setActive={setActive} active={active} id={item.id} item={item} />
+                      </>
+                    )
+                  }} />
               </> :
                 <Image source={imagePath.workExperience} style={{ resizeMode: "contain", width: "100%" }} />
             }
@@ -121,55 +121,27 @@ function CvCard({
             <Pressable onPress={() => { navigation.navigate(routes.EDUCATIONFORM, { ...item }) }} hitSlop={10} style={styles.iconBtn}>
               <Image source={imagePath.edit} />
             </Pressable>
-            <Pressable onPress={() => setActive(id)} hitSlop={10} style={styles.iconBtn}>
-              <Image source={imagePath.threeDot} />
-              {
-                id === active &&
-                <View
-                  style={[
-                    {
-                      backgroundColor: colors.white,
-                      position: "absolute",
-                      width: responsiveScreenWidth(30),
-                      right: 0,
-                      top: "120%",
-                      borderRadius: 10,
-                      zIndex:100, 
-                      gap: responsiveScreenHeight(1),
-                      paddingHorizontal: responsiveScreenWidth(3),
-                      paddingVertical: responsiveScreenHeight(1)
-                    },
-                  ]}
-                >
-                  <TouchableOpacity
-                  hitSlop={10}
-                    onPress={async() => {
-                      const ok = await showConfirm({
-                        title: "Delete Education?",
-                        message: "Are you sure you want to delete this record?",
-                        okText: "Delete",
-                        cancelText: "Cancel",
-                      });
-                      if (ok) {
-                        dispatch(DeleteEducation({ id: id, })).unwrap().then((res) => {
-                          refresh()
-                        })
-                      }}
-                    }
-                    style={{ flexDirection: "row", gap: responsiveScreenWidth(1) }}
-                  >
-                    <Image source={imagePath.delete} style={{}} />
-                    <Text style={[{ color: colors.textPrimary }]}>
-                      Delete
-                    </Text>
-                  </TouchableOpacity>
-                </View>
+            <Pressable onPress={async () => {
+              const ok = await showConfirm({
+                title: "Delete Education?",
+                message: "Are you sure you want to delete this record?",
+                okText: "Delete",
+                cancelText: "Cancel",
+              });
+              if (ok) {
+                dispatch(DeleteEducation({ id: id, })).unwrap().then((res) => {
+                  refresh()
+                })
               }
-
+            }
+            } hitSlop={10} style={styles.iconBtn}>
+              <Image source={imagePath.delete} style={{transform:[{scale:1.2}]}} />
             </Pressable>
+            
+           
           </View>
         </View>
-        <Text style={{ marginTop: responsiveScreenHeight(.8),  fontSize: responsiveScreenFontSize(1.7), }}>{item.date_completion} - {item.country.country} - {item.state.state}</Text>
+        <Text style={{ marginTop: responsiveScreenHeight(.8), fontSize: responsiveScreenFontSize(1.7), }}>{item.date_completion} - {item.country.country} - {item.state.state}</Text>
 
         <View style={[styles.metaRow, { gap: responsiveScreenWidth(2), marginTop: responsiveScreenHeight(1) }]}>
           <Image source={imagePath.education} />

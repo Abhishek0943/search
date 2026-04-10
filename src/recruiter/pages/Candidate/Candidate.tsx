@@ -35,6 +35,8 @@ const Candidate = () => {
         setLoading(true)
         dispatch(JobCandidates({ pages, job_id: jobId, status: a[active] })).unwrap().then(res => {
           if (res.success !== false) {
+            console.log("cvs cvs", res)
+
             if (cvs?.meta?.current_page > 1) {
               setCvs([...cvs, ...res.data?.applications])
             } else {
@@ -48,6 +50,7 @@ const Candidate = () => {
       else if (followers) {
         dispatch(Followers({ pages })).unwrap().then(res => {
           if (res.success !== false) {
+
             if (cvs.length > 0) {
               setCvs([...cvs, ...res.data.users])
             } else {
@@ -61,6 +64,7 @@ const Candidate = () => {
       else {
         dispatch(GetCandidates({ pages })).unwrap().then(res => {
           if (res.success !== false) {
+            console.log("cvs cvs", res)
             if (cvs.length > 0) {
               setCvs([...cvs, ...res.data.users])
             } else {
@@ -116,6 +120,7 @@ const Candidate = () => {
           loading ? <View style={{ flex: 1, marginTop: responsiveScreenHeight(40) }}>
             <ActivityIndicator size={responsiveScreenFontSize(3)} style={{}} />
           </View> :
+       
             <FlatList
               data={cvs}
               numColumns={2}
@@ -152,12 +157,12 @@ const Candidate = () => {
               renderItem={({ item }) => (
                 <View style={{ marginVertical: 10, width: responsiveScreenWidth(43), backgroundColor: colors.lightGrayNatural, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(1.5), borderRadius: 10, position: "relative" }}>
                   <View style={{ borderRadius: 100, borderWidth: 1, borderColor: colors.primary, padding: 2, backgroundColor: colors.white, overflow: "hidden", height: responsiveScreenHeight(8), aspectRatio: 1, marginHorizontal: "auto" }}>
-                    <Image source={{ uri: item.image || item.user.image }} style={{ borderRadius: 100, height: "100%", backgroundColor: "white", }} />
+                    <Image source={{ uri: item?.image || item?.user?.image }} style={{ borderRadius: 100, height: "100%", backgroundColor: "white", }} />
                   </View>
-                  <Text style={{ textTransform: "capitalize", textAlign: "center", marginTop: responsiveScreenHeight(.5), fontSize: responsiveScreenFontSize(2), fontWeight: "700" }}>{item.name || item.user.name}</Text>
+                  <Text style={{ textTransform: "capitalize", textAlign: "center", marginTop: responsiveScreenHeight(.5), fontSize: responsiveScreenFontSize(2), fontWeight: "700" }}>{item.name || item.user?.name}</Text>
                   {
                     item.profile_summary &&
-                    <Text numberOfLines={2} style={{ textAlign: "center", marginTop: responsiveScreenHeight(.5), color: colors.darkGray, fontSize: responsiveScreenFontSize(1.5), fontWeight: "500" }}>{item.profile_summary}</Text>
+                    <Text numberOfLines={2} style={{ textAlign: "center", marginTop: responsiveScreenHeight(.5), color: colors.darkGray, fontSize: responsiveScreenFontSize(1.5), fontWeight: "500" }}>{item?.profile_summary}</Text>
                   }
                   {
                     item.location &&
@@ -174,8 +179,6 @@ const Candidate = () => {
                       else {
                         navigation.navigate(routes.CANDIDATEPROFILE, { candidateId: item.id })
                       }
-
-
                     }}
                     style={{
                       width: '100%',

@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
-import { Alert, BackHandler, FlatList, Image, Pressable, ScrollView, StyleSheet, TouchableHighlight, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Alert, BackHandler, FlatList, Image, Platform, Pressable, ScrollView, StyleSheet, TouchableHighlight, TouchableOpacity, View } from 'react-native'
 import NavigationBar from '../../components/NavigationBar'
 import { API_URL, routes } from '../../../constants/values'
 import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions'
@@ -7,20 +7,73 @@ import imagePath from '../../../assets/imagePath'
 import { ThemeContext } from '../../../context/ThemeProvider'
 import { useAppDispatch, useAppSelector } from '../../../store'
 import Text from '../../../components/Text'
-import { RecruiterPlans, RecruiterProfile } from '../../../reducer/recruiterReducer'
+import { RecruiterPlans, RecruiterProfile, Tokien } from '../../../reducer/recruiterReducer'
 import { NavigationProp, ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native'
 import { initPaymentSheet, presentPaymentSheet } from '@stripe/stripe-react-native'
 import { postApiCall } from '../../../api'
 import { useAlert } from '../../../context/AlertContext'
 import { ProfileData } from '../../../reducer/jobsReducer'
+import Purchases, { LOG_LEVEL, PurchasesPackage } from 'react-native-purchases';
+import { getMessaging } from '@react-native-firebase/messaging'
+const iosApiKey = 'appl_dqiZtBzrbZSAYRmwUwEQdHnpuNO';
+import messaging from '@react-native-firebase/messaging';
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { getFCMToken } from '../../../utils/notificationService'
+
+const androidApiKey = 'test_dhcgdmeEwfOkaCafwBLIkiUeUcf';
+
 function RecruiterHome() {
     const navigation: NavigationProp<ParamListBase> = useNavigation()
     const { colors } = useContext(ThemeContext)
     const { user } = useAppSelector(state => state.userStore)
+    const { plan } = useAppSelector(state => state.recruiterReducer)
     const dispatch = useAppDispatch()
-    const [plans, setPlans] = useState([])
     const { showAlert } = useAlert();
+    const pendingPackageIdRef = { current: null as number | null };
+    async function buyIosWithRevenueCat(item: any) {
+        const key = item?.apple_package_id
+        if (!key) {
+            return Alert.alert('Error', 'Plan not available')
+        }
+        async function loadPackages() {
+            const offerings = await Purchases.getOfferings();
+            const current = offerings.current;
+            if (!current) return {};
+            const map: Record<string, PurchasesPackage> = {};
+            for (const p of current.availablePackages) {
+                map[p.product.identifier] = p;
+            }
+            return map;
+        }
+        const rcPackages = await loadPackages();
+        const pkg = rcPackages[key]
 
+        if (!pkg) {
+            Alert.alert('Error', 'Plan not available')
+            return
+        }
+        pendingPackageIdRef.current = item.id
+        try {
+            await Purchases.purchasePackage(pkg)
+            showAlert({
+                title: 'Successful',
+                message: 'Successfully Purchased Plan. If your plan is not updated, please restart the app. and make sure your app notification is enabled.',
+            })
+        } catch (e: any) {
+            console.log('RC purchase error', e?.message ?? e)
+        }
+    }
+    async function onSelectPlan(item: any) {
+        if (item.price.amount === 0) return free(item.id)
+
+
+        if (Platform.OS === 'ios') {
+            return buyIosWithRevenueCat(item)
+        }
+
+
+        return pay(item.price.currency, item.id)
+    }
     async function pay(currency, id) {
         try {
             if (!id) return
@@ -72,11 +125,7 @@ function RecruiterHome() {
                 return;
             }
             dispatch(RecruiterProfile())
-            dispatch(RecruiterPlans()).unwrap().then((res) => {
-                if (res.success) {
-                    setPlans(res.data)
-                }
-            })
+            dispatch(RecruiterPlans())
             showAlert({
                 title: "Successful",
                 message: "Successfully Activate Plan",
@@ -92,18 +141,13 @@ function RecruiterHome() {
         [],
     )
     )
-
     async function free(id) {
         try {
             if (!id) return
             const json = await postApiCall(`/company/packages/${id}/free`, {});
             if (json.success) {
                 dispatch(RecruiterProfile())
-                dispatch(RecruiterPlans()).unwrap().then((res) => {
-                    if (res.success) {
-                        setPlans(res.data)
-                    }
-                })
+                dispatch(RecruiterPlans())
                 showAlert({
                     title: "Successful",
                     message: "Successfully Activate Free Plan",
@@ -113,14 +157,59 @@ function RecruiterHome() {
         }
 
     }
+    useEffect(() => {
+        if (!user?.id) return;
+        let unsubscribe: undefined | (() => void);
+        const start = async () => {
+            try {
+                if (Platform.OS === "ios") {
+                    const authStatus = await messaging().requestPermission();
+                }
+                unsubscribe = messaging().onMessage(async remoteMessage => {
+                    if (remoteMessage.data.type === "purchase") {
+                        dispatch(RecruiterProfile())
+                        dispatch(RecruiterPlans())
+                        showAlert({
+                            title: 'Successful',
+                            message: 'Successfully Activate Plan',
+                        })
+                    }
+                });
+            } catch (e) {
+            }
+        };
+        const registerTokenIfNeeded = async () => {
+            if (!user?.id) return;
+            await AsyncStorage.removeItem("FCM");
+            const existing = await AsyncStorage.getItem("FCM");
+            if (existing) {
+                console.log("FCM cached:", existing);
+                return;
+            }
+            const fcm = await getFCMToken();
+            if (!fcm) return;
 
+            const role = (await AsyncStorage.getItem("role")) as "seeker" | "recruiter" | null;
+
+            await AsyncStorage.setItem("FCM", fcm);
+            dispatch(
+                Tokien({
+                    device_token: fcm,
+                    device_type: Platform.OS,
+                    auth_type: role === "recruiter" ? "company" : "user",
+                    auth_id: user.id,
+                })
+            );
+        };
+        registerTokenIfNeeded()
+        start();
+        return () => {
+            if (unsubscribe) unsubscribe();
+        };
+    }, [user?.id]);
     useFocusEffect(
         useCallback(() => {
-            dispatch(RecruiterPlans()).unwrap().then((res) => {
-                if (res.success) {
-                    setPlans(res.data)
-                }
-            })
+            dispatch(RecruiterPlans())
             const backHandler = BackHandler.addEventListener(
                 'hardwareBackPress',
                 () => true
@@ -136,10 +225,21 @@ function RecruiterHome() {
                 <Image source={require("./Ellipse44.png")} style={{ position: "absolute", width: responsiveScreenWidth(100), height: responsiveScreenHeight(100), top: -100, }} />
 
                 <View style={{ width: "90%", flex: 1, marginTop: responsiveScreenHeight(2), alignSelf: "center", borderRadius: 10, }}>
+                    {/* {
+                        plan?.plans?.length > 0 ? <> */}
                     <FlatList
                         showsVerticalScrollIndicator={false}
                         scrollEnabled={true}
                         ref={flatListRef}
+                        ListEmptyComponent={()=>{
+                            if (!user?.is_active){
+return null
+                            }
+                            return (
+                                <View style={{ flex: 1, marginTop: responsiveScreenHeight(15) }}><ActivityIndicator size={responsiveScreenFontSize(3)} /></View>
+
+                            )
+                        }}
                         ListHeaderComponent={() => {
                             return (
                                 <>
@@ -160,7 +260,7 @@ function RecruiterHome() {
 
                                         onPress={() => {
                                             flatListRef.current?.scrollToOffset({
-                                                offset: responsiveScreenHeight(40), 
+                                                offset: responsiveScreenHeight(40),
                                                 animated: true,
                                             });
                                         }}
@@ -200,15 +300,27 @@ function RecruiterHome() {
                                         </TouchableOpacity>
 
                                     </View>
-                                    <View style={styles.planWrap}>
-                                        <Text style={styles.planTitle}>Choose your plan</Text>
-                                        <Text style={[styles.planSubTitle, { color: colors.hardGray, marginTop: responsiveScreenHeight(.8) }]}>Change or cancel anytime.</Text>
-                                    </View>
+                                    {
+                                        user.is_active ?
+                                            <View style={styles.planWrap}>
+                                                <Text style={styles.planTitle}>Choose your plan</Text>
+                                                <Text style={[styles.planSubTitle, { color: colors.hardGray, marginTop: responsiveScreenHeight(.8) }]}>Change or cancel anytime.</Text>
+                                            </View> : <>
+                                                <Image source={require("./inActive.png")} style={{ marginVertical: responsiveScreenHeight(2) }} />
+                                                <TouchableOpacity style={{}} onPress={()=>navigation.navigate(routes.CONTACT)}>
+
+                                                <Image  source={require("./popupbutton.png")} style={{}} />
+                                                </TouchableOpacity>
+
+                                            </>
+                                    }
                                 </>
                             )
                         }}
 
-                        contentContainerStyle={{ gap: responsiveScreenHeight(2) }} data={plans?.plans} renderItem={({ item, index }) => (
+                        contentContainerStyle={{ gap: responsiveScreenHeight(2) }}
+                        data={ user.is_active?plan?.plans:[]}
+                        renderItem={({ item, index }) => (
                             <View style={{ overflow: "hidden", backgroundColor: index === 0 ? "#E5E4E2" : index === 1 ? "#FFD700" : "#AABDE4", borderRadius: 20 }}>
                                 <Text style={{ color: colors.textPrimary, fontWeight: "800", fontSize: responsiveScreenFontSize(2.5), textAlign: "center", paddingVertical: responsiveScreenHeight(1) }}> {item.name}</Text>
                                 <View style={{ justifyContent: "center", alignItems: "center", gap: responsiveScreenWidth(2), backgroundColor: "#09111E", }}>
@@ -239,16 +351,17 @@ function RecruiterHome() {
 
                                     }
                                     <Pressable
-                                        onPress={() => {
+                                        // onPress={() => {
 
-                                            if (item.price.amount === 0) {
-                                                free(item.id)
-                                            } else {
+                                        //     if (item.price.amount === 0) {
+                                        //         free(item.id)
+                                        //     } else {
 
-                                                pay(item.price.currency, item.id)
-                                            }
-                                        }
-                                        }
+                                        //         pay(item.price.currency, item.id)
+                                        //     }
+                                        // }
+                                        // }
+                                        onPress={() => onSelectPlan(item)}
                                         style={{
                                             width: '92%',
                                             justifyContent: 'center',
@@ -271,6 +384,12 @@ function RecruiterHome() {
                                 </View>
                             </View>
                         )} />
+                    {/* </> :
+                            <>
+                                <View style={{ flex: 1, marginTop: responsiveScreenHeight(15) }}><ActivityIndicator size={responsiveScreenFontSize(3)} /></View>
+                            </>
+                    } */}
+
                 </View>
             </>
 

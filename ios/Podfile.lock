@@ -105,6 +105,8 @@ PODS:
   - nanopb/decode (3.30910.0)
   - nanopb/encode (3.30910.0)
   - PromisesObjC (2.4.0)
+  - PurchasesHybridCommon (17.29.0):
+    - RevenueCat (= 5.55.3)
   - RCT-Folly (2024.11.18.00):
     - boost
     - DoubleConversion
@@ -2760,6 +2762,7 @@ PODS:
     - React-perflogger (= 0.83.1)
     - React-utils (= 0.83.1)
     - SocketRocket
+  - RevenueCat (5.55.3)
   - RNCAsyncStorage (2.2.0):
     - boost
     - DoubleConversion
@@ -2996,6 +2999,9 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
+  - RNPurchases (9.7.2):
+    - PurchasesHybridCommon (= 17.29.0)
+    - React-Core
   - RNScreens (4.20.0):
     - boost
     - DoubleConversion
@@ -3287,6 +3293,7 @@ DEPENDENCIES:
   - "RNGoogleSignin (from `../node_modules/@react-native-google-signin/google-signin`)"
   - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
   - RNPermissions (from `../node_modules/react-native-permissions`)
+  - RNPurchases (from `../node_modules/react-native-purchases`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - SocketRocket (~> 0.7.1)
   - "stripe-react-native (from `../node_modules/@stripe/stripe-react-native`)"
@@ -3309,6 +3316,8 @@ SPEC REPOS:
     - GTMSessionFetcher
     - nanopb
     - PromisesObjC
+    - PurchasesHybridCommon
+    - RevenueCat
     - SocketRocket
     - Stripe
     - StripeApplePay
@@ -3530,6 +3539,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-image-crop-picker"
   RNPermissions:
     :path: "../node_modules/react-native-permissions"
+  RNPurchases:
+    :path: "../node_modules/react-native-purchases"
   RNScreens:
     :path: "../node_modules/react-native-screens"
   stripe-react-native:
@@ -3561,6 +3572,7 @@ SPEC CHECKSUMS:
   hermes-engine: 24b7e7cbe485fdce660e141e3fc3dd83e5cf7702
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
+  PurchasesHybridCommon: 9214b5a937da03c2ee6c44a793f0ad6bab0b375a
   RCT-Folly: 846fda9475e61ec7bcbf8a3fe81edfcaeb090669
   RCTDeprecation: a41bbdd9af30bf2e5715796b313e44ec43eefff1
   RCTRequired: 7be34aabb0b77c3cefe644528df0fa0afad4e4d0
@@ -3649,6 +3661,7 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: 0eb286cc274abb059ee601b862ebddac2e681d01
   ReactCodegen: 3d48510bcef445f6403c0004047d4d9cbb915435
   ReactCommon: ac934cb340aee91282ecd6f273a26d24d4c55cae
+  RevenueCat: 5047075d769f19cccb0c8215633563017cb9c601
   RNCAsyncStorage: 29f0230e1a25f36c20b05f65e2eb8958d6526e82
   RNCMaskedView: 5ef8c95cbab95334a32763b72896a7b7d07e6299
   RNFBApp: b094e527070715680bf25d019ac853d1f22d92df
@@ -3657,6 +3670,7 @@ SPEC CHECKSUMS:
   RNGoogleSignin: 4122717989e2544988cb4cec3e917da3ebc969a5
   RNImageCropPicker: 5fd4ceaead64d8c53c787e4e559004f97bc76df7
   RNPermissions: e5dd84f29e7a3871451f88efa83dfa6227806b51
+  RNPurchases: 7196d4a9e7463a240e1f4b9b599ae9d6b0931641
   RNScreens: 714e10b6b554f7dc7ad9f78dcf36dc8e3fc73415
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Stripe: 4728e3e0dd8df134e4a420ab504e929a93a815f0
@@ -3671,6 +3685,6 @@ SPEC CHECKSUMS:
   TOCropViewController: 797deaf39c90e6e9ddd848d88817f6b9a8a09888
   Yoga: 5456bb010373068fc92221140921b09d126b116e
 
-PODFILE CHECKSUM: c3e7bdb5bec7f689a0f58bd8c15e538525163468
+PODFILE CHECKSUM: c9d4823e389e0da1707cb25c64fb517f23e8beaf
 
 COCOAPODS: 1.16.2

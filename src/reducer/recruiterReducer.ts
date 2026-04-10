@@ -38,6 +38,10 @@ export const RecruiterPlans = createAsyncThunk<{ success: true, topic: TopicItem
   'RecruiterPlans',
   () => getApiCall<{ success: true, topic: TopicItem[], token: string }>('/company/plans'),
 );
+export const Tokien = createAsyncThunk<{ success: true, topic: TopicItem[], } | ErrorResponse>(
+  'Tokien',
+  (body) => postApiCall<{ success: true, topic: TopicItem[], token: string }>('/apple/token', body),
+);
 export const RecruiterLoginByPassword = createAsyncThunk<{ success: true, recruiter: Recruiter, token: string } | ErrorResponse, { email: string, password: string }>(
   'RecruiterLoginByPassword',
   (body) => postApiCall<{ success: true, recruiter: Recruiter, token: string }>('/auth/companies/login', body),
@@ -144,18 +148,23 @@ const initialState: RecruiterInitialState = {
   welcomeScreen: [],
   countries: [],
   topic: [],
+  plan:[]
 };
 export const recruiterSlice = createSlice({
   name: 'recruiter',
   initialState,
   reducers: {
   },
-  // extraReducers: builder => {
-  //   builder.addCase(GetWelcomeScreen.fulfilled, (state, { payload }) => {
-  //     if (payload.success) {
-  //       state.welcomeScreen = payload.welcome;
-  //     }
-  //   }).addCase(GetCountries.fulfilled, (state, { payload }) => {
+  extraReducers: builder => {
+    builder.addCase(RecruiterPlans.fulfilled, (state, { payload }) => {
+      if (payload.success) {
+        state.plan = payload.data;
+      }
+    })
+
+  }
+
+  //.addCase(GetCountries.fulfilled, (state, { payload }) => {
   //     if (payload.success) {
   //       state.countries = payload.countries;
   //     }

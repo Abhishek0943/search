@@ -6,7 +6,7 @@ import { routes } from '../../constants/values'
 import { NavigationBar } from '../../components'
 import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions'
 import { useAppDispatch, useAppSelector } from '../../store'
-import { ProfileData, ProfileData2, UpdateProfile } from '../../reducer/jobsReducer'
+import { DeleteSesdkfjds, ProfileData, ProfileData2, UpdateProfile } from '../../reducer/jobsReducer'
 import imagePath from '../../assets/imagePath'
 import { ThemeContext } from '../../context/ThemeProvider'
 import { NavigationProp, ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native'
@@ -14,6 +14,7 @@ import { launchImageLibrary } from 'react-native-image-picker'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Text from '../../components/Text';
 import ImagePicker from 'react-native-image-crop-picker';
+import { useAlert } from '../../context/AlertContext';
 const logoutUser = async () => {
     try {
         await AsyncStorage.multiRemove([
@@ -34,13 +35,10 @@ const Profile = () => {
     const [profile, setProfile] = useState<User>()
     const [loading, setLoading] = useState(false)
     const dispatch = useAppDispatch()
-    const pickImage = async (field:string) => {
+    const pickImage = async (field: string) => {
         try {
             const image = await ImagePicker.openPicker({
-                // width: 800,
-                // height: 800,
-                // cropping: true,
-                cropperCircleOverlay: false, // true if profile pic
+                cropperCircleOverlay: false,
                 compressImageQuality: 0.9,
                 mediaType: 'photo',
             });
@@ -62,7 +60,20 @@ const Profile = () => {
                 .unwrap()
                 .then((res) => {
                     if (res.success) {
-                        dispatch(ProfileData())
+                        dispatch(ProfileData()).unwrap().then((res) => {
+                            if (res.success) {
+
+                                setProfile(res.data)
+                            }
+                            else {
+                                setProfile(user)
+                            }
+                        })
+                        // showAlert({
+                        //     title: "Successful",
+                        //     message: "Your Image change successfully",
+                        //     okText: "OK"
+                        // })
                     }
                     else {
                         Alert.alert('Error', 'Failed to update profile image.');
@@ -75,23 +86,31 @@ const Profile = () => {
         }
     };
     const [refreshing, setRefreshing] = useState(false);
-
     const onRefresh = async () => {
         setRefreshing(true);
         dispatch(ProfileData()).unwrap().then((res) => {
-            // if (res.success) {
-
-            //     setProfile(res.data)
-            // }
-            // else {
-            //     setProfile(user)
-            // }
-            // setLoading(false)
+            if (res.success) {
+                setProfile(res.data)
+            }
+            else {
+                setProfile(user)
+            }
         })
 
         setRefreshing(false);
     };
-    useEffect(() => { setProfile(user) }, [user])
+    useEffect(() => {
+        dispatch(ProfileData()).unwrap().then((res) => {
+            if (res.success) {
+                setProfile(res.data)
+            }
+            else {
+                setProfile(user)
+            }
+        })
+    }, [user])
+    const { showConfirm, showAlert } = useAlert();
+
     return (
         <>
             <NavigationBar name={routes.PROFILE} statusbar={false}>
@@ -165,6 +184,10 @@ const Profile = () => {
 
                                         <Text style={{ fontSize: responsiveScreenFontSize(2) }}>Favorite company</Text>
                                     </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => navigation.navigate(routes.BLOGPAGE, { isFavorite: true })} style={{ width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
+                                        <Image style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} source={imagePath.blog} />
+                                        <Text style={{ fontSize: responsiveScreenFontSize(2) }}>Insights</Text>
+                                    </TouchableOpacity>
                                     <TouchableOpacity onPress={() => navigation.navigate(routes.EDUCATION)} style={{ width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
                                         <Image tintColor={colors.textPrimary} style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} source={imagePath.education2} />
                                         <Text style={{ fontSize: responsiveScreenFontSize(2) }}>Education</Text>
@@ -181,11 +204,63 @@ const Profile = () => {
                                         <Image tintColor={colors.textPrimary} style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} source={imagePath.skill} />
                                         <Text style={{ fontSize: responsiveScreenFontSize(2) }}>Skills</Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity onPress={() => navigation.navigate(routes.LANGUAGE)} style={{ width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
+                                    <TouchableOpacity onPress={() => { navigation.navigate(routes.LANGUAGE) }} style={{ width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
                                         <Image tintColor={colors.textPrimary} style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} source={imagePath.language} />
                                         <Text style={{ fontSize: responsiveScreenFontSize(2) }}>Language</Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity onPress={logoutAndRestart} style={{ marginBottom: responsiveScreenHeight(5), width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
+
+                                    <TouchableOpacity
+
+                                        onPress={async () => {
+                                            showConfirm({
+                                                title: "Delete Account",
+                                                message: "Are you sure you want to delete your account?",
+                                                okText: "Delete",
+                                                cancelText: "Cancel",
+                                                waitForOk: true,
+                                                onOkPress: async () => {
+                                                    await dispatch(DeleteSesdkfjds({ id: user.id })).unwrap().then((res) => {
+                                                        if (res.success) {
+                                                            showAlert({
+                                                                title: "Account Deleted",
+                                                                message: "Your account has been deleted successfully.",
+                                                                okText: "OK"
+                                                            })
+                                                            logoutAndRestart()
+                                                        }
+                                                    })
+                                                    return true;
+                                                },
+                                            })
+                                            const ok = await showConfirm({
+                                                title: "Delete Account",
+                                                message: "Are you sure you want to delete your account?",
+                                                okText: "Delete",
+                                                cancelText: "Cancel",
+                                            })
+                                            if (ok && user && user?.id) {
+
+                                            }
+                                        }}
+                                        style={{ width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
+                                        <Image tintColor={colors.textPrimary} style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} source={imagePath.delete} />
+                                        <Text style={{ fontSize: responsiveScreenFontSize(2) }}>Delete Account</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={async () => {
+                                        showConfirm({
+                                            title: "Logout",
+                                            message: "Are you sure you want to Logout?",
+                                            okText: "Logout",
+                                            cancelText: "Cancel",
+                                            waitForOk: true,
+                                            onOkPress: async () => {
+                                                await logoutAndRestart()
+                                                await new Promise(resolve => setTimeout(resolve, 800))
+                                                return true;
+                                            },
+                                        })
+
+                                    }} style={{ marginBottom: responsiveScreenHeight(5), width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
                                         <Image tintColor={colors.textPrimary} style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} source={imagePath.logout} />
                                         <Text style={{ fontSize: responsiveScreenFontSize(2) }}>Log Out</Text>
                                     </TouchableOpacity>
@@ -198,7 +273,6 @@ const Profile = () => {
                     }
                 </ScrollView>
             </NavigationBar>
-            {/* <Image style={{ position: "absolute", height: "100%", width: "100%", opacity: .1 }} source={require("./Profile.png")} /> */}
         </>
 
     )

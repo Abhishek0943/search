@@ -46,7 +46,7 @@ const SuggestedJob = () => {
   return (
     <NavigationBar navigationBar={false}>
       <ScrollView style={{ flex: 1, }} contentContainerStyle={{ justifyContent: "flex-start" }}>
-        <Header title={isBookmark ? "Bookmark Job" : "Suggested Jobs"} />
+        <Header title={isBookmark ? "Save Job" : "Suggested Jobs"} />
         {
           loading ? <>
             <ActivityIndicator style={{ marginTop: responsiveScreenHeight(40) }} size={responsiveScreenFontSize(3)} />
@@ -56,7 +56,7 @@ const SuggestedJob = () => {
                 return (
                   <>
                     <Pressable
-                      onPress={() => { navigation.navigate(routes.HOME)}}
+                      onPress={() => { navigation.goBack()}}
                       style={{
                         width: '100%',
                         justifyContent: 'center',
