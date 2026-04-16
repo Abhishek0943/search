@@ -3,16 +3,20 @@ interface Job {
   company_info: {
     name: string;
     image: string;
+    description?: string;
   }
   title: string;
   job_description?:{title:string, data:string|{skill:string}[]}[]
-  salary_currency: string;
-  salary: string;
-  salary_period: string;
+  salary_period?: string;
+  salary_currency?: string;
+  salary?: string;
   is_applied: boolean;
   is_favorited: boolean;
   jobType: string;
   jobLocation: string;
+  functionalArea?: string;
+  expired?: boolean;
+  jobUrl?: string;
 }
 interface Company {
   id: number,
@@ -48,4 +52,5 @@ interface JobInitialState {
   }
   suggested:any[]
   recent:any[]
+  appliedJobIds: any[]
 }

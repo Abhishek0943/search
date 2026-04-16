@@ -64,7 +64,6 @@ const Candidate = () => {
       else {
         dispatch(GetCandidates({ pages })).unwrap().then(res => {
           if (res.success !== false) {
-            console.log("cvs cvs", res)
             if (cvs.length > 0) {
               setCvs([...cvs, ...res.data.users])
             } else {
@@ -120,7 +119,7 @@ const Candidate = () => {
           loading ? <View style={{ flex: 1, marginTop: responsiveScreenHeight(40) }}>
             <ActivityIndicator size={responsiveScreenFontSize(3)} style={{}} />
           </View> :
-       
+
             <FlatList
               data={cvs}
               numColumns={2}
@@ -129,7 +128,7 @@ const Candidate = () => {
                 return (
                   <View style={{ flex: 1, justifyContent: "center", alignItems: "center", height: responsiveScreenHeight(70) }}>
                     <Image source={require("./followerImage.png")} />
-                    <Pressable
+                    {/* <Pressable
                       onPress={() => navigation.navigate(routes.ACTIVECANDIDATE)}
                       style={{
                         width: '100%',
@@ -147,7 +146,7 @@ const Candidate = () => {
                       <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8) }}>
                         Search Candidates
                       </Text>
-                    </Pressable>
+                    </Pressable> */}
                   </View>
                 )
               }}

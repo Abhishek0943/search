@@ -58,11 +58,11 @@ export const UploadDocument = createAsyncThunk<
   }
 );
 export const GetJobApplication = createAsyncThunk<
-  { success: true, data: Job[] } | ErrorResponse, { search: string }
+  { success: true, data: Job[] } | ErrorResponse, { search: string, page: number }
 >(
   'GetJobApplication',
-  ({ search }) => {
-    return getApiCall<{ success: true, data: Job[] }>('/jobseekers/my-job-applications?search=' + search);
+  ({ search, page }) => {
+    return getApiCall<{ success: true, data: Job[] }>('/jobseekers/my-job-applications?search=' + search + '&page=' + page);
   }
 );
 export const GetCv = createAsyncThunk<
@@ -249,7 +249,7 @@ export const ReportJob = createAsyncThunk<
       jobDetail
       : Job
     }
-  } | ErrorResponse, { id: string | number }
+  } | ErrorResponse, { your_email: string, your_name: string, job_url: string }
 >(
   'ReportJob',
   (body) => {
@@ -267,7 +267,7 @@ export const ReportCompany = createAsyncThunk<
       jobDetail
       : Job
     }
-  } | ErrorResponse, { id: string | number }
+  } | ErrorResponse, { your_email: string, your_name: string, company_url: string }
 >(
   'ReportCompany',
   (body) => {
@@ -735,7 +735,8 @@ const initialState: JobInitialState = {
     jobIds: [],
   },
   suggested: [],
-  recent: []
+  recent: [],
+  appliedJobIds: []
 };
 const jobSlice = createSlice({
   name: 'jobs',
@@ -771,6 +772,11 @@ const jobSlice = createSlice({
     //     state.jobs.jobObject[payload._id].rejobCount = state.jobs.jobObject[payload._id].rejobCount ? state.jobs.jobObject[payload._id].rejobCount + 1 : 1
     //   }
     // },
+    setAppliedJobId: (state, { payload }) => {
+      if (!state.appliedJobIds.includes(payload)) {
+        state.appliedJobIds.push(payload);
+      }
+    },
   },
   extraReducers(builder) {
     builder
@@ -789,6 +795,5 @@ const jobSlice = createSlice({
 
 
 
-// export const { likeReducers, bookmarkReducers, rejobReducers } = jobSlice.actions;
-
+export const { setAppliedJobId } = jobSlice.actions;
 export default jobSlice.reducer;

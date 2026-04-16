@@ -38,7 +38,6 @@ const AddJob = () => {
     const [jobShifts, setJobShifts] = useState<Option[]>([]);
     const route = useRoute()
     const jobData = route.params;
-    console.log(user?.package_end_date && new Date(user?.package_end_date))
     const [genders, setGenders] = useState<Option[]>([]);
     const [degrees, setDegrees] = useState<Option[]>([]);
     const [experiences, setExperiences] = useState<Option[]>([]);
@@ -434,7 +433,6 @@ const AddJob = () => {
                                         {jobData?.id ? `Edit Job` : "Post a job"}
                                     </Text>
 
-                                    {/* Invisible icon to balance layout */}
                                     <Image
                                         source={imagePath.backIcon}
                                         style={{ opacity: 0, resizeMode: 'contain', transform: [{ scale: 1.1 }] }}
@@ -858,21 +856,21 @@ const AddJob = () => {
                                     }}
                                     onCancel={() => setStartDateOpen(false)}
                                 />
-                            </>:
-                            <>
-                              <View style={{ alignItems: "center", marginTop: responsiveScreenHeight(35), }}>
-                            <Image source={require("./test.png")} style={{ marginVertical: responsiveScreenHeight(2) }} />
-                            <TouchableOpacity style={{}} onPress={() => navigation.goBack()}>
-                                <Image source={require("./popupbutton.png")} style={{}} />
-                            </TouchableOpacity>
-                        </View>
-                            </>
-                    }
+                            </> :
+                                <>
+                                    <View style={{ alignItems: "center", marginTop: responsiveScreenHeight(35), }}>
+                                        <Image source={require("./test.png")} style={{ marginVertical: responsiveScreenHeight(2) }} />
+                                        <TouchableOpacity style={{}} onPress={() => navigation.navigate(routes.RECRUITERHOME)}>
+                                            <Image source={require("./popupbutton.png")} style={{}} />
+                                        </TouchableOpacity>
+                                    </View>
+                                </>
+                        }
 
                     </> :
                         <View style={{ alignItems: "center", marginTop: responsiveScreenHeight(20), }}>
                             <Image source={require("../Home/inActive.png")} style={{ marginVertical: responsiveScreenHeight(2) }} />
-                            <TouchableOpacity style={{}} onPress={() => navigation.navigate(routes.CONTACT)}>
+                            <TouchableOpacity style={{}} onPress={() => navigation.navigate(routes.RECRUITERHOME)}>
                                 <Image source={require("../Home/popupbutton.png")} style={{}} />
                             </TouchableOpacity>
                         </View>

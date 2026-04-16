@@ -14,14 +14,11 @@ import { postApiCall } from '../../../api'
 import { useAlert } from '../../../context/AlertContext'
 import { ProfileData } from '../../../reducer/jobsReducer'
 import Purchases, { LOG_LEVEL, PurchasesPackage } from 'react-native-purchases';
-import { getMessaging } from '@react-native-firebase/messaging'
 const iosApiKey = 'appl_dqiZtBzrbZSAYRmwUwEQdHnpuNO';
 import messaging from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { getFCMToken } from '../../../utils/notificationService'
-
+import { getFCMToken, onDisplayNotification } from '../../../utils/notificationService'
 const androidApiKey = 'test_dhcgdmeEwfOkaCafwBLIkiUeUcf';
-
 function RecruiterHome() {
     const navigation: NavigationProp<ParamListBase> = useNavigation()
     const { colors } = useContext(ThemeContext)
@@ -30,40 +27,47 @@ function RecruiterHome() {
     const dispatch = useAppDispatch()
     const { showAlert } = useAlert();
     const pendingPackageIdRef = { current: null as number | null };
+    const [isSelecting, setIsSelecting] = useState(false);
     async function buyIosWithRevenueCat(item: any) {
         const key = item?.apple_package_id
         if (!key) {
             return Alert.alert('Error', 'Plan not available')
         }
-        async function loadPackages() {
-            const offerings = await Purchases.getOfferings();
-            const current = offerings.current;
-            if (!current) return {};
-            const map: Record<string, PurchasesPackage> = {};
-            for (const p of current.availablePackages) {
-                map[p.product.identifier] = p;
-            }
-            return map;
-        }
-        const rcPackages = await loadPackages();
-        const pkg = rcPackages[key]
-
-        if (!pkg) {
-            Alert.alert('Error', 'Plan not available')
-            return
-        }
-        pendingPackageIdRef.current = item.id
+        setIsSelecting(true);
         try {
-            await Purchases.purchasePackage(pkg)
-            showAlert({
-                title: 'Successful',
-                message: 'Successfully Purchased Plan. If your plan is not updated, please restart the app. and make sure your app notification is enabled.',
-            })
-        } catch (e: any) {
-            console.log('RC purchase error', e?.message ?? e)
+            async function loadPackages() {
+                const offerings = await Purchases.getOfferings();
+                const current = offerings.current;
+                if (!current) return {};
+                const map: Record<string, PurchasesPackage> = {};
+                for (const p of current.availablePackages) {
+                    map[p.product.identifier] = p;
+                }
+                return map;
+            }
+            const rcPackages = await loadPackages();
+            const pkg = rcPackages[key]
+
+            if (!pkg) {
+                Alert.alert('Error', 'Plan not available')
+                return
+            }
+            pendingPackageIdRef.current = item.id
+            try {
+                await Purchases.purchasePackage(pkg)
+                showAlert({
+                    title: 'Successful',
+                    message: 'Successfully Purchased Plan. If your plan is not updated, please restart the app. and make sure your app notification is enabled.',
+                })
+            } catch (e: any) {
+                console.log('RC purchase error', e?.message ?? e)
+            }
+        } finally {
+            setIsSelecting(false);
         }
     }
     async function onSelectPlan(item: any) {
+        if (isSelecting) return;
         if (item.price.amount === 0) return free(item.id)
 
 
@@ -77,6 +81,7 @@ function RecruiterHome() {
     async function pay(currency, id) {
         try {
             if (!id) return
+            setIsSelecting(true);
             const json = await postApiCall(`/company/packages/${id}/intent`, {
                 currency,
             });
@@ -131,9 +136,12 @@ function RecruiterHome() {
                 message: "Successfully Activate Plan",
             })
         } catch (error) {
+        } finally {
+            setIsSelecting(false);
         }
 
     }
+
     useFocusEffect(useCallback(
         () => {
             dispatch(RecruiterProfile())
@@ -144,6 +152,7 @@ function RecruiterHome() {
     async function free(id) {
         try {
             if (!id) return
+            setIsSelecting(true);
             const json = await postApiCall(`/company/packages/${id}/free`, {});
             if (json.success) {
                 dispatch(RecruiterProfile())
@@ -154,6 +163,8 @@ function RecruiterHome() {
                 })
             }
         } catch (error) {
+        } finally {
+            setIsSelecting(false);
         }
 
     }
@@ -166,6 +177,11 @@ function RecruiterHome() {
                     const authStatus = await messaging().requestPermission();
                 }
                 unsubscribe = messaging().onMessage(async remoteMessage => {
+                    // const { title, body } = remoteMessage.notification || {}
+                    // const imageUrl = remoteMessage.notification?.android?.imageUrl || remoteMessage.data?.imageUrl || remoteMessage.data?.image;
+                    // if (title && body) {
+                    //     onDisplayNotification(title, body, imageUrl as string)
+                    // }
                     if (remoteMessage.data.type === "purchase") {
                         dispatch(RecruiterProfile())
                         dispatch(RecruiterPlans())
@@ -182,6 +198,7 @@ function RecruiterHome() {
             if (!user?.id) return;
             await AsyncStorage.removeItem("FCM");
             const existing = await AsyncStorage.getItem("FCM");
+            console.log("FCM cached:", existing);
             if (existing) {
                 console.log("FCM cached:", existing);
                 return;
@@ -192,6 +209,7 @@ function RecruiterHome() {
             const role = (await AsyncStorage.getItem("role")) as "seeker" | "recruiter" | null;
 
             await AsyncStorage.setItem("FCM", fcm);
+
             dispatch(
                 Tokien({
                     device_token: fcm,
@@ -231,9 +249,9 @@ function RecruiterHome() {
                         showsVerticalScrollIndicator={false}
                         scrollEnabled={true}
                         ref={flatListRef}
-                        ListEmptyComponent={()=>{
-                            if (!user?.is_active){
-return null
+                        ListEmptyComponent={() => {
+                            if (!user?.is_active) {
+                                return null
                             }
                             return (
                                 <View style={{ flex: 1, marginTop: responsiveScreenHeight(15) }}><ActivityIndicator size={responsiveScreenFontSize(3)} /></View>
@@ -307,9 +325,9 @@ return null
                                                 <Text style={[styles.planSubTitle, { color: colors.hardGray, marginTop: responsiveScreenHeight(.8) }]}>Change or cancel anytime.</Text>
                                             </View> : <>
                                                 <Image source={require("./inActive.png")} style={{ marginVertical: responsiveScreenHeight(2) }} />
-                                                <TouchableOpacity style={{}} onPress={()=>navigation.navigate(routes.CONTACT)}>
+                                                <TouchableOpacity style={{}} onPress={() => navigation.navigate(routes.CONTACT)}>
 
-                                                <Image  source={require("./popupbutton.png")} style={{}} />
+                                                    <Image source={require("./popupbutton.png")} style={{}} />
                                                 </TouchableOpacity>
 
                                             </>
@@ -319,7 +337,7 @@ return null
                         }}
 
                         contentContainerStyle={{ gap: responsiveScreenHeight(2) }}
-                        data={ user.is_active?plan?.plans:[]}
+                        data={user.is_active ? plan?.plans : []}
                         renderItem={({ item, index }) => (
                             <View style={{ overflow: "hidden", backgroundColor: index === 0 ? "#E5E4E2" : index === 1 ? "#FFD700" : "#AABDE4", borderRadius: 20 }}>
                                 <Text style={{ color: colors.textPrimary, fontWeight: "800", fontSize: responsiveScreenFontSize(2.5), textAlign: "center", paddingVertical: responsiveScreenHeight(1) }}> {item.name}</Text>
@@ -351,17 +369,8 @@ return null
 
                                     }
                                     <Pressable
-                                        // onPress={() => {
-
-                                        //     if (item.price.amount === 0) {
-                                        //         free(item.id)
-                                        //     } else {
-
-                                        //         pay(item.price.currency, item.id)
-                                        //     }
-                                        // }
-                                        // }
                                         onPress={() => onSelectPlan(item)}
+                                        disabled={isSelecting}
                                         style={{
                                             width: '92%',
                                             justifyContent: 'center',
@@ -374,12 +383,16 @@ return null
                                             paddingHorizontal: responsiveScreenWidth(3),
                                             paddingVertical: responsiveScreenHeight(1.5),
                                             marginBottom: responsiveScreenHeight(2),
+                                            opacity: isSelecting ? 0.7 : 1
 
                                         }}
                                     >
-                                        <Text style={{ color: colors.textPrimary, fontSize: responsiveScreenFontSize(1.9), fontWeight: '700' }}>
-                                            Select Plan
-                                        </Text>
+                                        {
+                                            isSelecting ? <ActivityIndicator size={responsiveScreenFontSize(2)} color={colors.textPrimary} /> :
+                                                <Text style={{ color: colors.textPrimary, fontSize: responsiveScreenFontSize(1.9), fontWeight: '700' }}>
+                                                    Select Plan
+                                                </Text>
+                                        }
                                     </Pressable>
                                 </View>
                             </View>

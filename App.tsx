@@ -72,11 +72,9 @@ const AppContent: React.FC = React.memo(() => {
   // In-app updates (android only)
   const checkForUpdates = useCallback(async () => {
     if (Platform.OS !== "android") return;
-
     try {
       const result = await inAppUpdates.checkNeedsUpdate();
       if (!result.shouldUpdate) return;
-
       const options: StartUpdateOptions = { updateType: IAUUpdateKind.IMMEDIATE };
       await inAppUpdates.startUpdate(options);
     } catch (e) {

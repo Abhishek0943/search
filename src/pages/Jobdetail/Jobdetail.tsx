@@ -1,15 +1,17 @@
-import { Image, TouchableOpacity, ScrollView, StyleSheet, View, ActivityIndicator, Pressable, Share, Platform } from 'react-native'
+import { Image, TouchableOpacity, ScrollView, StyleSheet, View, ActivityIndicator, Pressable, Share, Platform, Alert, BackHandler } from 'react-native'
 import React, { useContext, useEffect, useMemo, useState } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationBar } from '../../components'
 import { routes } from '../../constants/values'
 import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions'
 import imagePath from '../../assets/imagePath'
 import { ThemeContext } from '../../context/ThemeProvider'
-import { NavigationProp, ParamListBase, useNavigation, useRoute } from '@react-navigation/native'
+import { NavigationProp, ParamListBase, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native'
 import { useAppDispatch, useAppSelector } from '../../store'
 import { Bookmark, GetJob, ReportJob, } from '../../reducer/jobsReducer'
 import { WebView } from 'react-native-webview';
 import { formatSalaryRange } from '../../utils'
+import { Fonts } from '../../assets/imagePath';
 import Text from '../../components/Text'
 import { Header } from '../Company/Company'
 import { useAlert } from '../../context/AlertContext'
@@ -22,19 +24,48 @@ const Jobdetail = () => {
     const [loading, setLoading] = useState(true)
     const dispatch = useAppDispatch()
     const [job, setJob] = useState<Job>()
+    const [role, setRole] = useState<string | null>(null)
     const [pageVal, setPageVal] = useState<"dis" | "company" | "review">("dis")
+    useEffect(() => {
+        const getRole = async () => {
+            const r = await AsyncStorage.getItem("role")
+            setRole(r)
+        }
+        getRole()
+    }, [])
+
+    useFocusEffect(
+        React.useCallback(() => {
+            const onBackPress = () => {
+                if (!navigation.canGoBack()) {
+                    if (role === "recruiter") {
+                        (navigation as any).replace(routes.RECRUITERHOME);
+                    } else {
+                        (navigation as any).replace(routes.HOME);
+                    }
+                    return true;
+                }
+                return false;
+            };
+
+            const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+            return () => subscription.remove();
+        }, [navigation, role])
+    );
+    const { appliedJobIds } = useAppSelector(state => state.jobsReducer)
+    const isApplied = appliedJobIds.includes(id)
     useEffect(() => {
         dispatch(GetJob({ id })).unwrap().then((res) => {
             if (res.success) {
                 setJob(res.data.jobDetail)
-                console.log(res.data.jobDetail)
             }
             setLoading(false)
         })
     }, [id])
-    const shareJobPost = async (job) => {
+    const shareJobPost = async (job: Job) => {
         try {
-            const shareUrl = `${job.jobUrl}`;
+            const shareUrl = `${job?.jobUrl}`;
             await Share.share({
                 message: `🔥 New Job Opportunity!\n\nApply here:\n${shareUrl}`,
                 url: shareUrl,
@@ -50,221 +81,242 @@ const Jobdetail = () => {
                 <Header title="Job details" />
                 {
                     loading ? <View style={{ marginTop: responsiveScreenHeight(40) }}><ActivityIndicator size={responsiveScreenFontSize(3)} /></View> :
-                        <>
-                            <TouchableOpacity style={{ position: "relative", paddingVertical: responsiveScreenHeight(1.5), paddingHorizontal: responsiveScreenWidth(3), backgroundColor: colors.white, elevation: 4, margin: 10, borderRadius: 15 }}>
-                                <Image source={imagePath.circle4} style={{ position: "absolute", top: 0, right: 0 }} />
-                                <View style={{ flexDirection: "row", gap: responsiveScreenWidth(3), justifyContent: "space-between", alignItems: "center" }}>
-                                    <View style={{ borderRadius: 6, height: responsiveScreenHeight(6), overflow: "hidden", backgroundColor: "#CECECE38" }}>
-                                        <Image source={{ uri: job?.company_info?.image }} style={{ height: "100%", aspectRatio: 1 }} />
-                                    </View>
-                                    <TouchableOpacity style={{ flex: 1, gap: responsiveScreenHeight(1) }}>
-                                        <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>{job?.title}</Text>
-                                        <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(1), }}>
-                                            <Image source={imagePath.box} />
-                                            <Text numberOfLines={1} style={{ maxWidth: responsiveScreenWidth(45), color: colors.textPrimary, fontSize: responsiveScreenFontSize(1.6) }}>{job.company_info.name}</Text>
-                                        </View>
-                                        <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(1) }}>
-                                            <Image source={imagePath.location} />
-                                            <Text style={{ color: colors.textPrimary, fontSize: responsiveScreenFontSize(1.6) }}>{job?.jobLocation}</Text>
-                                        </View>
-                                    </TouchableOpacity>
-                                </View>
-                                <View style={{ flexDirection: "row", gap: responsiveScreenWidth(2), flexWrap: "wrap", marginVertical: responsiveScreenHeight(2) }}>
-                                    {
-                                        job.jobType && <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>{job?.jobType}</Text>
+                        !job ? <View style={{ marginTop: responsiveScreenHeight(20), alignItems: "center" }}>
+                            <Text style={{ fontSize: responsiveScreenFontSize(2), color: colors.textSecondary }}>Job details not available.</Text>
+                            <TouchableOpacity onPress={() => {
+                                if (navigation.canGoBack()) {
+                                    navigation.goBack();
+                                } else {
+                                    if (role === "recruiter") {
+                                        (navigation as any).replace(routes.RECRUITERHOME);
+                                    } else {
+                                        (navigation as any).replace(routes.HOME);
                                     }
-                                    {
-                                        job.functionalArea && <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>{job?.functionalArea}</Text>
-                                    }
-                                </View>
-                                <View style={{ flexDirection: "row" }}>
-                                    <View style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
-                                        {
-                                            job.salary && <>
-                                                <Text style={{ fontSize: responsiveScreenFontSize(2.2), fontWeight: "500" }}>{job.salary_currency}{formatSalaryRange(job.salary)}/</Text>
-                                                <Text style={{ flex: 1, marginTop: responsiveScreenHeight(.3) }}>{job.salary_period}</Text>
-                                            </>
-                                        }
-                                        {
-                                            user?.id &&
-                                            <TouchableOpacity onPress={() => dispatch(Bookmark({ id: job.id })).unwrap().then((res) => {
-                                                if (res.success) {
-                                                    dispatch(GetJob({ id })).unwrap().then((res) => {
-                                                        if (res.success) {
-                                                            setJob(res.data.jobDetail)
-                                                        }
-                                                    })
-                                                }
-                                                else {
-                                                    showAlert({
-                                                        title: "Validation",
-                                                        message: res.message,
-                                                    })
-                                                }
-                                            })}>
-                                                <Image source={job.is_favorited ? imagePath.activeBookmark : imagePath.bookmark} />
-                                            </TouchableOpacity>
-                                        }
-                                    </View>
-                                </View>
+                                }
+                            }} style={{ marginTop: responsiveScreenHeight(2), backgroundColor: colors.primary, paddingHorizontal: 20, paddingVertical: 10, borderRadius: 10 }}>
+                                <Text style={{ color: colors.white }}>Go Back</Text>
                             </TouchableOpacity>
-                            <Pressable style={{ flexDirection: "row", justifyContent: "space-between", margin: 10, borderRadius: 15, gap: responsiveScreenWidth(3) }}>
-                                {
-                                    job.expired ? <>
-                                        <Text onPress={async () => {
-                                        }} style={{ color: "#FF383C", backgroundColor: "#FFE5E6", borderWidth: 1, borderColor: "#FF383C", paddingVertical: responsiveScreenHeight(1), flex: 1, textAlign: "center", paddingHorizontal: responsiveScreenWidth(4), borderRadius: 15, fontSize: responsiveScreenFontSize(1.8) }}>Expired</Text>
-                                    </> : <>
-                                        <Text onPress={() => shareJobPost(job)} style={{ color: colors.primary, backgroundColor: "#EEF4FF", borderWidth: 1, borderColor: colors.primary, paddingVertical: responsiveScreenHeight(1), flex: 1, textAlign: "center", paddingHorizontal: responsiveScreenWidth(4), borderRadius: 15, fontSize: responsiveScreenFontSize(1.8) }}>Share To Friend</Text>
+                        </View> :
+                            <>
+                                <TouchableOpacity style={{ position: "relative", paddingVertical: responsiveScreenHeight(1.5), paddingHorizontal: responsiveScreenWidth(3), backgroundColor: colors.white, elevation: 4, margin: 10, borderRadius: 15 }}>
+                                    <Image source={imagePath.circle4} style={{ position: "absolute", top: 0, right: 0 }} />
+                                    <View style={{ flexDirection: "row", gap: responsiveScreenWidth(3), justifyContent: "space-between", alignItems: "center" }}>
+                                        <View style={{ borderRadius: 6, height: responsiveScreenHeight(6), overflow: "hidden", backgroundColor: "#CECECE38" }}>
+                                            <Image source={{ uri: job?.company_info?.image }} style={{ height: "100%", aspectRatio: 1 }} />
+                                        </View>
+                                        <TouchableOpacity style={{ flex: 1, gap: responsiveScreenHeight(1) }}>
+                                            <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>{job?.title}</Text>
+                                            <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(1), }}>
+                                                <Image source={imagePath.box} />
+                                                <Text numberOfLines={1} style={{ maxWidth: responsiveScreenWidth(45), color: colors.textPrimary, fontSize: responsiveScreenFontSize(1.6) }}>{job?.company_info?.name}</Text>
+                                            </View>
+                                            <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(1) }}>
+                                                <Image source={imagePath.location} />
+                                                <Text style={{ color: colors.textPrimary, fontSize: responsiveScreenFontSize(1.6) }}>{job?.jobLocation}</Text>
+                                            </View>
+                                        </TouchableOpacity>
+                                    </View>
+                                    <View style={{ flexDirection: "row", gap: responsiveScreenWidth(2), flexWrap: "wrap", marginVertical: responsiveScreenHeight(2) }}>
                                         {
-                                            user?.id &&
-                                            <Text onPress={async () => {
-                                                const ok = await showConfirm({
-                                                    title: "Report this job",
-                                                    message: "Are you sure you want to report this job?",
-                                                    okText: "Report",
-                                                    cancelText: "Cancel",
-                                                    waitForOk: true,
-                                                    onOkPress: async () => {
-                                                        const res = await dispatch(
-                                                            ReportJob({ your_email: user.email, your_name: user.name, job_url: job.jobUrl })
-                                                        ).unwrap();
-
+                                            job?.jobType && <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>{job?.jobType}</Text>
+                                        }
+                                        {
+                                            job?.functionalArea && <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>{job?.functionalArea}</Text>
+                                        }
+                                    </View>
+                                    <View style={{ flexDirection: "row" }}>
+                                        <View style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
+                                            {
+                                                job.salary && <>
+                                                    <Text style={{ fontSize: responsiveScreenFontSize(2.2), fontWeight: "500" }}>{job.salary_currency}{formatSalaryRange(job.salary)}/</Text>
+                                                    <Text style={{ flex: 1, marginTop: responsiveScreenHeight(.3) }}>{job.salary_period}</Text>
+                                                </>
+                                            }
+                                            {
+                                                user?.id &&
+                                                <TouchableOpacity onPress={() => dispatch(Bookmark({ id: job.id })).unwrap().then((res) => {
+                                                    if (res.success) {
+                                                        dispatch(GetJob({ id })).unwrap().then((res) => {
+                                                            if (res.success) {
+                                                                setJob(res.data.jobDetail)
+                                                            }
+                                                        })
+                                                    }
+                                                    else {
                                                         showAlert({
-                                                            title: res.success ? "Success message" : "Error message",
+                                                            title: "Validation",
                                                             message: res.message,
-                                                        });
+                                                        })
+                                                    }
+                                                })}>
+                                                    <Image source={job.is_favorited ? imagePath.activeBookmark : imagePath.bookmark} />
+                                                </TouchableOpacity>
+                                            }
+                                        </View>
+                                    </View>
+                                </TouchableOpacity>
+                                <Pressable style={{ flexDirection: "row", justifyContent: "space-between", margin: 10, borderRadius: 15, gap: responsiveScreenWidth(3) }}>
+                                    {
+                                        job?.expired ? <>
+                                            <Text onPress={async () => {
+                                            }} style={{ color: "#FF383C", backgroundColor: "#FFE5E6", borderWidth: 1, borderColor: "#FF383C", paddingVertical: responsiveScreenHeight(1), flex: 1, textAlign: "center", paddingHorizontal: responsiveScreenWidth(4), borderRadius: 15, fontSize: responsiveScreenFontSize(1.8) }}>Expired</Text>
+                                        </> : <>
+                                            <Text onPress={() => shareJobPost(job)} style={{ color: colors.primary, backgroundColor: "#EEF4FF", borderWidth: 1, borderColor: colors.primary, paddingVertical: responsiveScreenHeight(1), flex: 1, textAlign: "center", paddingHorizontal: responsiveScreenWidth(4), borderRadius: 15, fontSize: responsiveScreenFontSize(1.8) }}>Share To Friend</Text>
+                                            {
+                                                user?.id &&
+                                                <Text onPress={async () => {
+                                                    const ok = await showConfirm({
+                                                        title: "Report this job",
+                                                        message: "Are you sure you want to report this job?",
+                                                        okText: "Report",
+                                                        cancelText: "Cancel",
+                                                        waitForOk: true,
+                                                        onOkPress: async () => {
+                                                            const res = await dispatch(
+                                                                ReportJob({
+                                                                    your_email: user.email || "",
+                                                                    your_name: user.name || "",
+                                                                    job_url: job.jobUrl || ""
+                                                                })
+                                                            ).unwrap();
 
-                                                        return true; // ✅ close confirm modal now
-                                                    },
-                                                })
-                                                // if (ok) {
-                                                //     dispatch(ReportJob({ your_email: user.email, your_name: user.name, job_url: job.jobUrl })).unwrap().then(res => {
-                                                //         showAlert({
-                                                //             title: res.success ? "Success message" : "error message",
-                                                //             message: res.message
-                                                //         })
-                                                //     })
-                                                // }
-                                            }} style={{ color: "#FF383C", backgroundColor: "#FFE5E6", borderWidth: 1, borderColor: "#FF383C", paddingVertical: responsiveScreenHeight(1), flex: 1, textAlign: "center", paddingHorizontal: responsiveScreenWidth(4), borderRadius: 15, fontSize: responsiveScreenFontSize(1.8) }}>Report Abuse</Text>
+                                                            showAlert({
+                                                                title: res.success ? "Success message" : "Error message",
+                                                                message: res.success ? "Reported successfully" : (res as ErrorResponse).message,
+                                                            });
+
+                                                            return true; // ✅ close confirm modal now
+                                                        },
+                                                    })
+                                                    // if (ok) {
+                                                    //     dispatch(ReportJob({ your_email: user.email, your_name: user.name, job_url: job.jobUrl })).unwrap().then(res => {
+                                                    //         showAlert({
+                                                    //             title: res.success ? "Success message" : "error message",
+                                                    //             message: res.message
+                                                    //         })
+                                                    //     })
+                                                    // }
+                                                }} style={{ color: "#FF383C", backgroundColor: "#FFE5E6", borderWidth: 1, borderColor: "#FF383C", paddingVertical: responsiveScreenHeight(1), flex: 1, textAlign: "center", paddingHorizontal: responsiveScreenWidth(4), borderRadius: 15, fontSize: responsiveScreenFontSize(1.8) }}>Report Abuse</Text>
+                                            }
+                                        </>
+                                    }
+                                </Pressable>
+                                <TouchableOpacity style={{ paddingVertical: responsiveScreenHeight(1.5), paddingHorizontal: responsiveScreenWidth(3), backgroundColor: "#EEF4FF", flexDirection: "row", justifyContent: "space-between", margin: 10, borderRadius: 15 }}>
+                                    <Text onPress={() => setPageVal("dis")} style={{ color: pageVal === "dis" ? colors.white : "#478BFF75", backgroundColor: pageVal === "dis" ? colors.primary : colors.white, paddingVertical: responsiveScreenHeight(1), paddingHorizontal: responsiveScreenWidth(4), borderRadius: 6, fontSize: responsiveScreenFontSize(1.8) }}>Job Description</Text>
+                                    <Text onPress={() => setPageVal("company")} style={{ color: pageVal === "company" ? colors.white : "#478BFF75", backgroundColor: pageVal === "company" ? colors.primary : colors.white, paddingVertical: responsiveScreenHeight(1), paddingHorizontal: responsiveScreenWidth(4), borderRadius: 6, fontSize: responsiveScreenFontSize(1.8) }}>Company</Text>
+                                    {/* <Text onPress={() => setPageVal("review")} style={{ color: pageVal === "review" ? colors.white : "#478BFF75", backgroundColor: pageVal === "review" ? colors.primary : colors.white, paddingVertical: responsiveScreenHeight(1), paddingHorizontal: responsiveScreenWidth(4), borderRadius: 6, fontSize: responsiveScreenFontSize(1.8) }}>Review</Text> */}
+                                </TouchableOpacity>
+                                {
+                                    pageVal === "dis" && <>
+                                        {
+                                            job.job_description && job.job_description.map((e) => {
+                                                return (
+                                                    <>
+                                                        <Text style={{ marginHorizontal: 10, fontSize: responsiveScreenFontSize(2.1), textTransform: "capitalize", fontWeight: "700" }}>{e.title}</Text>
+                                                        {
+                                                            typeof e.data === "string" && <AutoHeightWebView html={e.data} />
+                                                        }
+                                                        {
+                                                            typeof e.data === "object" && <>
+                                                                {e.data.map((i) => {
+                                                                    return (
+                                                                        <View style={{ flexDirection: "row", marginTop: responsiveScreenHeight(1), marginHorizontal: 10, alignItems: "center" }}>
+                                                                            <Image source={imagePath.circle} />
+                                                                            <Text style={{ marginHorizontal: 10, fontSize: responsiveScreenFontSize(2), color: colors.textSecondary, textTransform: "capitalize" }}>{i.skill}</Text>
+                                                                        </View>
+                                                                    )
+                                                                })}
+                                                            </>
+                                                        }
+                                                    </>
+                                                )
+                                            })
                                         }
                                     </>
                                 }
-                            </Pressable>
-                            <TouchableOpacity style={{ paddingVertical: responsiveScreenHeight(1.5), paddingHorizontal: responsiveScreenWidth(3), backgroundColor: "#EEF4FF", flexDirection: "row", justifyContent: "space-between", margin: 10, borderRadius: 15 }}>
-                                <Text onPress={() => setPageVal("dis")} style={{ color: pageVal === "dis" ? colors.white : "#478BFF75", backgroundColor: pageVal === "dis" ? colors.primary : colors.white, paddingVertical: responsiveScreenHeight(1), paddingHorizontal: responsiveScreenWidth(4), borderRadius: 6, fontSize: responsiveScreenFontSize(1.8) }}>Job Description</Text>
-                                <Text onPress={() => setPageVal("company")} style={{ color: pageVal === "company" ? colors.white : "#478BFF75", backgroundColor: pageVal === "company" ? colors.primary : colors.white, paddingVertical: responsiveScreenHeight(1), paddingHorizontal: responsiveScreenWidth(4), borderRadius: 6, fontSize: responsiveScreenFontSize(1.8) }}>Company</Text>
-                                {/* <Text onPress={() => setPageVal("review")} style={{ color: pageVal === "review" ? colors.white : "#478BFF75", backgroundColor: pageVal === "review" ? colors.primary : colors.white, paddingVertical: responsiveScreenHeight(1), paddingHorizontal: responsiveScreenWidth(4), borderRadius: 6, fontSize: responsiveScreenFontSize(1.8) }}>Review</Text> */}
-                            </TouchableOpacity>
-                            {
-                                pageVal === "dis" && <>
-                                    {
-                                        job.job_description && job.job_description.map((e) => {
-                                            return (
-                                                <>
-                                                    <Text style={{ marginHorizontal: 10, fontSize: responsiveScreenFontSize(2.1), textTransform: "capitalize", fontWeight: "700" }}>{e.title}</Text>
-                                                    {
-                                                        typeof e.data === "string" && <AutoHeightWebView html={e.data} />
-                                                    }
-                                                    {
-                                                        typeof e.data === "object" && <>
-                                                            {e.data.map((i) => {
-                                                                return (
-                                                                    <View style={{ flexDirection: "row", marginTop: responsiveScreenHeight(1), marginHorizontal: 10, alignItems: "center" }}>
-                                                                        <Image source={imagePath.circle} />
-                                                                        <Text style={{ marginHorizontal: 10, fontSize: responsiveScreenFontSize(2), color: colors.textSecondary, textTransform: "capitalize" }}>{i.skill}</Text>
-                                                                    </View>
-                                                                )
-                                                            })}
-                                                        </>
-                                                    }
-                                                </>
-                                            )
-                                        })
-                                    }
-                                </>
-                            }
-                            {
-                                pageVal === "company" && <>
-                                    {
-                                        job?.company_info?.description &&
-                                        <>
-                                            <Text style={{ marginHorizontal: 10, fontSize: responsiveScreenFontSize(2.1), textTransform: "capitalize", fontWeight: "700" }}>About This Company</Text>
-                                            <AutoHeightWebView html={job.company_info.description} />
-                                        </>
-                                    }
-                                </>
-                            }
-                            {
-                                pageVal === "review" && <>
-                                    <Image source={require("./review.png")} style={{ margin: "auto", height: responsiveScreenWidth(177), resizeMode: "cover", width: responsiveScreenWidth(90) }} />
-                                </>
-                            }
-                            {
-                                !job.expired && <>
-                                    {
-                                        !job?.is_applied ?
-                                            <TouchableOpacity
-                                                onPress={() => { user?.id ? navigation.navigate(routes.APPLY, { id: job.id }) : navigation.navigate(routes.LOGIN) }}
-                                                style={{
-                                                    width: '96%',
-                                                    alignSelf: 'center',
-                                                    justifyContent: 'center',
-                                                    marginTop: responsiveScreenHeight(2),
-                                                    borderRadius: 15,
-                                                    gap: responsiveScreenWidth(1),
-                                                    flexDirection: 'row',
-                                                    alignItems: 'center',
-                                                    marginBottom: responsiveScreenHeight(2),
-                                                    backgroundColor: colors.primary,
-                                                    paddingHorizontal: responsiveScreenWidth(3),
-                                                    paddingVertical: responsiveScreenHeight(1.5),
-                                                }}
-                                            >
-                                                <Text
+                                {
+                                    pageVal === "company" && <>
+                                        {
+                                            job?.company_info?.description &&
+                                            <>
+                                                <Text style={{ marginHorizontal: 10, fontSize: responsiveScreenFontSize(2.1), textTransform: "capitalize", fontWeight: "700" }}>About This Company</Text>
+                                                <AutoHeightWebView html={job.company_info.description} />
+                                            </>
+                                        }
+                                    </>
+                                }
+                                {
+                                    pageVal === "review" && <>
+                                        <Image source={require("./review.png")} style={{ margin: "auto", height: responsiveScreenWidth(177), resizeMode: "cover", width: responsiveScreenWidth(90) }} />
+                                    </>
+                                }
+                                {
+                                    !job.expired && <>
+                                        {
+                                            !job?.is_applied && !isApplied ?
+                                                <TouchableOpacity
+                                                    onPress={() => { user?.id ? navigation.navigate(routes.APPLY, { id: job.id }) : navigation.navigate(routes.LOGIN) }}
                                                     style={{
-                                                        color: colors.white,
-                                                        fontSize: responsiveScreenFontSize(1.8),
+                                                        width: '96%',
+                                                        alignSelf: 'center',
+                                                        justifyContent: 'center',
+                                                        marginTop: responsiveScreenHeight(2),
+                                                        borderRadius: 15,
+                                                        gap: responsiveScreenWidth(1),
+                                                        flexDirection: 'row',
+                                                        alignItems: 'center',
+                                                        marginBottom: responsiveScreenHeight(2),
+                                                        backgroundColor: colors.primary,
+                                                        paddingHorizontal: responsiveScreenWidth(3),
+                                                        paddingVertical: responsiveScreenHeight(1.5),
                                                     }}
                                                 >
-                                                    Apply This Job
-                                                </Text>
-                                            </TouchableOpacity> : <View
-                                                style={{
-                                                    width: '96%',
-                                                    alignSelf: 'center',
-                                                    justifyContent: 'center',
-                                                    marginTop: responsiveScreenHeight(2),
-                                                    borderRadius: 15,
-                                                    gap: responsiveScreenWidth(1),
-                                                    flexDirection: 'row',
-                                                    alignItems: 'center',
-                                                    marginBottom: responsiveScreenHeight(2),
-                                                    backgroundColor: colors.primary,
-                                                    paddingHorizontal: responsiveScreenWidth(3),
-                                                    paddingVertical: responsiveScreenHeight(1.5),
-                                                }}
-                                            >
-                                                <Text
+                                                    <Text
+                                                        style={{
+                                                            color: colors.white,
+                                                            fontSize: responsiveScreenFontSize(1.8),
+                                                        }}
+                                                    >
+                                                        Apply This Job
+                                                    </Text>
+                                                </TouchableOpacity> : <View
                                                     style={{
-                                                        color: colors.white,
-                                                        fontSize: responsiveScreenFontSize(1.8),
+                                                        width: '96%',
+                                                        alignSelf: 'center',
+                                                        opacity: .5,
+                                                        justifyContent: 'center',
+                                                        marginTop: responsiveScreenHeight(2),
+                                                        borderRadius: 15,
+                                                        gap: responsiveScreenWidth(1),
+                                                        flexDirection: 'row',
+                                                        alignItems: 'center',
+                                                        marginBottom: responsiveScreenHeight(2),
+                                                        backgroundColor: colors.primary,
+                                                        paddingHorizontal: responsiveScreenWidth(3),
+                                                        paddingVertical: responsiveScreenHeight(1.5),
                                                     }}
                                                 >
-                                                    {job?.is_applied ? "Applied" : "Apply This Job"}
-                                                </Text>
-                                            </View>
-                                    }
-                                </>
-                            }
+                                                    <Text
+                                                        style={{
+                                                            color: colors.white,
+                                                            fontSize: responsiveScreenFontSize(1.8),
+                                                        }}
+                                                    >
+                                                        {job?.is_applied ? "Applied" : "Apply This Job"}
+                                                    </Text>
+                                                </View>
+                                        }
+                                    </>
+                                }
 
 
-                        </>
+                            </>
                 }
             </ScrollView>
         </NavigationBar>
     )
 }
-export function AutoHeightWebView({ html, margin = 10 }) {
+export function AutoHeightWebView({ html, margin = 10 }: { html: string, margin?: number }) {
     const [height, setHeight] = useState(50);
     const { colors } = useContext(ThemeContext);
     const wrapped = useMemo(() => {
@@ -274,13 +326,7 @@ export function AutoHeightWebView({ html, margin = 10 }) {
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <style>
-    @font-face {
-      font-family: 'AppFont';
-      font-weight: normal;
-      font-style: normal;
-    }
-
+    <style>
     :root {
       --text: ${colors.textSecondary};
       --primary: ${colors.primary};
@@ -289,7 +335,7 @@ export function AutoHeightWebView({ html, margin = 10 }) {
     body {
       margin: 0 ${margin}px;
       padding: 0;
-      font-family: 'AppFont';
+      font-family: '${Fonts.GilroyMedium}';
       font-size: ${responsiveScreenFontSize(2)}px;
       line-height: 1.6;
       color: var(--text);
@@ -299,13 +345,13 @@ export function AutoHeightWebView({ html, margin = 10 }) {
     }
 
     h1,h2,h3,h4,h5,h6 {
-      font-family: 'AppFont';
+      font-family: '${Fonts.GilroyBold}';
       font-weight: 700;
       margin: 12px 0 6px;
     }
 
     p, span, div, li {
-      font-family: 'AppFont';
+      font-family: '${Fonts.GilroyMedium}';
       color: var(--text);
     }
 

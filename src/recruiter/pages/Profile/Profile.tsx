@@ -176,7 +176,7 @@ const Profile = () => {
                         title: "Success",
                         message: "Profile updated successfully",
                     });
-                    dispatch(RecruiterProfile()).unwrap().then((res)=>res.success&& navigation.goBack())
+                    dispatch(RecruiterProfile()).unwrap().then((res) => res.success && navigation.goBack())
                 } else {
                     showAlert({
                         title: "Validation",
@@ -218,6 +218,7 @@ const Profile = () => {
         fontSize: responsiveScreenFontSize(1.8),
         paddingVertical: responsiveScreenHeight(1.3),
         marginTop: responsiveScreenHeight(1),
+        fontWeight: '500',
     } as const;
     const pickImage = async () => {
         const res = await launchImageLibrary({
@@ -320,7 +321,7 @@ const Profile = () => {
 
     }, []);
 
-    const Label = ({ text, require= true }: { text: string }) => (
+    const Label = ({ text, require = true }: { text: string }) => (
         <View style={{ flexDirection: 'row', width: '100%', marginTop: responsiveScreenHeight(1) }}>
             <Text style={{ color: colors.textPrimary, fontSize: responsiveScreenFontSize(1.8) }}>
                 {text}
@@ -441,7 +442,7 @@ const Profile = () => {
                     <View style={[{ width: "100%", minHeight: responsiveScreenHeight(20) }, { ...inputStyle, paddingHorizontal: 0, paddingVertical: 0 }]}>
                         <RichEditor
                             ref={editorRef}
-                                      initialContentHTML={user?.description}
+                            initialContentHTML={user?.description}
                             placeholder="Write company description here..."
                             onChange={html => handleChange('description', html)}
                             editorStyle={{}}
@@ -473,7 +474,7 @@ const Profile = () => {
                         </View>
 
                         <View style={{ flex: 1 }}>
-                            <Label text="No of Employees" require={false}/>
+                            <Label text="No of Employees" require={false} />
                             <CustomDropdown
                                 data={numberOfEmployees}
                                 placeholder="Select"
@@ -512,7 +513,7 @@ const Profile = () => {
                         </View>
                     </View>
 
-                    <Label text="Website URL" require={false}/>
+                    <Label text="Website URL" require={false} />
                     <TextInput
                         value={formData.website}
                         onChangeText={t => handleChange('website', t)}
@@ -524,7 +525,7 @@ const Profile = () => {
 
                     <View style={{ width: '100%', flexDirection: 'row', gap: responsiveScreenWidth(3) }}>
                         <View style={{ flex: 1 }}>
-                            <Label text="Facebook" require={false}/>
+                            <Label text="Facebook" require={false} />
                             <TextInput
                                 value={formData.facebook}
                                 onChangeText={t => handleChange('facebook', t)}
@@ -536,7 +537,7 @@ const Profile = () => {
                         </View>
 
                         <View style={{ flex: 1 }}>
-                            <Label text="Twitter" require={false}/>
+                            <Label text="Twitter" require={false} />
                             <TextInput
                                 value={formData.twitter}
                                 onChangeText={t => handleChange('twitter', t)}
@@ -550,7 +551,7 @@ const Profile = () => {
 
                     <View style={{ width: '100%', flexDirection: 'row', gap: responsiveScreenWidth(3) }}>
                         <View style={{ flex: 1 }}>
-                            <Label text="LinkedIn"require={false} />
+                            <Label text="LinkedIn" require={false} />
                             <TextInput
                                 value={formData.linkedin}
                                 onChangeText={t => handleChange('linkedin', t)}
@@ -562,7 +563,7 @@ const Profile = () => {
                         </View>
 
                         <View style={{ flex: 1 }}>
-                            <Label text="Pinterest" require={false}/>
+                            <Label text="Pinterest" require={false} />
                             <TextInput
                                 value={formData.pinterest}
                                 onChangeText={t => handleChange('pinterest', t)}
@@ -628,7 +629,7 @@ const Profile = () => {
 
                     <View style={{ width: '100%', flexDirection: 'row', gap: responsiveScreenWidth(3) }}>
                         <View style={{ flex: 1 }}>
-                            <Label text="Name" require={false}/>
+                            <Label text="Name" require={false} />
                             <TextInput
                                 // 🟢 fixed
                                 value={formData.hrName}
@@ -640,7 +641,7 @@ const Profile = () => {
                         </View>
 
                         <View style={{ flex: 1 }}>
-                            <Label text="Email" require={false}/>
+                            <Label text="Email" require={false} />
                             <TextInput
                                 // 🟢 fixed
                                 value={formData.hrEmail}
@@ -656,7 +657,7 @@ const Profile = () => {
 
                     <View style={{ width: '100%', flexDirection: 'row', gap: responsiveScreenWidth(3) }}>
                         <View style={{ flex: 1 }}>
-                            <Label text="Designation" require={false}/>
+                            <Label text="Designation" require={false} />
                             <TextInput
                                 // 🟢 fixed
                                 value={formData.hrDesignation}
@@ -668,7 +669,7 @@ const Profile = () => {
                         </View>
 
                         <View style={{ flex: 1 }}>
-                            <Label text="Company Registration no" require={false}/>
+                            <Label text="Company Registration no" require={false} />
                             <TextInput
                                 // 🟢 fixed
                                 value={formData.companyRegistrationNo}

@@ -95,7 +95,7 @@ const Profile = () => {
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate(routes.BLOGPAGE, { user_type: 'company' })} style={{ width: "100%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(2), alignItems: "center", gap: responsiveScreenHeight(1) }}>
                         <Image style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} tintColor={colors.textPrimary} source={imagePath.blog} />
-                        <Text style={{ flex: 1, fontSize: responsiveScreenFontSize(2) }}>Insights</Text>
+                        <Text style={{ flex: 1, fontSize: responsiveScreenFontSize(2) }}>Creator</Text>
                         <Image style={{ resizeMode: "contain" }} tintColor={colors.textPrimary} source={imagePath.rightAngle} />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => navigation.navigate(routes.OPENJOBS)} style={{ width: "100%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(2), alignItems: "center", gap: responsiveScreenHeight(1) }}>

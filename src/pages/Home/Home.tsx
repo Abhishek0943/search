@@ -19,6 +19,7 @@ function Home() {
   const navigation: NavigationProp<ParamListBase> = useNavigation()
   const { suggested, recent } = useAppSelector(state => state.jobsReducer)
   const { user, } = useAppSelector(state => state.userStore)
+  const { appliedJobIds } = useAppSelector(state => state.jobsReducer)
   const [search, setSearch] = useState<string>("")
   const dispatch = useAppDispatch()
   useEffect(() => {
@@ -202,6 +203,8 @@ function Home() {
                     <Text onPress={() => navigation.navigate(routes.SUGGESTEDJOB)} style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "600", textTransform: "capitalize", color: colors.darkGray }}>see all</Text>
                   </View>
                   <FlatList showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false} horizontal data={suggested} renderItem={({ item, index }) => {
+                    const isApplied = appliedJobIds.includes(item.id)
+                    console.log(!item?.is_applied, !isApplied, !item?.is_applied || !isApplied)
                     return (
                       <>
                         <View style={{ borderWidth: 1, borderColor: colors.gray, paddingVertical: responsiveScreenHeight(1.5), paddingHorizontal: responsiveScreenWidth(3), width: responsiveScreenWidth(75), backgroundColor: colors.white, margin: 10, borderRadius: 15 }}>
@@ -240,7 +243,7 @@ function Home() {
                               }
                             </Text>
                             {
-                              !item?.is_applied &&
+                              !item?.is_applied && !isApplied &&
                               <TouchableOpacity onPress={() => { navigation.navigate(routes.APPLY, { id: item.id }) }} style={{ borderRadius: 6, gap: responsiveScreenWidth(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.primary, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(.7) }}>
                                 <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8) }}>Apply Now</Text>
                                 <Icon icon={{ type: "Feather", name: 'arrow-right' }} style={{ color: colors.white, fontSize: responsiveScreenFontSize(2) }} />
@@ -265,7 +268,7 @@ function Home() {
                             </View>
                             <View style={{ flex: 1, gap: responsiveScreenHeight(1.2) }}>
                               <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "700" }}>{item.title}</Text>
-                              <View style={{ flexDirection: "row", gap: responsiveScreenWidth(2), flexWrap: "wrap" }}>
+                              <View style={{ flexDirection: "column", gap: responsiveScreenWidth(2), flexWrap: "wrap" }}>
                                 <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(1), }}>
                                   <Image source={imagePath.box} />
                                   <Text numberOfLines={1} style={{ maxWidth: responsiveScreenWidth(45), color: colors.textPrimary, fontSize: responsiveScreenFontSize(1.6) }}>{item.company_info.name}</Text>

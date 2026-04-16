@@ -2,7 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '../store';
 import { routes } from '../constants/values';
-import { AddJob, Apply, ApplyJob, Candidate, CandidateProfile,BlogPage, Chat, Company, CompanyDetails, CV, Education, ForgotPassword, Home, Jobdetail, Language, LanguageForm, Login, Messages, Notification, OpenJobs, PaymentHistory, PersonalInfo, Profile, Project, ProjectForm, RecentJob, RecruiterAccount, RecruiterHome, RecruiterProfile, Search,  Signup, Skill, SkillAdd, Splash, SuggestedJob, Welcome, WelcomeTwo, WorkExperience, WorkExperienceForm } from '../pages';
+import { AddJob, Apply, ApplyJob, Candidate, CandidateProfile, BlogPage, Chat, Company, CompanyDetails, CV, Education, ForgotPassword, Home, Jobdetail, Language, LanguageForm, Login, Messages, Notification, OpenJobs, PaymentHistory, PersonalInfo, Profile, Project, ProjectForm, RecentJob, RecruiterAccount, RecruiterHome, RecruiterProfile, Search, Signup, Skill, SkillAdd, Splash, SuggestedJob, Welcome, WelcomeTwo, WorkExperience, WorkExperienceForm } from '../pages';
 import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import EducationForm from '../pages/PersonalInfo/EducationForm';
@@ -23,13 +23,30 @@ const Routes = () => {
   }, [])
   const linking = {
     prefixes: [
-      "searchtalents.co/app",              
+      "searchtalents.co/app",
       "https://searchtalents.co",
       "https://www.searchtalents.co",
     ],
     config: {
       screens: {
-        [routes.SEARCH]: routes.SEARCH, 
+        [routes.SEARCH]: routes.SEARCH,
+        [routes.JOBDETAIL]: {
+          path: 'job/:id',
+          parse: {
+            id: (id: string) => {
+              const parts = id.split('-');
+              return parseInt(parts[parts.length - 1], 10);
+            },
+          },
+        },
+        [routes.CANDIDATEPROFILE]: {
+          path: 'applicant-profile/:application_id',
+          parse: {
+            application_id: Number,
+          },
+        },
+        [routes.PERSONALINFO]: 'profile-incomplete',
+        [routes.CV]: 'resume-upload-reminder',
       },
     },
   };

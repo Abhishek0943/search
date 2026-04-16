@@ -27,7 +27,7 @@ const CompanyDetails = () => {
     useEffect(() => {
         if (!id) return
         dispatch(GetCompany({ id })).unwrap().then((res) => {
-                console.log(res.data)
+            console.log(res.data)
             if (res.success) {
                 setJob(res.data)
                 console.log(res.data)
@@ -75,12 +75,12 @@ const CompanyDetails = () => {
                             }
                             {
                                 job?.no_of_employees &&
-                            <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
-0
-                                <Image source={imagePath.users} style={{ transform: [{ scale: 1.3 }], }} />
-                                <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "700" }}>Company size</Text>
-                                <Text style={{ color: colors.textSecondary, fontSize: responsiveScreenFontSize(1.8), }}>{job?.no_of_employees}</Text>
-                            </View>
+                                <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
+                                    0
+                                    <Image source={imagePath.users} style={{ transform: [{ scale: 1.3 }], }} />
+                                    <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "700" }}>Company size</Text>
+                                    <Text style={{ color: colors.textSecondary, fontSize: responsiveScreenFontSize(1.8), }}>{job?.no_of_employees}</Text>
+                                </View>
                             }
                             {
                                 job.founded_at &&
@@ -116,25 +116,31 @@ const CompanyDetails = () => {
                                 </View>
                             }
                         </View>
-                        <View style={{ borderBottomColor: colors.textDisabled, borderBottomWidth: .5, marginTop: responsiveScreenHeight(2) }}></View>
-                        <Text style={{ paddingHorizontal: responsiveScreenWidth(5), fontWeight: "600", color: colors.textPrimary, fontSize: responsiveScreenFontSize(2.6), marginVertical: responsiveScreenHeight(1), marginBottom: 0 }}>Current openings</Text>
-                        <FlatList scrollEnabled={false} data={job.jobs} renderItem={({ item, index }) => {
-                            return (
-                                <>
-                                    <JobCard item={item} refresh={() => {
-                                        dispatch(GetCompany({ id })).unwrap().then((res) => {
-                                            if (res.success) {
-                                                setJob(res.data)
-                                            }
-                                        })
-                                    }} company={company} />
-                                </>
-                            )
-                        }} />
                         {
-                            user?.id && !company&&
+                            job?.jobs?.length > 0 &&
+                            <>
+                                <View style={{ borderBottomColor: colors.textDisabled, borderBottomWidth: .5, marginTop: responsiveScreenHeight(2) }}></View>
+                                <Text style={{ paddingHorizontal: responsiveScreenWidth(5), fontWeight: "600", color: colors.textPrimary, fontSize: responsiveScreenFontSize(2.6), marginVertical: responsiveScreenHeight(1), marginBottom: 0 }}>Current openings</Text>
+                                <FlatList scrollEnabled={false} data={job.jobs} renderItem={({ item, index }) => {
+                                    return (
+                                        <>
+                                            <JobCard item={item} refresh={() => {
+                                                dispatch(GetCompany({ id })).unwrap().then((res) => {
+                                                    if (res.success) {
+                                                        setJob(res.data)
+                                                    }
+                                                })
+                                            }} company={company} />
+                                        </>
+                                    )
+                                }} />
+                            </>
+                        }
+
+                        {
+                            user?.id && !company &&
                             <Text onPress={async () => {
-                                 showConfirm({
+                                const b = await showConfirm({
                                     title: "Report this Company",
                                     message: "Are you sure you want to report this Company?",
                                     okText: "Report",
@@ -146,10 +152,15 @@ const CompanyDetails = () => {
                                             title: res.success ? "Success message" : "Error message",
                                             message: res.message,
                                         });
-                                        return true; 
+                                        return true;
                                     },
                                 })
-
+                                if (b) {
+                                    showAlert({
+                                        title: "Success message",
+                                        message: "Company reported successfully",
+                                    })
+                                }
 
                             }} style={{ color: "#FF383C", width: "90%", marginVertical: responsiveScreenHeight(2), marginHorizontal: "auto", backgroundColor: "#FFE5E6", borderWidth: 1, borderColor: "#FF383C", paddingVertical: responsiveScreenHeight(1), flex: 1, textAlign: "center", paddingHorizontal: responsiveScreenWidth(4), borderRadius: 15, fontSize: responsiveScreenFontSize(1.8) }}>Report Abuse</Text>
                         }
@@ -167,13 +178,15 @@ export const JobCard = ({ refresh, item, company, margin = responsiveScreenWidth
     const dispatch = useAppDispatch()
     const { showAlert } = useAlert();
     const { user } = useAppSelector(state => state.userStore)
+    const { appliedJobIds } = useAppSelector(state => state.jobsReducer)
+    const isApplied = appliedJobIds.includes(item.id)
     return (
-        <Pressable onPress={() => !company && navigation.navigate(routes.JOBDETAIL, { id: item.id })} style={{borderWidth:1, borderColor:colors.gray, paddingVertical: responsiveScreenHeight(1.5), paddingHorizontal: responsiveScreenWidth(3), backgroundColor: colors.white, elevation: 4, margin, borderRadius: 15 }}>
+        <Pressable onPress={() => !company && navigation.navigate(routes.JOBDETAIL, { id: item.id })} style={{ borderWidth: 1, borderColor: colors.gray, paddingVertical: responsiveScreenHeight(1.5), paddingHorizontal: responsiveScreenWidth(3), backgroundColor: colors.white, elevation: 4, margin, borderRadius: 15 }}>
             <View style={{ flexDirection: "row", gap: responsiveScreenWidth(3), justifyContent: "space-between", alignItems: "flex-start" }}>
                 <View style={{ borderRadius: 6, height: responsiveScreenHeight(5), overflow: "hidden", backgroundColor: "#CECECE38" }}>
                     <Image resizeMode='contain' source={{ uri: item.company_info.image }} style={{ height: "100%", aspectRatio: 1 }} />
                 </View>
-                <Pressable  style={{ flex: 1, gap: responsiveScreenHeight(0.5) }}>
+                <Pressable style={{ flex: 1, gap: responsiveScreenHeight(0.5) }}>
                     <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "700" }}>{item.title}</Text>
                     <Text numberOfLines={1} style={{ textTransform: "capitalize", fontSize: responsiveScreenFontSize(1.8), fontWeight: "400" }} >{item.company_info.name}</Text>
                 </Pressable>
@@ -203,10 +216,10 @@ export const JobCard = ({ refresh, item, company, margin = responsiveScreenWidth
                     item.functionalArea && <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>{item.functionalArea}</Text>
                 }
             </View>
-            <View style={{ flexDirection: "row",  alignItems:"center" }}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Text numberOfLines={2} style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
                     {
-                        item.salary&& item.salary_period && <>
+                        item.salary && item.salary_period && <>
                             <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(2.2), fontWeight: "500" }}>{item.salary_currency}{formatSalaryRange(item.salary)}/</Text>
                             <Text style={{ flex: 1, marginTop: responsiveScreenHeight(.3) }}>{item.salary_period}</Text>
                         </>
@@ -214,10 +227,16 @@ export const JobCard = ({ refresh, item, company, margin = responsiveScreenWidth
                 </Text>
                 {
                     company ? null :
-                        <TouchableOpacity onPress={() => { !item.is_applied && navigation.navigate(routes.APPLY, { id: item.id }) }} style={{ borderRadius: 6, gap: responsiveScreenWidth(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.primary, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(.7) }}>
-                            <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8) }}>{item.is_applied ? "Applied" : "Apply Now"}</Text>
-                            {!item.is_applied && <Icon icon={{ type: "Feather", name: 'arrow-right' }} style={{ color: colors.white, fontSize: responsiveScreenFontSize(2) }} />}
-                        </TouchableOpacity>
+                        <Pressable onPress={() => {
+                            if (user?.id) {
+                                !item?.is_applied && !isApplied && navigation.navigate(routes.APPLY, { id: item.id })
+                            } else {
+                                navigation.navigate(routes.LOGIN)
+                            }
+                        }} style={{ borderRadius: 6, gap: responsiveScreenWidth(1), flexDirection: "row", opacity: !item?.is_applied && !isApplied ? 1 : 0.5, alignItems: "center", backgroundColor: colors.primary, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(.7) }}>
+                            <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8) }}>{!item?.is_applied && !isApplied ? "Apply Now" : "Applied"}</Text>
+                            {!item?.is_applied && !isApplied && <Icon icon={{ type: "Feather", name: 'arrow-right' }} style={{ color: colors.white, fontSize: responsiveScreenFontSize(2) }} />}
+                        </Pressable>
                 }
             </View>
         </Pressable>

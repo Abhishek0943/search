@@ -15,24 +15,43 @@ import { EmptyComp } from '../../recruiter/pages/OpenJobs/OpenJobs'
 
 const ApplyJob = () => {
   const { colors } = useContext(ThemeContext);
-  const [cvs, setCvs] = useState<any[]>([]);
+  const [cvs, setCvs] = useState({
+    jobs: [],
+    meta: {}
+  });
   const dispatch = useAppDispatch();
   const [search, setSearch] = useState('');
   const navigation: NavigationProp<ParamListBase> = useNavigation();
   const { user } = useAppSelector(state => state.userStore)
   const [loading, setLoading] = useState(true)
+  const getCvs = (page = 1) => {
+    dispatch(GetJobApplication({ search, page }))
+      .unwrap()
+      .then(res => {
+        setLoading(false)
+        if (res.success !== false) {
+          if (page === 1) {
+            setCvs(res.data);
+          } else {
+            setCvs(prev => ({
+              jobs: [...prev.jobs, ...res.data.jobs],
+              meta: res.data.meta
+            }));
+          }
+        }
+      });
+  };
   useFocusEffect(
     useCallback(() => {
-      dispatch(GetJobApplication({ search: search }))
-        .unwrap()
-        .then(res => {
-          setLoading(false)
-          if (res.success !== false) {
-            setCvs(res.data);
-          }
-        });
-    }, [search]),
+      setLoading(true);
+      getCvs(1); // always reset on focus/search
+    }, [search])
   );
+  const loadMore = () => {
+    if (cvs?.meta?.current_page < cvs?.meta?.last_page) {
+      getCvs(cvs.meta.current_page + 1);
+    }
+  };
   return (
     <NavigationBar name={routes.APPLYJOB}>
       <ScrollView style={{ flex: 1, }} contentContainerStyle={{}}>
@@ -119,7 +138,10 @@ const ApplyJob = () => {
               }
               <FlatList
                 ListEmptyComponent={() => <EmptyComp />}
-                scrollEnabled={false} contentContainerStyle={{ marginTop: responsiveScreenHeight(2), gap: responsiveScreenHeight(1), width: responsiveScreenWidth(90), marginHorizontal: "auto", marginVertical: responsiveScreenHeight(1) }} data={cvs.jobs} renderItem={({ item, index }) => {
+                scrollEnabled={false} contentContainerStyle={{ marginTop: responsiveScreenHeight(2), gap: responsiveScreenHeight(1), width: responsiveScreenWidth(90), marginHorizontal: "auto", marginVertical: responsiveScreenHeight(1) }} data={cvs.jobs}
+                onEndReached={loadMore}
+                onEndReachedThreshold={0.5}
+                renderItem={({ item, index }) => {
                   return (
                     <>
                       <View style={{ paddingVertical: responsiveScreenHeight(2), borderWidth: 1, borderColor: colors.lightGray, paddingHorizontal: responsiveScreenWidth(4), backgroundColor: "#ffffffff", borderRadius: 15 }}>
@@ -174,59 +196,59 @@ const ApplyJob = () => {
                                 >
                                   {item.status}
                                 </Text>
-                              </TouchableOpacity> : item.status === "hired"?
-                              <TouchableOpacity
-                                style={{
-                                  flex: 1,
-                                  justifyContent: 'center',
-                                  marginTop: responsiveScreenHeight(2),
-                                  borderRadius: 15,
-                                  gap: responsiveScreenWidth(1),
-                                  flexDirection: 'row',
-                                  alignItems: 'center',
-                                  backgroundColor: "#E5FAF5",
-                                  paddingHorizontal: responsiveScreenWidth(3),
-                                  paddingVertical: responsiveScreenHeight(1.5),
-                                }}
-                              >
-                                <Text
+                              </TouchableOpacity> : item.status === "hired" ?
+                                <TouchableOpacity
                                   style={{
-                                    color: "#17D1A2",
-                                    fontSize: responsiveScreenFontSize(1.8),
-                                    textTransform: 'capitalize',
-                                    fontWeight: '800',
+                                    flex: 1,
+                                    justifyContent: 'center',
+                                    marginTop: responsiveScreenHeight(2),
+                                    borderRadius: 15,
+                                    gap: responsiveScreenWidth(1),
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    backgroundColor: "#E5FAF5",
+                                    paddingHorizontal: responsiveScreenWidth(3),
+                                    paddingVertical: responsiveScreenHeight(1.5),
                                   }}
                                 >
-                                  {item.status}
-                                </Text>
-                              </TouchableOpacity>:<>
-                               <TouchableOpacity
-                                style={{
-                                  flex: 1,
-                                  justifyContent: 'center',
-                                  marginTop: responsiveScreenHeight(2),
-                                  borderRadius: 15,
-                                  gap: responsiveScreenWidth(1),
-                                  flexDirection: 'row',
-                                  alignItems: 'center',
-                                  backgroundColor: "#FFE1DF",
-                                  paddingHorizontal: responsiveScreenWidth(3),
-                                  paddingVertical: responsiveScreenHeight(1.5),
-                                }}
-                              >
-                                <Text
-                                  style={{
-                                    color: "#F44336",
-                                    fontSize: responsiveScreenFontSize(1.8),
-                                    textTransform: 'capitalize',
-                                    fontWeight: '800',
-                                  }}
-                                >
-                                  {item.status}
-                                </Text>
-                              </TouchableOpacity>
-                              
-                  </>
+                                  <Text
+                                    style={{
+                                      color: "#17D1A2",
+                                      fontSize: responsiveScreenFontSize(1.8),
+                                      textTransform: 'capitalize',
+                                      fontWeight: '800',
+                                    }}
+                                  >
+                                    {item.status}
+                                  </Text>
+                                </TouchableOpacity> : <>
+                                  <TouchableOpacity
+                                    style={{
+                                      flex: 1,
+                                      justifyContent: 'center',
+                                      marginTop: responsiveScreenHeight(2),
+                                      borderRadius: 15,
+                                      gap: responsiveScreenWidth(1),
+                                      flexDirection: 'row',
+                                      alignItems: 'center',
+                                      backgroundColor: "#FFE1DF",
+                                      paddingHorizontal: responsiveScreenWidth(3),
+                                      paddingVertical: responsiveScreenHeight(1.5),
+                                    }}
+                                  >
+                                    <Text
+                                      style={{
+                                        color: "#F44336",
+                                        fontSize: responsiveScreenFontSize(1.8),
+                                        textTransform: 'capitalize',
+                                        fontWeight: '800',
+                                      }}
+                                    >
+                                      {item.status}
+                                    </Text>
+                                  </TouchableOpacity>
+
+                                </>
                           }
                           <TouchableOpacity
                             onPress={() => navigation.navigate(routes.JOBDETAIL, { id: item.id })}

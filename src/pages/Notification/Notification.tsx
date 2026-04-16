@@ -1,4 +1,4 @@
-import { View, Text, FlatList, Image, Pressable, Alert, TouchableWithoutFeedback, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, Image, Pressable, Alert, TouchableWithoutFeedback, ScrollView, ActivityIndicator, TouchableOpacity, Linking } from 'react-native';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { NavigationBar } from '../../components';
 import { routes } from '../../constants/values';
@@ -8,7 +8,6 @@ import {
   responsiveScreenWidth,
 } from 'react-native-responsive-dimensions';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { useConfirm } from '../../ConfirmContext';
 import { ThemeContext } from '../../context/ThemeProvider';
 import imagePath from '../../assets/imagePath';
 import { useAppDispatch } from '../../store';
@@ -36,6 +35,7 @@ const Notification = () => {
       });
   }
   const { showConfirm } = useAlert()
+
   useFocusEffect(
     useCallback(() => {
       const a = async () => {
@@ -48,11 +48,27 @@ const Notification = () => {
         .then(res => {
           if (res.success !== false) {
             setCvs(res.data.notifications);
+            console.log(res.data.notifications, "ok")
           }
           setLoading(false)
         });
     }, []),
   );
+  const openURL = async (url: any) => {
+    if (!url) return;
+    try {
+      const canOpen = await Linking.canOpenURL(url);
+      if (canOpen) {
+        console.log(`Opening URL: ${url}`);
+        Linking.openURL(url)
+          .catch(err => console.error("Failed to open URL:", err));
+      } else {
+        console.log(`Can't open URL: ${url}`);
+      }
+    } catch (error: any) {
+      console.error("Failed to open URL:", error.message);
+    }
+  };
   return (
     <>
       <NavigationBar navigationBar={false}>
@@ -65,7 +81,7 @@ const Notification = () => {
             alignItems: 'center',
             paddingBottom: responsiveScreenHeight(3),
           }}
-  
+
         >
           <Header title="Notifications" />
           {
@@ -73,7 +89,7 @@ const Notification = () => {
               <FlatList data={cvs}
                 showsVerticalScrollIndicator={false}
                 scrollEnabled={true}
-                ListEmptyComponent={() => (<View style={{ flex: 1,marginTop:responsiveScreenHeight(40), justifyContent: "center" }}>
+                ListEmptyComponent={() => (<View style={{ flex: 1, marginTop: responsiveScreenHeight(40), justifyContent: "center" }}>
                   <Image source={imagePath.notificationEmptyImage} />
                 </View>)}
                 // contentContainerStyle={{ flexGrow: 1 }}
@@ -83,21 +99,29 @@ const Notification = () => {
                     <TouchableWithoutFeedback onPress={() => setActive(0)} >
                       <View style={{ backgroundColor: colors.white, borderWidth: 1, borderColor: colors.gray, marginTop: responsiveScreenHeight(2), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 16, overflow: "hidden", paddingVertical: responsiveScreenHeight(1.4), width: responsiveScreenWidth(90), gap: responsiveScreenWidth(2), flexDirection: "row" }}>
                         <View style={{ borderRadius: 6, height: responsiveScreenHeight(4.9), overflow: "hidden", backgroundColor: "#CECECE38" }}>
-                          <Image source={{ uri: item.from.image }} resizeMode='cover' style={{ height: "100%", aspectRatio: 1, }} />
+                          <Image source={{ uri: item?.from?.image }} resizeMode='cover' style={{ height: "100%", aspectRatio: 1, }} />
                         </View>
                         <TouchableOpacity onPress={() => {
                           setActive(0)
-                          if (role === "seeker") {
-                            item?.job?.id && navigation.navigate(routes.JOBDETAIL, { id: item.job.id })
+
+                          if (item.type === "blog_rejected" || item.type === "blog_published" || item.type === "blog_approved") {
+                            openURL(item.redirect)
+                          }
+                          else if (item.job?.id || item.application_id) {
+                            if (role === "seeker") {
+                              item?.job?.id && navigation.navigate(routes.JOBDETAIL, { id: item.job.id })
+                            } else {
+                              navigation.navigate(routes.CANDIDATEPROFILE, { application_id: item.application_id, })
+                            }
                           } else {
-                            navigation.navigate(routes.CANDIDATEPROFILE, { application_id: item.application_id, })
+                            navigation.goBack()
                           }
                         }} style={{ flex: 1, }}>
                           <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(2) }}>
                             <Text numberOfLines={1} style={{ maxWidth: responsiveScreenWidth(30), fontWeight: "700", textTransform: "capitalize", fontSize: responsiveScreenFontSize(1.9) }}>{item?.job?.title}</Text>
                             <View style={{ borderRadius: 6, aspectRatio: 1, height: responsiveScreenHeight(.5), overflow: "hidden", backgroundColor: "#91E1DD" }}>
                             </View>
-                            <Text numberOfLines={1} style={{ maxWidth: responsiveScreenWidth(30), fontWeight: "400", textTransform: "capitalize", color: colors.darkGrayNatural, fontSize: responsiveScreenFontSize(1.9) }}>{item.from.name}</Text>
+                            <Text numberOfLines={1} style={{ maxWidth: responsiveScreenWidth(30), fontWeight: "400", textTransform: "capitalize", color: colors.darkGrayNatural, fontSize: responsiveScreenFontSize(1.9) }}>{item?.from?.name}</Text>
                           </View>
                           <Text
                             style={{
@@ -127,8 +151,8 @@ const Notification = () => {
                                 {
                                   backgroundColor: colors.white,
                                   position: "absolute",
-                               borderWidth:1,
-                               borderColor:colors.lightGray,
+                                  borderWidth: 1,
+                                  borderColor: colors.lightGray,
                                   width: responsiveScreenWidth(30),
                                   right: 0,
                                   top: "30%",

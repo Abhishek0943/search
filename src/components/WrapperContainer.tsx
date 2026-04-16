@@ -11,6 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import messaging from '@react-native-firebase/messaging';
 import { useAppDispatch, useAppSelector } from '../store';
 import { setMessageCount } from '../reducer/userReducer';
+import { onDisplayNotification } from '../utils/notificationService';
 
 interface WrapperContainerProps {
   children: ReactNode;
@@ -36,39 +37,44 @@ const WrapperContainer: React.FC<WrapperContainerProps> = ({
   };
 
   const dispatch = useAppDispatch()
- useEffect(() => {
-  if (!user?.id) return;
+  useEffect(() => {
+    if (!user?.id) return;
 
-  // If you only want this feature on Android, keep this:
-  // if (Platform.OS !== "android") return;
+    // If you only want this feature on Android, keep this:
+    // if (Platform.OS !== "android") return;
 
-  let unsubscribe: undefined | (() => void);
+    let unsubscribe: undefined | (() => void);
 
-  const start = async () => {
-    try {
-      // On iOS you should request permission before listening
-      if (Platform.OS === "ios") {
-        const authStatus = await messaging().requestPermission();
-        // optional: you can check authStatus if you want
+    const start = async () => {
+      try {
+        // On iOS you should request permission before listening
+        if (Platform.OS === "ios") {
+          const authStatus = await messaging().requestPermission();
+          // optional: you can check authStatus if you want
+        }
+
+        unsubscribe = messaging().onMessage(async remoteMessage => {
+          const { title, body } = remoteMessage.notification || {}
+          const imageUrl = remoteMessage.notification?.android?.imageUrl || remoteMessage.data?.imageUrl || remoteMessage.data?.image;
+          if (title && body) {
+            onDisplayNotification(title, body, imageUrl as string)
+          }
+          dispatch(
+            setMessageCount({
+              messages_count: remoteMessage?.data?.unread_message_count || 0,
+            })
+          );
+        });
+      } catch (e) {
       }
+    };
 
-      unsubscribe = messaging().onMessage(async remoteMessage => {
-        dispatch(
-          setMessageCount({
-            messages_count: remoteMessage?.data?.unread_message_count || 0,
-          })
-        );
-      });
-    } catch (e) {
-    }
-  };
+    start();
 
-  start();
-
-  return () => {
-    if (unsubscribe) unsubscribe();
-  };
-}, [user?.id]);
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [user?.id]);
   return (
     <View style={[containerStyle,]}>
       <StatusBar hidden={true} />

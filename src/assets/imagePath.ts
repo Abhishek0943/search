@@ -114,4 +114,8 @@ export const Fonts = {
     GilroyMedium: 'Gilroy-Medium',
     GilroyRegular: 'Gilroy-Regular',
     GilroySemiBold: 'Gilroy-SemiBold',
+    GilroyMediumPath: './fonts/Gilroy-Medium.ttf',
+    GilroyBoldPath: './fonts/Gilroy-Bold.ttf',
+    GilroyLightPath: './fonts/Gilroy-Light.ttf',
+    GilroyRegularPath: './fonts/Gilroy-Regular.ttf',
 }

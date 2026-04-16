@@ -109,31 +109,34 @@ export default function OpenJobs() {
                                         <Text style={{ color: "#494949", fontSize: responsiveScreenFontSize(2), fontWeight: "700" }}>{item.candidates_count} Candidates</Text>
                                     </View>
                                     <Text style={{ color: colors.darkGray, fontWeight: "600", fontSize: responsiveScreenFontSize(1.6) }}>{formatDate(item.posted_at)}</Text>
-                                    <TouchableOpacity
-                                        onPress={() => { navigation.navigate(routes.ACTIVECANDIDATE, { jobId: item?.id }) }}
-                                        // onPress={() =>{}}
-                                        style={{
-                                            width: '100%',
-                                            justifyContent: 'center',
-                                            marginTop: responsiveScreenHeight(2),
-                                            borderRadius: 15,
-                                            gap: responsiveScreenWidth(1),
-                                            flexDirection: 'row',
-                                            alignItems: 'center',
-                                            backgroundColor: colors.primary,
-                                            paddingHorizontal: responsiveScreenWidth(3),
-                                            paddingVertical: responsiveScreenHeight(1.5),
-                                        }}
-                                    >
-                                        <Text
+                                    {
+                                        item.candidates_count > 0 &&
+                                        <TouchableOpacity
+                                            onPress={() => { navigation.navigate(routes.ACTIVECANDIDATE, { jobId: item?.id }) }}
+                                            // onPress={() =>{}}
                                             style={{
-                                                color: colors.white,
-                                                fontSize: responsiveScreenFontSize(1.8),
+                                                width: '100%',
+                                                justifyContent: 'center',
+                                                marginTop: responsiveScreenHeight(2),
+                                                borderRadius: 15,
+                                                gap: responsiveScreenWidth(1),
+                                                flexDirection: 'row',
+                                                alignItems: 'center',
+                                                backgroundColor: colors.primary,
+                                                paddingHorizontal: responsiveScreenWidth(3),
+                                                paddingVertical: responsiveScreenHeight(1.5),
                                             }}
                                         >
-                                            Candidate
-                                        </Text>
-                                    </TouchableOpacity>
+                                            <Text
+                                                style={{
+                                                    color: colors.white,
+                                                    fontSize: responsiveScreenFontSize(1.8),
+                                                }}
+                                            >
+                                                Candidate
+                                            </Text>
+                                        </TouchableOpacity>
+                                    }
                                 </TouchableOpacity>
                             )} />
                     </>
@@ -151,13 +154,13 @@ const formatDate = (isoDate) => {
     });
 };
 export const EmptyComp =
-    ({bottom, heading = "No results found", text = "Content will appear once it becomes available" }) => {
+    ({ bottom, heading = "No results found", text = "Content will appear once it becomes available" }) => {
         const { colors } = useContext(ThemeContext)
-        return (<View style={{marginHorizontal:"auto", width: responsiveScreenWidth(90), height: responsiveScreenHeight(60), zIndex: 100, top: 0, right: 0, justifyContent: "center", alignItems: "center" }}>
+        return (<View style={{ marginHorizontal: "auto", width: responsiveScreenWidth(90), height: responsiveScreenHeight(60), zIndex: 100, top: 0, right: 0, justifyContent: "center", alignItems: "center" }}>
             <Text style={{ fontSize: responsiveScreenFontSize(2.7), fontWeight: "700" }}>{heading}</Text>
             <Text style={{ fontSize: responsiveScreenFontSize(1.8), color: colors.darkGrayNatural, width: "80%", textAlign: "center", fontWeight: "600" }}>{text}</Text>
             {
-                bottom&& bottom()
+                bottom && bottom()
             }
         </View>)
     }

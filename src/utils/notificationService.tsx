@@ -1,4 +1,5 @@
 import { PermissionsAndroid, Platform } from 'react-native';
+import notifee, { AndroidStyle, AndroidImportance } from '@notifee/react-native';
 import {
   getMessaging,
   requestPermission,
@@ -7,9 +8,7 @@ import {
   registerDeviceForRemoteMessages,
   AuthorizationStatus,
   getAPNSToken,
-  setAPNSToken,
 } from '@react-native-firebase/messaging';
-import { getApps, initializeApp } from '@react-native-firebase/app';
 import { checkNotifications, requestNotifications } from 'react-native-permissions';
 export async function requestUserPermission(): Promise<void> {
   if (Platform.OS === 'android' && Platform.Version >= 33) {
@@ -38,7 +37,7 @@ export async function requestUserPermission(): Promise<void> {
     }
   }
 }
-const sleep = (ms: number) => new Promise(res => setTimeout(res, ms));
+const sleep = (ms: number) => new Promise(res => setTimeout(() => res(null), ms));
 
 
 export const getFCMToken = async (): Promise<string | null> => {
@@ -92,7 +91,6 @@ export const getFCMToken = async (): Promise<string | null> => {
       if (!apns) return null;
     }
 
-    // 4) Get FCM token
     const token = await getToken(messaging);
     console.log("FCM token:", token);
     return token || null;
@@ -100,4 +98,34 @@ export const getFCMToken = async (): Promise<string | null> => {
     console.log("getFCMToken error:", e?.message ?? e);
     return null;
   }
+};
+
+export const onDisplayNotification = async (title: string, body: string, imageUrl?: string) => {
+  // Request permissions (required for iOS)
+  await notifee.requestPermission();
+
+  // Create a channel (required for Android)
+  const channelId = await notifee.createChannel({
+    id: 'default',
+    name: 'Default Channel',
+    importance: AndroidImportance.DEFAULT,
+  });
+
+  const finalImageUrl = imageUrl || "https://picsum.photos/200";
+
+  // Display a notification
+  await notifee.displayNotification({
+    title,
+    body,
+    android: {
+      channelId,
+      style: {
+        type: AndroidStyle.BIGPICTURE,
+        picture: finalImageUrl,
+      },
+      pressAction: {
+        id: 'default',
+      },
+    },
+  });
 };

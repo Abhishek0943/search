@@ -19,12 +19,10 @@ const Blog = () => {
     const [hasMore, setHasMore] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const fetchingRef = useRef(false);
-
     const loadMore = useCallback(async (isReset = false) => {
         if (fetchingRef.current) return;
         if (!isReset && !hasMore) return;
         if (loadingMore) return;
-
         fetchingRef.current = true;
         setLoadingMore(true);
         const currentPage = isReset ? 1 : page;
@@ -127,6 +125,7 @@ const Blog = () => {
 export default Blog
 export const ArticleCard = ({ post, onEdit, onDelete }: { post: any, onEdit?: (post: any) => void, onDelete?: (post: any) => void }) => {
     const { colors } = useContext(ThemeContext)
+    const [loading, setLoading] = useState(true);
     const openURL = async (url: any) => {
         if (!url) return;
         try {
@@ -156,8 +155,18 @@ export const ArticleCard = ({ post, onEdit, onDelete }: { post: any, onEdit?: (p
     const categoryName = post?.category?.name || post?.topic;
     return (
         <Pressable onPress={() => openURL(post?.web_url)} style={{ flexDirection: "row", gap: responsiveWidth(2), alignItems: "center", marginBottom: responsiveScreenHeight(2) }}>
-            <View style={{ borderWidth: .5, borderColor: "#b8b8b899", height: responsiveHeight(10), borderRadius: 10, aspectRatio: 1, overflow: "hidden", }}>
-                <Image source={{ uri: image }} style={{ height: "100%", width: "100%", resizeMode: "cover" }} />
+            <View style={{ borderWidth: .5, borderColor: "#b8b8b899", height: responsiveHeight(10), borderRadius: 10, aspectRatio: 1, overflow: "hidden", position: 'relative' }}>
+                {loading && (
+                    <View style={{ ...StyleSheet.absoluteFillObject, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.backgroundSurface || "#f0f0f0" }}>
+                        <ActivityIndicator size="small" color={colors.primary} />
+                    </View>
+                )}
+                <Image
+                    source={{ uri: image }}
+                    onLoadStart={() => setLoading(true)}
+                    onLoadEnd={() => setLoading(false)}
+                    style={{ height: "100%", width: "100%", resizeMode: "cover" }}
+                />
             </View>
             <View style={{ flex: 1 }}>
                 <Text numberOfLines={1} style={{ color: "black", fontSize: responsiveFontSize(2.5), fontWeight: "600" }}>{title}</Text>

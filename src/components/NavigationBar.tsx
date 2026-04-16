@@ -1,7 +1,7 @@
 import { View, TouchableOpacity, Image, KeyboardAvoidingView, Platform } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import RoutesType, { routes } from '../constants/values'
-import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions'
+import { responsiveFontSize, responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions'
 import { ThemeContext } from '../context/ThemeProvider'
 import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native'
 import imagePath from '../assets/imagePath'
@@ -65,7 +65,7 @@ const NavigationBar = ({ bottomPadding = false, children, statusbar = true, name
                                             <Text style={{ color: "white", fontSize: responsiveScreenFontSize(1), fontWeight: "800" }}>{user?.messages_count}</Text>
                                         </View>
                                     }
-                                    <Text style={{ color: e.path === name ? colors.black : colors.darkGray, fontWeight: e.path === name ? "900" : "400", }}>{e.name}</Text>
+                                    <Text numberOfLines={1} ellipsizeMode='clip' style={{ fontSize: responsiveFontSize(1.6), color: e.path === name ? colors.black : colors.darkGray, fontWeight: e.path === name ? "900" : "400", }}>{e.name}</Text>
                                 </TouchableOpacity>
                             )
                         })

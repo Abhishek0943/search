@@ -58,7 +58,6 @@ const Company = () => {
   const isFavorite = route.params?.isFavorite || false
   const [pages, setPages] = useState(1)
   const [meta, setMeta] = useState({})
-
   const onLoadMore = React.useCallback(() => {
     if (!meta?.last_page) return;
     if (meta?.current_page >= meta.last_page) return;

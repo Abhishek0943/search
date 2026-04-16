@@ -108,7 +108,7 @@ const Profile = () => {
                 setProfile(user)
             }
         })
-    }, [user])
+    }, [])
     const { showConfirm, showAlert } = useAlert();
 
     return (
@@ -186,7 +186,7 @@ const Profile = () => {
                                     </TouchableOpacity>
                                     <TouchableOpacity onPress={() => navigation.navigate(routes.BLOGPAGE, { isFavorite: true })} style={{ width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
                                         <Image style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} source={imagePath.blog} />
-                                        <Text style={{ fontSize: responsiveScreenFontSize(2) }}>Insights</Text>
+                                        <Text style={{ fontSize: responsiveScreenFontSize(2) }}>Creator</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity onPress={() => navigation.navigate(routes.EDUCATION)} style={{ width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
                                         <Image tintColor={colors.textPrimary} style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} source={imagePath.education2} />

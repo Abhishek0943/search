@@ -24,7 +24,7 @@ import {
   responsiveScreenWidth,
 } from 'react-native-responsive-dimensions';
 import { routes } from '../../constants/values';
-import { useAppDispatch } from '../../store';
+import { useAppDispatch, useAppSelector } from '../../store';
 import imagePath from '../../assets/imagePath';
 import { NavigationBar } from '../../components';
 import { ThemeContext } from '../../context/ThemeProvider';
@@ -83,7 +83,6 @@ const Search = () => {
 
   useEffect(() => {
     if (!ready) return;
-    // setLoading(true);
     const payload = {
       search,
       job_type_id: filter?.jobTypes ?? [],
@@ -134,6 +133,8 @@ const Search = () => {
         }
       });
   }, [])
+  const { appliedJobIds } = useAppSelector(state => state.jobsReducer)
+
   useEffect(() => {
     dispatch(GetFilter({})).unwrap().then((res) => {
       if (res.success) {
@@ -328,7 +329,7 @@ const Search = () => {
                       onEndReached={onLoadMore}       // ✅
                       scrollEventThrottle={16}
                       removeClippedSubviews={false}
-                      keyExtractor={(i)=>`${i.id}fasdfdasfasdfsadfdasfdasfdasfasdfsdfadsffdsafdsfasdfasdfadsferfewrqewserchitem`}
+                      keyExtractor={(i) => `${i.id}fasdfdasfasdfsadfdasfdasfdasfasdfsdfadsffdsafdsfasdfasdfadsferfewrqewserchitem`}
                       style={{ width: responsiveScreenWidth(94), marginHorizontal: "auto" }} data={job} renderItem={({ item, index }) => {
                         return (
                           <JobCard refresh={() => {
@@ -434,7 +435,7 @@ export const CustomMultiDropdown = ({
   data = [],
   placeholder = "Select",
   selectedValues = [],
-  onSelect = (arr: any[]) => {},
+  onSelect = (arr: any[]) => { },
   labelKey = "name",
   valueKey = "id",
 }) => {
@@ -511,7 +512,7 @@ export const CustomMultiDropdown = ({
         >
           {/* modal card - stop overlay close */}
           <Pressable
-            onPress={() => {}}
+            onPress={() => { }}
             style={{
               backgroundColor: "white",
               borderRadius: 8,

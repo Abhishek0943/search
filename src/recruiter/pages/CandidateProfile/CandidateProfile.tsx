@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react'
-import { ActivityIndicator, Alert, Image, ImageBackground, KeyboardAvoidingView, Linking, PermissionsAndroid, Platform, Pressable, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Alert, BackHandler, Image, ImageBackground, KeyboardAvoidingView, Linking, PermissionsAndroid, Platform, Pressable, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
 import { NavigationBar } from '../../../components'
 import { routes } from '../../../constants/values'
 import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions'
@@ -27,6 +27,16 @@ function CandidateProfile() {
   const { showAlert } = useAlert()
   useFocusEffect(useCallback(
     () => {
+      const onBackPress = () => {
+        if (!navigation.canGoBack()) {
+          (navigation as any).replace(routes.RECRUITERHOME);
+          return true;
+        }
+        return false;
+      };
+
+      const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
       if (id) {
         setLoading(true)
         dispatch(CandidateProfileData({ id: id })).unwrap().then(res => {
@@ -48,16 +58,17 @@ function CandidateProfile() {
 
         })
       }
+
+      return () => {
+        subscription.remove();
+      }
     },
-    [id, application],
+    [id, application, navigation],
   )
   )
   return (
     <NavigationBar navigationBar={false} >
-    <>
-    
-
-
+      <>
         <ScrollView style={{ flex: 1, }} contentContainerStyle={{}}>
           <View
             style={{
@@ -73,7 +84,13 @@ function CandidateProfile() {
               gap: responsiveScreenWidth(2),
             }}
           >
-            <TouchableOpacity onPress={() => navigation.goBack()}>
+            <TouchableOpacity onPress={() => {
+              if (navigation.canGoBack()) {
+                navigation.goBack();
+              } else {
+                (navigation as any).replace(routes.RECRUITERHOME);
+              }
+            }}>
               <Image source={imagePath.backIcon} style={{ resizeMode: 'contain', transform: [{ scale: 1.1 }] }} />
             </TouchableOpacity>
             <Text
@@ -262,7 +279,7 @@ function CandidateProfile() {
 
         </ScrollView>
         {isMsgModalVisible && (
-           
+
           <View
             style={{
               position: "absolute",
@@ -276,155 +293,155 @@ function CandidateProfile() {
               zIndex: 999,
             }}
           >
-             <KeyboardAvoidingView
-     style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: "rgba(0,0,0,0.45)",
-              alignItems: "center",
-              paddingHorizontal: responsiveScreenWidth(5),
-              zIndex: 999,
-            }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
-      >
-            <Pressable
-              onPress={() => {
-                if (!sendMsgLoading) setIsMsgModalVisible(false);
-              }}
+            <KeyboardAvoidingView
               style={{
                 position: "absolute",
                 top: 0,
                 left: 0,
                 right: 0,
                 bottom: 0,
+                backgroundColor: "rgba(0,0,0,0.45)",
+                alignItems: "center",
+                paddingHorizontal: responsiveScreenWidth(5),
+                zIndex: 999,
               }}
-            />
-
-            <View
-              style={{
-                width: "100%",
-                backgroundColor: "white",
-                borderRadius: 18,
-                marginVertical: "auto",
-                padding: responsiveScreenWidth(5),
-                zIndex: 1000,
-              }}
+              behavior={Platform.OS === "ios" ? "padding" : "height"}
+              keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
             >
-              <Text style={{ fontSize: responsiveScreenFontSize(2.2), fontWeight: "700" }}>
-                Send Message
-              </Text>
-
-              <Text
-                style={{
-                  marginTop: responsiveScreenHeight(0.8),
-                  color: colors.gray,
-                  fontSize: responsiveScreenFontSize(1.6),
+              <Pressable
+                onPress={() => {
+                  if (!sendMsgLoading) setIsMsgModalVisible(false);
                 }}
-              >
-                Write your message below and submit.
-              </Text>
-
-              <TextInput
-                value={messageText}
-                onChangeText={setMessageText}
-                placeholder="Type your message..."
-                placeholderTextColor="#999"
-                multiline
-                textAlignVertical="top"
-                editable={!sendMsgLoading}
                 style={{
-                  marginTop: responsiveScreenHeight(1.5),
-                  borderWidth: 1,
-                  borderColor: "#D9D9D9",
-                  borderRadius: 14,
-                  padding: responsiveScreenWidth(4),
-                  height: responsiveScreenHeight(18),
-                  fontSize: responsiveScreenFontSize(1.7),
-                  color: "#111",
-                  backgroundColor: "#FAFAFA",
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
                 }}
               />
 
-              {/* Buttons */}
               <View
                 style={{
-                  flexDirection: "row",
-                  gap: responsiveScreenWidth(3),
-                  marginTop: responsiveScreenHeight(2),
+                  width: "100%",
+                  backgroundColor: "white",
+                  borderRadius: 18,
+                  marginVertical: "auto",
+                  padding: responsiveScreenWidth(5),
+                  zIndex: 1000,
                 }}
               >
-                <Pressable
-                  disabled={sendMsgLoading}
-                  onPress={() => setIsMsgModalVisible(false)}
+                <Text style={{ fontSize: responsiveScreenFontSize(2.2), fontWeight: "700" }}>
+                  Send Message
+                </Text>
+
+                <Text
                   style={{
-                    flex: 1,
+                    marginTop: responsiveScreenHeight(0.8),
+                    color: colors.gray,
+                    fontSize: responsiveScreenFontSize(1.6),
+                  }}
+                >
+                  Write your message below and submit.
+                </Text>
+
+                <TextInput
+                  value={messageText}
+                  onChangeText={setMessageText}
+                  placeholder="Type your message..."
+                  placeholderTextColor="#999"
+                  multiline
+                  textAlignVertical="top"
+                  editable={!sendMsgLoading}
+                  style={{
+                    marginTop: responsiveScreenHeight(1.5),
                     borderWidth: 1,
                     borderColor: "#D9D9D9",
-                    paddingVertical: responsiveScreenHeight(1.2),
                     borderRadius: 14,
-                    alignItems: "center",
-                    backgroundColor: "#FFF",
+                    padding: responsiveScreenWidth(4),
+                    height: responsiveScreenHeight(18),
+                    fontSize: responsiveScreenFontSize(1.7),
+                    color: "#111",
+                    backgroundColor: "#FAFAFA",
                   }}
-                >
-                  <Text style={{ color: "#111", fontSize: responsiveScreenFontSize(1.8) }}>
-                    Cancel
-                  </Text>
-                </Pressable>
+                />
 
-                <Pressable
-                  disabled={sendMsgLoading || messageText.trim().length < 2}
-                  onPress={async () => {
-                    const msg = messageText.trim();
-                    if (msg.length < 2) return;
-
-                    try {
-                      setSendMsgLoading(true);
-                      dispatch(SendMessage({ seeker_id: cvs.id, message: messageText })).unwrap().then((res) => { })
-                      setMessageText("");
-                      setIsMsgModalVisible(false);
-                      showAlert({
-                        title: "Success",
-                        message: "Message sent successfully.",
-                      });
-                    } catch (e) {
-                      showAlert({
-                        title: "Failed",
-                        message: "Could not send message. Please try again.",
-                      });
-                    } finally {
-                      setSendMsgLoading(false);
-                    }
-                  }}
+                {/* Buttons */}
+                <View
                   style={{
-                    flex: 1,
-                    paddingVertical: responsiveScreenHeight(1.2),
-                    borderRadius: 14,
-                    alignItems: "center",
-                    backgroundColor:
-                      sendMsgLoading || messageText.trim().length < 2
-                        ? "#B7C7FF"
-                        : colors.primary,
+                    flexDirection: "row",
+                    gap: responsiveScreenWidth(3),
+                    marginTop: responsiveScreenHeight(2),
                   }}
                 >
-                  {sendMsgLoading ? (
-                    <ActivityIndicator color="#fff" />
-                  ) : (
-                    <Text style={{ color: "#fff", fontSize: responsiveScreenFontSize(1.8) }}>
-                      Submit
+                  <Pressable
+                    disabled={sendMsgLoading}
+                    onPress={() => setIsMsgModalVisible(false)}
+                    style={{
+                      flex: 1,
+                      borderWidth: 1,
+                      borderColor: "#D9D9D9",
+                      paddingVertical: responsiveScreenHeight(1.2),
+                      borderRadius: 14,
+                      alignItems: "center",
+                      backgroundColor: "#FFF",
+                    }}
+                  >
+                    <Text style={{ color: "#111", fontSize: responsiveScreenFontSize(1.8) }}>
+                      Cancel
                     </Text>
-                  )}
-                </Pressable>
+                  </Pressable>
+
+                  <Pressable
+                    disabled={sendMsgLoading || messageText.trim().length < 2}
+                    onPress={async () => {
+                      const msg = messageText.trim();
+                      if (msg.length < 2) return;
+
+                      try {
+                        setSendMsgLoading(true);
+                        dispatch(SendMessage({ seeker_id: cvs.id, message: messageText })).unwrap().then((res) => { })
+                        setMessageText("");
+                        setIsMsgModalVisible(false);
+                        showAlert({
+                          title: "Success",
+                          message: "Message sent successfully.",
+                        });
+                      } catch (e) {
+                        showAlert({
+                          title: "Failed",
+                          message: "Could not send message. Please try again.",
+                        });
+                      } finally {
+                        setSendMsgLoading(false);
+                      }
+                    }}
+                    style={{
+                      flex: 1,
+                      paddingVertical: responsiveScreenHeight(1.2),
+                      borderRadius: 14,
+                      alignItems: "center",
+                      backgroundColor:
+                        sendMsgLoading || messageText.trim().length < 2
+                          ? "#B7C7FF"
+                          : colors.primary,
+                    }}
+                  >
+                    {sendMsgLoading ? (
+                      <ActivityIndicator color="#fff" />
+                    ) : (
+                      <Text style={{ color: "#fff", fontSize: responsiveScreenFontSize(1.8) }}>
+                        Submit
+                      </Text>
+                    )}
+                  </Pressable>
+                </View>
               </View>
-            </View>
-      </KeyboardAvoidingView>
+            </KeyboardAvoidingView>
           </View>
         )}
 
-    </>
+      </>
 
     </NavigationBar>
   )
@@ -533,7 +550,7 @@ function SkillCard({ data }) {
     <View style={[styles.card, { backgroundColor: colors.lightGrayNatural, marginTop: responsiveScreenHeight(2) }]}>
       <View style={styles.headerRow}>
         <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: '800' }}>Skills</Text>
-         
+
       </View>
 
       <View style={{ borderBottomColor: colors.mediumGrayNatural, borderBottomWidth: 1, borderStyle: "dashed", marginVertical: responsiveScreenHeight(1) }} />
@@ -558,7 +575,7 @@ function LanguageCard({ data }) {
     <View style={[styles.card, { backgroundColor: colors.lightGrayNatural, marginTop: responsiveScreenHeight(2) }]}>
       <View style={styles.headerRow}>
         <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: '800' }}>Languages</Text>
-         
+
       </View>
 
       <View style={{ borderBottomColor: colors.mediumGrayNatural, borderBottomWidth: 1, borderStyle: "dashed", marginVertical: responsiveScreenHeight(1) }} />
@@ -579,7 +596,7 @@ function EducationCard({ data }) {
     <View style={[styles.card, { backgroundColor: colors.lightGrayNatural, marginTop: responsiveScreenHeight(2) }]}>
       <View style={styles.headerRow}>
         <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: '800' }}>Education</Text>
-         
+
       </View>
 
       <View style={{ borderBottomColor: colors.mediumGrayNatural, borderBottomWidth: 1, borderStyle: "dashed", marginTop: responsiveScreenHeight(1) }} />
@@ -588,7 +605,7 @@ function EducationCard({ data }) {
           <View style={[{
             width: "100%",
             borderRadius: 14,
-            marginTop:responsiveScreenHeight(2)
+            marginTop: responsiveScreenHeight(2)
           }]}>
             <View style={styles.topRow}>
               <Text style={[styles.title, { fontSize: responsiveScreenFontSize(2.5), fontWeight: "600", color: colors.textPrimary }]} numberOfLines={1}>
@@ -632,7 +649,7 @@ function Selection({ data, application_id }) {
     <View style={[styles.card, { backgroundColor: colors.lightGrayNatural, marginTop: responsiveScreenHeight(2) }]}>
       <View style={styles.headerRow}>
         <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: '800' }}>Select Option</Text>
-         
+
       </View>
 
       <View style={{ borderBottomColor: colors.mediumGrayNatural, borderBottomWidth: 1, borderStyle: "dashed", marginVertical: responsiveScreenHeight(1) }} />
