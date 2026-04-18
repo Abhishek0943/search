@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, ActivityIndicator, FlatList, Image, Pressable } from 'react-native'
+import { View, Text, ScrollView, ActivityIndicator, FlatList, Image, Pressable, Alert, TouchableOpacity } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { NavigationBar } from '../../../components'
 import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions'
@@ -8,6 +8,33 @@ import { JobCandidates, PaymentHistoryApi } from '../../../reducer/recruiterRedu
 import { EmptyComp } from '../OpenJobs/OpenJobs'
 import { ThemeContext } from '../../../context/ThemeProvider'
 import imagePath from '../../../assets/imagePath'
+import RNFS from 'react-native-fs'
+
+const downloadInvoice = async (
+  invoiceUrl: string,
+  fileName: string,
+  setDownloadingId: (id: string | null) => void,
+  id: string,
+) => {
+  try {
+    setDownloadingId(id);
+    const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9.]/g, '_');
+    const destPath = `${RNFS.DownloadDirectoryPath}/${sanitizedFileName}`;
+    const result = await RNFS.downloadFile({
+      fromUrl: invoiceUrl,
+      toFile: destPath,
+    }).promise;
+    if (result.statusCode === 200) {
+      Alert.alert('Downloaded', 'Invoice saved to Downloads folder.');
+    } else {
+      Alert.alert('Error', 'Failed to download invoice.');
+    }
+  } catch (e) {
+    Alert.alert('Error', 'Something went wrong while downloading.');
+  } finally {
+    setDownloadingId(null);
+  }
+};
 
 const PaymentHistory = () => {
   const { colors } = useContext(ThemeContext);
@@ -15,6 +42,7 @@ const PaymentHistory = () => {
   const dispatch = useAppDispatch()
   const [cvs, setCvs] = useState([])
   const [loading, setLoading] = useState(true)
+  const [downloadingId, setDownloadingId] = useState<string | null>(null)
   const [meta, setMeta] = useState()
   const [pages, setPages] = useState(1)
   const onLoadMore = React.useCallback(() => {
@@ -27,6 +55,7 @@ const PaymentHistory = () => {
     dispatch(PaymentHistoryApi()).unwrap().then(res => {
       if (res.success !== false) {
         setCvs(res.data)
+        console.log(res.data)
       }
       setLoading(false)
     })
@@ -54,7 +83,7 @@ const PaymentHistory = () => {
               style={{ marginBottom: responsiveScreenHeight(2) }}
               keyExtractor={(item, index) => index.toString()}
               renderItem={({ item }) => (
-                <View style={{ marginVertical: 10, width: responsiveScreenWidth(90), backgroundColor: colors.lightGrayNatural, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(1.5), borderRadius: 10, position: "relative", gap:responsiveScreenHeight(2) }}>
+                <View style={{ marginVertical: 10, width: responsiveScreenWidth(90), backgroundColor: colors.lightGrayNatural, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(1.5), borderRadius: 10, position: "relative", gap: responsiveScreenHeight(2) }}>
                   <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                     <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "600" }}>Package Title</Text>
                     <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "400", color: colors.darkGrayNatural }}>{item?.package_title}</Text>
@@ -94,6 +123,28 @@ const PaymentHistory = () => {
                       <Text numberOfLines={1} style={{ textAlign: "center", color: colors.darkGray, fontSize: responsiveScreenFontSize(1.5), fontWeight: "500" }}>{item.location}</Text>
                     </View>
                   } */}
+
+                  {item?.invoice_url && (
+                    <TouchableOpacity
+                      disabled={!!downloadingId}
+                      onPress={() => downloadInvoice(
+                        item.invoice_url,
+                        `invoice_${item?.package_title ? `${item.package_title}_` : ''}${Date.now()}.pdf`,
+                        setDownloadingId,
+                        String(item?.id ?? item?.invoice_url),
+                      )}
+                      style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-end", gap: responsiveScreenWidth(1.5), backgroundColor: colors.primary, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(0.8), borderRadius: 8, opacity: downloadingId === String(item?.id ?? item?.invoice_url) ? 0.7 : 1 }}
+                    >
+                      {downloadingId === String(item?.id ?? item?.invoice_url) ? (
+                        <ActivityIndicator size={18} color="#fff" />
+                      ) : (
+                        <Image source={require('./downlod.png')} style={{ width: 18, height: 18, tintColor: '#fff' }} />
+                      )}
+                      <Text style={{ color: '#fff', fontSize: responsiveScreenFontSize(1.7), fontWeight: '600' }}>
+                        {downloadingId === String(item?.id ?? item?.invoice_url) ? 'Downloading...' : 'Download Invoice'}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
 
                 </View>
               )}

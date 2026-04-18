@@ -327,16 +327,37 @@ export function AutoHeightWebView({ html, margin = 10 }: { html: string, margin?
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <style>
+    @font-face {
+      font-family: '${Fonts.GilroyRegular}';
+      src: url('file:///android_asset/fonts/Gilroy-Regular.ttf') format('truetype');
+      font-weight: 400;
+    }
+    @font-face {
+      font-family: '${Fonts.GilroyMedium}';
+      src: url('file:///android_asset/fonts/Gilroy-Medium.ttf') format('truetype');
+      font-weight: 500;
+    }
+    @font-face {
+      font-family: '${Fonts.GilroyBold}';
+      src: url('file:///android_asset/fonts/Gilroy-Bold.ttf') format('truetype');
+      font-weight: 700;
+    }
+
     :root {
       --text: ${colors.textSecondary};
       --primary: ${colors.primary};
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
     body {
       margin: 0 ${margin}px;
       padding: 0;
-      font-family: '${Fonts.GilroyMedium}';
-      font-size: ${responsiveScreenFontSize(2)}px;
+      font-family: '${Fonts.GilroyRegular}';
+      font-size:  ${responsiveScreenFontSize(2)}vw;
       line-height: 1.6;
       color: var(--text);
       padding-bottom:10px;
@@ -344,15 +365,22 @@ export function AutoHeightWebView({ html, margin = 10 }: { html: string, margin?
       word-break: break-word;
     }
 
-    h1,h2,h3,h4,h5,h6 {
-      font-family: '${Fonts.GilroyBold}';
-      font-weight: 700;
-      margin: 12px 0 6px;
-    }
+    h1 { font-family: '${Fonts.GilroyBold}'; font-weight: 700; font-size: 5.6vw; margin: 12px 0 6px; }
+    h2 { font-family: '${Fonts.GilroyBold}'; font-weight: 700; font-size: 5.2vw; margin: 12px 0 6px; }
+    h3 { font-family: '${Fonts.GilroyBold}'; font-weight: 700; font-size: 4.8vw; margin: 12px 0 6px; }
+    h4 { font-family: '${Fonts.GilroyBold}'; font-weight: 700; font-size: 4.4vw; margin: 10px 0 4px; }
+    h5 { font-family: '${Fonts.GilroyBold}'; font-weight: 700; font-size: 4.2vw; margin: 8px 0 4px; }
+    h6 { font-family: '${Fonts.GilroyBold}'; font-weight: 700; font-size: 4.0vw; margin: 8px 0 4px; }
 
     p, span, div, li {
       font-family: '${Fonts.GilroyMedium}';
+      font-size:  ${4.5}vw;
       color: var(--text);
+    }
+
+    strong, b {
+      font-family: '${Fonts.GilroyBold}';
+      font-weight: 700;
     }
 
     a { color: var(--primary); text-decoration: none; }
@@ -387,6 +415,8 @@ export function AutoHeightWebView({ html, margin = 10 }: { html: string, margin?
             style={{ width: "100%", height, backgroundColor: "transparent" }}
             scrollEnabled={false}
             showsVerticalScrollIndicator={false}
+            allowFileAccess={true}
+            allowUniversalAccessFromFileURLs={true}
         />
     );
 }
