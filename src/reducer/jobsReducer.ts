@@ -45,7 +45,6 @@ export const UploadCV = createAsyncThunk<
 >(
   'UploadCV',
   (body) => {
-    console.log(body)
     return postApiCall<{ success: true, data: Job[] }>('/jobseekers/cv-save', body, { as: "form" });
   }
 );

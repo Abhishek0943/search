@@ -9,6 +9,7 @@ import { enableScreens } from 'react-native-screens';
 import { AlertProvider } from "./src/context/AlertContext";
 import { StripeProvider } from '@stripe/stripe-react-native'
 import { SocketProvider } from "./src/context/SocketProvider";
+import ErrorBoundary from "./src/components/ErrorBoundary";
 enableScreens(true);
 import Purchases, { LOG_LEVEL } from "react-native-purchases";
 import { Platform } from "react-native";
@@ -62,7 +63,6 @@ const AppContent: React.FC = React.memo(() => {
         }
         await initRevenueCat(null);
       } catch (e) {
-        console.log("RevenueCat init failed:", e);
       } finally {
         setReady(true);
       }
@@ -78,7 +78,6 @@ const AppContent: React.FC = React.memo(() => {
       const options: StartUpdateOptions = { updateType: IAUUpdateKind.IMMEDIATE };
       await inAppUpdates.startUpdate(options);
     } catch (e) {
-      console.log("In-app update error", e);
     }
   }, []);
 
@@ -111,19 +110,20 @@ const AppContent: React.FC = React.memo(() => {
   );
 });
 const App: React.FC = () => (
-  <Provider store={store}>
-    <StripeProvider
-      merchantIdentifier="merchant.com.searchtalent.app"
-      publishableKey="pk_live_51RYRHEKzQ210P9pldkRm88H5hzMQQuTDgU0Q2gON2YuTb5bVZkkoX0G9Mvizl2uYMxXmNTgIXALn8rRx2bOcQtZh002vm5EeQV">
-      <ThemeProvider key={1}>
-        <SocketProvider>
-          <AlertProvider>
-            <AppContent />
-          </AlertProvider>
-        </SocketProvider>
-      </ThemeProvider>
-    </StripeProvider>
-  </Provider>
+  <ErrorBoundary>
+    <Provider store={store}>
+      <StripeProvider
+        merchantIdentifier="merchant.com.searchtalent.app"
+        publishableKey="pk_live_51RYRHEKzQ210P9pldkRm88H5hzMQQuTDgU0Q2gON2YuTb5bVZkkoX0G9Mvizl2uYMxXmNTgIXALn8rRx2bOcQtZh002vm5EeQV">
+        <ThemeProvider key={1}>
+          <SocketProvider>
+            <AlertProvider>
+              <AppContent />
+            </AlertProvider>
+          </SocketProvider>
+        </ThemeProvider>
+      </StripeProvider>
+    </Provider>
+  </ErrorBoundary>
 );
-
 export default App;

@@ -16,12 +16,6 @@ const Contact = () => {
     const { showConfirm, showAlert } = useAlert();
 
     const handleSubmit = async () => {
-        console.log('Full Name:', fullName);
-        console.log('Email:', email);
-        console.log('Phone:', phone);
-        console.log('Subject:', subject);
-        console.log('Message:', message);
-
         const a = await showConfirm({
             title: "Submit Mail",
             message: "Are you sure you want to submit this mail?",
@@ -33,7 +27,6 @@ const Contact = () => {
 
             //                 } catch (error) {
             //                     // Handle any errors during the dispatch
-            //                     console.error(error);
             //                     showAlert({
             //                         title: "Error",
             //                         message: "There was an issue sending the mail.",
@@ -46,7 +39,6 @@ const Contact = () => {
             const res = await dispatch(
                 ContactT({ full_name: fullName, email, phone, subject, message_txt: message })
             ).unwrap();
-            console.log(res.success)
             showAlert({
                 title: res.success ? "Success" : "Error",
                 message: res.success ? "Mail sent successfully" : res.message,

@@ -23,7 +23,7 @@ import imagePath from '../../assets/imagePath';
 import { CustomDropdown, formatDate } from './PersonalInfo';
 import { useAppDispatch } from '../../store';
 import { GetCountry, GetState, GetCity, AddWorkExperience, UploadCV } from '../../reducer/jobsReducer';
-import { pick, types, keepLocalCopy,  } from '@react-native-documents/picker';
+import { pick, types, keepLocalCopy, } from '@react-native-documents/picker';
 // If you use react-native-date-picker
 import DatePicker from 'react-native-date-picker';
 import { Header } from '../Company/Company';
@@ -65,76 +65,69 @@ const EducationForm = () => {
             <Text style={{ color: colors.red, fontSize: responsiveScreenFontSize(1.8) }}> *</Text>
         </View>
     );
-const normalizeFileUri = (u?: string) => {
-  if (!u) return '';
-  if (u.startsWith('/')) return `file://${u}`;
-  return u;
-};
+    const normalizeFileUri = (u?: string) => {
+        if (!u) return '';
+        if (u.startsWith('/')) return `file://${u}`;
+        return u;
+    };
 
-const pickPdf = async () => {
-  try {
-    const [doc] = await pick({
-      type: [types.pdf],
-      allowMultiSelection: false,
-      mode: 'import',
-      copyTo: 'documentDirectory',   // ✅ important (not caches)
-    });
+    const pickPdf = async () => {
+        try {
+            const [doc] = await pick({
+                type: [types.pdf],
+                allowMultiSelection: false,
+                mode: 'import',
+                copyTo: 'documentDirectory',   // ✅ important (not caches)
+            });
 
-    const uri = normalizeFileUri(doc.fileCopyUri || doc.uri);  // ✅ prefer fileCopyUri
+            const uri = normalizeFileUri(doc.fileCopyUri || doc.uri);  // ✅ prefer fileCopyUri
 
-    setFormData(prev => ({
-      ...prev,
-      cvFile: {
-        uri,
-        name: doc.name ?? 'cv.pdf',
-        type: 'application/pdf',
-        size: doc.size,
-      },
-    }));
-  } catch (e) {
-    console.log('pickPdf error:', e);
-  }
-};
+            setFormData(prev => ({
+                ...prev,
+                cvFile: {
+                    uri,
+                    name: doc.name ?? 'cv.pdf',
+                    type: 'application/pdf',
+                    size: doc.size,
+                },
+            }));
+        } catch (e) {
+        }
+    };
 
 
-const onSubmit = () => {
-  if (!formData.cvTitle?.trim()) {
-    showAlert({ title: "CV Title Required", message: "Please enter a title for your CV." });
-    return;
-  }
+    const onSubmit = () => {
+        if (!formData.cvTitle?.trim()) {
+            showAlert({ title: "CV Title Required", message: "Please enter a title for your CV." });
+            return;
+        }
 
-  if (!formData.cvFile?.uri) {
-    showAlert({ title: "CV File Required", message: "Please select and upload your CV in PDF format." });
-    return;
-  }
+        if (!formData.cvFile?.uri) {
+            showAlert({ title: "CV File Required", message: "Please select and upload your CV in PDF format." });
+            return;
+        }
 
-  const uri = normalizeFileUri(formData.cvFile.uri);
+        const uri = normalizeFileUri(formData.cvFile.uri);
+        const fd = new FormData();
+        fd.append('title', formData.cvTitle.trim());
+        fd.append('is_default', formData.isDefault ? '1' : '0');
+        fd.append('cv_file', {
+            uri,
+            name: formData.cvFile.name || 'cv.pdf',
+            type: 'application/pdf',
+        } as any);
 
-  // Debug once on iOS to confirm it is file://...
-  console.log('Uploading CV uri:', uri);
-
-  const fd = new FormData();
-  fd.append('title', formData.cvTitle.trim());
-  fd.append('is_default', formData.isDefault ? '1' : '0');
-
-  fd.append('cv_file', {
-    uri,
-    name: formData.cvFile.name || 'cv.pdf',
-    type: 'application/pdf',
-  } as any);
-
-  setLoading(true);
-  dispatch(UploadCV(fd))
-    .unwrap()
-    .then(res => {
-      setLoading(false);
-      if (res.success) navigation.goBack();
-    })
-    .catch(err => {
-      setLoading(false);
-      console.log('UploadCV error:', err);
-    });
-};
+        setLoading(true);
+        dispatch(UploadCV(fd))
+            .unwrap()
+            .then(res => {
+                setLoading(false);
+                if (res.success) navigation.goBack();
+            })
+            .catch(err => {
+                setLoading(false);
+            });
+    };
 
     const inputStyle = {
         borderWidth: 1,

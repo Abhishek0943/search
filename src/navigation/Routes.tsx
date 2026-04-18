@@ -1,19 +1,23 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useAppSelector } from '../store';
 import { routes } from '../constants/values';
 import { AddJob, Apply, ApplyJob, Candidate, CandidateProfile, BlogPage, Chat, Company, CompanyDetails, CV, Education, ForgotPassword, Home, Jobdetail, Language, LanguageForm, Login, Messages, Notification, OpenJobs, PaymentHistory, PersonalInfo, Profile, Project, ProjectForm, RecentJob, RecruiterAccount, RecruiterHome, RecruiterProfile, Search, Signup, Skill, SkillAdd, Splash, SuggestedJob, Welcome, WelcomeTwo, WorkExperience, WorkExperienceForm } from '../pages';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import EducationForm from '../pages/PersonalInfo/EducationForm';
 import CVAdd from '../pages/PersonalInfo/CVAdd';
 import Contact from '../pages/PersonalInfo/Contact';
 import Blog from '../pages/Blog';
+import { logScreen } from '../utils/analytics';
 
 const Stack = createNativeStackNavigator();
 const Routes = () => {
   const { isAuth, user } = useAppSelector(state => state.userStore);
   const [role, setRole] = useState<"seeker" | "recruiter">()
+  const navigationRef = useRef<NavigationContainerRef<any>>(null);
+  const routeNameRef = useRef<string | undefined>();
+
   useEffect(() => {
     const set = async () => {
       const a = await AsyncStorage.getItem("role") as "seeker" | "recruiter"
@@ -50,8 +54,26 @@ const Routes = () => {
       },
     },
   };
+  const onReady = () => {
+    routeNameRef.current = navigationRef.current?.getCurrentRoute()?.name;
+  };
+
+  const onStateChange = async () => {
+    const previousRoute = routeNameRef.current;
+    const currentRoute = navigationRef.current?.getCurrentRoute()?.name;
+    if (currentRoute && currentRoute !== previousRoute) {
+      await logScreen(currentRoute);
+    }
+    routeNameRef.current = currentRoute;
+  };
+
   return (
-    <NavigationContainer linking={linking}>
+    <NavigationContainer
+      ref={navigationRef}
+      linking={linking}
+      onReady={onReady}
+      onStateChange={onStateChange}
+    >
       <Stack.Navigator>
         <Stack.Screen name={routes.SPLASH} component={Splash} options={{ headerShown: false }} />
         {

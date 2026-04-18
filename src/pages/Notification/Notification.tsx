@@ -48,7 +48,6 @@ const Notification = () => {
         .then(res => {
           if (res.success !== false) {
             setCvs(res.data.notifications);
-            console.log(res.data.notifications, "ok")
           }
           setLoading(false)
         });
@@ -59,14 +58,11 @@ const Notification = () => {
     try {
       const canOpen = await Linking.canOpenURL(url);
       if (canOpen) {
-        console.log(`Opening URL: ${url}`);
         Linking.openURL(url)
-          .catch(err => console.error("Failed to open URL:", err));
+          .catch(err => { });
       } else {
-        console.log(`Can't open URL: ${url}`);
       }
     } catch (error: any) {
-      console.error("Failed to open URL:", error.message);
     }
   };
   return (

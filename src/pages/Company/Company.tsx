@@ -77,7 +77,6 @@ const Company = () => {
     }
     else {
       dispatch(GetCompanies({ pages })).unwrap().then((res) => {
-        console.log(res.data.companies)
         setMeta(res.data.meta);
         if (res.data.meta.current_page === 1) {
           setJob(res.data.companies);

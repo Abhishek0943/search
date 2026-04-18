@@ -65,7 +65,6 @@ const EditProfileScreen = () => {
     },
     onError: async (error: any) => {
       setLoading(false);
-      console.error('Update Error:===>', error);
       showError(error?.message);
     },
   });

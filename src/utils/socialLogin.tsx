@@ -58,7 +58,6 @@ export const googleLogin = async (): Promise<GoogleUser | ErrorWithCode> => {
 //       }
 //     },
 //     (error: any) => {
-//       console.error('Facebook login error:', error);
 //     }
 //   );
 // };

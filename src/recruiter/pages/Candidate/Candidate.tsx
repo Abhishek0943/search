@@ -35,8 +35,6 @@ const Candidate = () => {
         setLoading(true)
         dispatch(JobCandidates({ pages, job_id: jobId, status: a[active] })).unwrap().then(res => {
           if (res.success !== false) {
-            console.log("cvs cvs", res)
-
             if (cvs?.meta?.current_page > 1) {
               setCvs([...cvs, ...res.data?.applications])
             } else {

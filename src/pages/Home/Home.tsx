@@ -204,7 +204,6 @@ function Home() {
                   </View>
                   <FlatList showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false} horizontal data={suggested} renderItem={({ item, index }) => {
                     const isApplied = appliedJobIds.includes(item.id)
-                    console.log(!item?.is_applied, !isApplied, !item?.is_applied || !isApplied)
                     return (
                       <>
                         <View style={{ borderWidth: 1, borderColor: colors.gray, paddingVertical: responsiveScreenHeight(1.5), paddingHorizontal: responsiveScreenWidth(3), width: responsiveScreenWidth(75), backgroundColor: colors.white, margin: 10, borderRadius: 15 }}>

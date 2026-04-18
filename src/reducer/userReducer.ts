@@ -106,7 +106,6 @@ export const userSlice = createSlice({
         }
       })
       .addCase(RecruiterProfile.fulfilled, (state, { payload }) => {
-        console.log(payload)
         if (payload.success) {
           state.user = payload.data;
         }

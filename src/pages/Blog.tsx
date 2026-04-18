@@ -131,14 +131,10 @@ export const ArticleCard = ({ post, onEdit, onDelete }: { post: any, onEdit?: (p
         try {
             const canOpen = await Linking.canOpenURL(url);
             if (canOpen) {
-                console.log(`Opening URL: ${url}`);
                 Linking.openURL(url)
-                    .catch(err => console.error("Failed to open URL:", err));
-            } else {
-                console.log(`Can't open URL: ${url}`);
+                    .catch(err => { });
             }
         } catch (error: any) {
-            console.error("Failed to open URL:", error.message);
         }
     };
 

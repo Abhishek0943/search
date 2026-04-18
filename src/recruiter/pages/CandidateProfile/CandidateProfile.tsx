@@ -511,7 +511,6 @@ export async function downloadCV(cv: string) {
       Alert.alert("Download failed");
     }
   } catch (err) {
-    console.error("Download error:", err);
     Alert.alert("Error downloading file");
   }
 }

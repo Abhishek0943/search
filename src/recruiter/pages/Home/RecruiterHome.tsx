@@ -60,7 +60,6 @@ function RecruiterHome() {
                     message: 'Successfully Purchased Plan. If your plan is not updated, please restart the app. and make sure your app notification is enabled.',
                 })
             } catch (e: any) {
-                console.log('RC purchase error', e?.message ?? e)
             }
         } finally {
             setIsSelecting(false);
@@ -198,9 +197,7 @@ function RecruiterHome() {
             if (!user?.id) return;
             await AsyncStorage.removeItem("FCM");
             const existing = await AsyncStorage.getItem("FCM");
-            console.log("FCM cached:", existing);
             if (existing) {
-                console.log("FCM cached:", existing);
                 return;
             }
             const fcm = await getFCMToken();

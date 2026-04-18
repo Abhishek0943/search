@@ -17,13 +17,11 @@ export const fetchPlaceSuggestions = async (
     const data = await response.json();
 
     if (!data.features) {
-      console.warn('⚠️ Mapbox Autocomplete returned no features');
       return [];
     }
 
     return data.features; // Array of places
   } catch (error) {
-    console.error('❌ Error fetching Mapbox suggestions:', error);
     return [];
   }
 };
@@ -46,13 +44,11 @@ export const fetchPlaceDetails = async (
     const data = await response.json();
 
     if (!data.features || data.features.length === 0) {
-      console.warn('⚠️ Mapbox Place Details returned no data');
       return null;
     }
 
     return data.features[0]; // Only one result
   } catch (error) {
-    console.error('❌ Error fetching Mapbox place details:', error);
     return null;
   }
 };

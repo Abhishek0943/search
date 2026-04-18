@@ -19,7 +19,6 @@ const BlogPage = () => {
     const userType = route.params?.user_type || 'user'
     const dispatch = useAppDispatch()
     const { user } = useAppSelector(state => state.userStore)
-    console.log(user, "user")
     const { colors } = useContext(ThemeContext)
     const [loading, setLoading] = useState(false)
     const [blogsLoading, setBlogsLoading] = useState(false)
@@ -37,12 +36,11 @@ const BlogPage = () => {
         setLoading(true)
         try {
             const res = await dispatch(CreatorRequest()).unwrap()
-            console.log(res, "res")
             if (res.success) {
                 if (userType === 'user') {
-                    await dispatch(ProfileData()).unwrap().then((res) => console.log(res, "res"))
+                    await dispatch(ProfileData())
                 } else {
-                    await dispatch(RecruiterProfile()).unwrap().then((res) => console.log(res, "res"))
+                    await dispatch(RecruiterProfile())
                 }
                 Alert.alert("Success", res.message || "Request sent successfully!")
             } else {
@@ -80,7 +78,6 @@ const BlogPage = () => {
                 setHasMore(newBlogs.length > 0 && res.data.meta?.current_page < res.data.meta?.last_page)
             }
         } catch (error) {
-            console.log("Error fetching blogs:", error)
         } finally {
             setBlogsLoading(false)
         }
@@ -102,7 +99,6 @@ const BlogPage = () => {
     }
 
     const renderContent = () => {
-        console.log(creatorData, "creatorData")
         switch (creatorData) {
             case 'pending':
                 return <PendingCreatorView />
@@ -119,7 +115,6 @@ const BlogPage = () => {
                         hasMore={hasMore}
                         onLoadMore={loadMore}
                         onDeleteSuccess={(id) => {
-                            console.log(id, blogIds, "id")
                             setBlogIds(prev => prev.filter(blogId => blogId !== id))
                             setAllData((prev: any) => ({
                                 ...prev,

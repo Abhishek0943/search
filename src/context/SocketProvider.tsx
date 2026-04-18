@@ -38,27 +38,12 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 setIsConnected(true);
             });
 
-            newSocket.on("connect_error", (error) => {
-                // console.error("❌ connect_error");
-                // console.error("Message:", error.message);
-                // console.error("Name:", error.name);
-                // console.error("Stack:", error.stack);
-            });
 
-            newSocket.on("error", (error) => {
-                console.error("❌ socket error:", error);
-            });
 
-            newSocket.on("disconnect", (reason) => {
-                console.warn("⚠️ Socket disconnected:", reason);
-            });
 
-            newSocket.on("reconnect_attempt", (attempt) => {
-            });
 
-            newSocket.on("reconnect_failed", () => {
-                console.error("❌ Reconnection failed");
-            });
+
+
             setSocket(newSocket);
         }
         a()

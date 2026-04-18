@@ -27,10 +27,8 @@ const CompanyDetails = () => {
     useEffect(() => {
         if (!id) return
         dispatch(GetCompany({ id })).unwrap().then((res) => {
-            console.log(res.data)
             if (res.success) {
                 setJob(res.data)
-                console.log(res.data)
             }
             setLoading(false)
         })

@@ -62,12 +62,10 @@ const WelcomeTwo = () => {
     try {
       const canOpen = await Linking.canOpenURL(url);
       if (canOpen) {
-        Linking.openURL(url).catch(err => console.error("Failed to open URL:", err));
+        Linking.openURL(url).catch(err => { });
       } else {
-        console.log(`Can't open URL: ${url}`);
       }
     } catch (error: any) {
-      console.error("Failed to open URL:", error.message);
     }
   };
 

@@ -55,7 +55,6 @@ const PaymentHistory = () => {
     dispatch(PaymentHistoryApi()).unwrap().then(res => {
       if (res.success !== false) {
         setCvs(res.data)
-        console.log(res.data)
       }
       setLoading(false)
     })

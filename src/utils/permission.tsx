@@ -19,7 +19,7 @@ export const requestLocationPermission = async (): Promise<boolean> => {
   if (result === RESULTS.GRANTED) return true;
 
   if (result === RESULTS.BLOCKED) {
-    openSettings().catch(() => console.warn('Cannot open settings'));
+    openSettings().catch(() => { });
     return false;
   }
 

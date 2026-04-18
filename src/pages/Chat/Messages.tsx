@@ -126,10 +126,10 @@ const Messages = () => {
     const [sending, setSending] = useState(false);
 
     const onSend = async () => {
-        if (sending) return;            
+        if (sending) return;
         const a = (comment || "").trim();
-        
-        if (!a && !document?.cvFile?.name) return; 
+
+        if (!a && !document?.cvFile?.name) return;
         setSending(true);
         try {
             setComment("");
@@ -176,7 +176,7 @@ const Messages = () => {
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
-                keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0} 
+                keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
             >
                 <View style={{ paddingHorizontal: responsiveScreenWidth(5), flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(3), paddingBottom: responsiveScreenHeight(1) }}>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -204,20 +204,19 @@ const Messages = () => {
                                 <>
                                     {
                                         item.messages && [...item.messages].reverse().map((e) => {
-                                            console.log(e)
                                             if (role === "recruiter") {
                                                 return (
                                                     <>
                                                         {e.message && <Text style={{ backgroundColor: e.type === "reply" ? colors.primary : colors.lightGray, maxWidth: responsiveScreenWidth(70), alignSelf: e.type === "reply" ? "flex-end" : "flex-start", color: e.type === "reply" ? colors.white : colors.darkGray, paddingHorizontal: responsiveScreenWidth(4), paddingVertical: responsiveScreenHeight(1.3), borderTopRightRadius: e.type === "reply" ? 0 : 20, borderTopLeftRadius: e.type === "reply" ? 20 : 0, borderRadius: 20, fontSize: responsiveScreenFontSize(1.8), }}>{e.message}</Text>}
                                                         {
                                                             e.attachment_type === "file" &&
-                                                            <Pressable onPress={()=>downloadCV(e.url)} style={{ alignSelf: e.type === "reply" ? "flex-end" : "flex-start", borderRadius: 16, marginVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), paddingVertical: responsiveScreenHeight(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.lightGrayNatural, maxWidth: responsiveScreenWidth(70) }}>
+                                                            <Pressable onPress={() => downloadCV(e.url)} style={{ alignSelf: e.type === "reply" ? "flex-end" : "flex-start", borderRadius: 16, marginVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), paddingVertical: responsiveScreenHeight(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.lightGrayNatural, maxWidth: responsiveScreenWidth(70) }}>
                                                                 <Icon icon={{ type: "Ionicons", name: "document-outline" }} /> <Text>{e.name}</Text>
                                                             </Pressable>
                                                         }
                                                         {
                                                             e.attachment_type === "image" &&
-                                                            <Pressable onPress={()=>downloadCV(e.url)} style={{ overflow: "hidden", alignSelf: e.type === "reply" ? "flex-end" : "flex-start", borderRadius: 16, marginVertical: responsiveScreenHeight(.5), }}>
+                                                            <Pressable onPress={() => downloadCV(e.url)} style={{ overflow: "hidden", alignSelf: e.type === "reply" ? "flex-end" : "flex-start", borderRadius: 16, marginVertical: responsiveScreenHeight(.5), }}>
                                                                 <Image source={{ uri: e.url }} style={{ height: responsiveScreenWidth(50), aspectRatio: 1 }} />
                                                             </Pressable>
                                                         }
@@ -231,13 +230,13 @@ const Messages = () => {
                                                     {e.message && <Text style={{ backgroundColor: e.type !== "reply" ? colors.primary : colors.lightGray, maxWidth: responsiveScreenWidth(70), alignSelf: e.type !== "reply" ? "flex-end" : "flex-start", color: e.type !== "reply" ? colors.white : colors.darkGray, paddingHorizontal: responsiveScreenWidth(4), paddingVertical: responsiveScreenHeight(1.3), borderTopRightRadius: e.type !== "reply" ? 0 : 20, borderTopLeftRadius: e.type !== "reply" ? 20 : 0, borderRadius: 20, fontSize: responsiveScreenFontSize(1.8), }}>{e.message}</Text>}
                                                     {
                                                         e.attachment_type === "file" &&
-                                                        <Pressable onPress={()=>downloadCV(e.url)} style={{ alignSelf: e.type !== "reply" ? "flex-end" : "flex-start", borderRadius: 16, marginVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), paddingVertical: responsiveScreenHeight(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.lightGrayNatural, maxWidth: responsiveScreenWidth(70) }}>
+                                                        <Pressable onPress={() => downloadCV(e.url)} style={{ alignSelf: e.type !== "reply" ? "flex-end" : "flex-start", borderRadius: 16, marginVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), paddingVertical: responsiveScreenHeight(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.lightGrayNatural, maxWidth: responsiveScreenWidth(70) }}>
                                                             <Icon icon={{ type: "Ionicons", name: "document-outline" }} /> <Text>{e.name}</Text>
                                                         </Pressable>
                                                     }
                                                     {
                                                         e.attachment_type === "image" &&
-                                                        <Pressable onPress={()=>downloadCV(e.url)} style={{ overflow: "hidden", alignSelf: e.type !== "reply" ? "flex-end" : "flex-start", borderRadius: 16, marginVertical: responsiveScreenHeight(.5), }}>
+                                                        <Pressable onPress={() => downloadCV(e.url)} style={{ overflow: "hidden", alignSelf: e.type !== "reply" ? "flex-end" : "flex-start", borderRadius: 16, marginVertical: responsiveScreenHeight(.5), }}>
                                                             <Image source={{ uri: e.url }} style={{ height: responsiveScreenWidth(50), aspectRatio: 1 }} />
                                                         </Pressable>
                                                     }
@@ -331,7 +330,6 @@ const Messages = () => {
                                 dispatch(UploadDocument(fd))
                                     .unwrap()
                                     .then(res => {
-                                        console.log(res.success)
                                         if (res.success) {
                                             setDocument((prev) => ({ ...prev, ...res.data }))
                                         }
@@ -366,13 +364,11 @@ const Messages = () => {
                                     dispatch(UploadDocument(fd))
                                         .unwrap()
                                         .then(res => {
-                                            console.log("okk", res)
                                             if (res.success) {
                                                 setDocument((prev) => ({ ...prev, ...res.data }))
                                             }
                                         })
                                         .catch(err => {
-                                            console.log(err)
                                         });
                                 }}
 

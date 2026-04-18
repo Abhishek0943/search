@@ -209,7 +209,6 @@ const AddJob = () => {
             .unwrap()
             .then(res => {
                 if (res?.success) setDegrees(res.data || []);
-                console.log(res.data, "degrees")
             })
             .catch(() => { });
         dispatch(Experiences())

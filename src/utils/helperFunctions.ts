@@ -33,7 +33,6 @@ const requestCameraPermission = async () => {
     }
     return true; // iOS automatically handles permissions
   } catch (err) {
-    console.warn(err);
     return false;
   }
 };
@@ -74,4 +73,4 @@ The first six values (the red, green, and blue ones) stay the exact same. The on
 }
 
 
-export { showError, showSuccess ,requestCameraPermission};
+export { showError, showSuccess, requestCameraPermission };
