@@ -12,12 +12,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import RNRestart from 'react-native-restart';
 import { useAlert } from '../../../context/AlertContext'
 import { DeleteRecruter } from '../../../reducer/jobsReducer'
+import messaging from '@react-native-firebase/messaging';
+import { clearAnalyticsUser } from '../../../utils/analytics';
 
 const logoutUser = async () => {
     try {
+        await messaging().deleteToken();
+        await clearAnalyticsUser();
         await AsyncStorage.multiRemove([
             'token',
             'role',
+            'FCM'
         ]);
     } catch (e) {
     }

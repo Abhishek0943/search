@@ -39,7 +39,6 @@ function Home() {
         dispatch(Tokien({ device_token: FCM, device_type: Platform.OS, auth_type: a === "recruiter" ? "company" : "user", auth_id: user?.id }))
       }
       set()
-
     }, [user?.id])
   )
   useFocusEffect(useCallback(

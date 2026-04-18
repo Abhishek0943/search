@@ -1,7 +1,8 @@
 import { View, ScrollView, Image, TouchableOpacity, ImageBackground, ActivityIndicator, Alert, RefreshControl } from 'react-native'
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import RNRestart from 'react-native-restart';
-
+import messaging from '@react-native-firebase/messaging';
+import { clearAnalyticsUser } from '../../utils/analytics';
 import { routes } from '../../constants/values'
 import { NavigationBar } from '../../components'
 import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions'
@@ -17,9 +18,12 @@ import ImagePicker from 'react-native-image-crop-picker';
 import { useAlert } from '../../context/AlertContext';
 const logoutUser = async () => {
     try {
+        await messaging().deleteToken();
+        await clearAnalyticsUser();
         await AsyncStorage.multiRemove([
             'token',
             'role',
+            'FCM'
         ]);
     } catch (e) {
     }
