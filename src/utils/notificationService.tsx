@@ -78,7 +78,7 @@ export const getFCMToken = async (): Promise<string | null> => {
   }
 };
 
-export const onDisplayNotification = async (title: string, body: string, imageUrl?: string) => {
+export const onDisplayNotification = async (title: string, body: string, imageUrl?: string, data?: Record<string, string | number | object>) => {
   await notifee.requestPermission();
   const channelId = await notifee.createChannel({
     id: 'default',
@@ -90,6 +90,7 @@ export const onDisplayNotification = async (title: string, body: string, imageUr
   await notifee.displayNotification({
     title,
     body,
+    data,
     android: {
       channelId,
       style: {

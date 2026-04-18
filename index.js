@@ -14,7 +14,7 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
   const imageUrl = remoteMessage.notification?.android?.imageUrl || remoteMessage.data?.imageUrl || remoteMessage.data?.image;
 
   if (title && body && !remoteMessage.notification) {
-    await onDisplayNotification(title, body, imageUrl);
+    await onDisplayNotification(title, body, imageUrl as string, remoteMessage.data);
   }
 });
 

@@ -57,7 +57,7 @@ const WrapperContainer: React.FC<WrapperContainerProps> = ({
           const { title, body } = remoteMessage.notification || {}
           const imageUrl = remoteMessage.notification?.android?.imageUrl || remoteMessage.data?.imageUrl || remoteMessage.data?.image;
           if (title && body) {
-            onDisplayNotification(title, body, imageUrl as string)
+            onDisplayNotification(title, body, imageUrl as string, remoteMessage.data)
           }
           dispatch(
             setMessageCount({

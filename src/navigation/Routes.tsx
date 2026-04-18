@@ -10,6 +10,9 @@ import CVAdd from '../pages/PersonalInfo/CVAdd';
 import Contact from '../pages/PersonalInfo/Contact';
 import Blog from '../pages/Blog';
 import { logScreen } from '../utils/analytics';
+import messaging from '@react-native-firebase/messaging';
+import notifee, { EventType } from '@notifee/react-native';
+import { Linking } from 'react-native';
 
 const Stack = createNativeStackNavigator();
 const Routes = () => {
@@ -25,6 +28,68 @@ const Routes = () => {
     }
     set()
   }, [])
+
+  const handleNotificationNavigation = async (data: any) => {
+    // if (!data) {
+    navigationRef.current?.navigate(routes.NOTIFICATION as never);
+    // return;
+    // }
+
+    // const { type, redirect, job_id, application_id } = data;
+    // const currentRole = await AsyncStorage.getItem("role");
+
+    // if (type === "blog_rejected" || type === "blog_published" || type === "blog_approved") {
+    //   if (redirect) {
+    //     try {
+    //       const canOpen = await Linking.canOpenURL(redirect);
+    //       if (canOpen) Linking.openURL(redirect).catch(() => { });
+    //     } catch (e) { }
+    //   } else {
+    //     navigationRef.current?.navigate(routes.NOTIFICATION as never);
+    //   }
+    // } else if (job_id) {
+    //   if (currentRole === "seeker") {
+    //     navigationRef.current?.navigate(routes.JOBDETAIL as never, { id: Number(job_id) } as never);
+    //   } else {
+    //     navigationRef.current?.navigate(routes.NOTIFICATION as never);
+    //   }
+    // } else if (application_id) {
+    //   if (currentRole === "recruiter") {
+    //     navigationRef.current?.navigate(routes.CANDIDATEPROFILE as never, { application_id: Number(application_id) } as never);
+    //   } else {
+    //     navigationRef.current?.navigate(routes.NOTIFICATION as never);
+    //   }
+    // } else if (data.chat_id || type === 'chat') {
+    //   navigationRef.current?.navigate(routes.MESSAGE as never);
+    // } else {
+    //   navigationRef.current?.navigate(routes.NOTIFICATION as never);
+    // }
+  };
+
+  useEffect(() => {
+    const unsubscribeFCM = messaging().onNotificationOpenedApp(remoteMessage => {
+      handleNotificationNavigation(remoteMessage?.data);
+    });
+
+    messaging().getInitialNotification().then(remoteMessage => {
+      if (remoteMessage) {
+        setTimeout(() => {
+          handleNotificationNavigation(remoteMessage?.data);
+        }, 1000); // Give navigation router time to mount
+      }
+    });
+
+    const unsubscribeNotifee = notifee.onForegroundEvent(({ type, detail }) => {
+      if (type === EventType.PRESS) {
+        handleNotificationNavigation(detail.notification?.data);
+      }
+    });
+
+    return () => {
+      unsubscribeFCM();
+      unsubscribeNotifee();
+    };
+  }, []);
   const linking = {
     prefixes: [
       "searchtalents.co/app",
