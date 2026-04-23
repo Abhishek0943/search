@@ -11,6 +11,8 @@ export const logScreen = async (screenName: string): Promise<void> => {
       screen_name: screenName,
       screen_class: screenName,
     });
+
+
   } catch (e) {
     // silently ignore — analytics should never crash the app
   }

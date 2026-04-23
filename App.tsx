@@ -18,6 +18,7 @@ import SpInAppUpdates, {
   StartUpdateOptions,
   IAUInstallStatus,
 } from "sp-react-native-in-app-updates";
+import Text from "./src/components/Text";
 
 let configured = false;
 const inAppUpdates = new SpInAppUpdates(false);
@@ -58,10 +59,9 @@ const AppContent: React.FC = React.memo(() => {
   useEffect(() => {
     (async () => {
       try {
-        if (Platform.OS !== "ios") {
-          return;
+        if (Platform.OS === "ios") {
+          await initRevenueCat(null);
         }
-        await initRevenueCat(null);
       } catch (e) {
       } finally {
         setReady(true);
