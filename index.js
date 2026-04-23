@@ -14,8 +14,8 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
   const imageUrl = remoteMessage.notification?.android?.imageUrl || remoteMessage.data?.imageUrl || remoteMessage.data?.image;
 
   if (title && body && !remoteMessage.notification) {
-    await onDisplayNotification(title, body, imageUrl as string, remoteMessage.data);
+    await onDisplayNotification(title, body, imageUrl, remoteMessage.data);
   }
 });
 
-AppRegistry.registerComponent(appName, () => App);
+AppRegistry.registerComponent("SearchTalent", () => App);

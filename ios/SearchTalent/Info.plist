@@ -33,8 +33,14 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>This app uses the camera to capture photos and videos for your profile.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need permission to access your photo library to let you share photos and videos.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>We need permission to save images to your photo library when required.</string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UIAppFonts</key>
@@ -48,14 +54,19 @@
 		<string>EvilIcons.ttf</string>
 		<string>Feather.ttf</string>
 		<string>FontAwesome.ttf</string>
-		<string>FontAwesome5.ttf</string>
-		<string>FontAwesome6.ttf</string>
+		<string>FontAwesome5_Brands.ttf</string>
+		<string>FontAwesome5_Regular.ttf</string>
+		<string>FontAwesome5_Solid.ttf</string>
+		<string>FontAwesome6_Brands.ttf</string>
+		<string>FontAwesome6_Regular.ttf</string>
+		<string>FontAwesome6_Solid.ttf</string>
 		<string>Fontisto.ttf</string>
 		<string>Ionicons.ttf</string>
 		<string>Lucide.ttf</string>
 		<string>MaterialDesignIcons.ttf</string>
 		<string>MaterialIcons.ttf</string>
 		<string>Octicons.ttf</string>
+		<string>AntDesign.ttf</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
@@ -63,14 +74,6 @@
 	<array>
 		<string>arm64</string>
 	</array>
-	<key>NSCameraUsageDescription</key>
-<string>We need camera access to allow users to upload profile photos and documents.</string>
-
-<key>NSPhotoLibraryUsageDescription</key>
-<string>We need photo library access to let users select images and documents.</string>
-
-<key>NSPhotoLibraryAddUsageDescription</key>
-<string>We need permission to save images to your photo library when required.</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
@@ -83,5 +86,22 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UISceneConfigurations</key>
+		<dict>
+			<key>UIWindowSceneSessionRoleApplication</key>
+			<array>
+				<dict>
+					<key>UISceneConfigurationName</key>
+					<string>Default Configuration</string>
+					<key>UISceneDelegateClassName</key>
+					<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
 </dict>
 </plist>

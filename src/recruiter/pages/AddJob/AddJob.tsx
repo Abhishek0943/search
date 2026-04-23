@@ -141,7 +141,6 @@ const AddJob = () => {
     };
 
     useEffect(() => {
-        // ✅ Working APIs from your code
         dispatch(GetSkills())
             .unwrap()
             .then(res => {

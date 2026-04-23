@@ -1,4 +1,7 @@
 {
   "name": "SearchTalent",
-  "displayName": "SearchTalents"
+  "displayName": "SearchTalents",
+  "ios": {
+    "deploymentTarget": "15.0"
+  }
 }

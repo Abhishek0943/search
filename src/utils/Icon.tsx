@@ -9,8 +9,8 @@ import { Lucide, LucideIconName } from "@react-native-vector-icons/lucide"
 import { Feather, FeatherIconName } from "@react-native-vector-icons/feather"
 import { Octicons, OcticonsIconName } from "@react-native-vector-icons/octicons"
 import { MaterialDesignIcons, MaterialDesignIconsIconName } from "@react-native-vector-icons/material-design-icons"
-import { FontAwesome5, FontAwesome5IconName, FontAwesome5RegularIconName } from "@react-native-vector-icons/fontawesome5"
-import { Entypo, EntypoIconName} from "@react-native-vector-icons/entypo"
+import { FontAwesome5, FontAwesome5RegularIconName } from "@react-native-vector-icons/fontawesome5"
+import { Entypo, EntypoIconName } from "@react-native-vector-icons/entypo"
 import LinearGradient from 'react-native-linear-gradient';
 import MaskedView from '@react-native-masked-view/masked-view';
 export type IconLibrary =
@@ -74,7 +74,7 @@ const Icon: React.FC<IconProps> = ({
             return <FontAwesome5 name={icon.name} size={size} onPress={onPress} style={[{ color: colors.textPrimary }, style]} />;
         case 'Entypo':
             return <Entypo name={icon.name} size={size} onPress={onPress} style={[{ color: colors.textPrimary }, style]} />;
-        
+
         default:
             return null;
     }

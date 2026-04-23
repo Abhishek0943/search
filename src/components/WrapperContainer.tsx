@@ -52,12 +52,11 @@ const WrapperContainer: React.FC<WrapperContainerProps> = ({
           const authStatus = await messaging().requestPermission();
           // optional: you can check authStatus if you want
         }
-
         unsubscribe = messaging().onMessage(async remoteMessage => {
           const { title, body } = remoteMessage.notification || {}
           const imageUrl = remoteMessage.notification?.android?.imageUrl || remoteMessage.data?.imageUrl || remoteMessage.data?.image;
           if (title && body) {
-            onDisplayNotification(title, body, imageUrl as string, remoteMessage.data)
+            onDisplayNotification(title, body, imageUrl, remoteMessage.data)
           }
           dispatch(
             setMessageCount({

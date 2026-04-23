@@ -14,6 +14,7 @@
 		3A1B1BF0F4134AB8B1468C27 /* Gilroy-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F75A7D7E93C74780BFE9F781 /* Gilroy-Regular.ttf */; };
 		576122552F28AA23005A9223 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 576122542F28AA23005A9223 /* StoreKit.framework */; };
 		57DFADCF2F20EE1400CEC2F6 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 57DFADCE2F20EE1400CEC2F6 /* GoogleService-Info.plist */; };
+		57E659662F9A278400CFCDEB /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57E659652F9A278400CFCDEB /* SceneDelegate.swift */; };
 		5AE26633790043EC9BD18B78 /* Gilroy-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4AB3AA562E1846B9B0E9DD0C /* Gilroy-Medium.ttf */; };
 		6A8B6E9C08564A8A87848472 /* Gilroy-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1D714AA16EE54F00BFCDF08E /* Gilroy-Light.ttf */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
@@ -35,6 +36,7 @@
 		576122542F28AA23005A9223 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		57DFADCD2F20EB0400CEC2F6 /* SearchTalent.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = SearchTalent.entitlements; path = SearchTalent/SearchTalent.entitlements; sourceTree = "<group>"; };
 		57DFADCE2F20EE1400CEC2F6 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		57E659652F9A278400CFCDEB /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-SearchTalent.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SearchTalent.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = SearchTalent/AppDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = SearchTalent/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -59,6 +61,7 @@
 			isa = PBXGroup;
 			children = (
 				57DFADCD2F20EB0400CEC2F6 /* SearchTalent.entitlements */,
+				57E659652F9A278400CFCDEB /* SceneDelegate.swift */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				761780EC2CA45674006654EE /* AppDelegate.swift */,
 				57DFADCE2F20EE1400CEC2F6 /* GoogleService-Info.plist */,
@@ -299,6 +302,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				761780ED2CA45674006654EE /* AppDelegate.swift in Sources */,
+				57E659662F9A278400CFCDEB /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -324,7 +328,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3;
+				MARKETING_VERSION = 4;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -356,7 +360,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3;
+				MARKETING_VERSION = 4;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
