@@ -86,7 +86,6 @@ export const onDisplayNotification = async (title: string, body: string, imageUr
     importance: AndroidImportance.DEFAULT,
   });
 
-  const finalImageUrl = imageUrl || "https://picsum.photos/200";
   await notifee.displayNotification({
     title,
     body,
@@ -95,7 +94,7 @@ export const onDisplayNotification = async (title: string, body: string, imageUr
       channelId,
       style: {
         type: AndroidStyle.BIGPICTURE,
-        picture: finalImageUrl,
+        picture: imageUrl || "",
       },
       pressAction: {
         id: 'default',

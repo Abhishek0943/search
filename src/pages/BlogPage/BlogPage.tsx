@@ -1,6 +1,8 @@
 import { ScrollView, StyleSheet, View, TouchableOpacity, Alert, ActivityIndicator, Linking, RefreshControl } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
-import { useRoute } from '@react-navigation/native'
+import { useNavigation, useRoute } from '@react-navigation/native'
+import { routes } from '../../constants/values'
+
 import { ArticleCard } from '../Blog'
 import { useAppDispatch, useAppSelector } from '../../store'
 import { NavigationBar } from '../../components'

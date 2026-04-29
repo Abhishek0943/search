@@ -8,13 +8,14 @@ import { getApiCall } from '../api'
 import { useAppDispatch } from '../store'
 import Text from '../components/Text'
 import { routes } from '../constants/values'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useNavigation } from '@react-navigation/native'
+
+import RNavigationBar from '../recruiter/components/NavigationBar'
 
 const Blog = () => {
     const { colors } = useContext(ThemeContext);
     const [data, setData] = useState<any[]>([]);
-    const dispatch = useAppDispatch();
-
-    const [savedTopics, setSavedTopics] = useState<Record<number, boolean>>({});
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
@@ -61,64 +62,80 @@ const Blog = () => {
     useEffect(() => {
         loadMore(true);
     }, []);
-
-
-    return (
-        <NavigationBar name={routes.BLOG}>
-            <View style={{ flex: 1, }}>
-                <View
+    const [role, setRole] = useState<"seeker" | "recruiter">()
+    useEffect(() => {
+        const set = async () => {
+            const a = await AsyncStorage.getItem("role") as "seeker" | "recruiter"
+            setRole(a)
+        }
+        set()
+    }, [])
+    const element = () => {
+        return <View style={{ flex: 1, }}>
+            <View
+                style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    position: 'relative',
+                    alignItems: 'center',
+                    borderBottomColor: colors.textDisabled,
+                    borderBottomWidth: 0.5,
+                    paddingBottom: responsiveScreenHeight(2),
+                    width: responsiveScreenWidth(100),
+                    paddingHorizontal: responsiveScreenWidth(5),
+                }}
+            >
+                <Text
                     style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        position: 'relative',
-                        alignItems: 'center',
-                        borderBottomColor: colors.textDisabled,
-                        borderBottomWidth: 0.5,
-                        paddingBottom: responsiveScreenHeight(2),
-                        width: responsiveScreenWidth(100),
-                        paddingHorizontal: responsiveScreenWidth(5),
+                        flex: 1,
+                        textAlign: 'left',
+                        fontSize: responsiveScreenFontSize(2),
+                        color: colors.textPrimary,
+                        fontWeight: '800',
                     }}
                 >
-                    <Text
-                        style={{
-                            flex: 1,
-                            textAlign: 'left',
-                            fontSize: responsiveScreenFontSize(2),
-                            color: colors.textPrimary,
-                            fontWeight: '800',
-                        }}
-                    >
-                        Insights
-                    </Text>
-                    {/* <TouchableOpacity onPress={() => navigation.navigate(routes.NOTIFICATION)}>
+                    Insights
+                </Text>
+                {/* <TouchableOpacity onPress={() => navigation.navigate(routes.NOTIFICATION)}>
                  <Image
                    source={imagePath.notification}
                    style={{ opacity: 1, resizeMode: 'contain' }}
                  />
                </TouchableOpacity> */}
-                </View>
-                <View style={{ flex: 1, width: responsiveWidth(90), alignSelf: 'center', marginTop: responsiveScreenHeight(2) }}>
-                    <FlatList
-                        data={data}
-                        showsVerticalScrollIndicator={false}
-                        style={{ paddingTop: responsiveScreenHeight(1) }}
-                        contentContainerStyle={{ gap: responsiveScreenHeight(2.2), paddingBottom: responsiveScreenHeight(5) }}
-                        keyExtractor={(item, index) => item?.id ? String(item.id) : index.toString()}
-                        onEndReached={() => loadMore(false)}
-                        onEndReachedThreshold={0.5}
-                        ListFooterComponent={loadingMore ? <ActivityIndicator size="small" color={colors.primary} /> : null}
-                        ListEmptyComponent={!loadingMore ? <Text style={{ textAlign: "center", marginTop: 20 }}>No {'articles'} found</Text> : null}
-                        renderItem={({ item, index }) => {
-
-                            return <ArticleCard post={item} />;
-
-                        }}
-                    />
-                </View>
             </View>
+            <View style={{ flex: 1, width: responsiveWidth(90), alignSelf: 'center', marginTop: responsiveScreenHeight(2) }}>
+                <FlatList
+                    data={data}
+                    showsVerticalScrollIndicator={false}
+                    style={{ paddingTop: responsiveScreenHeight(1) }}
+                    contentContainerStyle={{ gap: responsiveScreenHeight(2.2), paddingBottom: responsiveScreenHeight(5) }}
+                    keyExtractor={(item, index) => item?.id ? String(item.id) : index.toString()}
+                    onEndReached={() => loadMore(false)}
+                    onEndReachedThreshold={0.5}
+                    ListFooterComponent={loadingMore ? <ActivityIndicator size="small" color={colors.primary} /> : null}
+                    ListEmptyComponent={!loadingMore ? <Text style={{ textAlign: "center", marginTop: 20 }}>No {'articles'} found</Text> : null}
+                    renderItem={({ item, index }) => {
 
+                        return <ArticleCard post={item} />;
 
-        </NavigationBar>
+                    }}
+                />
+            </View>
+        </View>
+    }
+    return (
+        <>
+            {
+                role === "recruiter" ?
+                    <RNavigationBar name={routes.BLOG}>
+                        {element()}
+                    </RNavigationBar>
+                    :
+                    <NavigationBar name={routes.BLOG}>
+                        {element()}
+                    </NavigationBar>
+            }
+        </>
     )
 }
 
@@ -126,16 +143,10 @@ export default Blog
 export const ArticleCard = ({ post, onEdit, onDelete }: { post: any, onEdit?: (post: any) => void, onDelete?: (post: any) => void }) => {
     const { colors } = useContext(ThemeContext)
     const [loading, setLoading] = useState(true);
-    const openURL = async (url: any) => {
+    const navigation = useNavigation<any>();
+    const openURL = (url: any) => {
         if (!url) return;
-        try {
-            const canOpen = await Linking.canOpenURL(url);
-            if (canOpen) {
-                Linking.openURL(url)
-                    .catch(err => { });
-            }
-        } catch (error: any) {
-        }
+        navigation.navigate(routes.BROWSER, { url, title: "Blog Detail" });
     };
 
     const formatDate = (dateString?: string) => {

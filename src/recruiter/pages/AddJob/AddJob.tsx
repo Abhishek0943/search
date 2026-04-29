@@ -403,8 +403,7 @@ const AddJob = () => {
                 {
                     user.is_active ? <>
                         {
-
-                            user.package_end_date ? <>
+                            user.package_end_date && new Date(user.package_end_date.replace(' ', 'T')) >= new Date() ? <>
                                 <View
                                     style={{
                                         flexDirection: 'row',
@@ -608,7 +607,6 @@ const AddJob = () => {
                                     </View>
                                 </View>
 
-                                {/* ✅ Hide Salary (radio) */}
                                 <View
                                     style={{
                                         marginTop: responsiveScreenHeight(1.5),
@@ -818,7 +816,6 @@ const AddJob = () => {
                                         </View>
                                     </View>
                                 </View>
-
                                 <Pressable
                                     onPress={onSubmit}
                                     style={{

@@ -1,0 +1,12 @@
+diff --git a/node_modules/react-native/ReactCommon/hermes/executor/HermesExecutorFactory.cpp b/node_modules/react-native/ReactCommon/hermes/executor/HermesExecutorFactory.cpp
+index 8d58bb3..e45dd06 100644
+--- a/node_modules/react-native/ReactCommon/hermes/executor/HermesExecutorFactory.cpp
++++ b/node_modules/react-native/ReactCommon/hermes/executor/HermesExecutorFactory.cpp
+@@ -12,6 +12,7 @@
+ #include <hermes/hermes.h>
+ #include <jsi/decorator.h>
+ #include <jsinspector-modern/InspectorFlags.h>
++#include <thread> // Fix: Xcode 26 libc++ no longer includes <thread> transitively
+ 
+ #include <hermes/inspector-modern/chrome/HermesRuntimeTargetDelegate.h>
+ 

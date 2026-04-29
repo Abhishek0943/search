@@ -399,7 +399,25 @@ const Profile = () => {
                                     style={{ height: '100%', width: '100%' }}
                                 />
                             </View>
-                        ) : null}
+                        ) : <View
+                            style={{
+                                position: 'absolute',
+                                right: 10,
+                                bottom: 10,
+                                height: 44,
+                                width: 44,
+                                borderRadius: 8,
+                                overflow: 'hidden',
+                                borderWidth: 1,
+                                borderColor: colors.mediumGray,
+                            }}
+                        >
+                            <Image
+                                source={{ uri: user.logo }}
+                                style={{ height: '100%', width: '100%' }}
+                            />
+                        </View>}
+
                     </Pressable>
 
                     <Label text="Company Name" />

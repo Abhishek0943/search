@@ -57,16 +57,9 @@ const WelcomeTwo = () => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>()
   const [role, setRole] = useState<"seeker" | "recruiter">()
 
-  const openURL = async (url: string) => {
+  const openURL = (url: string) => {
     if (!url) return;
-    try {
-      const canOpen = await Linking.canOpenURL(url);
-      if (canOpen) {
-        Linking.openURL(url).catch(err => { });
-      } else {
-      }
-    } catch (error: any) {
-    }
+    navigation.navigate(routes.BROWSER, { url, title: "Recruiter login" });
   };
 
   useFocusEffect(

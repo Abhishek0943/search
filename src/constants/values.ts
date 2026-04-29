@@ -43,6 +43,8 @@ export const routes: RoutesType = {
     LANGUAGE: "LANGUAGE",
     LANGUAGEFORM: "LANGUAGEFORM",
     ACTIVECANDIDATE: "ACTIVECANDIDATE",
+    BROWSER: "BROWSER",
+
 
 
 }
@@ -92,6 +94,8 @@ export default interface RoutesType {
     PROJECTFORM: "PROJECTFORM",
     APPLY: "APPLY",
     ACTIVECANDIDATE: "ACTIVECANDIDATE",
+    BROWSER: "BROWSER",
+
 
 
 }

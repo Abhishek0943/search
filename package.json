@@ -8,6 +8,10 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
+    "postinstall": "patch-package",
+    "clean-android": "cd android && ./gradlew clean",
+    "clean-ios": "rm -rf ios/Pods && cd ios && pod deintegrate && pod install",
+    "clean": "npm run clean-android && npm run clean-ios",
     "release": "cd android && ./gradlew assembleRelease",
     "bundle": "cd android && ./gradlew clean && ./gradlew bundleRelease",
     "bundle-fast": "cd android && ./gradlew bundleRelease"

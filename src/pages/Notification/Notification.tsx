@@ -53,17 +53,9 @@ const Notification = () => {
         });
     }, []),
   );
-  const openURL = async (url: any) => {
+  const openURL = (url: any) => {
     if (!url) return;
-    try {
-      const canOpen = await Linking.canOpenURL(url);
-      if (canOpen) {
-        Linking.openURL(url)
-          .catch(err => { });
-      } else {
-      }
-    } catch (error: any) {
-    }
+    navigation.navigate(routes.BROWSER as never, { url } as never);
   };
   return (
     <>

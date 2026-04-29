@@ -296,14 +296,14 @@ function RecruiterHome() {
                                                 <Text style={[styles.statValue, { color: colors.darkGrayNatural, }]}>{user?.jobs_count ?? 0}</Text>
                                             </>
                                         </TouchableOpacity>
-
+                                        {/* 
                                         <TouchableOpacity style={[styles.statCard, { backgroundColor: colors.lightGrayNatural, }]}>
                                             <View style={styles.statIconWrap}>
                                                 <Image source={imagePath.activeProfile} style={styles.statIcon} />
                                             </View>
                                             <Text style={styles.statTitle}>Followers</Text>
                                             <Text style={[styles.statValue, { color: colors.darkGrayNatural, }]}>{user?.followers_count ?? 0}</Text>
-                                        </TouchableOpacity>
+                                        </TouchableOpacity> */}
 
                                         <TouchableOpacity onPress={() => navigation.navigate(routes.CHAT, { followers: true })} style={[styles.statCard, { backgroundColor: colors.lightGrayNatural, }]}>
                                             <View style={styles.statIconWrap}>

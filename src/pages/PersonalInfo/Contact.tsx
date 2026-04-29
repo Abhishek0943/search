@@ -19,39 +19,49 @@ const Contact = () => {
         const a = await showConfirm({
             title: "Submit Mail",
             message: "Are you sure you want to submit this mail?",
-            okText: "Report",
+            okText: "Submit",
             cancelText: "Cancel",
             waitForOk: true,
-            //             onOkPress: async () => {
-            //                 try {
-
-            //                 } catch (error) {
-            //                     // Handle any errors during the dispatch
-            //                     showAlert({
-            //                         title: "Error",
-            //                         message: "There was an issue sending the mail.",
-            //                     });
-            //                 }
-            //                 return true;
-            //             },
+            onOkPress: async () => {
+                if (!fullName || !email || !phone || !subject || !message) {
+                    showAlert({
+                        title: "Error",
+                        message: "Please fill all the fields",
+                    });
+                    return false;
+                }
+                const res = await dispatch(
+                    ContactT({ full_name: fullName, email, phone, subject, message_txt: message })
+                ).unwrap();
+                if (!res.success) {
+                    showAlert({
+                        title: "Error",
+                        message: res.message,
+                    });
+                    return false;
+                }
+                return true;
+            },
         })
         if (a) {
-            const res = await dispatch(
-                ContactT({ full_name: fullName, email, phone, subject, message_txt: message })
-            ).unwrap();
             showAlert({
-                title: res.success ? "Success" : "Error",
-                message: res.success ? "Mail sent successfully" : res.message,
+                title: "Success",
+                message: "Mail sent successfully",
             });
+            setFullName("");
+            setEmail("");
+            setPhone("");
+            setSubject("");
+            setMessage("");
         }
 
     };
     const dispatch = useAppDispatch()
     return (
-        <NavigationBar statusbar={false} navigationBar={false}>
+        <NavigationBar statusbar={true} navigationBar={false}>
             <KeyboardAvoidingView behavior="height" style={{ flex: 1 }}>
+                <Header title="Contact Support" />
                 <ScrollView style={{ flex: 1 }} contentContainerStyle={{ justifyContent: 'flex-start', alignItems: 'center' }}>
-                    <Header title="Contact Support" />
                     <Image source={require('./c.png')} style={{ margin: 'auto', marginVertical: responsiveScreenHeight(2) }} />
                     <View style={{ width: '100%', maxWidth: 400, paddingHorizontal: responsiveScreenWidth(6) }}>
                         <Text style={{ marginBottom: 8, fontSize: responsiveScreenFontSize(1.8), color: '#000000', fontWeight: '500' }}>Full Name</Text>
@@ -73,7 +83,6 @@ const Contact = () => {
                         />
                     </View>
 
-                    {/* Email Input */}
                     <View style={{ width: '100%', maxWidth: 400, paddingHorizontal: responsiveScreenWidth(6), marginTop: responsiveScreenHeight(1) }}>
                         <Text style={{ marginBottom: 8, fontSize: responsiveScreenFontSize(1.8), color: '#000000', fontWeight: '500' }}>Email</Text>
                         <TextInput
@@ -94,7 +103,6 @@ const Contact = () => {
                         />
                     </View>
 
-                    {/* Phone Input */}
                     <View style={{ width: '100%', maxWidth: 400, paddingHorizontal: responsiveScreenWidth(6), marginTop: responsiveScreenHeight(1) }}>
                         <Text style={{ marginBottom: 8, fontSize: responsiveScreenFontSize(1.8), color: '#000000', fontWeight: '500' }}>Phone</Text>
                         <TextInput
@@ -115,7 +123,6 @@ const Contact = () => {
                         />
                     </View>
 
-                    {/* Subject Input */}
                     <View style={{ width: '100%', maxWidth: 400, paddingHorizontal: responsiveScreenWidth(6), marginTop: responsiveScreenHeight(1) }}>
                         <Text style={{ marginBottom: 8, fontSize: responsiveScreenFontSize(1.8), color: '#000000', fontWeight: '500' }}>Subject</Text>
                         <TextInput
@@ -136,7 +143,6 @@ const Contact = () => {
                         />
                     </View>
 
-                    {/* Message Input */}
                     <View style={{ width: '100%', maxWidth: 400, paddingHorizontal: responsiveScreenWidth(6), marginTop: responsiveScreenHeight(1) }}>
                         <Text style={{ marginBottom: 8, fontSize: responsiveScreenFontSize(1.8), color: '#000000', fontWeight: '500' }}>Message</Text>
                         <View style={{ height: responsiveScreenHeight(20), borderWidth: 1, borderRadius: 6, borderColor: '#BEBEBE' }}>

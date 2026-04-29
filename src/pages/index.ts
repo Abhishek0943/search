@@ -37,5 +37,4 @@ export { default as RecruiterAccount } from "../recruiter/pages/Profile/Profile2
 export { default as OpenJobs } from "../recruiter/pages/OpenJobs/OpenJobs"
 export { default as CandidateProfile } from "../recruiter/pages/CandidateProfile/CandidateProfile"
 export { default as PaymentHistory } from "../recruiter/pages/PaymentHistory/PaymentHistory"
-
-
+export { default as Browser } from "./Browser/Browser"

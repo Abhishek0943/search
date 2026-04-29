@@ -2,7 +2,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useEffect, useRef, useState } from 'react';
 import { useAppSelector } from '../store';
 import { routes } from '../constants/values';
-import { AddJob, Apply, ApplyJob, Candidate, CandidateProfile, BlogPage, Chat, Company, CompanyDetails, CV, Education, ForgotPassword, Home, Jobdetail, Language, LanguageForm, Login, Messages, Notification, OpenJobs, PaymentHistory, PersonalInfo, Profile, Project, ProjectForm, RecentJob, RecruiterAccount, RecruiterHome, RecruiterProfile, Search, Signup, Skill, SkillAdd, Splash, SuggestedJob, Welcome, WelcomeTwo, WorkExperience, WorkExperienceForm } from '../pages';
+import { AddJob, Apply, ApplyJob, Browser, Candidate, CandidateProfile, BlogPage, Chat, Company, CompanyDetails, CV, Education, ForgotPassword, Home, Jobdetail, Language, LanguageForm, Login, Messages, Notification, OpenJobs, PaymentHistory, PersonalInfo, Profile, Project, ProjectForm, RecentJob, RecruiterAccount, RecruiterHome, RecruiterProfile, Search, Signup, Skill, SkillAdd, Splash, SuggestedJob, Welcome, WelcomeTwo, WorkExperience, WorkExperienceForm } from '../pages';
+
 import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import EducationForm from '../pages/PersonalInfo/EducationForm';
@@ -192,6 +193,7 @@ const Routes = () => {
         <Stack.Screen name={routes.APPLY} component={Apply} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.NOTIFICATION} component={Notification} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.CONTACT} component={Contact} options={{ headerShown: false, animation: 'none' }} />
+        <Stack.Screen name={routes.BROWSER} component={Browser} options={{ headerShown: false }} />
 
 
       </Stack.Navigator>

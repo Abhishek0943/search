@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, ActivityIndicator, FlatList, Image, Pressable, Alert, TouchableOpacity } from 'react-native'
+import { View, Text, ScrollView, ActivityIndicator, FlatList, Image, Pressable, Alert, TouchableOpacity, Platform, Share } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { NavigationBar } from '../../../components'
 import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions'
@@ -19,18 +19,38 @@ const downloadInvoice = async (
   try {
     setDownloadingId(id);
     const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9.]/g, '_');
-    const destPath = `${RNFS.DownloadDirectoryPath}/${sanitizedFileName}`;
+    // On iOS we save to DocumentDirectory (app sandbox), then offer a Share Sheet
+    // so the user can move the file to Files app, iCloud, Mail, etc.
+    // On Android we save directly to the Downloads folder.
+    const baseDir =
+      Platform.OS === 'ios'
+        ? RNFS.DocumentDirectoryPath
+        : RNFS.DownloadDirectoryPath;
+    const destPath = `${baseDir}/${sanitizedFileName}`;
+
     const result = await RNFS.downloadFile({
       fromUrl: invoiceUrl,
       toFile: destPath,
     }).promise;
+
     if (result.statusCode === 200) {
+      // if (Platform.OS === 'ios') {
+      //   await Share.share({
+      //     url: `file://${destPath}`,
+      //     title: fileName,
+      //   });
+      // } else {
       Alert.alert('Downloaded', 'Invoice saved to Downloads folder.');
+      // }
     } else {
       Alert.alert('Error', 'Failed to download invoice.');
     }
-  } catch (e) {
-    Alert.alert('Error', 'Something went wrong while downloading.');
+  } catch (e: any) {
+    // User cancelled the share sheet — not an error
+    console.log(e)
+    if (e?.message !== 'User did not share') {
+      Alert.alert('Error', 'Something went wrong while downloading.');
+    }
   } finally {
     setDownloadingId(null);
   }
