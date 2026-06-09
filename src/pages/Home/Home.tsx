@@ -324,12 +324,16 @@ function Home() {
                               {job?.job_type || 'Full Time'}
                             </Text>
                           </View>
-                          <View style={styles.metaRow}>
-                            <Image source={require("./location2.png")} style={{ transform: [{ scale: .8 }] }} />
-                            <Text style={[styles.metaText, { color: "#484848" }]} numberOfLines={2}>
-                              {job?.address || job?.city?.name || job?.location || 'India'}
-                            </Text>
-                          </View>
+                          {
+                            (job?.company_info?.location || job?.address || job?.city?.name || job?.location) && (
+                              <View style={styles.metaRow}>
+                                <Image source={require("./location2.png")} style={{ transform: [{ scale: .8 }] }} />
+                                <Text style={[styles.metaText, { color: "#484848" }]} numberOfLines={2}>
+                                  {job?.company_info?.location || job?.address || job?.city?.name || job?.location}
+                                </Text>
+                              </View>
+                            )
+                          }
                           {job?.description && (
                             <Text numberOfLines={4} style={[{ lineHeight: responsiveHeight(2), color: "#737373", fontSize: responsiveFontSize(1.8) }]}>
                               {job?.description}
