@@ -722,6 +722,14 @@ export const EditWorkExperience = createAsyncThunk<
     return postApiCall<{ success: true, jobs: Job[], }>('/jobseeker/experiences/' + id, body);
   }
 );
+export const GetBanners = createAsyncThunk<
+  { success: true, data: any[] } | ErrorResponse
+>(
+  'GetBanners',
+  () => {
+    return getApiCall<{ success: true, data: any[] }>('/banners');
+  }
+);
 
 const initialState: JobInitialState = {
   users: {
@@ -735,7 +743,8 @@ const initialState: JobInitialState = {
   },
   suggested: [],
   recent: [],
-  appliedJobIds: []
+  appliedJobIds: [],
+  banners: []
 };
 const jobSlice = createSlice({
   name: 'jobs',
@@ -787,6 +796,11 @@ const jobSlice = createSlice({
       .addCase(GetRecentJobs.fulfilled, (state, { payload }) => {
         if (payload.success) {
           state.recent = payload.data
+        }
+      })
+      .addCase(GetBanners.fulfilled, (state, { payload }) => {
+        if (payload.success) {
+          state.banners = payload.data
         }
       })
   }

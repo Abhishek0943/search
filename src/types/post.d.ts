@@ -53,4 +53,5 @@ interface JobInitialState {
   suggested:any[]
   recent:any[]
   appliedJobIds: any[]
+  banners: any[]
 }
