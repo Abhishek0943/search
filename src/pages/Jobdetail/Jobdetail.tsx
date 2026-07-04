@@ -48,9 +48,7 @@ const Jobdetail = () => {
                 }
                 return false;
             };
-
             const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
-
             return () => subscription.remove();
         }, [navigation, role])
     );
@@ -223,16 +221,7 @@ const Jobdetail = () => {
                                                                     typeof e.data === "string" && <AutoHeightWebView html={e.data} />
                                                                 }
                                                                 {
-                                                                    typeof e.data === "object" && <View style={{ marginBottom: responsiveScreenHeight(2), }}>
-                                                                        {e?.data?.map((i) => {
-                                                                            return (
-                                                                                <View style={{ flexDirection: "row", marginTop: responsiveScreenHeight(1), marginHorizontal: 10, alignItems: "center" }}>
-                                                                                    <Image source={imagePath.circle} />
-                                                                                    <Text style={{ marginHorizontal: 10, fontSize: responsiveScreenFontSize(2), color: colors.textSecondary, textTransform: "capitalize" }}>{i.skill}</Text>
-                                                                                </View>
-                                                                            )
-                                                                        })}
-                                                                    </View>
+                                                                    typeof e.data === "object" && Array.isArray(e.data) && <AutoHeightWebView html={`<ul>${e.data.map(i => `<li style="text-transform: capitalize;">${i?.skill || ""}</li>`).join("")}</ul>`} />
                                                                 }
                                                             </>
                                                         }
@@ -380,7 +369,7 @@ export function AutoHeightWebView({ html, margin = 10 }: { html: string, margin?
     h6 { font-family: '${Fonts.GilroyBold}';color:black; font-weight: 700; font-size: 4.0vw; margin: 8px 0 4px; }
 
     p, span, div, li {
-      font-family: '${Fonts.GilroyMedium}';
+      font-family: '${Fonts.GilroyRegular}';
       font-size:  ${4.2}vw;
       color: var(--text);
     }

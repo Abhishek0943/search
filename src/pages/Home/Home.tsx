@@ -378,12 +378,7 @@ function Home() {
                           }
 
                           <View style={{ flexDirection: "row", gap: responsiveScreenWidth(2), flexWrap: "wrap", marginVertical: responsiveScreenHeight(1) }}>
-                            {
-                              job?.posted_at && <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>Post Date : {job?.posted_at}</Text>
-                            }
-                            {
-                              job?.expiredAt && <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>Expiry Date : {job?.expiredAt}</Text>
-                            }
+
 
                             {
                               (job?.salary && job?.salary_period) ? (
@@ -391,6 +386,13 @@ function Home() {
                               ) : (job?.salary_from || job?.salary_to) ? (
                                 <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>Salary : {job.salary_currency}{job.salary_from} - {job.salary_to}</Text>
                               ) : null
+                            }
+
+                            {
+                              job?.expiredAt && <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>Expiry Date : {job?.expiredAt}</Text>
+                            }
+                            {
+                              job?.posted_at && <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>Post Date : {job?.posted_at}</Text>
                             }
                           </View>
                           {

@@ -271,7 +271,7 @@ const ApplyJob = () => {
                                 fontWeight: '800',
                               }}
                             >
-                              View Application
+                              View Job
                             </Text>
                           </TouchableOpacity>
                         </View>
