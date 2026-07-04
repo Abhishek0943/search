@@ -8,7 +8,7 @@ import imagePath from '../../assets/imagePath'
 import { ThemeContext } from '../../context/ThemeProvider'
 import { NavigationProp, ParamListBase, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native'
 import { useAppDispatch, useAppSelector } from '../../store'
-import { Bookmark, GetJob, ReportJob, } from '../../reducer/jobsReducer'
+import { Bookmark, GetJob, ReportJob, toggleBookmark } from '../../reducer/jobsReducer'
 import { WebView } from 'react-native-webview';
 import { formatSalaryRange } from '../../utils'
 import { Fonts } from '../../assets/imagePath';
@@ -21,6 +21,7 @@ const Jobdetail = () => {
     const { id } = route.params as { id: number }
     const navigation: NavigationProp<ParamListBase> = useNavigation()
     const { user } = useAppSelector(state => state.userStore)
+    const { bookmarkedJobIds } = useAppSelector(state => state.jobsReducer)
     const [loading, setLoading] = useState(true)
     const dispatch = useAppDispatch()
     const [job, setJob] = useState<Job>()
@@ -33,7 +34,7 @@ const Jobdetail = () => {
         }
         getRole()
     }, [])
-
+    console.log(job)
     useFocusEffect(
         React.useCallback(() => {
             const onBackPress = () => {
@@ -102,7 +103,7 @@ const Jobdetail = () => {
                                     <Image source={imagePath.circle4} style={{ position: "absolute", top: 0, right: 0 }} />
                                     <View style={{ flexDirection: "row", gap: responsiveScreenWidth(3), justifyContent: "space-between", alignItems: "center" }}>
                                         <View style={{ borderRadius: 6, height: responsiveScreenHeight(6), overflow: "hidden", backgroundColor: "#CECECE38" }}>
-                                            <Image source={{ uri: job?.company_info?.image }} style={{ height: "100%", aspectRatio: 1 }} />
+                                            <Image source={{ uri: job?.company_info?.image }} style={{ height: "100%", aspectRatio: 1, resizeMode: "contain" }} />
                                         </View>
                                         <TouchableOpacity style={{ flex: 1, gap: responsiveScreenHeight(1) }}>
                                             <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>{job?.title}</Text>
@@ -123,6 +124,12 @@ const Jobdetail = () => {
                                         {
                                             job?.functionalArea && <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>{job?.functionalArea}</Text>
                                         }
+                                        {
+                                            job?.posted_at && <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>Post Date : {job?.posted_at}</Text>
+                                        }
+                                        {
+                                            job?.expiredAt && <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>Expiry Date : {job?.expiredAt}</Text>
+                                        }
                                     </View>
                                     <View style={{ flexDirection: "row" }}>
                                         <View style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
@@ -134,22 +141,26 @@ const Jobdetail = () => {
                                             }
                                             {
                                                 user?.id &&
-                                                <TouchableOpacity onPress={() => dispatch(Bookmark({ id: job.id })).unwrap().then((res) => {
-                                                    if (res.success) {
-                                                        dispatch(GetJob({ id })).unwrap().then((res) => {
-                                                            if (res.success) {
-                                                                setJob(res.data.jobDetail)
-                                                            }
-                                                        })
-                                                    }
-                                                    else {
-                                                        showAlert({
-                                                            title: "Validation",
-                                                            message: res.message,
-                                                        })
-                                                    }
-                                                })}>
-                                                    <Image source={job.is_favorited ? imagePath.activeBookmark : imagePath.bookmark} />
+                                                <TouchableOpacity onPress={() => {
+                                                    dispatch(toggleBookmark({ id: job.id, is_favorited: bookmarkedJobIds[job.id] ?? job.is_favorited }))
+                                                    dispatch(Bookmark({ id: job.id })).unwrap().then((res) => {
+                                                        if (res.success) {
+                                                            dispatch(GetJob({ id })).unwrap().then((res) => {
+                                                                if (res.success) {
+                                                                    setJob(res.data.jobDetail)
+                                                                }
+                                                            })
+                                                        }
+                                                        else {
+                                                            showAlert({
+                                                                title: "Validation",
+                                                                message: res.message,
+                                                            })
+                                                            dispatch(toggleBookmark({ id: job.id, is_favorited: bookmarkedJobIds[job.id] ?? job.is_favorited })) // revert on error
+                                                        }
+                                                    })
+                                                }}>
+                                                    <Image source={(bookmarkedJobIds[job.id] ?? job.is_favorited) ? imagePath.activeBookmark : imagePath.bookmark} />
                                                 </TouchableOpacity>
                                             }
                                         </View>
@@ -188,14 +199,7 @@ const Jobdetail = () => {
                                                             return true; // ✅ close confirm modal now
                                                         },
                                                     })
-                                                    // if (ok) {
-                                                    //     dispatch(ReportJob({ your_email: user.email, your_name: user.name, job_url: job.jobUrl })).unwrap().then(res => {
-                                                    //         showAlert({
-                                                    //             title: res.success ? "Success message" : "error message",
-                                                    //             message: res.message
-                                                    //         })
-                                                    //     })
-                                                    // }
+
                                                 }} style={{ color: "#FF383C", backgroundColor: "#FFE5E6", borderWidth: 1, borderColor: "#FF383C", paddingVertical: responsiveScreenHeight(1), flex: 1, textAlign: "center", paddingHorizontal: responsiveScreenWidth(4), borderRadius: 15, fontSize: responsiveScreenFontSize(1.8) }}>Report Abuse</Text>
                                             }
                                         </>
@@ -212,22 +216,27 @@ const Jobdetail = () => {
                                             job.job_description && job.job_description.map((e) => {
                                                 return (
                                                     <>
-                                                        <Text style={{ marginHorizontal: 10, fontSize: responsiveScreenFontSize(2.1), textTransform: "capitalize", fontWeight: "700" }}>{e.title}</Text>
                                                         {
-                                                            typeof e.data === "string" && <AutoHeightWebView html={e.data} />
-                                                        }
-                                                        {
-                                                            typeof e.data === "object" && <>
-                                                                {e.data.map((i) => {
-                                                                    return (
-                                                                        <View style={{ flexDirection: "row", marginTop: responsiveScreenHeight(1), marginHorizontal: 10, alignItems: "center" }}>
-                                                                            <Image source={imagePath.circle} />
-                                                                            <Text style={{ marginHorizontal: 10, fontSize: responsiveScreenFontSize(2), color: colors.textSecondary, textTransform: "capitalize" }}>{i.skill}</Text>
-                                                                        </View>
-                                                                    )
-                                                                })}
+                                                            e.data && <>
+                                                                <Text style={{ marginHorizontal: 10, fontSize: responsiveScreenFontSize(2), textTransform: "capitalize", fontWeight: "700" }}>{e.title}</Text>
+                                                                {
+                                                                    typeof e.data === "string" && <AutoHeightWebView html={e.data} />
+                                                                }
+                                                                {
+                                                                    typeof e.data === "object" && <View style={{ marginBottom: responsiveScreenHeight(2), }}>
+                                                                        {e?.data?.map((i) => {
+                                                                            return (
+                                                                                <View style={{ flexDirection: "row", marginTop: responsiveScreenHeight(1), marginHorizontal: 10, alignItems: "center" }}>
+                                                                                    <Image source={imagePath.circle} />
+                                                                                    <Text style={{ marginHorizontal: 10, fontSize: responsiveScreenFontSize(2), color: colors.textSecondary, textTransform: "capitalize" }}>{i.skill}</Text>
+                                                                                </View>
+                                                                            )
+                                                                        })}
+                                                                    </View>
+                                                                }
                                                             </>
                                                         }
+
                                                     </>
                                                 )
                                             })
@@ -260,7 +269,6 @@ const Jobdetail = () => {
                                                         width: '96%',
                                                         alignSelf: 'center',
                                                         justifyContent: 'center',
-                                                        marginTop: responsiveScreenHeight(2),
                                                         borderRadius: 15,
                                                         gap: responsiveScreenWidth(1),
                                                         flexDirection: 'row',
@@ -357,7 +365,6 @@ export function AutoHeightWebView({ html, margin = 10 }: { html: string, margin?
       margin: 0 ${margin}px;
       padding: 0;
       font-family: '${Fonts.GilroyRegular}';
-      font-size:  ${responsiveScreenFontSize(2)}vw;
       line-height: 1.6;
       color: var(--text);
       padding-bottom:10px;
@@ -365,16 +372,16 @@ export function AutoHeightWebView({ html, margin = 10 }: { html: string, margin?
       word-break: break-word;
     }
 
-    h1 { font-family: '${Fonts.GilroyBold}'; font-weight: 700; font-size: 5.6vw; margin: 12px 0 6px; }
-    h2 { font-family: '${Fonts.GilroyBold}'; font-weight: 700; font-size: 5.2vw; margin: 12px 0 6px; }
-    h3 { font-family: '${Fonts.GilroyBold}'; font-weight: 700; font-size: 4.8vw; margin: 12px 0 6px; }
-    h4 { font-family: '${Fonts.GilroyBold}'; font-weight: 700; font-size: 4.4vw; margin: 10px 0 4px; }
-    h5 { font-family: '${Fonts.GilroyBold}'; font-weight: 700; font-size: 4.2vw; margin: 8px 0 4px; }
-    h6 { font-family: '${Fonts.GilroyBold}'; font-weight: 700; font-size: 4.0vw; margin: 8px 0 4px; }
+    h1 { font-family: '${Fonts.GilroyBold}';color:black; font-weight: 700; font-size: 5.6vw; margin: 12px 0 6px; }
+    h2 { font-family: '${Fonts.GilroyBold}';color:black; font-weight: 700; font-size: 5.2vw; margin: 12px 0 6px; }
+    h3 { font-family: '${Fonts.GilroyBold}';color:black; font-weight: 700; font-size: 4.8vw; margin: 12px 0 6px; }
+    h4 { font-family: '${Fonts.GilroyBold}';color:black; font-weight: 700; font-size: 4.4vw; margin: 10px 0 4px; }
+    h5 { font-family: '${Fonts.GilroyBold}';color:black; font-weight: 700; font-size: 4.2vw; margin: 8px 0 4px; }
+    h6 { font-family: '${Fonts.GilroyBold}';color:black; font-weight: 700; font-size: 4.0vw; margin: 8px 0 4px; }
 
     p, span, div, li {
       font-family: '${Fonts.GilroyMedium}';
-      font-size:  ${4.5}vw;
+      font-size:  ${4.2}vw;
       color: var(--text);
     }
 

@@ -9,7 +9,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Text from './Text'
 import { useAppSelector } from '../store'
 
-const NavigationBar = ({ bottomPadding = false, children, statusbar = true, name, navigationBar = true }: { navigationBar?: boolean, statusbar?: boolean, bottomPadding?: boolean, children: React.JSX.Element, name?: RoutesType["HOME"] | RoutesType["CHAT"] | RoutesType["PROFILE"] | RoutesType["APPLYJOB"] | RoutesType["BLOG"] }) => {
+const NavigationBar = ({ onPress, bottomPadding = false, children, statusbar = true, name, navigationBar = true }: { navigationBar?: boolean, statusbar?: boolean, bottomPadding?: boolean, children: React.JSX.Element, name?: RoutesType["HOME"] | RoutesType["CHAT"] | RoutesType["PROFILE"] | RoutesType["APPLYJOB"] | RoutesType["BLOG"] }) => {
     const { colors } = useContext(ThemeContext)
     const navigation: NavigationProp<ParamListBase> = useNavigation();
     const { user } = useAppSelector((state) => state.userStore);
@@ -57,7 +57,7 @@ const NavigationBar = ({ bottomPadding = false, children, statusbar = true, name
                     {
                         route.map((e, i) => {
                             return (
-                                <TouchableOpacity key={e.path} onPress={() => navigation.navigate(e.path)} style={{ position: "relative", paddingVertical: responsiveScreenHeight(1), flex: 1, alignItems: "center", height: "100%", }}>
+                                <TouchableOpacity key={e.path} onPress={() => name === e.path && onPress ? onPress() : navigation.navigate(e.path)} style={{ position: "relative", paddingVertical: responsiveScreenHeight(1), flex: 1, alignItems: "center", height: "100%", }}>
                                     {e.icon}
                                     {
                                         e.name === "Chat" && user?.messages_count > 0 &&

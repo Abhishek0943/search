@@ -31,26 +31,21 @@ const Routes = () => {
   }, [])
 
   const handleNotificationNavigation = async (data: any) => {
-    // if (!data) {
-    navigationRef.current?.navigate(routes.NOTIFICATION as never);
-    // return;
-    // }
-
+    console.log("🚀 ~ handleNotificationNavigation ~ data:", data)
+    if (!data) {
+      navigationRef.current?.navigate(routes.NOTIFICATION);
+    }
+    else if (data?.click_action) {
+      Linking.openURL(data?.click_action)
+    }
+    else {
+      navigationRef.current?.navigate(routes.NOTIFICATION);
+    }
     // const { type, redirect, job_id, application_id } = data;
     // const currentRole = await AsyncStorage.getItem("role");
-
-    // if (type === "blog_rejected" || type === "blog_published" || type === "blog_approved") {
-    //   if (redirect) {
-    //     try {
-    //       const canOpen = await Linking.canOpenURL(redirect);
-    //       if (canOpen) Linking.openURL(redirect).catch(() => { });
-    //     } catch (e) { }
-    //   } else {
-    //     navigationRef.current?.navigate(routes.NOTIFICATION as never);
-    //   }
-    // } else if (job_id) {
+    // if (job_id) {
     //   if (currentRole === "seeker") {
-    //     navigationRef.current?.navigate(routes.JOBDETAIL as never, { id: Number(job_id) } as never);
+    //     navigationRef.current?.navigate(routes.  as never, { id: Number(job_id) } as never);
     //   } else {
     //     navigationRef.current?.navigate(routes.NOTIFICATION as never);
     //   }
@@ -60,8 +55,12 @@ const Routes = () => {
     //   } else {
     //     navigationRef.current?.navigate(routes.NOTIFICATION as never);
     //   }
-    // } else if (data.chat_id || type === 'chat') {
-    //   navigationRef.current?.navigate(routes.MESSAGE as never);
+    // } else if (data.click_action) {
+    //   try {
+    //     await Linking.openURL(data.click_action);
+    //   } catch (e) {
+    //     navigationRef.current?.navigate(routes.NOTIFICATION as never);
+    //   }
     // } else {
     //   navigationRef.current?.navigate(routes.NOTIFICATION as never);
     // }
@@ -76,7 +75,7 @@ const Routes = () => {
       if (remoteMessage) {
         setTimeout(() => {
           handleNotificationNavigation(remoteMessage?.data);
-        }, 1000); // Give navigation router time to mount
+        }, 1000);
       }
     });
 
@@ -100,6 +99,7 @@ const Routes = () => {
     config: {
       screens: {
         [routes.SEARCH]: routes.SEARCH,
+        [routes.CHAT]: 'my-messages',
         [routes.JOBDETAIL]: {
           path: 'job/:id',
           parse: {
@@ -115,6 +115,7 @@ const Routes = () => {
             application_id: Number,
           },
         },
+        [routes.BLOGPAGE]: 'creator-dashboard',
         [routes.PERSONALINFO]: 'profile-incomplete',
         [routes.CV]: 'resume-upload-reminder',
       },

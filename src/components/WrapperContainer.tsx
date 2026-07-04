@@ -39,18 +39,11 @@ const WrapperContainer: React.FC<WrapperContainerProps> = ({
   const dispatch = useAppDispatch()
   useEffect(() => {
     if (!user?.id) return;
-
-    // If you only want this feature on Android, keep this:
-    // if (Platform.OS !== "android") return;
-
     let unsubscribe: undefined | (() => void);
-
     const start = async () => {
       try {
-        // On iOS you should request permission before listening
         if (Platform.OS === "ios") {
-          const authStatus = await messaging().requestPermission();
-          // optional: you can check authStatus if you want
+          await messaging().requestPermission();
         }
         unsubscribe = messaging().onMessage(async remoteMessage => {
           const { title, body } = remoteMessage.notification || {}
@@ -58,6 +51,7 @@ const WrapperContainer: React.FC<WrapperContainerProps> = ({
           if (title && body) {
             onDisplayNotification(title, body, imageUrl, remoteMessage.data)
           }
+          console.log(remoteMessage?.data, `remoteMessage?.data?.unread_message_count`)
           dispatch(
             setMessageCount({
               messages_count: remoteMessage?.data?.unread_message_count || 0,
@@ -67,9 +61,7 @@ const WrapperContainer: React.FC<WrapperContainerProps> = ({
       } catch (e) {
       }
     };
-
     start();
-
     return () => {
       if (unsubscribe) unsubscribe();
     };

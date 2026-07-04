@@ -56,7 +56,7 @@ const SuggestedJob = () => {
                 return (
                   <>
                     <Pressable
-                      onPress={() => { navigation.goBack()}}
+                      onPress={() => { navigation.goBack() }}
                       style={{
                         width: '100%',
                         justifyContent: 'center',

@@ -22,7 +22,6 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const [isConnected, setIsConnected] = useState(false);
     const { user } = useAppSelector(state => state.userStore);
     const SOCKET_URL = 'https://socket.searchtalents.co/';
-    // const SOCKET_URL = 'http://192.168.1.4:4000/';
     useEffect(() => {
         const a = async () => {
             if (!user?.id) return;
@@ -35,20 +34,13 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             });
             newSocket.connect()
             newSocket.on("connect", () => {
+                console.log("newSocket", newSocket)
                 setIsConnected(true);
             });
-
-
-
-
-
-
-
             setSocket(newSocket);
         }
         a()
         return () => {
-            // newSocket.disconnect();
         };
     }, [user?.id]);
     return (

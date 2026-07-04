@@ -9,10 +9,8 @@ import { NavigationProp, ParamListBase, useFocusEffect, useNavigation } from '@r
 import { useAppDispatch, useAppSelector } from '../../store'
 import { GetJobApplication } from '../../reducer/jobsReducer'
 import { formatSalaryRange } from '../../utils'
-import Routes from '../../navigation/Routes'
 import Text from '../../components/Text'
 import { EmptyComp } from '../../recruiter/pages/OpenJobs/OpenJobs'
-
 const ApplyJob = () => {
   const { colors } = useContext(ThemeContext);
   const [cvs, setCvs] = useState({

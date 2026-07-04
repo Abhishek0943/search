@@ -238,7 +238,6 @@ function RecruiterHome() {
         <NavigationBar name={routes.RECRUITERHOME}>
             <>
                 <Image source={require("./Ellipse44.png")} style={{ position: "absolute", width: responsiveScreenWidth(100), height: responsiveScreenHeight(100), top: -100, }} />
-
                 <View style={{ width: "90%", flex: 1, marginTop: responsiveScreenHeight(2), alignSelf: "center", borderRadius: 10, }}>
                     {/* {
                         plan?.plans?.length > 0 ? <> */}
@@ -251,7 +250,7 @@ function RecruiterHome() {
                                 return null
                             }
                             return (
-                                <View style={{ flex: 1, marginTop: responsiveScreenHeight(15) }}><ActivityIndicator size={responsiveScreenFontSize(3)} /></View>
+                                <View style={{ flex: 1, marginTop: responsiveScreenHeight(15), }}><ActivityIndicator size={responsiveScreenFontSize(3)} /></View>
 
                             )
                         }}
@@ -320,14 +319,14 @@ function RecruiterHome() {
                                             <View style={styles.planWrap}>
                                                 <Text style={styles.planTitle}>Choose your plan</Text>
                                                 <Text style={[styles.planSubTitle, { color: colors.hardGray, marginTop: responsiveScreenHeight(.8) }]}>Change or cancel anytime.</Text>
-                                            </View> : <>
+                                            </View> : <View style={{ height: responsiveScreenHeight(45), justifyContent: "center", alignItems: "center" }}>
                                                 <Image source={require("./inActive.png")} style={{ marginVertical: responsiveScreenHeight(2) }} />
                                                 <TouchableOpacity style={{}} onPress={() => navigation.navigate(routes.CONTACT)}>
 
                                                     <Image source={require("./popupbutton.png")} style={{}} />
                                                 </TouchableOpacity>
 
-                                            </>
+                                            </View>
                                     }
                                 </>
                             )

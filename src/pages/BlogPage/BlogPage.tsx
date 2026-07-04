@@ -1,8 +1,6 @@
 import { ScrollView, StyleSheet, View, TouchableOpacity, Alert, ActivityIndicator, Linking, RefreshControl } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
-import { useNavigation, useRoute } from '@react-navigation/native'
-import { routes } from '../../constants/values'
-
+import { useRoute } from '@react-navigation/native'
 import { ArticleCard } from '../Blog'
 import { useAppDispatch, useAppSelector } from '../../store'
 import { NavigationBar } from '../../components'
@@ -13,7 +11,7 @@ import Icon from '../../utils/Icon'
 import Button from '../../components/Button'
 import Text from '../../components/Text'
 import { CreatorRequest, MyBlogs } from '../../reducer/userReducer'
-import { DeleteBlog, ProfileData, ProfileData2 } from '../../reducer/jobsReducer'
+import { DeleteBlog, ProfileData, } from '../../reducer/jobsReducer'
 import { useAlert } from '../../context/AlertContext'
 import { RecruiterProfile } from '../../reducer/recruiterReducer'
 const BlogPage = () => {
@@ -95,8 +93,27 @@ const BlogPage = () => {
 
     const onRefresh = async () => {
         setRefreshing(true)
-        setPage(1)
-        await fetchMyBlogs({ status: selectedStatus, page: 1 })
+        let currentStatus = creatorData;
+        try {
+            if (userType === 'user') {
+                const res = await dispatch(ProfileData()).unwrap() as any;
+                if (res.success && res.data) {
+                    currentStatus = res.data.creator_status;
+                }
+            } else {
+                const res = await dispatch(RecruiterProfile()).unwrap() as any;
+                if (res.success && res.data) {
+                    currentStatus = res.data.creator_status;
+                }
+            }
+        } catch (error) {
+            console.log("Error refreshing profile status:", error);
+        }
+
+        if (currentStatus === 'approved') {
+            setPage(1)
+            await fetchMyBlogs({ status: selectedStatus, page: 1 })
+        }
         setRefreshing(false)
     }
 

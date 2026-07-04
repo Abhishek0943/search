@@ -55,7 +55,11 @@ const Notification = () => {
   );
   const openURL = (url: any) => {
     if (!url) return;
-    navigation.navigate(routes.BROWSER as never, { url } as never);
+    if (url === "https://searchtalents.co/creator-dashboard") {
+      navigation.navigate(routes.BLOGPAGE as never, { isFavorite: true } as never);
+    } else {
+      navigation.navigate(routes.BROWSER as never, { url } as never);
+    }
   };
   return (
     <>
@@ -91,8 +95,8 @@ const Notification = () => {
                         </View>
                         <TouchableOpacity onPress={() => {
                           setActive(0)
-
-                          if (item.type === "blog_rejected" || item.type === "blog_published" || item.type === "blog_approved") {
+                          console.log(item)
+                          if (item.type === "blog_rejected" || item.type === "creator_request_status" || item.type === "blog_published" || item.type === "blog_approved") {
                             openURL(item.redirect)
                           }
                           else if (item.job?.id || item.application_id) {
@@ -100,6 +104,14 @@ const Notification = () => {
                               item?.job?.id && navigation.navigate(routes.JOBDETAIL, { id: item.job.id })
                             } else {
                               navigation.navigate(routes.CANDIDATEPROFILE, { application_id: item.application_id, })
+                            }
+                          } else if (item.type === "chat" || item.type === "message" || item.chat_id) {
+                            const partnerId = item.sender_id || item.seeker_id || item.company_id || item.chat_id || item.from?.id;
+                            const partnerName = item.sender_name || item.from?.name || "Chat";
+                            if (partnerId) {
+                              navigation.navigate(routes.MESSAGE, { id: Number(partnerId), name: partnerName })
+                            } else {
+                              navigation.navigate(routes.CHAT)
                             }
                           } else {
                             navigation.goBack()

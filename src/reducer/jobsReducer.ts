@@ -17,11 +17,11 @@ export const GetBookmarkJobs = createAsyncThunk<
   }
 );
 export const GetRecentJobs = createAsyncThunk<
-  { success: true, data: Job[] } | ErrorResponse
+  { success: true, data: Job[] } | ErrorResponse, { page?: number }
 >(
   'GetRecentJobs',
-  () => {
-    return getApiCall<{ success: true, data: Job[] }>('/jobseekers/jobs');
+  ({ page = 1 }) => {
+    return getApiCall<{ success: true, data: Job[] }>('/jobseekers/jobs?page=' + page);
   }
 );
 export const GetJobByStatus = createAsyncThunk<
@@ -177,19 +177,19 @@ export const DeleteSesdkfjds = createAsyncThunk<
   }
 );
 export const GetCompanies = createAsyncThunk<
-  { success: true, data: { companies: Company[] } } | ErrorResponse, { pages?: number }
+  { success: true, data: { companies: Company[] } } | ErrorResponse, { pages?: number, search?: string }
 >(
   'GetCompanies',
-  ({ pages }) => {
-    return getApiCall<{ success: true, data: { companies: Company[] } }>('/jobseekers/company-list?page=' + (pages || 1));
+  ({ pages, search }) => {
+    return getApiCall<{ success: true, data: { companies: Company[] } }>('/jobseekers/company-list?page=' + (pages || 1) + (search ? '&search=' + encodeURIComponent(search) : ''));
   }
 );
 export const GetFavoriteCompanies = createAsyncThunk<
-  { success: true, data: { companies: Company[] } } | ErrorResponse
+  { success: true, data: { companies: Company[] } } | ErrorResponse, { pages?: number, search?: string }
 >(
   'GetFavoriteCompanies',
-  ({ pages }) => {
-    return getApiCall<{ success: true, data: { companies: Company[] } }>('/jobseekers/my-favourite-companies?page=' + (pages || 1));
+  ({ pages, search }) => {
+    return getApiCall<{ success: true, data: { companies: Company[] } }>('/jobseekers/my-favourite-companies?page=' + (pages || 1) + (search ? '&search=' + encodeURIComponent(search) : ''));
   }
 );
 export const ContactT = createAsyncThunk<
@@ -744,6 +744,7 @@ const initialState: JobInitialState = {
   suggested: [],
   recent: [],
   appliedJobIds: [],
+  bookmarkedJobIds: {} as Record<number, boolean>,
   banners: []
 };
 const jobSlice = createSlice({
@@ -785,6 +786,9 @@ const jobSlice = createSlice({
         state.appliedJobIds.push(payload);
       }
     },
+    toggleBookmark: (state, { payload }: { payload: { id: number, is_favorited: boolean } }) => {
+      state.bookmarkedJobIds[payload.id] = !payload.is_favorited;
+    },
   },
   extraReducers(builder) {
     builder
@@ -795,7 +799,7 @@ const jobSlice = createSlice({
       })
       .addCase(GetRecentJobs.fulfilled, (state, { payload }) => {
         if (payload.success) {
-          state.recent = payload.data
+          state.recent = payload.data.jobs
         }
       })
       .addCase(GetBanners.fulfilled, (state, { payload }) => {
@@ -808,5 +812,5 @@ const jobSlice = createSlice({
 
 
 
-export const { setAppliedJobId } = jobSlice.actions;
+export const { setAppliedJobId, toggleBookmark } = jobSlice.actions;
 export default jobSlice.reducer;

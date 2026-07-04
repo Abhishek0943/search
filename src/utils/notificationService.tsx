@@ -92,10 +92,14 @@ export const onDisplayNotification = async (title: string, body: string, imageUr
     data,
     android: {
       channelId,
-      style: {
-        type: AndroidStyle.BIGPICTURE,
-        picture: imageUrl || "",
-      },
+      ...(imageUrl
+        ? {
+            style: {
+              type: AndroidStyle.BIGPICTURE,
+              picture: imageUrl,
+            },
+          }
+        : {}),
       pressAction: {
         id: 'default',
       },

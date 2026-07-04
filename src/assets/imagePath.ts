@@ -10,6 +10,8 @@ export default {
     logo: require('./Icon/logo.png'),
     bookmark: require('./Icon/bookmark.png'),
     backIcon: require('./Icon/backIcon.png'),
+    expired: require('./Icon/expired.png'),
+
     search: require('./Icon/search.png'),
     history: require('./Icon/history.png'),
     cross: require('./Icon/cross.png'),

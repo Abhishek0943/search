@@ -631,6 +631,8 @@ const PersonalInfo = () => {
                     paddingVertical: responsiveScreenHeight(1.3),
                     marginTop: responsiveScreenHeight(1),
                   }}
+                  maxLength={10}
+
                   placeholderTextColor={colors.gray}
                   placeholder="Enter Phone Number"
                   keyboardType="phone-pad"
@@ -656,14 +658,14 @@ const PersonalInfo = () => {
                   >
                     Mobile Number
                   </Text>
-                  <Text
+                  {/* <Text
                     style={{
                       color: colors.red,
                       fontSize: responsiveScreenFontSize(1.8),
                     }}
                   >
                     *
-                  </Text>
+                  </Text> */}
                 </View>
                 <TextInput
                   style={{
@@ -677,6 +679,7 @@ const PersonalInfo = () => {
                     paddingVertical: responsiveScreenHeight(1.3),
                     marginTop: responsiveScreenHeight(1),
                   }}
+                  maxLength={10}
                   placeholderTextColor={colors.gray}
                   placeholder="Enter Mobile Number"
                   keyboardType="phone-pad"
@@ -1140,15 +1143,7 @@ const PersonalInfo = () => {
                   return;
                 }
 
-                // 🔹 Contact validations
 
-                if (!formData.mobileNumber?.trim()) {
-                  showAlert({
-                    title: "Validation",
-                    message: "Please enter mobile number",
-                  });
-                  return;
-                }
                 if (formData.videoProfileUrl?.trim() && !/^https?:\/\/.+/i.test(formData.videoProfileUrl.trim())) {
                   showAlert({
                     title: "Validation",
@@ -1237,7 +1232,7 @@ const PersonalInfo = () => {
               mode={"date"}
               open={dobModalOpen}
               date={formData.dateOfBirth || new Date()}
-            minimumDate={new Date(1900, 0, 1)}
+              minimumDate={new Date(1900, 0, 1)}
               maximumDate={new Date()}
               onConfirm={(date) => {
                 setDobModalOpen(false)

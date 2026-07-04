@@ -71,6 +71,7 @@ const Search = () => {
   const [filter, setFilter] = useState<FilterState>({});
   const [functionalAreas, setFunctionalAreas] = useState([]);
   const [pages, setPages] = useState(1)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [meta, setMeta] = useState({})
   const [ready, setReady] = useState(false);
 
@@ -104,14 +105,17 @@ const Search = () => {
         if (!res?.success) return;
 
         setMeta(res.data.meta);
-
+        console.log(res.data.jobs, "=========================")
         if (res.data.meta.current_page === 1) {
           setJob(res.data.jobs);
         } else {
           setJob(prev => [...prev, ...res.data.jobs]); // ✅ avoid stale "job"
         }
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setLoading(false)
+        setLoadingMore(false)
+      });
 
     return () => {
       // ✅ cancels previous request if filter/pages changes quickly
@@ -122,8 +126,10 @@ const Search = () => {
   const onLoadMore = React.useCallback(() => {
     if (!meta?.last_page) return;
     if (meta?.current_page >= meta.last_page) return;
+    if (loadingMore) return;
+    setLoadingMore(true)
     setPages((p) => p + 1);
-  }, [meta?.last_page, meta?.current_page]);
+  }, [meta?.last_page, meta?.current_page, loadingMore]);
   useEffect(() => {
     dispatch(FunctionalAria())
       .unwrap()
@@ -133,7 +139,7 @@ const Search = () => {
         }
       });
   }, [])
-  const { appliedJobIds } = useAppSelector(state => state.jobsReducer)
+  // const { appliedJobIds } = useAppSelector(state => state.jobsReducer)
 
   useEffect(() => {
     dispatch(GetFilter({})).unwrap().then((res) => {
@@ -194,6 +200,8 @@ const Search = () => {
               <TouchableOpacity
                 onPress={() => {
                   setActiveFilter(false)
+                  setPages(1)
+                  setLoading(true)
                   setFilter(temFilter)
                 }}
                 style={{
@@ -216,7 +224,6 @@ const Search = () => {
               </TouchableOpacity>
 
             </View> : <>
-
               <View style={{ flexDirection: "row", marginTop: responsiveScreenHeight(1), gap: responsiveScreenWidth(2), alignItems: "center", width: responsiveScreenWidth(90), marginHorizontal: "auto" }}>
                 <TouchableOpacity
                   style={{
@@ -303,7 +310,10 @@ const Search = () => {
                         return (
                           <>
                             <Pressable
-                              onPress={() => { setFilter({}) }}
+                              onPress={() => {
+                                setFilter({})
+                                setLoading(true)
+                              }}
                               style={{
                                 width: '100%',
                                 justifyContent: 'center',
@@ -329,10 +339,12 @@ const Search = () => {
                       onEndReached={onLoadMore}       // ✅
                       scrollEventThrottle={16}
                       removeClippedSubviews={false}
-                      keyExtractor={(i) => `${i.id}fasdfdasfasdfsadfdasfdasfdasfasdfsdfadsffdsafdsfasdfasdfadsferfewrqewserchitem`}
+                      ListFooterComponent={loadingMore ? <ActivityIndicator size="small" style={{ marginVertical: responsiveScreenHeight(2) }} /> : null}
+                      keyExtractor={(i, index) => `${index}fasdfasdfdasfasdfsadfdasfdasfdasfasdfsdfadsffdsafdsfasdfasdfadsferfewrqewserchitem`}
                       style={{ width: responsiveScreenWidth(94), marginHorizontal: "auto" }} data={job} renderItem={({ item, index }) => {
                         return (
                           <JobCard refresh={() => {
+                            setLoading(true)
                             dispatch(GetJobs({ search: search })).unwrap().then((res) => {
                               if (res.success) {
                                 setJob(res.data.jobs)

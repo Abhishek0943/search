@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, BackHandler, FlatList, Image, ImageBackground, Platform, Pressable, ScrollView, StyleSheet, TextInput, TouchableHighlight, TouchableOpacity, View } from 'react-native';
 import { NavigationBar, } from '../../components';
 import { responsiveFontSize, responsiveHeight, responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth, responsiveWidth } from 'react-native-responsive-dimensions';
@@ -7,7 +7,7 @@ import { NavigationProp, ParamListBase, useFocusEffect, useNavigation, useRoute 
 import Icon from '../../utils/Icon';
 import { routes } from '../../constants/values';
 import { useAppDispatch, useAppSelector } from '../../store';
-import { Bookmark, GetBanners, GetRecentJobs, GetSuggestedJobs, ProfileData, } from '../../reducer/jobsReducer';
+import { Bookmark, GetBanners, GetRecentJobs, GetSuggestedJobs, ProfileData, toggleBookmark } from '../../reducer/jobsReducer';
 import imagePath from '../../assets/imagePath';
 import { formatSalaryRange } from '../../utils';
 import Text from '../../components/Text';
@@ -17,16 +17,40 @@ import { Tokien } from '../../reducer/recruiterReducer';
 function Home() {
   const { colors } = useContext(ThemeContext)
   const navigation: NavigationProp<ParamListBase> = useNavigation()
-  const { suggested, recent, banners } = useAppSelector(state => state.jobsReducer)
-  const { user, } = useAppSelector(state => state.userStore)
-  const { appliedJobIds } = useAppSelector(state => state.jobsReducer)
+  const { suggested, banners } = useAppSelector(state => state.jobsReducer)
+  const { user } = useAppSelector(state => state.userStore)
+  const { appliedJobIds, bookmarkedJobIds } = useAppSelector(state => state.jobsReducer)
   const [search, setSearch] = useState<string>("")
   const dispatch = useAppDispatch()
+  const [recent, setRecent] = useState<any[]>([])
+  const [page, setPage] = useState(2)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [meta, setMeta] = useState<any>(null)
+  const scrollViewRef = useRef<ScrollView>(null)
+
+  const onLoadMore = () => {
+    if (loadingMore || !meta || meta.current_page >= meta.last_page) return;
+    setLoadingMore(true);
+    dispatch(GetRecentJobs({ page: page })).unwrap().then((res) => {
+      setLoadingMore(false);
+      if (res.success) {
+        setRecent(prev => [...prev, ...res.data.jobs]);
+        setMeta(res.data.meta);
+        setPage(prev => prev + 1);
+      }
+    }).catch(() => {
+      setLoadingMore(false);
+    });
+  };
+
   useEffect(() => {
     dispatch(GetSuggestedJobs())
-    dispatch(GetRecentJobs())
-    dispatch(GetBanners()).unwrap().then((res) => {
-      console.log(res)
+    dispatch(GetBanners())
+    dispatch(GetRecentJobs({})).unwrap().then((res) => {
+      if (res.success) {
+        setRecent(res.data.jobs)
+        setMeta(res.data.meta)
+      }
     })
   }, [])
   useFocusEffect(
@@ -53,7 +77,9 @@ function Home() {
   useBlockBack()
   return (
     <>
-      <NavigationBar statusbar={user?.id ? true : false} name={routes.HOME}>
+      <NavigationBar statusbar={user?.id ? true : false} name={routes.HOME} onPress={() => {
+        scrollViewRef.current?.scrollTo({ y: 0, animated: true })
+      }}>
         {
           !user?.id ? <>
             <ImageBackground
@@ -128,7 +154,18 @@ function Home() {
 
             </ImageBackground>
           </> :
-            <ScrollView style={{ flex: 1, paddingHorizontal: responsiveScreenWidth(5) }}>
+            <ScrollView
+              ref={scrollViewRef}
+              style={{ flex: 1, paddingHorizontal: responsiveScreenWidth(5) }}
+              onScroll={({ nativeEvent }) => {
+                const paddingToBottom = 1000;
+                const isCloseToBottom = nativeEvent.layoutMeasurement.height + nativeEvent.contentOffset.y >= nativeEvent.contentSize.height - paddingToBottom;
+                if (isCloseToBottom) {
+                  onLoadMore();
+                }
+              }}
+              scrollEventThrottle={400}
+            >
               <View style={{ height: responsiveScreenHeight(5), flexDirection: "row", alignItems: "stretch", gap: responsiveScreenWidth(2), }}>
                 <Pressable onPress={() => navigation.navigate(routes.PROFILE)} style={{ height: "100%", aspectRatio: 1, overflow: "hidden", borderRadius: 5 }}>
                   <Image source={{ uri: user.image }} style={{ height: "100%", resizeMode: "cover", }} />
@@ -195,7 +232,8 @@ function Home() {
                 />
               ) : (
                 <Pressable onPress={() => navigation.navigate(routes.RECENTJOB)} style={{ width: "100%", aspectRatio: 2.58 }}>
-                  <Image source={imagePath.banner} style={{ width: "100%", height: "100%", }} />
+                  <ActivityIndicator size="small" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} />
+                  {/* <Image source={imagePath.banner} style={{ width: "100%", height: "100%", }} /> */}
                 </Pressable>
               )}
               <Text style={{ fontSize: responsiveScreenFontSize(2.4), fontWeight: "700", textTransform: "capitalize", marginTop: responsiveScreenHeight(1.5) }}>browser by jobs</Text>
@@ -232,8 +270,11 @@ function Home() {
                               <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "700" }}>{item.title}</Text>
                               <Text numberOfLines={1} style={{ textTransform: "capitalize", fontSize: responsiveScreenFontSize(1.8), fontWeight: "400" }} >{item.company_info.name}</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => dispatch(Bookmark({ id: item.id })).unwrap().then((res) => dispatch(GetSuggestedJobs()))}>
-                              <Image source={item.is_favorited ? imagePath.activeBookmark : imagePath.bookmark} />
+                            <TouchableOpacity onPress={() => {
+                              dispatch(toggleBookmark({ id: item.id, is_favorited: bookmarkedJobIds[item.id] ?? item.is_favorited }))
+                              dispatch(Bookmark({ id: item.id }))
+                            }}>
+                              <Image source={(bookmarkedJobIds[item.id] ?? item.is_favorited) ? imagePath.activeBookmark : imagePath.bookmark} />
                             </TouchableOpacity>
                           </View>
                           <View style={{ flexDirection: "row", gap: responsiveScreenWidth(2), flexWrap: "wrap", marginVertical: responsiveScreenHeight(2) }}>
@@ -258,13 +299,18 @@ function Home() {
                                 </>
                               }
                             </Text>
-                            {
-                              !item?.is_applied && !isApplied &&
+                            {item?.is_applied || isApplied ? (
+                              <View style={{ borderRadius: 6, gap: responsiveScreenWidth(1), flexDirection: "row", opacity: 0.5, alignItems: "center", backgroundColor: colors.primary, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(.7) }}>
+                                <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8) }}>Applied</Text>
+                              </View>
+                            ) : item?.expired ? (
+                              <Image source={imagePath.expired} style={{ resizeMode: "contain" }} />
+                            ) : (
                               <TouchableOpacity onPress={() => { navigation.navigate(routes.APPLY, { id: item.id }) }} style={{ borderRadius: 6, gap: responsiveScreenWidth(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.primary, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(.7) }}>
                                 <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8) }}>Apply Now</Text>
                                 <Icon icon={{ type: "Feather", name: 'arrow-right' }} style={{ color: colors.white, fontSize: responsiveScreenFontSize(2) }} />
                               </TouchableOpacity>
-                            }
+                            )}
                           </View>
                         </View>
                       </>
@@ -291,35 +337,31 @@ function Home() {
                               />
                             </View>
                             <View style={{ flex: 1 }} />
-                            <TouchableOpacity onPress={() => dispatch(Bookmark({ id: job.id })).unwrap().then((res) => dispatch(GetRecentJobs()))}>
-                              <Image source={job.is_favorited ? imagePath.activeBookmark : imagePath.bookmark} />
+                            <TouchableOpacity onPress={() => {
+                              dispatch(toggleBookmark({ id: job.id, is_favorited: bookmarkedJobIds[job.id] ?? job.is_favorited }))
+                              dispatch(Bookmark({ id: job.id }))
+                            }}>
+                              <Image source={(bookmarkedJobIds[job.id] ?? job.is_favorited) ? imagePath.activeBookmark : imagePath.bookmark} />
                             </TouchableOpacity>
-                            {/* <TouchableOpacity onPress={handleBookmark}>
-                              <Image
-                                source={job?.is_favorited ? imagePath.bookmarked : imagePath.bookmark}
-                                style={[
-                                  styles.bookmarkIcon,
-                                  { tintColor: job?.is_favorited ? colors.primary : colors.textThree },
-                                ]}
-                              />
-                            </TouchableOpacity> */}
-                          </View>
+                          </View >
                           <View style={styles.companyInfo}>
                             <Text style={[styles.companyName, { color: colors.textOne }]}>
-                              {job?.company_info?.name || 'Digitz Technologies'}
+                              {job?.company_info?.name}
                             </Text>
                             <Text style={[styles.companyCategory, { color: colors.textOne }]}>
-                              {job?.company_info?.category || job?.title || 'Digital Marketing Agency'}
+                              {job?.company_info?.category || job?.title}
                             </Text>
                           </View>
-                          {job?.expired && (
-                            <Image
-                              source={imagePath.expired}
-                              style={{ marginTop: responsiveHeight(1), }}
-                            />
-                          )}
+                          {
+                            job?.expired && (
+                              <Image
+                                source={imagePath.expired}
+                                style={{ marginTop: responsiveHeight(1), }}
+                              />
+                            )
+                          }
                           <View style={[styles.metaRow, { marginTop: responsiveHeight(1) }]}>
-                            <Image source={imagePath.clock} style={{ transform: [{ scale: .8 }] }} />
+                            <Image source={imagePath.clock} style={{ transform: [{ scale: .7 }] }} />
                             <Text style={[styles.metaText, { color: "#484848" }]}>
                               {job?.job_type || 'Full Time'}
                             </Text>
@@ -327,39 +369,49 @@ function Home() {
                           {
                             (job?.company_info?.location || job?.address || job?.city?.name || job?.location) && (
                               <View style={styles.metaRow}>
-                                <Image source={require("./location2.png")} style={{ transform: [{ scale: .8 }] }} />
+                                <Image source={require("./location2.png")} style={{ transform: [{ scale: .7 }] }} />
                                 <Text style={[styles.metaText, { color: "#484848" }]} numberOfLines={2}>
                                   {job?.company_info?.location || job?.address || job?.city?.name || job?.location}
                                 </Text>
                               </View>
                             )
                           }
-                          {job?.description && (
-                            <Text numberOfLines={4} style={[{ lineHeight: responsiveHeight(2), color: "#737373", fontSize: responsiveFontSize(1.8) }]}>
-                              {job?.description}
-                            </Text>
-                          )}
 
-                          {/* ── Salary ─────────────────────────────────── */}
-                          {(job?.salary_from || job?.salary_to) && (
-                            <View style={styles.metaRow}>
-                              <Text style={[styles.salaryText, { color: colors.textOne }]}>
-                                ₹{job?.salary_from}L – ₹{job?.salary_to}L
+                          <View style={{ flexDirection: "row", gap: responsiveScreenWidth(2), flexWrap: "wrap", marginVertical: responsiveScreenHeight(1) }}>
+                            {
+                              job?.posted_at && <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>Post Date : {job?.posted_at}</Text>
+                            }
+                            {
+                              job?.expiredAt && <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>Expiry Date : {job?.expiredAt}</Text>
+                            }
+
+                            {
+                              (job?.salary && job?.salary_period) ? (
+                                <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>{job.salary_currency}{job.salary}/{job.salary_period}</Text>
+                              ) : (job?.salary_from || job?.salary_to) ? (
+                                <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>Salary : {job.salary_currency}{job.salary_from} - {job.salary_to}</Text>
+                              ) : null
+                            }
+                          </View>
+                          {
+                            job?.description && (
+                              <Text numberOfLines={4} style={[{ lineHeight: responsiveHeight(2), color: "#737373", fontSize: responsiveFontSize(1.8) }]}>
+                                {job?.description}
                               </Text>
-                            </View>
-                          )}
-
-                          {/* ── Highlights ─────────────────────────────── */}
-                          {highlights.length > 0 && (
-                            <View style={styles.highlightsContainer}>
-                              {highlights.slice(0, 3).map((item, idx) => (
-                                <View key={idx} style={styles.bulletRow}>
-                                  <View style={[styles.bullet, { backgroundColor: colors.textThree }]} />
-                                  <Text style={[styles.bulletText, { color: colors.textTwo }]}>{item}</Text>
-                                </View>
-                              ))}
-                            </View>
-                          )}
+                            )
+                          }
+                          {
+                            highlights.length > 0 && (
+                              <View style={styles.highlightsContainer}>
+                                {highlights.slice(0, 3).map((item, idx) => (
+                                  <View key={idx} style={styles.bulletRow}>
+                                    <View style={[styles.bullet, { backgroundColor: colors.textThree }]} />
+                                    <Text style={[styles.bulletText, { color: colors.textTwo }]}>{item}</Text>
+                                  </View>
+                                ))}
+                              </View>
+                            )
+                          }
 
                           {/* ── Footer: Quick Apply + days ago ─────────── */}
                           {/* <View style={styles.footerRow}>
@@ -376,10 +428,11 @@ function Home() {
                             </Text>
                           </View> */}
                           {
-                            !job?.is_applied && !isApplied &&
+                            !job?.is_applied && !isApplied && !job?.expired &&
                             <TouchableOpacity onPress={() => { navigation.navigate(routes.APPLY, { id: job.id }) }} style={{ marginTop: responsiveScreenHeight(1.5) }}>
                               <Image source={require('./updateAndSaveButton.png')} style={{ width: "100%", resizeMode: "contain" }} />
-                            </TouchableOpacity>}
+                            </TouchableOpacity>
+                          }
                         </Pressable>
                         {/* <View style={{ paddingVertical: responsiveScreenHeight(1), height: responsiveScreenHeight(10), justifyContent: "center", paddingHorizontal: responsiveScreenWidth(2), backgroundColor: "#F5F5F5", borderRadius: 15 }}>
                           <View style={{ flexDirection: "row", gap: responsiveScreenWidth(3), justifyContent: "space-between", alignItems: "center" }}>
@@ -407,16 +460,17 @@ function Home() {
                       </>
                     )
                   }} />
+                  {loadingMore && <ActivityIndicator size="small" style={{ marginVertical: responsiveScreenHeight(2) }} />}
                 </> :
                   <>
                     <View style={{ flex: 1, marginTop: responsiveScreenHeight(15) }}><ActivityIndicator size={responsiveScreenFontSize(3)} /></View>
                   </>
               }
 
-            </ScrollView>
+            </ScrollView >
         }
 
-      </NavigationBar>
+      </NavigationBar >
     </>
   );
 }

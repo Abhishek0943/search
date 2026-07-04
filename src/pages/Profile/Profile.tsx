@@ -11,7 +11,6 @@ import { DeleteSesdkfjds, ProfileData, ProfileData2, UpdateProfile } from '../..
 import imagePath from '../../assets/imagePath'
 import { ThemeContext } from '../../context/ThemeProvider'
 import { NavigationProp, ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native'
-import { launchImageLibrary } from 'react-native-image-picker'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Text from '../../components/Text';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -214,7 +213,6 @@ const Profile = () => {
                                     </TouchableOpacity>
 
                                     <TouchableOpacity
-
                                         onPress={async () => {
                                             showConfirm({
                                                 title: "Delete Account",
@@ -236,15 +234,6 @@ const Profile = () => {
                                                     return true;
                                                 },
                                             })
-                                            const ok = await showConfirm({
-                                                title: "Delete Account",
-                                                message: "Are you sure you want to delete your account?",
-                                                okText: "Delete",
-                                                cancelText: "Cancel",
-                                            })
-                                            if (ok && user && user?.id) {
-
-                                            }
                                         }}
                                         style={{ width: "90%", marginHorizontal: "auto", flexDirection: "row", marginTop: responsiveScreenHeight(1), alignItems: "center", gap: responsiveScreenHeight(1) }}>
                                         <Image tintColor={colors.textPrimary} style={{ width: responsiveScreenWidth(7), resizeMode: "contain" }} source={imagePath.delete} />

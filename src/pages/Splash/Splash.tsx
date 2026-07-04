@@ -5,7 +5,6 @@ import { responsiveScreenHeight, responsiveScreenWidth } from 'react-native-resp
 import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native'
 import { useAppDispatch, useAppSelector } from '../../store'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { TokenLogin } from '../../reducer/userReducer'
 import { ThemeContext } from '../../context/ThemeProvider'
 import { EnvContext } from '../../context/EnvProvider'
 import { ProfileData } from '../../reducer/jobsReducer'
@@ -16,37 +15,37 @@ const Splash = () => {
   const { isAuth, user } = useAppSelector(state => state.userStore);
   const { colors } = useContext(ThemeContext)
   const { env } = useContext(EnvContext);
-useEffect(() => {
-  const login = async () => {
+  useEffect(() => {
+    const login = async () => {
+      // 500 ms delay
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-    // 500 ms delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+      const token = await AsyncStorage.getItem("token");
+      const role = (await AsyncStorage.getItem("role")) as "seeker" | "recruiter";
 
-    const token = await AsyncStorage.getItem("token");
-    const role = (await AsyncStorage.getItem("role")) as "seeker" | "recruiter";
+      if (!token && !role) {
+        navigation.navigate(routes.WELCOME);
+        return;
+      }
 
-    if (!token && !role) {
-      navigation.navigate(routes.WELCOME);
-      return;
-    }
+      if (role === "recruiter") {
+        dispatch(RecruiterProfile()).unwrap().then((res) => {
+          if (res.success) {
+            navigation.navigate(routes.RECRUITERHOME);
+          } else {
+            navigation.navigate(routes.WELCOME);
+          }
+        });
+      } else {
+        dispatch(ProfileData()).unwrap().then((res) => {
+          console.log("res", res)
+          navigation.navigate(routes.HOME);
+        });
+      }
+    };
 
-    if (role === "recruiter") {
-      dispatch(RecruiterProfile()).unwrap().then((res) => {
-        if (res.success) {
-          navigation.navigate(routes.RECRUITERHOME);
-        } else {
-          navigation.navigate(routes.WELCOME);
-        }
-      });
-    } else {
-      dispatch(ProfileData()).unwrap().then(() => {
-        navigation.navigate(routes.HOME);
-      });
-    }
-  };
-
-  login();
-}, []);
+    login();
+  }, []);
 
 
   return (

@@ -13,7 +13,6 @@ import { useSocket } from '../../context/SocketProvider'
 import { SendMessage, SendMessageSeeker } from '../../reducer/recruiterReducer'
 import { pick, types } from '@react-native-documents/picker'
 import Icon from '../../utils/Icon'
-import { setMessageCount } from '../../reducer/userReducer'
 import { downloadCV } from '../../recruiter/pages/CandidateProfile/CandidateProfile'
 
 const Messages = () => {
@@ -34,28 +33,17 @@ const Messages = () => {
         if (meta?.current_page >= meta.last_page) return;
         setPages((p) => p + 1);
     }, [meta?.last_page, meta?.current_page]);
-    useEffect(() => {
-        if (!socket || !isConnected) return;
-
-        // join room
-        // socket.emit("chat:join", { conversationId });
-
-        // receive new message
-        // const onNewMessage = (data: Message) => {
-        //   setMessages(prev => [data, ...prev]);
-        // };
-
-        socket.on("message_delivered", (e) => {
-        });
-
-        // optional: load history
+    // useEffect(() => {
+    //     if (!socket || !isConnected) return;
+    //     socket.on("message_delivered", (e) => {
+    //     });
 
 
-        return () => {
-            // socket.off("chat:new_message", onNewMessage);
-            socket.emit("chat:leave");
-        };
-    }, [socket, isConnected]);
+
+    //     return () => {
+    //         socket.emit("chat:leave");
+    //     };
+    // }, [socket, isConnected]);
     useEffect(() => {
         const login = async () => {
             const role = await AsyncStorage.getItem("role") as "seeker" | "recruiter"
@@ -92,7 +80,6 @@ const Messages = () => {
     }, [dataa, role, pages])
     useEffect(() => {
         if (!socket || !isConnected) return;
-
         const handler = (e: any) => {
             const msg = e?.message;
             if (!msg?.id) return;
@@ -186,8 +173,8 @@ const Messages = () => {
                         <Image source={{ uri: item.logo }} style={{ height: "100%", width: "100%" }} />
                     </View>
                     <View>
-                        <Text style={{ fontSize: responsiveScreenFontSize(2), color: "rgba(11, 11, 11, 0.9)", fontWeight: "600" }}>{dataa.name}</Text>
-                        <Text style={{ fontSize: responsiveScreenFontSize(2), color: colors.darkGrayNatural, fontWeight: "600" }}>online</Text>
+                        <Text numberOfLines={1} style={{ width: responsiveScreenWidth(60), fontSize: responsiveScreenFontSize(2), color: "rgba(11, 11, 11, 0.9)", fontWeight: "600", }}>{dataa.name}</Text>
+                        {/* <Text style={{ fontSize: responsiveScreenFontSize(2), color: colors.darkGrayNatural, fontWeight: "600" }}>online</Text> */}
                     </View>
 
                 </View>
