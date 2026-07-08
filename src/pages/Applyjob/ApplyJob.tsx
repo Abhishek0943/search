@@ -2,7 +2,7 @@ import { View, ScrollView, Image, Pressable, TextInput, FlatList, TouchableHighl
 import React, { useCallback, useContext, useState } from 'react'
 import { NavigationBar } from '../../components'
 import { routes } from '../../constants/values'
-import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions'
+import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth, responsiveWidth } from 'react-native-responsive-dimensions'
 import imagePath from '../../assets/imagePath'
 import { ThemeContext } from '../../context/ThemeProvider'
 import { NavigationProp, ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native'
@@ -145,14 +145,14 @@ const ApplyJob = () => {
                       <View style={{ paddingVertical: responsiveScreenHeight(2), borderWidth: 1, borderColor: colors.lightGray, paddingHorizontal: responsiveScreenWidth(4), backgroundColor: "#ffffffff", borderRadius: 15 }}>
                         <View style={{ flexDirection: "row", gap: responsiveScreenWidth(3), justifyContent: "space-between", alignItems: "flex-start" }}>
                           <View style={{ borderRadius: 6, height: responsiveScreenHeight(6), overflow: "hidden", backgroundColor: "#CECECE38" }}>
-                            <Image source={{ uri: item.company_info.image }} style={{ height: "100%", aspectRatio: 1 }} />
+                            <Image source={{ uri: item.company_info.image }} style={{ height: "100%", aspectRatio: 1, resizeMode: "contain" }} />
                           </View>
                           <View style={{ flex: 1 }}>
                             <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(2.2), fontWeight: "700" }}>{item.title}</Text>
                             <Text style={{ color: colors.textPrimary, fontSize: responsiveScreenFontSize(2), marginTop: responsiveScreenHeight(.5), textTransform: "capitalize" }}>{item.company_info.name}</Text>
                             <View style={{ flexDirection: "row", gap: responsiveScreenWidth(2), marginTop: responsiveScreenHeight(1) }}>
                               <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(1) }}>
-                                <Image source={require("./salary.png")} />
+                                <Image source={require("./salary.png")} style={{ transform: [{ scale: .8 }] }} />
                                 {
                                   item.salary && <>
                                     <Text style={{ color: "#A9A9A9", fontSize: responsiveScreenFontSize(1.8), }}>{item.salary_currency}{formatSalaryRange(item.salary)} </Text>
@@ -160,8 +160,8 @@ const ApplyJob = () => {
                                 }
                               </View>
                               <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(1) }}>
-                                <Image source={imagePath.location} />
-                                <Text style={{ color: "#A9A9A9", fontSize: responsiveScreenFontSize(1.8) }}>{item.jobLocation}</Text>
+                                <Image source={imagePath.location} style={{ transform: [{ scale: .8 }] }} />
+                                <Text numberOfLines={1} style={{ maxWidth: responsiveWidth(35), color: "#A9A9A9", fontSize: responsiveScreenFontSize(1.8) }}>{item.jobLocation}</Text>
                               </View>
                             </View>
                           </View>

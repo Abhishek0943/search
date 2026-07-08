@@ -3,7 +3,7 @@ import React, { useCallback, useContext, useEffect, useState } from 'react'
 import NavigationBar from '../../components/NavigationBar'
 import { Header } from '../../../pages/Company/Company'
 import { ThemeContext } from '../../../context/ThemeProvider'
-import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions'
+import { responsiveHeight, responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions'
 import { useAppDispatch } from '../../../store'
 import { deleteJob, GetJobByStatus } from '../../../reducer/jobsReducer'
 import imagePath from '../../../assets/imagePath'
@@ -157,8 +157,8 @@ export const EmptyComp =
     ({ bottom, heading = "No results found", text = "Content will appear once it becomes available" }) => {
         const { colors } = useContext(ThemeContext)
         return (<View style={{ marginHorizontal: "auto", width: responsiveScreenWidth(90), height: responsiveScreenHeight(60), zIndex: 100, top: 0, right: 0, justifyContent: "center", alignItems: "center" }}>
-            <Text style={{ fontSize: responsiveScreenFontSize(2.7), fontWeight: "700" }}>{heading}</Text>
-            <Text style={{ fontSize: responsiveScreenFontSize(1.8), color: colors.darkGrayNatural, width: "80%", textAlign: "center", fontWeight: "600" }}>{text}</Text>
+            <Text style={{ fontSize: responsiveScreenFontSize(2.7), fontWeight: "700", marginBottom: responsiveHeight(.4) }}>{heading}</Text>
+            <Text style={{ fontSize: responsiveScreenFontSize(1.8), color: colors.darkGrayNatural, lineHeight: responsiveHeight(2), width: "100%", textAlign: "center", fontWeight: "600" }}>{text}</Text>
             {
                 bottom && bottom()
             }

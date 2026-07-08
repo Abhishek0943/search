@@ -48,5 +48,7 @@ const styles = StyleSheet.create({
   base: {
     fontSize: 14,
     color: '#000',
+    borderWidth: 1,
+    borderColor: "#ffffff00"
   },
 });

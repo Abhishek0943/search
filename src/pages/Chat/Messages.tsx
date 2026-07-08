@@ -170,7 +170,7 @@ const Messages = () => {
                         <Image source={imagePath.backIcon} style={{ resizeMode: 'contain', transform: [{ scale: 1.1 }] }} />
                     </TouchableOpacity>
                     <View style={{ width: responsiveScreenWidth(14), borderWidth: 2, borderColor: colors.primary, aspectRatio: 1, borderRadius: 200, overflow: "hidden" }}>
-                        <Image source={{ uri: item.logo }} style={{ height: "100%", width: "100%" }} />
+                        <Image source={{ uri: item.logo }} style={{ resizeMode: 'contain', height: "100%", width: "100%" }} />
                     </View>
                     <View>
                         <Text numberOfLines={1} style={{ width: responsiveScreenWidth(60), fontSize: responsiveScreenFontSize(2), color: "rgba(11, 11, 11, 0.9)", fontWeight: "600", }}>{dataa.name}</Text>

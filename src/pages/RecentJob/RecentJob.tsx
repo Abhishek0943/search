@@ -22,6 +22,7 @@ const SuggestedJob = () => {
       setLoadingMore(true)
     }
     dispatch(GetRecentJobs({ page: pageNumber })).unwrap().then((res) => {
+      console.log('res', res)
       setLoading(false)
       setLoadingMore(false)
       if (res.success) {

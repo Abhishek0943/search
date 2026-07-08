@@ -22,7 +22,7 @@ const Chat = () => {
     const dispatch = useAppDispatch()
     const [search, setSearch] = useState("")
     const { socket, isConnected } = useSocket();
-      const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false)
     useEffect(() => {
         if (!socket || !isConnected) return;
 
@@ -72,7 +72,7 @@ const Chat = () => {
                     if (res.success) {
                         setData(res.data)
                     }
-               }).finally(() => setLoading(false))
+                }).finally(() => setLoading(false))
             } else {
                 dispatch(GetChatsSeeker({})).unwrap().then((res) => {
                     if (res.success) {
@@ -131,61 +131,61 @@ const Chat = () => {
                         <Text style={{ color: colors.primary, fontSize: responsiveScreenFontSize(1.8) }}>Log In</Text>
                     </TouchableOpacity>
                 </View>
-           </View> : <View style={{ paddingVertical: responsiveScreenHeight(2), paddingHorizontal: responsiveScreenWidth(3), backgroundColor: colors.white, flex: 1, alignItems: "center" }}>
+            </View> : <View style={{ paddingVertical: responsiveScreenHeight(2), paddingHorizontal: responsiveScreenWidth(3), backgroundColor: colors.white, flex: 1, alignItems: "center" }}>
                 {loading ? (
-                   <View style={{ flex: 1, marginTop: responsiveScreenHeight(40) }}><ActivityIndicator size={responsiveScreenFontSize(3)} /></View>
+                    <View style={{ flex: 1, marginTop: responsiveScreenHeight(40) }}><ActivityIndicator size={responsiveScreenFontSize(3)} /></View>
                 ) : (
-                <FlatList
-                    onEndReachedThreshold={0.5}
-                    style={{ flex: 1, }} contentContainerStyle={{ gap: responsiveScreenHeight(1) }}
-                    data={data.filter(e =>
-                        e?.name.toLowerCase().includes(search.toLowerCase())
-                    )}
-                    ListEmptyComponent={() => <EmptyComp />}
-                    keyExtractor={(item, index) => `${item}-${index}`}
-                    renderItem={({ item, index }) => {
-                        return (
-                            <>
-                                <Pressable onPress={() => {
-                                    setData(prev =>
-                                        prev.map(k => k.id == item.id
-                                            ? { ...k, unread_count: 0 }
-                                            : k
-                                        )
-                                    );
-                                    dispatch(setMessageCount({ messages_count: user?.messages_count - item?.unread_count }))
-                                    navigation.navigate(routes.MESSAGE, { ...item })
-                                }} style={{ marginHorizontal: "auto", backgroundColor: "white", elevation: 1, margin: 1, borderRadius: 16, paddingHorizontal: responsiveScreenWidth(4), paddingVertical: responsiveScreenHeight(1.5), width: responsiveScreenWidth(93), flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(2.5) }}>
-                                    <View style={{ width: responsiveScreenWidth(14), borderWidth: 2, borderColor: colors.primary, aspectRatio: 1, borderRadius: 200, overflow: "hidden" }}>
-                                        <Image source={{ uri: item.logo }} style={{ height: "100%", width: "100%" }} />
-                                    </View>
-                                    <View style={{ flex: 1 }}>
-                                        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: responsiveScreenWidth(1) }}>
-                                            <Text numberOfLines={1} style={{ maxWidth: responsiveScreenWidth(50), fontSize: responsiveScreenFontSize(2), color: "#262626", fontWeight: "700" }}>{item.name}</Text>
-                                            <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(1.5), color: "#262626", fontWeight: "500" }}>{formatConversationTime(item.last_message_at)}</Text>
+                    <FlatList
+                        onEndReachedThreshold={0.5}
+                        style={{ flex: 1, }} contentContainerStyle={{ gap: responsiveScreenHeight(1) }}
+                        data={data.filter(e =>
+                            e?.name.toLowerCase().includes(search.toLowerCase())
+                        )}
+                        ListEmptyComponent={() => <EmptyComp />}
+                        keyExtractor={(item, index) => `${item}-${index}`}
+                        renderItem={({ item, index }) => {
+                            return (
+                                <>
+                                    <Pressable onPress={() => {
+                                        setData(prev =>
+                                            prev.map(k => k.id == item.id
+                                                ? { ...k, unread_count: 0 }
+                                                : k
+                                            )
+                                        );
+                                        dispatch(setMessageCount({ messages_count: user?.messages_count - item?.unread_count }))
+                                        navigation.navigate(routes.MESSAGE, { ...item })
+                                    }} style={{ marginHorizontal: "auto", backgroundColor: "white", elevation: 1, margin: 1, borderRadius: 16, paddingHorizontal: responsiveScreenWidth(4), paddingVertical: responsiveScreenHeight(1.5), width: responsiveScreenWidth(93), flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(2.5) }}>
+                                        <View style={{ width: responsiveScreenWidth(14), borderWidth: 2, borderColor: colors.primary, aspectRatio: 1, borderRadius: 200, overflow: "hidden" }}>
+                                            <Image source={{ uri: item.logo }} style={{ height: "100%", width: "100%", resizeMode: "contain" }} />
                                         </View>
-                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                            {
-                                                item.last_message ? <Text numberOfLines={1} style={{ maxWidth: responsiveScreenWidth(65), fontSize: responsiveScreenFontSize(1.8), flex: 1, color: colors.darkGrayNatural, }}>{item.last_message}</Text> : item.attachment_type === "file" ? <Text numberOfLines={1} style={{ maxWidth: responsiveScreenWidth(65), fontSize: responsiveScreenFontSize(1.8), flex: 1, color: colors.darkGrayNatural, }}>Sent a Pdf</Text> : <Text numberOfLines={1} style={{ maxWidth: responsiveScreenWidth(65), fontSize: responsiveScreenFontSize(1.8), flex: 1, color: colors.darkGrayNatural, }}>Sent a Image</Text>
-                                            }
-                                            {
-                                                item?.unread_count > 0 ?
-                                                    <Text numberOfLines={1} style={{ padding: 2, fontSize: responsiveScreenFontSize(1.3), height: responsiveScreenHeight(2), textAlign: "center", color: colors.white, aspectRatio: 1, borderRadius: 100, backgroundColor: colors.primary, }}>{item.unread_count}</Text> : item?.last_message_status === "viewed" ? <Image source={require("./sent2.png")} /> : <Image source={require("./sent3.png")} />
-                                            }
+                                        <View style={{ flex: 1 }}>
+                                            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: responsiveScreenWidth(1) }}>
+                                                <Text numberOfLines={1} style={{ maxWidth: responsiveScreenWidth(50), fontSize: responsiveScreenFontSize(2), color: "#262626", fontWeight: "700" }}>{item.name}</Text>
+                                                <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(1.5), color: "#262626", fontWeight: "500" }}>{formatConversationTime(item.last_message_at)}</Text>
+                                            </View>
+                                            <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                                {
+                                                    item.last_message ? <Text numberOfLines={1} style={{ maxWidth: responsiveScreenWidth(65), fontSize: responsiveScreenFontSize(1.8), flex: 1, color: colors.darkGrayNatural, }}>{item.last_message}</Text> : item.attachment_type === "file" ? <Text numberOfLines={1} style={{ maxWidth: responsiveScreenWidth(65), fontSize: responsiveScreenFontSize(1.8), flex: 1, color: colors.darkGrayNatural, }}>Sent a Pdf</Text> : <Text numberOfLines={1} style={{ maxWidth: responsiveScreenWidth(65), fontSize: responsiveScreenFontSize(1.8), flex: 1, color: colors.darkGrayNatural, }}>Sent a Image</Text>
+                                                }
+                                                {
+                                                    item?.unread_count > 0 ?
+                                                        <Text numberOfLines={1} style={{ padding: 2, fontSize: responsiveScreenFontSize(1.3), height: responsiveScreenHeight(2), textAlign: "center", color: colors.white, aspectRatio: 1, borderRadius: 100, backgroundColor: colors.primary, }}>{item.unread_count}</Text> : item?.last_message_status === "viewed" ? <Image source={require("./sent2.png")} /> : <Image source={require("./sent3.png")} />
+                                                }
+                                            </View>
                                         </View>
-                                    </View>
-                                    {/* <Text style={{ fontSize: responsiveScreenFontSize(1.8), color: "rgba(45, 45, 45, 0.9)", fontWeight: "600", alignItems: "center", justifyContent: "center" }}>{formatConversationTime(conversationById[item].last_message?.created_at)} */}
-                                    {/* {" "} */}
-                                    {/* </Text> */}
-                                    {/* {
+                                        {/* <Text style={{ fontSize: responsiveScreenFontSize(1.8), color: "rgba(45, 45, 45, 0.9)", fontWeight: "600", alignItems: "center", justifyContent: "center" }}>{formatConversationTime(conversationById[item].last_message?.created_at)} */}
+                                        {/* {" "} */}
+                                        {/* </Text> */}
+                                        {/* {
                                             conversationById[item].unread_count > 0 &&
                                             <Text style={{ backgroundColor: "blue", fontSize: responsiveScreenFontSize(3), aspectRatio: 1, borderRadius: 100, }}>·</Text>
                                         } */}
 
-                                </Pressable>
-                            </>
-                        )
-                    }} />
+                                    </Pressable>
+                                </>
+                            )
+                        }} />
                 )}
             </View>
         }

@@ -10,6 +10,7 @@ import { NavigationProp, ParamListBase, useFocusEffect, useNavigation, useRoute 
 import { useAppDispatch, useAppSelector } from '../../store'
 import { Bookmark, GetJob, ReportJob, toggleBookmark } from '../../reducer/jobsReducer'
 import { WebView } from 'react-native-webview';
+import RNFS from 'react-native-fs';
 import { formatSalaryRange } from '../../utils'
 import { Fonts } from '../../assets/imagePath';
 import Text from '../../components/Text'
@@ -105,35 +106,35 @@ const Jobdetail = () => {
                                         </View>
                                         <TouchableOpacity style={{ flex: 1, gap: responsiveScreenHeight(1) }}>
                                             <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>{job?.title}</Text>
-                                            <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(1), }}>
-                                                <Image source={imagePath.box} />
+                                            <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(.8), }}>
+                                                <Image source={imagePath.box} style={{ transform: [{ scale: .8 }] }} />
                                                 <Text numberOfLines={1} style={{ maxWidth: responsiveScreenWidth(45), color: colors.textPrimary, fontSize: responsiveScreenFontSize(1.6) }}>{job?.company_info?.name}</Text>
                                             </View>
-                                            <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(1) }}>
-                                                <Image source={imagePath.location} />
+                                            <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(.8) }}>
+                                                <Image source={imagePath.location} style={{ transform: [{ scale: .8 }] }} />
                                                 <Text style={{ color: colors.textPrimary, fontSize: responsiveScreenFontSize(1.6) }}>{job?.jobLocation}</Text>
                                             </View>
                                         </TouchableOpacity>
                                     </View>
                                     <View style={{ flexDirection: "row", gap: responsiveScreenWidth(2), flexWrap: "wrap", marginVertical: responsiveScreenHeight(2) }}>
                                         {
-                                            job?.jobType && <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>{job?.jobType}</Text>
+                                            job?.jobType && <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.6) }}>{job?.jobType}</Text>
                                         }
                                         {
-                                            job?.functionalArea && <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>{job?.functionalArea}</Text>
+                                            job?.functionalArea && <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.6) }}>{job?.functionalArea}</Text>
                                         }
                                         {
-                                            job?.posted_at && <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>Post Date : {job?.posted_at}</Text>
+                                            job?.posted_at && <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.6) }}>Post Date : {job?.posted_at}</Text>
                                         }
                                         {
-                                            job?.expiredAt && <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>Expiry Date : {job?.expiredAt}</Text>
+                                            job?.expiredAt && <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.6) }}>Expiry Date : {job?.expiredAt}</Text>
                                         }
                                     </View>
                                     <View style={{ flexDirection: "row" }}>
                                         <View style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
                                             {
                                                 job.salary && <>
-                                                    <Text style={{ fontSize: responsiveScreenFontSize(2.2), fontWeight: "500" }}>{job.salary_currency}{formatSalaryRange(job.salary)}/</Text>
+                                                    <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "500" }}>{job.salary_currency}{formatSalaryRange(job.salary)}/</Text>
                                                     <Text style={{ flex: 1, marginTop: responsiveScreenHeight(.3) }}>{job.salary_period}</Text>
                                                 </>
                                             }
@@ -326,20 +327,27 @@ export function AutoHeightWebView({ html, margin = 10 }: { html: string, margin?
     <style>
     @font-face {
       font-family: '${Fonts.GilroyRegular}';
-      src: url('file:///android_asset/fonts/Gilroy-Regular.ttf') format('truetype');
+      ${Platform.OS === 'ios'
+                ? `src: local('Gilroy-Regular.ttf'), url('Gilroy-Regular.ttf') format('truetype');`
+                : `src: url('file:///android_asset/fonts/${Fonts.GilroyRegular}.ttf') format('truetype');`}
       font-weight: 400;
     }
     @font-face {
       font-family: '${Fonts.GilroyMedium}';
-      src: url('file:///android_asset/fonts/Gilroy-Medium.ttf') format('truetype');
+      /* FIXED: Changed // to proper CSS comment syntax */
+      /* src: url('${Platform.OS === 'ios' ? `file://${RNFS.MainBundlePath}/Gilroy-Medium.ttf` : 'file:///android_asset/fonts/Gilroy-Medium.ttf'}') format('truetype'); */
+      ${Platform.OS === 'ios'
+                ? `src: local('Gilroy-Medium.ttf'), url('Gilroy-Medium.ttf') format('truetype');`
+                : `src: url('file:///android_asset/fonts/Gilroy-Medium.ttf') format('truetype');`}
       font-weight: 500;
-    }
+    }   
     @font-face {
       font-family: '${Fonts.GilroyBold}';
-      src: url('file:///android_asset/fonts/Gilroy-Bold.ttf') format('truetype');
+      ${Platform.OS === 'ios'
+                ? `src: local('Gilroy-Bold.ttf'), url('Gilroy-Bold.ttf') format('truetype');`
+                : `src: url('file:///android_asset/fonts/${Fonts.GilroyBold}.ttf') format('truetype');`}
       font-weight: 700;
     }
-
     :root {
       --text: ${colors.textSecondary};
       --primary: ${colors.primary};
@@ -353,7 +361,7 @@ export function AutoHeightWebView({ html, margin = 10 }: { html: string, margin?
     body {
       margin: 0 ${margin}px;
       padding: 0;
-      font-family: '${Fonts.GilroyRegular}';
+      font-family: '${Fonts.GilroyRegular}', 'Gilroy-Regular.ttf';
       line-height: 1.6;
       color: var(--text);
       padding-bottom:10px;
@@ -361,21 +369,23 @@ export function AutoHeightWebView({ html, margin = 10 }: { html: string, margin?
       word-break: break-word;
     }
 
-    h1 { font-family: '${Fonts.GilroyBold}';color:black; font-weight: 700; font-size: 5.6vw; margin: 12px 0 6px; }
-    h2 { font-family: '${Fonts.GilroyBold}';color:black; font-weight: 700; font-size: 5.2vw; margin: 12px 0 6px; }
-    h3 { font-family: '${Fonts.GilroyBold}';color:black; font-weight: 700; font-size: 4.8vw; margin: 12px 0 6px; }
-    h4 { font-family: '${Fonts.GilroyBold}';color:black; font-weight: 700; font-size: 4.4vw; margin: 10px 0 4px; }
-    h5 { font-family: '${Fonts.GilroyBold}';color:black; font-weight: 700; font-size: 4.2vw; margin: 8px 0 4px; }
-    h6 { font-family: '${Fonts.GilroyBold}';color:black; font-weight: 700; font-size: 4.0vw; margin: 8px 0 4px; }
+    h1 { font-family: '${Fonts.GilroyBold}', sans-serif;color:black; font-weight: 700; font-size: 5.6vw; margin: 12px 0 6px; }
+    h2 { font-family: '${Fonts.GilroyBold}', sans-serif;color:black; font-weight: 700; font-size: 5.2vw; margin: 12px 0 6px; }
+    h3 { font-family: '${Fonts.GilroyBold}', sans-serif;color:black; font-weight: 700; font-size: 4.8vw; margin: 12px 0 6px; }
+    h4 { font-family: '${Fonts.GilroyBold}', sans-serif;color:black; font-weight: 700; font-size: 4.4vw; margin: 10px 0 4px; }
+    h5 { font-family: '${Fonts.GilroyBold}', sans-serif;color:black; font-weight: 700; font-size: 4.2vw; margin: 8px 0 4px; }
+    h6 { font-family: '${Fonts.GilroyBold}', sans-serif;color:black; font-weight: 700; font-size: 4.0vw; margin: 8px 0 4px; }
 
     p, span, div, li {
-      font-family: '${Fonts.GilroyRegular}';
+    //   font-family: '${Fonts.GilroyRegular}';
+      font-family: '${Fonts.GilroyRegular}', sans-serif;
+    // font-family: 'Gilroy-Regular';
       font-size:  ${4.2}vw;
       color: var(--text);
     }
 
     strong, b {
-      font-family: '${Fonts.GilroyBold}';
+      font-family: '${Fonts.GilroyBold}', sans-serif;
       font-weight: 700;
     }
 

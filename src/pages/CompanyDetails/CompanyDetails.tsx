@@ -1,7 +1,7 @@
 import { FlatList, Image, TouchableOpacity, ScrollView, StyleSheet, View, Pressable, ActivityIndicator, Alert } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { NavigationBar } from '../../components'
-import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions'
+import { responsiveFontSize, responsiveHeight, responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions'
 import imagePath from '../../assets/imagePath'
 import { ThemeContext } from '../../context/ThemeProvider'
 import { NavigationProp, ParamListBase, useNavigation, useRoute } from '@react-navigation/native'
@@ -42,32 +42,32 @@ const CompanyDetails = () => {
                     loading ? <>
                         <ActivityIndicator style={{ marginTop: responsiveScreenHeight(40) }} size={responsiveScreenFontSize(3)} />
                     </> : <>
-                        <Text style={{ paddingHorizontal: responsiveScreenWidth(5), color: colors.textPrimary, fontWeight: "900", fontSize: responsiveScreenFontSize(2.6), marginTop: responsiveScreenHeight(1) }}>{job?.name}</Text>
+                        <Text style={{ paddingHorizontal: responsiveScreenWidth(5), color: colors.textPrimary, fontWeight: "900", fontSize: responsiveScreenFontSize(2.3), marginTop: responsiveScreenHeight(2.5) }}>{job?.name}</Text>
                         {
                             job?.industry &&
                             <Text style={{ paddingHorizontal: responsiveScreenWidth(5), marginTop: responsiveScreenHeight(1), color: colors.textSecondary, fontSize: responsiveScreenFontSize(1.8), }}>{job?.industry}</Text>
                         }
                         {
                             (job?.city || job?.country || job?.company_address) &&
-                            <Text style={{ paddingHorizontal: responsiveScreenWidth(5), marginTop: responsiveScreenHeight(.5), color: colors.textSecondary, fontSize: responsiveScreenFontSize(1.8), }}>{job?.company_address || job?.city || job?.country}</Text>
+                            <Text style={{ lineHeight: responsiveHeight(2.3), paddingHorizontal: responsiveScreenWidth(5), marginTop: responsiveScreenHeight(.5), color: colors.textSecondary, fontSize: responsiveScreenFontSize(1.8), }}>{job?.company_address || job?.city || job?.country}</Text>
                         }
                         <View style={{ borderBottomColor: colors.textDisabled, borderBottomWidth: .5, marginTop: responsiveScreenHeight(2) }}></View>
-                        <Text style={{ paddingHorizontal: responsiveScreenWidth(5), fontWeight: "600", color: colors.textPrimary, fontSize: responsiveScreenFontSize(2.6), marginVertical: responsiveScreenHeight(1), marginBottom: 0 }}>About Company</Text>
-                        <View style={{ paddingHorizontal: responsiveScreenWidth(5), }}>
+                        <Text style={{ paddingHorizontal: responsiveScreenWidth(5), fontWeight: "600", color: colors.textPrimary, fontSize: responsiveScreenFontSize(2.6), marginVertical: responsiveScreenHeight(2), marginBottom: 0 }}>About Company</Text>
+                        <View style={{ marginTop: responsiveScreenHeight(1), paddingHorizontal: responsiveScreenWidth(5), }}>
                             {
                                 job?.description &&
                                 <AutoHeightWebView html={job.description} margin={0} />
                             }
                         </View>
                         <View style={{ borderBottomColor: colors.textDisabled, borderBottomWidth: .5, }}></View>
-                        <Text style={{ paddingHorizontal: responsiveScreenWidth(5), fontWeight: "600", color: colors.textPrimary, fontSize: responsiveScreenFontSize(2.6), marginVertical: responsiveScreenHeight(1), marginBottom: 0 }}>Company details</Text>
+                        <Text style={{ paddingHorizontal: responsiveScreenWidth(5), fontWeight: "600", color: colors.textPrimary, fontSize: responsiveScreenFontSize(2.6), marginVertical: responsiveScreenHeight(2), marginBottom: 0 }}>Company details</Text>
 
-                        <View style={{ flexDirection: "row", marginTop: responsiveScreenHeight(2), marginHorizontal: responsiveScreenWidth(5), rowGap: responsiveScreenHeight(1.54), flexWrap: "wrap", justifyContent: "space-between", }}>
+                        <View style={{ flexDirection: "row", marginTop: responsiveScreenHeight(2), marginHorizontal: responsiveScreenWidth(5), rowGap: responsiveScreenHeight(2.5), flexWrap: "wrap", justifyContent: "space-between", }}>
                             {
                                 job.is_verified &&
                                 <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
-                                    <Image source={imagePath.verify} style={{ transform: [{ scale: 1.3 }], }} />
-                                    <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "700" }}>Verified</Text>
+                                    <Image source={imagePath.verify} style={{ transform: [{ scale: 1.3 }], marginBottom: responsiveHeight(1) }} />
+                                    <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Verified</Text>
                                     <Text style={{ color: colors.textSecondary, fontSize: responsiveScreenFontSize(1.8), }}>Yes</Text>
                                 </View>
                             }
@@ -75,40 +75,40 @@ const CompanyDetails = () => {
                                 job?.no_of_employees &&
                                 <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
                                     0
-                                    <Image source={imagePath.users} style={{ transform: [{ scale: 1.3 }], }} />
-                                    <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "700" }}>Company size</Text>
+                                    <Image source={imagePath.users} style={{ transform: [{ scale: 1.3 }], marginBottom: responsiveHeight(.8) }} />
+                                    <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Company size</Text>
                                     <Text style={{ color: colors.textSecondary, fontSize: responsiveScreenFontSize(1.8), }}>{job?.no_of_employees}</Text>
                                 </View>
                             }
                             {
                                 job.founded_at &&
                                 <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
-                                    <Image source={imagePath.verify} style={{ transform: [{ scale: 1.3 }], }} />
-                                    <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "700" }}>Founded in</Text>
+                                    <Image source={imagePath.verify} style={{ transform: [{ scale: 1.3 }], marginBottom: responsiveHeight(.8) }} />
+                                    <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Founded in</Text>
                                     <Text style={{ color: colors.textSecondary, fontSize: responsiveScreenFontSize(1.8), }}>{job.founded_at}</Text>
                                 </View>
                             }
                             {
                                 job.organizationType &&
                                 <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
-                                    <Image source={imagePath.company2} style={{ transform: [{ scale: 1.3 }], }} />
-                                    <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "700" }}>Organization</Text>
+                                    <Image source={imagePath.company2} style={{ transform: [{ scale: 1.3 }], marginBottom: responsiveHeight(.8) }} />
+                                    <Text style={{ lineHeight: responsiveHeight(2.3), fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Organization Type</Text>
                                     <Text style={{ color: colors.textSecondary, fontSize: responsiveScreenFontSize(1.8), }}>{job.organizationType}</Text>
                                 </View>
                             }
                             {
                                 job.no_of_offices &&
                                 <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
-                                    <Image source={imagePath.company2} style={{ transform: [{ scale: 1.3 }], }} />
-                                    <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "700" }}>Total Offices</Text>
+                                    <Image source={imagePath.company2} style={{ transform: [{ scale: 1.3 }], marginBottom: responsiveHeight(.8) }} />
+                                    <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Total Offices</Text>
                                     <Text style={{ color: colors.textSecondary, fontSize: responsiveScreenFontSize(1.8), }}>{job.no_of_offices}</Text>
                                 </View>
                             }
                             {
                                 job.jobs_count &&
                                 <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
-                                    <Image source={imagePath.bag2} style={{ transform: [{ scale: 1.3 }], }} />
-                                    <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "700" }}>Opened Jobs</Text>
+                                    <Image source={imagePath.bag2} style={{ transform: [{ scale: 1.3 }], marginBottom: responsiveHeight(.8) }} />
+                                    <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Opened Jobs</Text>
                                     <Text style={{ color: colors.textSecondary, fontSize: responsiveScreenFontSize(1.8), }}>{job.jobs_count}</Text>
                                 </View>
                             }
@@ -117,7 +117,7 @@ const CompanyDetails = () => {
                             job?.jobs?.length > 0 &&
                             <>
                                 <View style={{ borderBottomColor: colors.textDisabled, borderBottomWidth: .5, marginTop: responsiveScreenHeight(2) }}></View>
-                                <Text style={{ paddingHorizontal: responsiveScreenWidth(5), fontWeight: "600", color: colors.textPrimary, fontSize: responsiveScreenFontSize(2.6), marginVertical: responsiveScreenHeight(1), marginBottom: 0 }}>Current openings</Text>
+                                <Text style={{ paddingHorizontal: responsiveScreenWidth(5), fontWeight: "600", color: colors.textPrimary, fontSize: responsiveScreenFontSize(2.6), marginVertical: responsiveScreenHeight(2), marginBottom: 0 }}>Current openings</Text>
                                 <FlatList scrollEnabled={false} data={job.jobs} renderItem={({ item, index }) => {
                                     return (
                                         <>
@@ -137,7 +137,7 @@ const CompanyDetails = () => {
                             job?.expiredJobs?.length > 0 &&
                             <>
                                 <View style={{ borderBottomColor: colors.textDisabled, borderBottomWidth: .5, marginTop: responsiveScreenHeight(2) }}></View>
-                                <Text style={{ paddingHorizontal: responsiveScreenWidth(5), fontWeight: "600", color: colors.textPrimary, fontSize: responsiveScreenFontSize(2.6), marginVertical: responsiveScreenHeight(1), marginBottom: 0 }}>Expired jobs</Text>
+                                <Text style={{ paddingHorizontal: responsiveScreenWidth(5), fontWeight: "600", color: colors.textPrimary, fontSize: responsiveScreenFontSize(2.6), marginVertical: responsiveScreenHeight(2), marginBottom: 0 }}>Expired jobs</Text>
                                 <FlatList scrollEnabled={false} data={job.expiredJobs} renderItem={({ item, index }) => {
                                     return (
                                         <>
@@ -204,8 +204,14 @@ export const JobCard = ({ refresh, item, company, margin = responsiveScreenWidth
                     <Image resizeMode='contain' source={{ uri: item.company_info.image }} style={{ height: "100%", aspectRatio: 1 }} />
                 </View>
                 <View style={{ flex: 1, gap: responsiveScreenHeight(0.5) }}>
-                    <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "700" }}>{item.title}</Text>
-                    <Text numberOfLines={1} style={{ textTransform: "capitalize", fontSize: responsiveScreenFontSize(1.8), fontWeight: "400" }} >{item.company_info.name}</Text>
+                    <Text numberOfLines={1} style={{
+                        fontSize: responsiveFontSize(1.9),
+                        fontWeight: '700',
+                    }}>{item.title}</Text>
+                    <Text numberOfLines={1} style={{
+                        fontSize: responsiveFontSize(1.8),
+                        marginTop: 1,
+                    }} >{item.company_info.name}</Text>
                 </View>
                 {
                     company || !user?.id ? null :
@@ -231,18 +237,18 @@ export const JobCard = ({ refresh, item, company, margin = responsiveScreenWidth
             </View>
             <View style={{ flexDirection: "row", gap: responsiveScreenWidth(2), flexWrap: "wrap", marginVertical: responsiveScreenHeight(2) }}>
                 {
-                    item.jobType && <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>{item.jobType}</Text>
+                    item.jobType && <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.6) }}>{item.jobType}</Text>
                 }
                 {
-                    item.functionalArea && <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>{item.functionalArea}</Text>
+                    item.functionalArea && <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.6) }}>{item.functionalArea}</Text>
                 }
             </View>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Text numberOfLines={2} style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
                     {
                         item.salary && item.salary_period && <>
-                            <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(2.2), fontWeight: "500" }}>{item.salary_currency}{formatSalaryRange(item.salary)}/</Text>
-                            <Text style={{ flex: 1, marginTop: responsiveScreenHeight(.3) }}>{item.salary_period}</Text>
+                            <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "500" }}>{item.salary_currency}{formatSalaryRange(item.salary)}/</Text>
+                            <Text style={{ fontSize: responsiveScreenFontSize(1.6), marginTop: responsiveScreenHeight(.3) }}>{item.salary_period}</Text>
                         </>
                     }
                 </Text>
@@ -264,7 +270,7 @@ export const JobCard = ({ refresh, item, company, margin = responsiveScreenWidth
                             <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8) }}>Apply Now</Text>
                             <Icon icon={{ type: "Feather", name: 'arrow-right' }} style={{ color: colors.white, fontSize: responsiveScreenFontSize(2) }} />
                         </Pressable>
-                    )}
+                    )
                 }
             </View>
         </Pressable>

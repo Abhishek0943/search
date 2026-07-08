@@ -57,7 +57,7 @@ const NavigationBar = ({ onPress, bottomPadding = false, children, statusbar = t
                     {
                         route.map((e, i) => {
                             return (
-                                <TouchableOpacity key={e.path} onPress={() => name === e.path && onPress ? onPress() : navigation.navigate(e.path)} style={{ position: "relative", paddingVertical: responsiveScreenHeight(1), flex: 1, alignItems: "center", height: "100%", }}>
+                                <TouchableOpacity key={e.path} onPress={() => name === e.path && onPress ? onPress() : navigation.navigate(e.path)} style={{ position: "relative", paddingVertical: responsiveScreenHeight(1), flex: 1, alignItems: "center", gap: responsiveScreenHeight(1), height: "100%", }}>
                                     {e.icon}
                                     {
                                         e.name === "Chat" && user?.messages_count > 0 &&
