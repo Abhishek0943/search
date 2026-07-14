@@ -7,7 +7,7 @@ import { ThemeContext } from '../../context/ThemeProvider'
 import { NavigationProp, ParamListBase, useNavigation, useRoute } from '@react-navigation/native'
 import { useAppDispatch, useAppSelector } from '../../store'
 import { Bookmark, GetCompany, ReportCompany, toggleBookmark } from '../../reducer/jobsReducer'
-import { AutoHeightWebView } from '../Jobdetail/Jobdetail'
+import { ContentViewer } from '../../recruiter/pages/Profile/Profile'
 import { formatSalaryRange } from '../../utils'
 import Icon from '../../utils/Icon'
 import { routes } from '../../constants/values'
@@ -23,7 +23,6 @@ const CompanyDetails = () => {
     const dispatch = useAppDispatch()
     const [job, setJob] = useState<Company>()
     const { showConfirm, showAlert } = useAlert();
-
     useEffect(() => {
         if (!id) return
         dispatch(GetCompany({ id })).unwrap().then((res) => {
@@ -51,14 +50,18 @@ const CompanyDetails = () => {
                             (job?.city || job?.country || job?.company_address) &&
                             <Text style={{ lineHeight: responsiveHeight(2.3), paddingHorizontal: responsiveScreenWidth(5), marginTop: responsiveScreenHeight(.5), color: colors.textSecondary, fontSize: responsiveScreenFontSize(1.8), }}>{job?.company_address || job?.city || job?.country}</Text>
                         }
-                        <View style={{ borderBottomColor: colors.textDisabled, borderBottomWidth: .5, marginTop: responsiveScreenHeight(2) }}></View>
-                        <Text style={{ paddingHorizontal: responsiveScreenWidth(5), fontWeight: "600", color: colors.textPrimary, fontSize: responsiveScreenFontSize(2.6), marginVertical: responsiveScreenHeight(2), marginBottom: 0 }}>About Company</Text>
-                        <View style={{ marginTop: responsiveScreenHeight(1), paddingHorizontal: responsiveScreenWidth(5), }}>
-                            {
-                                job?.description &&
-                                <AutoHeightWebView html={job.description} margin={0} />
-                            }
-                        </View>
+                        {
+                            job?.description && <>
+                                <View style={{ borderBottomColor: colors.textDisabled, borderBottomWidth: .5, marginTop: responsiveScreenHeight(2) }}></View>
+                                <View style={{ marginTop: responsiveScreenHeight(1), paddingHorizontal: responsiveScreenWidth(5), }}>
+                                    {
+                                        job?.description &&
+                                        <ContentViewer content={job.description} />
+                                    }
+                                </View>
+                            </>
+                        }
+
                         <View style={{ borderBottomColor: colors.textDisabled, borderBottomWidth: .5, }}></View>
                         <Text style={{ paddingHorizontal: responsiveScreenWidth(5), fontWeight: "600", color: colors.textPrimary, fontSize: responsiveScreenFontSize(2.6), marginVertical: responsiveScreenHeight(2), marginBottom: 0 }}>Company details</Text>
 

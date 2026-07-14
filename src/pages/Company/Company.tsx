@@ -182,7 +182,7 @@ const Company = () => {
                         {
                           (item.city || item.country) &&
                           <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(1), }}>
-                            {/* <Image style={{ transform: [{ scale: .9 }] }} source={require('../home/location2.png')} /> */}
+                            <Image style={{ transform: [{ scale: .7 }] }} source={require('../Home/location2.png')} />
                             <Text style={{ fontSize: responsiveScreenFontSize(1.8), color: colors.darkGray }}>{item.city || item.country}</Text>
                           </View>
                         }
