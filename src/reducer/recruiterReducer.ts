@@ -19,7 +19,7 @@ export const RecruiterRecruiterVerification = createAsyncThunk<{ success: true, 
 );
 export const RecruiterRecruiterReSentOtp = createAsyncThunk<{ success: true, recruiter: Recruiter, token: string } | ErrorResponse, { email: string }>(
   'RecruiterReSentOtp',
-  (body) => postApiCall<{ success: true, recruiter: Recruiter, token: string }>('/auth/jobseekers/otp/resend', body),
+  (body) => postApiCall<{ success: true, recruiter: Recruiter, token: string }>('/auth/recruiter/otp/resend', body),
 );
 
 export const RecruiterTokenLogin = createAsyncThunk<{ success: true, recruiter: Recruiter, } | ErrorResponse, { token: string, }>(
@@ -66,24 +66,24 @@ export const ComResetPassword = createAsyncThunk<{ success: true, recruiter: Rec
   'ComResetPassword',
   (body) => postApiCall<{ success: true, recruiter: Recruiter, token: string }>('/auth/companies/password/reset', body),
 );
-export const ForgetPassword = createAsyncThunk<{ success: true, recruiter: Recruiter, token: string } | ErrorResponse, { email: string,}>(
+export const ForgetPassword = createAsyncThunk<{ success: true, recruiter: Recruiter, token: string } | ErrorResponse, { email: string, }>(
   'ForgetPassword',
   (body) => postApiCall<{ success: true, recruiter: Recruiter, token: string }>('/auth/jobseekers/password/forgot', body),
 );
 export const GetCandidates = createAsyncThunk<
-  { success: true, data: User } | ErrorResponse,{pages}
+  { success: true, data: User } | ErrorResponse, { pages }
 >(
   'GetCandidates',
-  ({pages}) => {
-    return getApiCall<{ success: true, data: User }>('/company/find-candidates?page='+pages);
+  ({ pages }) => {
+    return getApiCall<{ success: true, data: User }>('/company/find-candidates?page=' + pages);
   }
 );
 export const Followers = createAsyncThunk<
-  { success: true, data: User } | ErrorResponse, {pages}
+  { success: true, data: User } | ErrorResponse, { pages }
 >(
   'Followers',
-  ({pages}) => {
-    return getApiCall<{ success: true, data: User }>('/company/followers?page='+pages);
+  ({ pages }) => {
+    return getApiCall<{ success: true, data: User }>('/company/followers?page=' + pages);
   }
 );
 export const PaymentHistoryApi = createAsyncThunk<
@@ -95,52 +95,52 @@ export const PaymentHistoryApi = createAsyncThunk<
   }
 );
 export const JobCandidates = createAsyncThunk<
-  { success: true, data: User } | ErrorResponse, {job_id:string, status?:string, pages:string}
+  { success: true, data: User } | ErrorResponse, { job_id: string, status?: string, pages: string }
 >(
   'JobCandidates',
-  ({pages, ...body}) => {
-    return postApiCall<{ success: true, data: User }>('/company/job-candidates?page='+pages, body);
+  ({ pages, ...body }) => {
+    return postApiCall<{ success: true, data: User }>('/company/job-candidates?page=' + pages, body);
   }
 );
 export const CandidateProfileData = createAsyncThunk<
-  { success: true, data: User } | ErrorResponse, {id:number,}
+  { success: true, data: User } | ErrorResponse, { id: number, }
 >(
   'CandidateProfileData',
-  ({id}) => {
-    return getApiCall<{ success: true, data: User }>('/jobseekers/job-seeker-profile?user_id='+id);
+  ({ id }) => {
+    return getApiCall<{ success: true, data: User }>('/jobseekers/job-seeker-profile?user_id=' + id);
   }
 );
 export const UpdateStatus = createAsyncThunk<
-  { success: true, data: User } | ErrorResponse, {id:number,}
+  { success: true, data: User } | ErrorResponse, { id: number, }
 >(
   'UpdateStatus',
   (body) => {
-    return postApiCall<{ success: true, data: User }>('/company/update-application-status',body);
+    return postApiCall<{ success: true, data: User }>('/company/update-application-status', body);
   }
 );
 export const SendMessage = createAsyncThunk<
-  { success: true, data: User } | ErrorResponse, {id:number,}
+  { success: true, data: User } | ErrorResponse, { id: number, }
 >(
   'SendMessage',
   (body) => {
-    return postApiCall<{ success: true, data: User }>('/company/messages',body);
+    return postApiCall<{ success: true, data: User }>('/company/messages', body);
   }
 );
 export const SendMessageSeeker = createAsyncThunk<
-  { success: true, data: User } | ErrorResponse, {id:number,}
+  { success: true, data: User } | ErrorResponse, { id: number, }
 >(
   'SendMessage',
   (body) => {
-    return postApiCall<{ success: true, data: User }>('/jobseeker/messages',body);
+    return postApiCall<{ success: true, data: User }>('/jobseeker/messages', body);
   }
 );
 
 export const CandidateProf = createAsyncThunk<
-  { success: true, data: User } | ErrorResponse, {id:number,}
+  { success: true, data: User } | ErrorResponse, { id: number, }
 >(
   'CandidateProf',
-  ({id}) => {
-    return getApiCall<{ success: true, data: User }>('/company/applicant-profile/'+id);
+  ({ id }) => {
+    return getApiCall<{ success: true, data: User }>('/company/applicant-profile/' + id);
   }
 );
 const initialState: RecruiterInitialState = {
@@ -148,7 +148,7 @@ const initialState: RecruiterInitialState = {
   welcomeScreen: [],
   countries: [],
   topic: [],
-  plan:[]
+  plan: []
 };
 export const recruiterSlice = createSlice({
   name: 'recruiter',

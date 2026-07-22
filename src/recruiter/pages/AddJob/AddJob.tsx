@@ -865,7 +865,7 @@ const AddJob = () => {
                     </> :
                         <View style={{ alignItems: "center", marginTop: responsiveScreenHeight(20), }}>
                             <Image source={require("../Home/inActive.png")} style={{ marginVertical: responsiveScreenHeight(2) }} />
-                            <TouchableOpacity style={{}} onPress={() => navigation.navigate(routes.RECRUITERHOME)}>
+                            <TouchableOpacity style={{}} onPress={() => navigation.navigate(routes.CONTACT)}>
                                 <Image source={require("../Home/popupbutton.png")} style={{}} />
                             </TouchableOpacity>
                         </View>

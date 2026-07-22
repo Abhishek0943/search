@@ -32,7 +32,7 @@ import { CompanyVerification, CompleteSteps, GetCountries, GetTopics, setUser, U
 import { HOST, routes } from '../../constants/values';
 import { OrSeparator, SocialButton } from '../Welcome/WelcomeTwo';
 import Button from '../../components/Button';
-import { RecruiterRegister } from '../../reducer/recruiterReducer';
+import { RecruiterRecruiterReSentOtp, RecruiterRegister } from '../../reducer/recruiterReducer';
 import { useAlert } from '../../context/AlertContext';
 import { googleLogin } from '../../utils/socialLogin';
 import { postApiCall } from '../../api';
@@ -69,7 +69,7 @@ const Signup = () => {
     // passwordVisible: false,
     // cPasswordVisible: false,
     // isRemember: false,
-      lastName: "",
+    lastName: "",
     firstName: "",
     email: "",
     password: "",
@@ -102,7 +102,7 @@ const Signup = () => {
   const [remainingSeconds, setRemainingSeconds] = useState(60);
   const intervalRef = useRef<NodeJS.Timeout>(null);
   const startTimer = useCallback(() => {
-    setRemainingSeconds(10);
+    setRemainingSeconds(60);
     if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = setInterval(() => {
       setRemainingSeconds(prev => {
@@ -380,9 +380,12 @@ const Signup = () => {
             </View>
             <Text style={[styles.title, { fontSize: responsiveScreenFontSize(2.7), textAlign: "left", marginTop: responsiveScreenHeight(4), color: colors.textPrimary }]}>Please verify your email address
             </Text>
-            <Text style={[styles.description, { color: colors.textSecondary, marginBottom: responsiveScreenHeight(2) }]}>
-              We've sent an email to be {userData.email}, please enter the code below.
+            <Text style={[styles.description, { color: colors.textSecondary, marginBottom: responsiveScreenHeight(1) }]}>
+              We've sent an email to {userData.email}, please enter the code below.
             </Text>
+            <TouchableOpacity onPress={() => setCurrentStep(1)}>
+               <Text style={{color: colors.primary, fontSize: responsiveScreenFontSize(1.8), fontWeight: "600", marginBottom: responsiveScreenHeight(2)}}>Change Email</Text>
+            </TouchableOpacity>
             <Text style={[styles.description, { color: colors.textPrimary, fontWeight: "700" }]}>
               Enter Code
             </Text>
@@ -443,7 +446,14 @@ const Signup = () => {
                 Don't receive email?
               </Text>
               {
-                remainingSeconds <= 0 ? <Text onPress={() => dispatch(UserReSentOtp({ email: userData.email })).unwrap().then((res) => {})} style={[{
+                remainingSeconds <= 0 ? <Text onPress={() => {
+                  startTimer();
+                  if (role === "recruiter") {
+                    dispatch(RecruiterRecruiterReSentOtp({ email: userData.email }))
+                  } else {
+                    dispatch(UserReSentOtp({ email: userData.email }))
+                  }
+                }} style={[{
                   fontSize: responsiveScreenFontSize(1.8),
                   fontWeight: '500',
                 }, { color: colors.primary, textAlign: "center" }]}>

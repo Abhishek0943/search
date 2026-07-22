@@ -56,7 +56,7 @@ const Profile = () => {
     });
     useEffect(() => {
         if (user) {
-            // editorRef.current.setContentHTML(user.description);
+            editorRef.current.setContentHTML(user.description);
             setFormData({
                 companyLogo: user.company_logo ? { uri: user.company_logo, name: 'logo.jpg', type: 'image/jpeg' } : null,
                 companyName: user.name || '',
@@ -379,7 +379,6 @@ const Profile = () => {
                             source={imagePath.imageInput}
                             style={{ height: '100%', width: '100%' }}
                         />
-
                         {formData.companyLogo?.uri ? (
                             <View
                                 style={{
@@ -457,9 +456,26 @@ const Profile = () => {
                     </View>
 
                     <Label text="Description" />
-                    <View style={[{ width: "100%", minHeight: responsiveScreenHeight(40) }, { ...inputStyle, paddingHorizontal: 0, paddingVertical: 0 }]}>
-                        <Editor initialContent={formData.description} onChange={(html: string) => handleChange('description', html)} />
+                    <View style={[{ width: "100%", minHeight: responsiveScreenHeight(20) }, { ...inputStyle, paddingHorizontal: 0, paddingVertical: 0 }]}>
+                        <RichEditor
+                            ref={editorRef}
+                            initialContentHTML={user?.description}
+                            placeholder="Write company description here..."
+                            onChange={html => handleChange('description', html)}
+                            editorStyle={{}}
+                        />
                     </View>
+                    {!!editorRef.current ? (
+                        <RichToolbar
+                            editor={editorRef}
+                            actions={[
+                                actions.setBold,
+                                actions.setItalic,
+                                actions.insertBulletsList,
+                                actions.insertOrderedList,
+                            ]}
+                        />
+                    ) : null}
 
                     <View style={{ width: '100%', flexDirection: 'row', gap: responsiveScreenWidth(3) }}>
                         <View style={{ flex: 1 }}>
@@ -710,7 +726,7 @@ const Profile = () => {
         </NavigationBar>
     );
 };
-type BlockType = 'paragraph' | 'h1' | 'bullet';
+type BlockType = 'paragraph' | 'h1' | 'bullet' | 'ordered';
 
 interface TextSegment {
     text: string;
@@ -745,8 +761,9 @@ const blockToJson = (block: Block): any => {
         case 'h1':
             return { type: 'heading', attrs: { level: 1 }, ...(content.length > 0 ? { content } : {}) };
         case 'bullet':
+        case 'ordered':
             return {
-                type: 'listItem',
+                type: 'list_item',
                 content: [{ type: 'paragraph', ...(content.length > 0 ? { content } : {}) }],
             };
         default:
@@ -757,21 +774,36 @@ const blockToJson = (block: Block): any => {
 const blocksToJson = (blocks: Block[]): string => {
     const result: any[] = [];
     let bulletItems: any[] = [];
+    let orderedItems: any[] = [];
+
+    const flushBullets = () => {
+        if (bulletItems.length > 0) {
+            result.push({ type: 'bullet_list', content: bulletItems });
+            bulletItems = [];
+        }
+    };
+    const flushOrdered = () => {
+        if (orderedItems.length > 0) {
+            result.push({ type: 'ordered_list', content: orderedItems });
+            orderedItems = [];
+        }
+    };
 
     blocks.forEach((block) => {
         if (block.type === 'bullet') {
+            flushOrdered();
             bulletItems.push(blockToJson(block));
+        } else if (block.type === 'ordered') {
+            flushBullets();
+            orderedItems.push(blockToJson(block));
         } else {
-            if (bulletItems.length > 0) {
-                result.push({ type: 'bulletList', content: bulletItems });
-                bulletItems = [];
-            }
+            flushBullets();
+            flushOrdered();
             result.push(blockToJson(block));
         }
     });
-    if (bulletItems.length > 0) {
-        result.push({ type: 'bulletList', content: bulletItems });
-    }
+    flushBullets();
+    flushOrdered();
 
     return JSON.stringify({ content: result });
 };
@@ -809,13 +841,25 @@ const jsonToBlocks = (json: string): Block[] => {
                         segments: parseTextNodes(node.content),
                     });
                     break;
-                case 'bulletList':
+                case 'bullet_list':
                     if (node.content) {
                         for (const listItem of node.content) {
                             const para = listItem.content?.[0];
                             blocks.push({
                                 id: generateId(),
                                 type: 'bullet',
+                                segments: parseTextNodes(para?.content),
+                            });
+                        }
+                    }
+                    break;
+                case 'ordered_list':
+                    if (node.content) {
+                        for (const listItem of node.content) {
+                            const para = listItem.content?.[0];
+                            blocks.push({
+                                id: generateId(),
+                                type: 'ordered',
                                 segments: parseTextNodes(para?.content),
                             });
                         }
@@ -1017,7 +1061,7 @@ const Editor = ({ onChange, initialContent }: { onChange?: (html: string) => voi
         const currentBlock = blocks[blockIndex];
         const newBlock: Block = {
             id: generateId(),
-            type: currentBlock.type === 'bullet' ? 'bullet' : 'paragraph',
+            type: currentBlock.type === 'bullet' ? 'bullet' : currentBlock.type === 'ordered' ? 'ordered' : 'paragraph',
             segments: [{ text: '', bold: false }],
         };
         const newBlocks = [...blocks];
@@ -1078,7 +1122,8 @@ const Editor = ({ onChange, initialContent }: { onChange?: (html: string) => voi
         { label: 'H', type: 'h1' },
         { label: '¶', type: 'paragraph' },
         ...(isParagraph ? [{ label: 'B', isBoldToggle: true }] : []),
-        { label: 'Li', type: 'bullet' },
+        { label: 'ul', type: 'bullet' },
+        { label: 'ol', type: 'ordered' },
     ];
 
     // Check if Bold button should appear active
@@ -1142,68 +1187,88 @@ const Editor = ({ onChange, initialContent }: { onChange?: (html: string) => voi
             </View>
 
             <View style={{ flex: 1, paddingVertical: 8 }}>
-                {blocks.map((block, index) => (
-                    <View key={block.id} style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                        {block.type === 'bullet' && (
-                            <Text style={{
-                                color: colors.textPrimary || '#000',
-                                fontSize: responsiveScreenFontSize(1.8),
-                                paddingLeft: responsiveScreenWidth(3),
-                                paddingTop: 6,
-                            }}>•  </Text>
-                        )}
-                        <View style={{ flex: 1, position: 'relative' }}>
-                            {/* Formatted overlay — shows bold styling visually */}
-                            {block.type === 'paragraph' && block.segments.some(s => s.bold) && (
-                                <View pointerEvents="none" style={[
-                                    getBlockStyle(block),
-                                    { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 1 },
-                                    (block.type === 'bullet') && { paddingLeft: 0 },
-                                ]}>
-                                    <Text>
-                                        {block.segments.map((seg, i) => (
-                                            <Text
-                                                key={i}
-                                                style={{
-                                                    fontWeight: seg.bold ? 'bold' : 'normal',
-                                                    color: colors.textPrimary || '#000',
-                                                    fontSize: getBlockStyle(block).fontSize,
-                                                }}
-                                            >
-                                                {seg.text}
-                                            </Text>
-                                        ))}
-                                    </Text>
-                                </View>
+                {blocks.map((block, index) => {
+                    // Calculate ordered list number
+                    let orderedNumber = 0;
+                    if (block.type === 'ordered') {
+                        orderedNumber = 1;
+                        for (let i = index - 1; i >= 0; i--) {
+                            if (blocks[i].type === 'ordered') orderedNumber++;
+                            else break;
+                        }
+                    }
+                    return (
+                        <View key={block.id} style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                            {block.type === 'bullet' && (
+                                <Text style={{
+                                    color: colors.textPrimary || '#000',
+                                    fontSize: responsiveScreenFontSize(1.8),
+                                    paddingLeft: responsiveScreenWidth(3),
+                                    paddingTop: 6,
+                                }}>•  </Text>
                             )}
-                            {/* Actual TextInput for editing */}
-                            <TextInput
-                                ref={(ref) => { inputRefs.current[block.id] = ref; }}
-                                style={[
-                                    getBlockStyle(block),
-                                    (block.type === 'bullet') && { paddingLeft: 0 },
-                                    // Make text transparent when overlay is active
-                                    (block.type === 'paragraph' && block.segments.some(s => s.bold)) && { opacity: 0 },
-                                ]}
-                                value={getPlainText(block.segments)}
-                                onChangeText={(text) => handleTextChange(block.id, text)}
-                                onFocus={() => setActiveBlockId(block.id)}
-                                onKeyPress={(e) => handleKeyPress(block.id, e)}
-                                onSubmitEditing={() => handleSubmitEditing(block.id)}
-                                onSelectionChange={(e) => {
-                                    if (block.id === activeBlockId) {
-                                        setSelection(e.nativeEvent.selection);
-                                    }
-                                }}
-                                placeholder={index === 0 && blocks.length === 1 ? 'Enter your company description...' : ''}
-                                placeholderTextColor={colors.mediumGray || '#999'}
-                                blurOnSubmit={false}
-                                multiline={false}
-                                returnKeyType="next"
-                            />
+                            {block.type === 'ordered' && (
+                                <Text style={{
+                                    color: colors.textPrimary || '#000',
+                                    fontSize: responsiveScreenFontSize(1.8),
+                                    paddingLeft: responsiveScreenWidth(3),
+                                    paddingTop: 6,
+                                    minWidth: responsiveScreenWidth(6),
+                                }}>{orderedNumber}.  </Text>
+                            )}
+                            <View style={{ flex: 1, position: 'relative' }}>
+                                {/* Formatted overlay — shows bold styling visually */}
+                                {block.type === 'paragraph' && block.segments.some(s => s.bold) && (
+                                    <View pointerEvents="none" style={[
+                                        getBlockStyle(block),
+                                        { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 1 },
+                                        (block.type === 'bullet') && { paddingLeft: 0 },
+                                    ]}>
+                                        <Text>
+                                            {block.segments.map((seg, i) => (
+                                                <Text
+                                                    key={i}
+                                                    style={{
+                                                        fontWeight: seg.bold ? 'bold' : 'normal',
+                                                        color: colors.textPrimary || '#000',
+                                                        fontSize: getBlockStyle(block).fontSize,
+                                                    }}
+                                                >
+                                                    {seg.text}
+                                                </Text>
+                                            ))}
+                                        </Text>
+                                    </View>
+                                )}
+                                {/* Actual TextInput for editing */}
+                                <TextInput
+                                    ref={(ref) => { inputRefs.current[block.id] = ref; }}
+                                    style={[
+                                        getBlockStyle(block),
+                                        (block.type === 'bullet' || block.type === 'ordered') && { paddingLeft: 0 },
+                                        // Make text transparent when overlay is active
+                                        (block.type === 'paragraph' && block.segments.some(s => s.bold)) && { opacity: 0 },
+                                    ]}
+                                    value={getPlainText(block.segments)}
+                                    onChangeText={(text) => handleTextChange(block.id, text)}
+                                    onFocus={() => setActiveBlockId(block.id)}
+                                    onKeyPress={(e) => handleKeyPress(block.id, e)}
+                                    onSubmitEditing={() => handleSubmitEditing(block.id)}
+                                    onSelectionChange={(e) => {
+                                        if (block.id === activeBlockId) {
+                                            setSelection(e.nativeEvent.selection);
+                                        }
+                                    }}
+                                    placeholder={index === 0 && blocks.length === 1 ? 'Enter your company description...' : ''}
+                                    placeholderTextColor={colors.mediumGray || '#999'}
+                                    blurOnSubmit={false}
+                                    multiline={false}
+                                    returnKeyType="next"
+                                />
+                            </View>
                         </View>
-                    </View>
-                ))}
+                    );
+                })}
             </View>
         </View>
     );
@@ -1276,7 +1341,7 @@ export const ContentViewer = ({ content, style }: { content: string; style?: any
                 );
             }
 
-            case 'bulletList': {
+            case 'bullet_list': {
                 return (
                     <View key={index} style={{ marginBottom: responsiveScreenHeight(0.8) }}>
                         {block.content?.map((listItem: any, liIndex: number) => (
@@ -1296,6 +1361,47 @@ export const ContentViewer = ({ content, style }: { content: string; style?: any
                                     }}
                                 >
                                     •
+                                </Text>
+                                <View style={{ flex: 1 }}>
+                                    {listItem.content?.map((para: any, pIndex: number) => (
+                                        <Text
+                                            key={pIndex}
+                                            style={{
+                                                fontSize: responsiveScreenFontSize(1.8),
+                                                color: colors.textPrimary || '#1a1a1a',
+                                                lineHeight: responsiveScreenHeight(2.8),
+                                            }}
+                                        >
+                                            {para.content[0]?.text}
+                                        </Text>
+                                    ))}
+                                </View>
+                            </View>
+                        ))}
+                    </View>
+                );
+            }
+
+            case 'ordered_list': {
+                return (
+                    <View key={index} style={{ marginBottom: responsiveScreenHeight(0.8) }}>
+                        {block.content?.map((listItem: any, liIndex: number) => (
+                            <View
+                                key={liIndex}
+                                style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'flex-start',
+                                }}
+                            >
+                                <Text
+                                    style={{
+                                        color: colors.textSecondary,
+                                        fontSize: responsiveScreenFontSize(1.8),
+                                        lineHeight: responsiveScreenHeight(2.8),
+                                        marginRight: responsiveScreenWidth(1),
+                                    }}
+                                >
+                                    {liIndex + 1}.
                                 </Text>
                                 <View style={{ flex: 1 }}>
                                     {listItem.content?.map((para: any, pIndex: number) => (

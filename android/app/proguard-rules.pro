@@ -9,7 +9,9 @@
 
 # Add any project specific keep options here:
 
-# We don't care about SLF4J at runtime
+# We don't care about +
+
+# SLF4J at runtime
 -dontwarn org.slf4j.**
 
 # Treat logging as no-op so R8 can safely drop it
@@ -34,3 +36,12 @@
 -dontwarn com.stripe.android.pushProvisioning.PushProvisioningActivityStarter$Error
 -dontwarn com.stripe.android.pushProvisioning.PushProvisioningActivityStarter
 -dontwarn com.stripe.android.pushProvisioning.PushProvisioningEphemeralKeyProvider
+
+
+# react-native-screens
+-keep class com.swmansion.rnscreens.** { *; }
+-keepclassmembers class com.swmansion.rnscreens.** { *; }
+
+# Fragments in general are instantiated reflectively by the FragmentManager,
+# so it's worth keeping all Fragment subclasses too, not just screens'
+-keep public class * extends androidx.fragment.app.Fragment

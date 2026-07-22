@@ -10,7 +10,7 @@ import imagePath from '../../assets/imagePath';
 import Button from '../../components/Button';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAppDispatch } from '../../store';
-import { ComOtpVerify, ComResetPassword, ForgetPassword, OtpVerify, RecruiterForgetPassword, RecruiterLoginByPassword, ResetPassword } from '../../reducer/recruiterReducer';
+import { ComOtpVerify, ComResetPassword, ForgetPassword, OtpVerify, RecruiterForgetPassword, RecruiterLoginByPassword, RecruiterRecruiterReSentOtp, ResetPassword } from '../../reducer/recruiterReducer';
 import { UserReSentOtp } from '../../reducer/userReducer';
 import { useAlert } from '../../context/AlertContext';
 
@@ -23,6 +23,7 @@ const ForgotPassword = () => {
     password: "",
     confirmPassword: "",
     passwordVisible: false,
+    cPasswordVisible: false,
     rememberMe: false
 
   })
@@ -41,7 +42,7 @@ const ForgotPassword = () => {
     set()
   }, [])
   const startTimer = useCallback(() => {
-    setRemainingSeconds(10);
+    setRemainingSeconds(60);
     if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = setInterval(() => {
       setRemainingSeconds(prev => {
@@ -94,10 +95,10 @@ const ForgotPassword = () => {
                     setCurrentStep(2)
                   }
                   else {
-                   showAlert({
-                  title: "Validation",
-                  message: res.message,
-                })
+                    showAlert({
+                      title: "Validation",
+                      message: res.message,
+                    })
                   }
                   setLoading(false)
                 })
@@ -108,9 +109,9 @@ const ForgotPassword = () => {
                   }
                   else {
                     showAlert({
-                  title: "Validation",
-                  message: res.message,
-                })
+                      title: "Validation",
+                      message: res.message,
+                    })
                   }
                   setLoading(false)
                 })
@@ -139,31 +140,31 @@ const ForgotPassword = () => {
 
             <Text style={[SignupStyle.title, { fontSize: responsiveScreenFontSize(2.7), textAlign: "left", marginTop: responsiveScreenHeight(4) }]}>You've got mail
             </Text>
-            <Text style={[SignupStyle.description, { color: colors.darkGray, marginBottom: responsiveScreenHeight(2) }]}>
-              We have sent the OTP verification code to your email address. Check your email and enter the code below.
+            <Text style={[SignupStyle.description, { color: colors.darkGray, marginBottom: responsiveScreenHeight(1) }]}>
+              We have sent the OTP verification code to {userData.username}. Check your email and enter the code below.
             </Text>
+            <TouchableOpacity onPress={() => setCurrentStep(1)}>
+              <Text style={{ color: colors.primary, fontSize: responsiveScreenFontSize(1.8), fontWeight: "600", marginBottom: responsiveScreenHeight(2) }}>Change Email</Text>
+            </TouchableOpacity>
             <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Enter Code</Text>
-
             <OtpInput
               length={6}
               value={otp}
               disabled={false}
               onChange={handleOtpChange} />
-
-
             <View style={{ borderBottomColor: colors.surfaces, borderBottomWidth: .5, }}></View>
             <Button onPress={() => {
               setLoading(true)
               if (role === "recruiter") {
-                dispatch(ComOtpVerify({  email: userData.username, code: otp.join('') })).unwrap().then((res) => {
+                dispatch(ComOtpVerify({ email: userData.username, code: otp.join('') })).unwrap().then((res) => {
                   if (res.success) {
                     setCurrentStep(3)
                   }
                   else {
                     showAlert({
-                  title: "Validation",
-                  message: res.message,
-                })
+                      title: "Validation",
+                      message: res.message,
+                    })
                   }
                   setLoading(false)
                 })
@@ -174,9 +175,9 @@ const ForgotPassword = () => {
                   }
                   else {
                     showAlert({
-                  title: "Validation",
-                  message: res.message,
-                })
+                      title: "Validation",
+                      message: res.message,
+                    })
                   }
                   setLoading(false)
                 })
@@ -191,7 +192,16 @@ const ForgotPassword = () => {
                 Didn’t see your email?
               </Text>
               {
-                remainingSeconds <= 0 ? <Text onPress={() => dispatch(UserReSentOtp({ email: userData.username })).unwrap().then((res) => {})} style={[{
+                remainingSeconds <= 0 ? <Text onPress={() => {
+                  startTimer();
+                  if (role === "recruiter") {
+
+                    dispatch(RecruiterRecruiterReSentOtp({ email: userData.username }))
+                  } else {
+
+                    dispatch(UserReSentOtp({ email: userData.username }))
+                  }
+                }} style={[{
                   fontSize: responsiveScreenFontSize(1.8),
                   fontWeight: '500',
                 }, { color: colors.primary, textAlign: "center" }]}>
@@ -234,35 +244,42 @@ const ForgotPassword = () => {
               label={'Confirm Password'}
               placeholder='●●●●●●●●'
               isRequired
-              secureText={!userData.passwordVisible}
-
-              rightIcon={(color) => <Icon onPress={() => setUserData({ ...userData, passwordVisible: !userData.passwordVisible })} icon={{ type: "Feather", name: userData.passwordVisible ? 'eye' : 'eye-off' }} size={responsiveScreenFontSize(2.8)} style={{ color: colors.gray }} />}
+              secureText={!userData.cPasswordVisible}
+              rightIcon={(color) => <Icon onPress={() => setUserData({ ...userData, cPasswordVisible: !userData.cPasswordVisible })} icon={{ type: "Feather", name: userData.cPasswordVisible ? 'eye' : 'eye-off' }} size={responsiveScreenFontSize(2.8)} style={{ color: colors.gray }} />}
             />
             <Button onPress={() => {
               setLoading(true)
               if (role === "recruiter") {
-                dispatch(ComResetPassword({ email: userData.username, password: userData.password, password_confirmation: userData.confirmPassword })).unwrap().then((res) => {
+                dispatch(ComResetPassword({ email: userData.username, password: userData.password, password_confirmation: userData.confirmPassword })).unwrap().then(async (res) => {
                   if (res.success) {
+                    await showAlert({
+                      title: "Success",
+                      message: "Password Reset Successfully",
+                    })
                     navigation.goBack()
                   }
                   else {
                     showAlert({
-                  title: "Validation",
-                  message: res.message,
-                })
+                      title: "Validation",
+                      message: res.message,
+                    })
                   }
                   setLoading(false)
                 })
               } else {
-                dispatch(ResetPassword({ email: userData.username, password: userData.password, password_confirmation: userData.confirmPassword })).unwrap().then((res) => {
+                dispatch(ResetPassword({ email: userData.username, password: userData.password, password_confirmation: userData.confirmPassword })).unwrap().then(async (res) => {
                   if (res.success) {
+                    await showAlert({
+                      title: "Success",
+                      message: "Password Reset Successfully",
+                    })
                     navigation.goBack()
                   }
                   else {
                     showAlert({
-                  title: "Validation",
-                  message: res.message,
-                })
+                      title: "Validation",
+                      message: res.message,
+                    })
                   }
                   setLoading(false)
                 })
