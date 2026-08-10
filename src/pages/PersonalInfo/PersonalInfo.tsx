@@ -41,6 +41,7 @@ import Text from '../../components/Text';
 import Icon from '../../utils/Icon';
 import { Header } from '../Company/Company';
 import { useAlert } from '../../context/AlertContext';
+import { CustomTextInput } from '../../components';
 
 const PersonalInfo = () => {
   const { colors } = useContext(ThemeContext);
@@ -232,7 +233,6 @@ const PersonalInfo = () => {
             }}
           >
             <Header title="Personal Information" />
-            {/* First & Last Name */}
             <View
               style={{
                 width: '100%',
@@ -265,7 +265,7 @@ const PersonalInfo = () => {
                     *
                   </Text>
                 </View>
-                <TextInput
+                <CustomTextInput
                   style={{
                     borderWidth: 1,
                     width: '100%',
@@ -280,6 +280,7 @@ const PersonalInfo = () => {
                   placeholderTextColor={colors.gray}
                   placeholder="Enter First Name"
                   value={formData.firstName}
+                  maxLength={20}
                   onChangeText={text => handleChange('firstName', text)}
                 />
               </View>
@@ -310,7 +311,7 @@ const PersonalInfo = () => {
                     *
                   </Text>
                 </View>
-                <TextInput
+                <CustomTextInput
                   style={{
                     borderWidth: 1,
                     width: '100%',
@@ -323,6 +324,7 @@ const PersonalInfo = () => {
                     marginTop: responsiveScreenHeight(1),
                   }}
                   placeholderTextColor={colors.gray}
+                  maxLength={20}
                   placeholder="Enter Last Name"
                   value={formData.lastName}
                   onChangeText={text => handleChange('lastName', text)}
@@ -619,7 +621,7 @@ const PersonalInfo = () => {
                   </Text>
 
                 </View>
-                <TextInput
+                <CustomTextInput
                   style={{
                     borderWidth: 1,
                     width: '100%',
@@ -667,7 +669,7 @@ const PersonalInfo = () => {
                     *
                   </Text> */}
                 </View>
-                <TextInput
+                <CustomTextInput
                   style={{
                     borderWidth: 1,
                     width: '100%',
@@ -708,7 +710,7 @@ const PersonalInfo = () => {
               </Text>
 
             </View>
-            <TextInput
+            <CustomTextInput
               style={{
                 borderWidth: 1,
                 width: '100%',
@@ -745,7 +747,7 @@ const PersonalInfo = () => {
               </Text>
 
             </View>
-            <TextInput
+            <CustomTextInput
               style={{
                 borderWidth: 1,
                 width: '100%',
@@ -1005,7 +1007,7 @@ const PersonalInfo = () => {
                   </Text>
 
                 </View>
-                <TextInput
+                <CustomTextInput
                   style={{
                     borderWidth: 1,
                     width: '100%',
@@ -1019,6 +1021,7 @@ const PersonalInfo = () => {
                   }}
                   placeholderTextColor={colors.gray}
                   placeholder="Enter Current Salary"
+                  maxLength={10}
                   keyboardType="numeric"
                   value={formData.currentSalary}
                   onChangeText={text => handleChange('currentSalary', text)}
@@ -1053,7 +1056,7 @@ const PersonalInfo = () => {
                   </Text>
 
                 </View>
-                <TextInput
+                <CustomTextInput
                   style={{
                     borderWidth: 1,
                     width: '100%',
@@ -1069,6 +1072,8 @@ const PersonalInfo = () => {
                   placeholder="Enter Expected Salary"
                   keyboardType="numeric"
                   value={formData.expectedSalary}
+                  maxLength={10}
+
                   onChangeText={text => handleChange('expectedSalary', text)}
                 />
               </View>

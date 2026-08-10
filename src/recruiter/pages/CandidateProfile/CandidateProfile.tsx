@@ -1,3 +1,4 @@
+import { CustomTextInput } from '../../../components';
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { ActivityIndicator, Alert, BackHandler, Image, ImageBackground, KeyboardAvoidingView, Linking, PermissionsAndroid, Platform, Pressable, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
 import { NavigationBar } from '../../../components'
@@ -24,6 +25,7 @@ function CandidateProfile() {
   const [isMsgModalVisible, setIsMsgModalVisible] = useState(false);
   const [messageText, setMessageText] = useState("");
   const [sendMsgLoading, setSendMsgLoading] = useState(false);
+  const [isDownloadingCV, setIsDownloadingCV] = useState(false);
   const { showAlert } = useAlert()
   useFocusEffect(useCallback(
     () => {
@@ -270,7 +272,21 @@ function CandidateProfile() {
                 <View style={{ gap: responsiveScreenWidth(2), marginHorizontal: responsiveScreenWidth(5), flexDirection: "row", justifyContent: "center" }}>
                   {
                     cvs?.cv &&
-                    <Text onPress={() => downloadCV(cvs.cv)} style={{ color: colors.primary, width: "90%", marginVertical: responsiveScreenHeight(2), marginHorizontal: "auto", backgroundColor: "#E2ECFF", borderWidth: 1, borderColor: colors.primary, paddingVertical: responsiveScreenHeight(1), flex: 1, textAlign: "center", paddingHorizontal: responsiveScreenWidth(4), borderRadius: 15, fontSize: responsiveScreenFontSize(1.8) }}>Download CV</Text>
+                    <TouchableOpacity
+                      disabled={isDownloadingCV}
+                      onPress={async () => {
+                        setIsDownloadingCV(true);
+                        await downloadCV(cvs.cv);
+                        setIsDownloadingCV(false);
+                      }}
+                      style={{ width: "90%", marginVertical: responsiveScreenHeight(2), marginHorizontal: "auto", backgroundColor: "#E2ECFF", borderWidth: 1, borderColor: colors.primary, paddingVertical: responsiveScreenHeight(1), flex: 1, paddingHorizontal: responsiveScreenWidth(4), borderRadius: 15, justifyContent: "center", alignItems: "center", opacity: isDownloadingCV ? 0.6 : 1 }}
+                    >
+                      {isDownloadingCV ? (
+                        <ActivityIndicator color={colors.primary} size="small" />
+                      ) : (
+                        <Text style={{ color: colors.primary, textAlign: "center", fontSize: responsiveScreenFontSize(1.8) }}>Download CV</Text>
+                      )}
+                    </TouchableOpacity>
                   }
                   <Text onPress={() => setIsMsgModalVisible(true)} style={{ color: colors.primary, width: "90%", marginVertical: responsiveScreenHeight(2), marginHorizontal: "auto", backgroundColor: "#E2ECFF", borderWidth: 1, borderColor: colors.primary, paddingVertical: responsiveScreenHeight(1), flex: 1, textAlign: "center", paddingHorizontal: responsiveScreenWidth(4), borderRadius: 15, fontSize: responsiveScreenFontSize(1.8) }}>Send Message</Text>
                 </View>
@@ -345,7 +361,7 @@ function CandidateProfile() {
                   Write your message below and submit.
                 </Text>
 
-                <TextInput
+                <CustomTextInput
                   value={messageText}
                   onChangeText={setMessageText}
                   placeholder="Type your message..."

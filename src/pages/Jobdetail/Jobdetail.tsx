@@ -133,7 +133,7 @@ const Jobdetail = () => {
                                     <View style={{ flexDirection: "row" }}>
                                         <View style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
                                             {
-                                                job.salary && <>
+                                                job.salary && !job?.is_hide_salary && <>
                                                     <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "500" }}>{job.salary_currency}{formatSalaryRange(job.salary)}/</Text>
                                                     <Text style={{ flex: 1, marginTop: responsiveScreenHeight(.3) }}>{job.salary_period}</Text>
                                                 </>

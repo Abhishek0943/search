@@ -249,7 +249,7 @@ export const JobCard = ({ refresh, item, company, margin = responsiveScreenWidth
             <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Text numberOfLines={2} style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
                     {
-                        item.salary && item.salary_period && <>
+                        item.salary && item.salary_period && !item.is_hide_salary && <>
                             <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "500" }}>{item.salary_currency}{formatSalaryRange(item.salary)}/</Text>
                             <Text style={{ fontSize: responsiveScreenFontSize(1.6), marginTop: responsiveScreenHeight(.3) }}>{item.salary_period}</Text>
                         </>

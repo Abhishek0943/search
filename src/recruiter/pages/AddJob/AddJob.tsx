@@ -6,6 +6,7 @@ import { ThemeContext } from '../../../context/ThemeProvider'
 import imagePath from '../../../assets/imagePath'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { actions, RichEditor, RichToolbar } from 'react-native-pell-rich-editor';
+import { CustomTextInput } from '../../../components';
 import { routes } from '../../../constants/values'
 import { CustomDropdown, formatDate } from '../../../pages/PersonalInfo/PersonalInfo'
 import { useAppDispatch, useAppSelector } from '../../../store'
@@ -437,7 +438,7 @@ const AddJob = () => {
                                 </View>
 
                                 <Label text="Job Title" />
-                                <TextInput
+                                <CustomTextInput
                                     value={formData.jobTitle}
                                     onChangeText={t => handleChange('jobTitle', t)}
                                     style={inputStyle}
@@ -557,7 +558,7 @@ const AddJob = () => {
                                 <View style={{ width: '100%', flexDirection: 'row', gap: responsiveScreenWidth(3) }}>
                                     <View style={{ flex: 1 }}>
                                         <Label text="Salary" />
-                                        <TextInput
+                                        <CustomTextInput
                                             value={formData.salary}
                                             onChangeText={t => handleChange('salary', t)}
                                             style={inputStyle}
@@ -569,7 +570,7 @@ const AddJob = () => {
 
                                     <View style={{ flex: 1 }}>
                                         <Label text="Salary To" />
-                                        <TextInput
+                                        <CustomTextInput
                                             value={formData.salaryTo}
                                             onChangeText={t => handleChange('salaryTo', t)}
                                             style={inputStyle}

@@ -20,16 +20,15 @@ import { ThemeContext } from '../../context/ThemeProvider';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NavigationBar } from '../../components';
 import imagePath from '../../assets/imagePath';
-import { CustomDropdown, formatDate } from './PersonalInfo';
+import { formatDate } from './PersonalInfo';
 import { useAppDispatch } from '../../store';
-import { GetCountry, GetState, GetCity, DegreeLevel, DegreeType, Subject, ResultType, AddEducation, AddProject } from '../../reducer/jobsReducer';
 import { launchImageLibrary } from 'react-native-image-picker';
 // If you use react-native-date-picker
 import DatePicker from 'react-native-date-picker';
-import { CustomMultiDropdown } from '../Search/Search';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header } from '../Company/Company';
 import { useAlert } from '../../context/AlertContext';
+import { CustomTextInput } from '../../components';
 
 const addProjectWithFetch = async (fd: FormData, navigation: any, fun) => {
   try {
@@ -129,7 +128,7 @@ const ProjectForm = () => {
     currentlyOngoing: false,
     description: '',
     image: null as PickedImage | null,
-    url:""
+    url: ""
   });
   const { showAlert } = useAlert();
 
@@ -144,7 +143,7 @@ const ProjectForm = () => {
       endDate: data.date_end ? new Date(data.date_end) : prev.endDate,
       currentlyOngoing: !!data.is_on_going,
       description: data.description ?? prev.description,
-      url:data?.image
+      url: data?.image
     }));
   }, [data?.id]);
 
@@ -180,14 +179,14 @@ const ProjectForm = () => {
       },
     }));
   };
-const isValidUrl = (url) => {
-  try {
-    const u = new URL(url);
-    return u.protocol === 'http:' || u.protocol === 'https:';
-  } catch {
-    return false;
-  }
-};
+  const isValidUrl = (url) => {
+    try {
+      const u = new URL(url);
+      return u.protocol === 'http:' || u.protocol === 'https:';
+    } catch {
+      return false;
+    }
+  };
   const onSubmit = () => {
     if (!formData.projectName?.trim()) {
       showAlert({
@@ -204,15 +203,15 @@ const isValidUrl = (url) => {
       });
       return;
     }
-if (formData.projectUrl?.trim()) {
-  if (!isValidUrl(formData.projectUrl.trim())) {
-    showAlert({
-      title: "Validation",
-      message: "Please enter a valid project URL (https://example.com)",
-    });
-    return;
-  }
-}
+    if (formData.projectUrl?.trim()) {
+      if (!isValidUrl(formData.projectUrl.trim())) {
+        showAlert({
+          title: "Validation",
+          message: "Please enter a valid project URL (https://example.com)",
+        });
+        return;
+      }
+    }
     const fd = new FormData();
     fd.append('name', formData.projectName);
     fd.append('url', formData.projectUrl);
@@ -229,20 +228,20 @@ if (formData.projectUrl?.trim()) {
     }
     setLoading(true)
     if (data?.id) {
-      updateProjectWithFetch(fd, navigation,setLoading, data.id)
+      updateProjectWithFetch(fd, navigation, setLoading, data.id)
     } else {
       addProjectWithFetch(fd, navigation, setLoading)
     }
   };
 
-  const Label = ({ text, require=true }: { text: string }) => (
+  const Label = ({ text, require = true }: { text: string }) => (
     <View style={{ flexDirection: 'row', width: '100%', marginTop: responsiveScreenHeight(1) }}>
       <Text style={{ color: colors.textPrimary, fontSize: responsiveScreenFontSize(1.8) }}>
         {text}
       </Text>
       {
-        require && 
-      <Text style={{ color: colors.red, fontSize: responsiveScreenFontSize(1.8) }}> *</Text>
+        require &&
+        <Text style={{ color: colors.red, fontSize: responsiveScreenFontSize(1.8) }}> *</Text>
       }
     </View>
   );
@@ -261,255 +260,251 @@ if (formData.projectUrl?.trim()) {
 
   return (
     <NavigationBar navigationBar={false}>
-            <KeyboardAvoidingView behavior={"padding"} keyboardVerticalOffset={0} style={{ flex: 1 }}>
-
-      
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{
-          width: responsiveScreenWidth(90),
-          alignSelf: 'center',
-          alignItems: 'center',
-          paddingBottom: responsiveScreenHeight(3),
-        }}
-      >
-        <Header title={data?.id ? "Edit Project" : "Add Project"} />
-        <Label text="Project name" />
-        <TextInput
-          value={formData.projectName}
-          onChangeText={t => handleChange('projectName', t)}
-          style={inputStyle}
-          placeholderTextColor={colors.gray}
-          placeholder="Enter Project name"
-        />
-
-        <Label text="Upload Image" require={false} />
-        <Pressable
-          onPress={pickImage}
-          style={{ width: '100%', aspectRatio: 2.44, marginTop: responsiveScreenHeight(1) }}
+      <KeyboardAvoidingView behavior={"padding"} keyboardVerticalOffset={0} style={{ flex: 1 }}>
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{
+            width: responsiveScreenWidth(90),
+            alignSelf: 'center',
+            alignItems: 'center',
+            paddingBottom: responsiveScreenHeight(3),
+          }}
         >
-          <Image
-            source={imagePath.imageInput}
-            style={{ height: '100%', width: '100%' }}
+          <Header title={data?.id ? "Edit Project" : "Add Project"} />
+          <Label text="Project name" />
+          <CustomTextInput
+            value={formData.projectName}
+            onChangeText={t => handleChange('projectName', t)}
+            style={inputStyle}
+            maxLength={30}
+            placeholderTextColor={colors.gray}
+            placeholder="Enter Project name"
+          />
+          <Label text="Upload Image" require={false} />
+          <Pressable
+            onPress={pickImage}
+            style={{ width: '100%', aspectRatio: 2.44, marginTop: responsiveScreenHeight(1) }}
+          >
+            <Image
+              source={imagePath.imageInput}
+              style={{ height: '100%', width: '100%' }}
+            />
+
+            {formData.image?.uri ? (
+              <View
+                style={{
+                  position: 'absolute',
+                  right: 10,
+                  bottom: 10,
+                  height: 44,
+                  width: 44,
+                  borderRadius: 8,
+                  overflow: 'hidden',
+                  borderWidth: 1,
+                  borderColor: colors.mediumGray,
+                }}
+              >
+                <Image source={{ uri: formData.image.uri }} style={{ height: '100%', width: '100%' }} />
+              </View>
+            ) : null}
+          </Pressable>
+
+          {/* Project URL */}
+          <Label text="Project URL" require={false} />
+          <CustomTextInput
+            value={formData.projectUrl}
+            onChangeText={t => handleChange('projectUrl', t)}
+            style={inputStyle}
+            placeholderTextColor={colors.gray}
+            placeholder="https://example.com"
+            autoCapitalize="none"
           />
 
-          {formData.image?.uri ? (
-            <View
-              style={{
-                position: 'absolute',
-                right: 10,
-                bottom: 10,
-                height: 44,
-                width: 44,
-                borderRadius: 8,
-                overflow: 'hidden',
-                borderWidth: 1,
-                borderColor: colors.mediumGray,
-              }}
-            >
-              <Image source={{ uri: formData.image.uri }} style={{ height: '100%', width: '100%' }} />
-            </View>
-          ) : null}
-        </Pressable>
+          {/* Project Start Date */}
+          <Label text="Project Start Date" />
+          <TouchableOpacity
+            onPress={() => setStartDateOpen(true)}
+            style={{ ...inputStyle, justifyContent: 'center' }}
+          >
+            <Text style={{ fontSize: responsiveScreenFontSize(1.8), color: colors.textPrimary }}>
+              {formatDate(formData.startDate)}
+            </Text>
+          </TouchableOpacity>
 
-        {/* Project URL */}
-        <Label text="Project URL" require={false} />
-        <TextInput
-          value={formData.projectUrl}
-          onChangeText={t => handleChange('projectUrl', t)}
-          style={inputStyle}
-          placeholderTextColor={colors.gray}
-          placeholder="https://example.com"
-          autoCapitalize="none"
-        />
-
-        {/* Project Start Date */}
-        <Label text="Project Start Date" />
-        <TouchableOpacity
-          onPress={() => setStartDateOpen(true)}
-          style={{ ...inputStyle, justifyContent: 'center' }}
-        >
-          <Text style={{ fontSize: responsiveScreenFontSize(1.8), color: colors.textPrimary }}>
-            {formatDate(formData.startDate)}
-          </Text>
-        </TouchableOpacity>
-
-        {/* Project End Date */}
-        <Label text="Project End Date" />
-        <TouchableOpacity
-          onPress={() => {
-            if (!formData.currentlyOngoing) setEndDateOpen(true);
-          }}
-          style={{
-            ...inputStyle,
-            justifyContent: 'center',
-            opacity: formData.currentlyOngoing ? 0.5 : 1,
-          }}
-          disabled={formData.currentlyOngoing}
-        >
-          <Text style={{ fontSize: responsiveScreenFontSize(1.8), color: colors.textPrimary }}>
-            {formData.currentlyOngoing ? 'Present' : formatDate(formData.endDate)}
-          </Text>
-        </TouchableOpacity>
-
-        {/* Is Currently Ongoing (Radio) */}
-        <View
-          style={{
-            marginTop: responsiveScreenHeight(1.5),
-            width: '100%',
-            borderColor: colors.mediumGray,
-            borderRadius: 6,
-            paddingVertical: responsiveScreenHeight(1.3),
-          }}
-        >
-          <Text
+          {/* Project End Date */}
+          <Label text="Project End Date" />
+          <TouchableOpacity
+            onPress={() => {
+              if (!formData.currentlyOngoing) setEndDateOpen(true);
+            }}
             style={{
-              color: colors.textPrimary,
-              fontSize: responsiveScreenFontSize(1.8),
-              marginBottom: responsiveScreenHeight(1),
+              ...inputStyle,
+              justifyContent: 'center',
+              opacity: formData.currentlyOngoing ? 0.5 : 1,
+            }}
+            disabled={formData.currentlyOngoing}
+          >
+            <Text style={{ fontSize: responsiveScreenFontSize(1.8), color: colors.textPrimary }}>
+              {formData.currentlyOngoing ? 'Present' : formatDate(formData.endDate)}
+            </Text>
+          </TouchableOpacity>
+
+          {/* Is Currently Ongoing (Radio) */}
+          <View
+            style={{
+              marginTop: responsiveScreenHeight(1.5),
+              width: '100%',
+              borderColor: colors.mediumGray,
+              borderRadius: 6,
+              paddingVertical: responsiveScreenHeight(1.3),
             }}
           >
-            Is Currently Ongoing?
-          </Text>
-
-          <View style={{ flexDirection: 'row', gap: responsiveScreenWidth(6) }}>
-            {/* YES */}
-            <Pressable
-              onPress={() => handleChange('currentlyOngoing', true)}
-              style={{ flexDirection: 'row', alignItems: 'center' }}
+            <Text
+              style={{
+                color: colors.textPrimary,
+                fontSize: responsiveScreenFontSize(1.8),
+                marginBottom: responsiveScreenHeight(1),
+              }}
             >
-              <View
-                style={{
-                  height: 18,
-                  width: 18,
-                  borderRadius: 9,
-                  borderWidth: 2,
-                  borderColor: colors.primary,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginRight: 8,
-                }}
-              >
-                {formData.currentlyOngoing && (
-                  <View
-                    style={{
-                      height: 10,
-                      width: 10,
-                      borderRadius: 5,
-                      backgroundColor: colors.primary,
-                    }}
-                  />
-                )}
-              </View>
-              <Text style={{ color: colors.textPrimary }}>Yes</Text>
-            </Pressable>
+              Is Currently Ongoing?
+            </Text>
 
-            {/* NO */}
-            <Pressable
-              onPress={() => handleChange('currentlyOngoing', false)}
-              style={{ flexDirection: 'row', alignItems: 'center' }}
-            >
-              <View
-                style={{
-                  height: 18,
-                  width: 18,
-                  borderRadius: 9,
-                  borderWidth: 2,
-                  borderColor: colors.primary,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginRight: 8,
-                }}
+            <View style={{ flexDirection: 'row', gap: responsiveScreenWidth(6) }}>
+              {/* YES */}
+              <Pressable
+                onPress={() => handleChange('currentlyOngoing', true)}
+                style={{ flexDirection: 'row', alignItems: 'center' }}
               >
-                {!formData.currentlyOngoing && (
-                  <View
-                    style={{
-                      height: 10,
-                      width: 10,
-                      borderRadius: 5,
-                      backgroundColor: colors.primary,
-                    }}
-                  />
-                )}
-              </View>
-              <Text style={{ color: colors.textPrimary }}>No</Text>
-            </Pressable>
+                <View
+                  style={{
+                    height: 18,
+                    width: 18,
+                    borderRadius: 9,
+                    borderWidth: 2,
+                    borderColor: colors.primary,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginRight: 8,
+                  }}
+                >
+                  {formData.currentlyOngoing && (
+                    <View
+                      style={{
+                        height: 10,
+                        width: 10,
+                        borderRadius: 5,
+                        backgroundColor: colors.primary,
+                      }}
+                    />
+                  )}
+                </View>
+                <Text style={{ color: colors.textPrimary }}>Yes</Text>
+              </Pressable>
+
+              {/* NO */}
+              <Pressable
+                onPress={() => handleChange('currentlyOngoing', false)}
+                style={{ flexDirection: 'row', alignItems: 'center' }}
+              >
+                <View
+                  style={{
+                    height: 18,
+                    width: 18,
+                    borderRadius: 9,
+                    borderWidth: 2,
+                    borderColor: colors.primary,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginRight: 8,
+                  }}
+                >
+                  {!formData.currentlyOngoing && (
+                    <View
+                      style={{
+                        height: 10,
+                        width: 10,
+                        borderRadius: 5,
+                        backgroundColor: colors.primary,
+                      }}
+                    />
+                  )}
+                </View>
+                <Text style={{ color: colors.textPrimary }}>No</Text>
+              </Pressable>
+            </View>
           </View>
-        </View>
 
-        {/* Project Description (multiline) */}
-        <Label text="Project Description" require={false} />
-        <TextInput
-          value={formData.description}
-          onChangeText={t => handleChange('description', t)}
-          multiline
-          style={[
-            inputStyle,
+          <Label text="Project Description" require={false} />
+          <CustomTextInput
+            value={formData.description}
+            onChangeText={t => handleChange('description', t)}
+            multiline
+            style={[
+              inputStyle,
+              {
+                minHeight: responsiveScreenHeight(14),
+                textAlignVertical: 'top',
+              },
+            ]}
+            placeholderTextColor={colors.gray}
+            placeholder="Write about your project..."
+          />
+
+          <Pressable
+            onPress={onSubmit}
+            style={{
+              width: '100%',
+              justifyContent: 'center',
+              marginTop: responsiveScreenHeight(2),
+              borderRadius: 6,
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: colors.primary,
+              paddingHorizontal: responsiveScreenWidth(3),
+              paddingVertical: responsiveScreenHeight(1.5),
+            }}
+          >
             {
-              minHeight: responsiveScreenHeight(14),
-              textAlignVertical: 'top',
-            },
-          ]}
-          placeholderTextColor={colors.gray}
-          placeholder="Write about your project..."
-        />
-
-        {/* Save */}
-        <Pressable
-          onPress={onSubmit}
-          style={{
-            width: '100%',
-            justifyContent: 'center',
-            marginTop: responsiveScreenHeight(2),
-            borderRadius: 6,
-            flexDirection: 'row',
-            alignItems: 'center',
-            backgroundColor: colors.primary,
-            paddingHorizontal: responsiveScreenWidth(3),
-            paddingVertical: responsiveScreenHeight(1.5),
-          }}
-        >
-          {
-            loading ? <ActivityIndicator color={colors.white}/>:
-          <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8) }}>
-            Save Project
-          </Text>
-          }
-        </Pressable>
-
-        {/* Date pickers */}
-        <DatePicker
-          modal
-          open={startDateOpen}
-          date={formData.startDate}
-          mode="date"
-          onConfirm={(date) => {
-            setStartDateOpen(false);
-            handleChange('startDate', date);
-
-            // if startDate is after endDate, fix endDate
-            if (!formData.currentlyOngoing && formData.endDate < date) {
-              handleChange('endDate', date);
+              loading ? <ActivityIndicator color={colors.white} /> :
+                <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8) }}>
+                  Save Project
+                </Text>
             }
-          }}
-          onCancel={() => setStartDateOpen(false)}
-        />
+          </Pressable>
 
-        <DatePicker
-          modal
-          open={endDateOpen}
-          date={formData.endDate}
-           maximumDate={new Date()}
-          mode="date"
-          minimumDate={formData.startDate}
-          onConfirm={(date) => {
-            setEndDateOpen(false);
-            handleChange('endDate', date);
-          }}
-          onCancel={() => setEndDateOpen(false)}
-        />
-      </ScrollView>
-            </KeyboardAvoidingView>
+          {/* Date pickers */}
+          <DatePicker
+            modal
+            open={startDateOpen}
+            date={formData.startDate}
+            mode="date"
+            onConfirm={(date) => {
+              setStartDateOpen(false);
+              handleChange('startDate', date);
+
+              // if startDate is after endDate, fix endDate
+              if (!formData.currentlyOngoing && formData.endDate < date) {
+                handleChange('endDate', date);
+              }
+            }}
+            onCancel={() => setStartDateOpen(false)}
+          />
+
+          <DatePicker
+            modal
+            open={endDateOpen}
+            date={formData.endDate}
+            maximumDate={new Date()}
+            mode="date"
+            minimumDate={formData.startDate}
+            onConfirm={(date) => {
+              setEndDateOpen(false);
+              handleChange('endDate', date);
+            }}
+            onCancel={() => setEndDateOpen(false)}
+          />
+        </ScrollView>
+      </KeyboardAvoidingView>
 
     </NavigationBar>
   );

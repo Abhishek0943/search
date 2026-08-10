@@ -127,7 +127,7 @@ const Login = () => {
           </Text>}
           rightIcon={(color) => <Icon onPress={() => setUserData({ ...userData, passwordVisible: !userData.passwordVisible })} icon={{ type: "Feather", name: userData.passwordVisible ? 'eye' : 'eye-off' }} size={responsiveScreenFontSize(2.8)} style={{ color: colors.gray }} />}
         />
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", }}>
+        {/* <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(1.5), }}>
             <Icon onPress={() => setUserData({ ...userData, rememberMe: !userData.rememberMe })} icon={{ name: !userData.rememberMe ? 'checkbox' : 'checkbox-outline', type: "Ionicons" }} size={responsiveScreenFontSize(2.8)} style={{ color: userData.rememberMe ? colors.textPrimary : colors.primary }} />
             <Text style={[{
@@ -137,7 +137,7 @@ const Login = () => {
               Keep me signed in
             </Text>
           </View>
-        </View>
+        </View> */}
         <Button onPress={async () => {
           setLoading(true)
           const FCM = await getFCMToken()

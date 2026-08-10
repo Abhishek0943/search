@@ -1,4 +1,4 @@
-import { ActivityIndicator, FlatList, Image, Pressable, ScrollView,  TouchableWithoutFeedback, View } from 'react-native'
+import { ActivityIndicator, FlatList, Image, Pressable, ScrollView, TouchableWithoutFeedback, View } from 'react-native'
 import React, { useCallback, useContext, useState } from 'react'
 import { NavigationBar } from '../../components'
 import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions'
@@ -112,7 +112,7 @@ function CvCard({
         <TouchableWithoutFeedback style={{ flex: 1 }} onPress={() => setActive(0)}>
             <View style={[styles.card, { marginTop: responsiveScreenHeight(1.8), borderColor: colors.surfaces, backgroundColor: colors.lightGrayNatural, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(1), borderWidth: 1 }]}>
                 <View style={styles.topRow}>
-                    <Text style={[styles.title, {fontSize: responsiveScreenFontSize(2.2), fontWeight: "700", color: colors.textPrimary }]} numberOfLines={1}>
+                    <Text style={[styles.title, { fontSize: responsiveScreenFontSize(2.2), fontWeight: "700", color: colors.textPrimary }]} numberOfLines={1}>
                         {item.name}
                     </Text>
 
@@ -121,26 +121,26 @@ function CvCard({
                             <Image source={imagePath.edit} />
                         </Pressable>
                         <Pressable
-                                        onPress={async () => {
-                                            const ok = await showConfirm({
-                                                title: "Delete Project?",
-                                                message: "Are you sure you want to delete this record?",
-                                                okText: "Delete",
-                                                cancelText: "Cancel",
-                                            })
-                                            if (ok) {
-                                                dispatch(DeleteProject({ id: id, })).unwrap().then((res) => {
-                                                    refresh()
-                                                })
-                                            }
-                                        }
-                                        }
-                                       style={styles.iconBtn}
-                                    >
-                                        <Image source={imagePath.delete} style={{transform:[{scale:1.2}]}} />
-                                       
-                                    </Pressable>
-                    
+                            onPress={async () => {
+                                const ok = await showConfirm({
+                                    title: "Delete Project?",
+                                    message: "Are you sure you want to delete this record?",
+                                    okText: "Delete",
+                                    cancelText: "Cancel",
+                                })
+                                if (ok) {
+                                    dispatch(DeleteProject({ id: id, })).unwrap().then((res) => {
+                                        refresh()
+                                    })
+                                }
+                            }
+                            }
+                            style={styles.iconBtn}
+                        >
+                            <Image source={imagePath.delete} style={{ transform: [{ scale: 1.2 }] }} />
+
+                        </Pressable>
+
                     </View>
                 </View>
 
@@ -152,7 +152,7 @@ function CvCard({
                     item.description &&
                     <View style={[styles.metaRow, { gap: responsiveScreenWidth(1), marginTop: responsiveScreenHeight(1) }]}>
                         {/* <Image source={imagePath.calendar} /> */}
-                        <Text style={[styles.metaText, { fontSize: responsiveScreenFontSize(1.7), color: colors.textSecondary, fontWeight: "600", }]}> {item.description}</Text>
+                        <Text numberOfLines={3} style={[styles.metaText, { fontSize: responsiveScreenFontSize(1.7), color: colors.textSecondary, fontWeight: "600", }]}> {item.description}</Text>
                     </View>
 
                 }

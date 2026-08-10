@@ -31,9 +31,9 @@ const logoutAndRestart = async () => {
     await logoutUser();
     RNRestart.restart();
 };
-const { showConfirm, showAlert } = useAlert();
 
 const Profile = () => {
+    const { showConfirm, showAlert } = useAlert();
     const { colors } = useContext(ThemeContext);
     const { user } = useAppSelector(state => state.userStore);
     const navigation: NavigationProp<ParamListBase> = useNavigation();

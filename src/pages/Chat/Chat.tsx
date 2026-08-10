@@ -1,7 +1,8 @@
+import { CustomTextInput } from '../../components';
 import { Image, TouchableOpacity, StyleSheet, Text, View, TextInput, FlatList, Pressable, ActivityIndicator, } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { ThemeContext } from '../../context/ThemeProvider'
-import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native'
+import { NavigationProp, ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native'
 import { NavigationBar, } from '../../components'
 import RNavigationBar from '../../recruiter/components/NavigationBar'
 import { routes } from '../../constants/values'
@@ -14,11 +15,12 @@ import { GetChats, GetChatsSeeker, GetFilter, ProfileData2 } from '../../reducer
 import { useSocket } from '../../context/SocketProvider'
 import { setMessageCount } from '../../reducer/userReducer'
 import { EmptyComp } from '../../recruiter/pages/OpenJobs/OpenJobs'
+import { setChatData, setActiveChat, updateChatMessage, clearUnreadCount } from '../../reducer/chatReducer'
 const Chat = () => {
     const { colors } = useContext(ThemeContext)
     const navigation: NavigationProp<ParamListBase> = useNavigation()
     const { user } = useAppSelector(state => state.userStore)
-    const [data, setData] = useState<{ unread_count: number | string, id: number, logo: string }[]>([])
+    const { data, active } = useAppSelector(state => state.chatStore)
     const dispatch = useAppDispatch()
     const [search, setSearch] = useState("")
     const { socket, isConnected } = useSocket();
@@ -30,28 +32,12 @@ const Chat = () => {
         let handler: any;
 
         (async () => {
-            const role = (await AsyncStorage.getItem("role")) as "seeker" | "recruiter";
-
             handler = (e: any) => {
                 if (!isMounted) return;
-
-                setData(prev =>
-                    prev.map(k => {
-                        if (role === "recruiter") {
-                            const num = Number(e?.message?.seeker_id);
-                            if (Number.isNaN(num)) return k;
-                            return k.id === num
-                                ? { ...k, last_message: e?.message?.message, unread_count: (Number(k?.unread_count) || 0) + 1 }
-                                : k;
-                        }
-
-                        const num = Number(e?.message?.company_id);
-                        if (Number.isNaN(num)) return k;
-                        return k.id === num
-                            ? { ...k, last_message: e?.message?.message, unread_count: (Number(k?.unread_count) || 0) + 1 }
-                            : k;
-                    })
-                );
+                const num = Number(e?.from_id);
+                if (!Number.isNaN(num)) {
+                    dispatch(updateChatMessage({ companyId: num, lastMessage: e?.message?.message, active }));
+                }
             };
 
             socket.off("message_received", handler);
@@ -62,7 +48,7 @@ const Chat = () => {
             isMounted = false;
             if (handler) socket.off("message_received", handler);
         };
-    }, [socket, isConnected]);
+    }, [socket, isConnected, active]);
     useEffect(() => {
         const a = async () => {
             const role = await AsyncStorage.getItem("role") as "seeker" | "recruiter"
@@ -70,19 +56,22 @@ const Chat = () => {
             if (role === "recruiter") {
                 dispatch(GetChats({})).unwrap().then((res) => {
                     if (res.success) {
-                        setData(res.data)
+                        dispatch(setChatData(res.data))
                     }
                 }).finally(() => setLoading(false))
             } else {
                 dispatch(GetChatsSeeker({})).unwrap().then((res) => {
                     if (res.success) {
-                        setData(res.data)
+                        dispatch(setChatData(res.data))
                     }
                 }).finally(() => setLoading(false))
             }
         }
         a()
     }, [])
+    useFocusEffect(() => {
+        dispatch(setActiveChat(0))
+    })
     const element = <View style={{ flex: 1, }}>
         <View style={{ borderBottomColor: colors.surfaces, borderBottomWidth: 1, flexDirection: "row", marginBottom: responsiveScreenHeight(1), justifyContent: "space-between", paddingHorizontal: responsiveScreenWidth(5), paddingBottom: responsiveScreenHeight(1.5) }}>
             <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "600" }}>Chat</Text>
@@ -104,7 +93,7 @@ const Chat = () => {
             <TouchableOpacity onPress={() => { }}>
                 <Image style={{}} source={imagePath.search} />
             </TouchableOpacity>
-            <TextInput
+            <CustomTextInput
                 value={search}
                 // onFocus={() => { setActiveSearch(true) }}
                 onChangeText={e => setSearch(e)}
@@ -147,12 +136,7 @@ const Chat = () => {
                             return (
                                 <>
                                     <Pressable onPress={() => {
-                                        setData(prev =>
-                                            prev.map(k => k.id == item.id
-                                                ? { ...k, unread_count: 0 }
-                                                : k
-                                            )
-                                        );
+                                        dispatch(clearUnreadCount(item.id));
                                         dispatch(setMessageCount({ messages_count: user?.messages_count - item?.unread_count }))
                                         navigation.navigate(routes.MESSAGE, { ...item })
                                     }} style={{ marginHorizontal: "auto", backgroundColor: "white", elevation: 1, margin: 1, borderRadius: 16, paddingHorizontal: responsiveScreenWidth(4), paddingVertical: responsiveScreenHeight(1.5), width: responsiveScreenWidth(93), flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(2.5) }}>

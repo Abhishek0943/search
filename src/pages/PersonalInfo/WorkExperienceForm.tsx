@@ -30,6 +30,7 @@ import { GetCountry, GetState, GetCity, AddWorkExperience, EditWorkExperience } 
 import DatePicker from 'react-native-date-picker';
 import { Header } from '../Company/Company';
 import { useAlert } from '../../context/AlertContext';
+import { CustomTextInput } from '../../components';
 
 const WorkExperienceForm = () => {
   const { colors } = useContext(ThemeContext);
@@ -212,6 +213,12 @@ const WorkExperienceForm = () => {
         if (res.success) {
           navigation.goBack()
         }
+        else {
+          showAlert({
+            title: "Error",
+            message: res?.message || "Something went wrong",
+          });
+        }
         setLoading(false)
 
       })
@@ -232,6 +239,12 @@ const WorkExperienceForm = () => {
         setLoading(false)
         if (res.success) {
           navigation.goBack()
+        }
+        else {
+          showAlert({
+            title: "Error",
+            message: res?.message || "Something went wrong",
+          });
         }
       })
     }
@@ -261,257 +274,260 @@ const WorkExperienceForm = () => {
 
   return (
     <NavigationBar bottomPadding={true} navigationBar={false}>
-                    <KeyboardAvoidingView behavior={"padding"} keyboardVerticalOffset={0} style={{ flex: 1 }}>
+      <KeyboardAvoidingView behavior={"padding"} keyboardVerticalOffset={0} style={{ flex: 1 }}>
 
-      
-      <ScrollView
-        style={{ flex: 1, }}
-        contentContainerStyle={{
-          width: responsiveScreenWidth(90),
-          alignSelf: 'center',
-          alignItems: 'center',
-          paddingBottom: responsiveScreenHeight(3),
-        }}
-      >
-        <Header title={data?.id ? "Edit Work Experience" : "Add Work Experience"} />
-        <Label text="Experience Title" />
-        <TextInput
-          value={formData.experienceTitle}
-          onChangeText={t => handleChange('experienceTitle', t)}
-          style={inputStyle}
-          autoFocus={true}
-          placeholderTextColor={colors.gray}
-          placeholder="e.g., React Native Developer"
-        />
 
-        {/* Company */}
-        <Label text="Company" />
-        <TextInput
-          value={formData.company}
-          onChangeText={t => handleChange('company', t)}
-          style={inputStyle}
-          placeholderTextColor={colors.gray}
-          placeholder="e.g., KBS IT Solutions"
-        />
+        <ScrollView
+          style={{ flex: 1, }}
+          contentContainerStyle={{
+            width: responsiveScreenWidth(90),
+            alignSelf: 'center',
+            alignItems: 'center',
+            paddingBottom: responsiveScreenHeight(3),
+          }}
+        >
+          <Header title={data?.id ? "Edit Work Experience" : "Add Work Experience"} />
+          <Label text="Experience Title" />
+          <CustomTextInput
+            value={formData.experienceTitle}
+            onChangeText={t => handleChange('experienceTitle', t)}
+            style={inputStyle}
+            maxLength={30}
 
-        {/* Country */}
-        <Label text="Country" />
-        <CustomDropdown
-          data={countries}
-          placeholder="Select"
-          selectedValue={formData.country}
-          onSelect={onSelectCountry}
-          labelKey="name"
-          valueKey="id"
-        />
+            autoFocus={true}
+            placeholderTextColor={colors.gray}
+            placeholder="Experience Title"
+          />
 
-        {/* State / City */}
-        <View style={{ width: '100%', flexDirection: 'row', gap: responsiveScreenWidth(3) }}>
-          <View style={{ flex: 1 }}>
-            <Label text="State" />
-            <CustomDropdown
-              data={states}
-              placeholder="Select"
-              selectedValue={formData.state}
-              onSelect={onSelectState}
-              labelKey="name"
-              valueKey="id"
-            />
+          {/* Company */}
+          <Label text="Company Name" />
+          <CustomTextInput
+            value={formData.company}
+            onChangeText={t => handleChange('company', t)}
+            style={inputStyle}
+            maxLength={30}
+            placeholderTextColor={colors.gray}
+            placeholder="Company Name"
+          />
+
+          {/* Country */}
+          <Label text="Country" />
+          <CustomDropdown
+            data={countries}
+            placeholder="Select"
+            selectedValue={formData.country}
+            onSelect={onSelectCountry}
+            labelKey="name"
+            valueKey="id"
+          />
+
+          {/* State / City */}
+          <View style={{ width: '100%', flexDirection: 'row', gap: responsiveScreenWidth(3) }}>
+            <View style={{ flex: 1 }}>
+              <Label text="State" />
+              <CustomDropdown
+                data={states}
+                placeholder="Select"
+                selectedValue={formData.state}
+                onSelect={onSelectState}
+                labelKey="name"
+                valueKey="id"
+              />
+            </View>
+
+            <View style={{ flex: 1 }}>
+              <Label text="City" />
+              <CustomDropdown
+                data={cities}
+                placeholder="Select"
+                selectedValue={formData.city}
+                onSelect={(val: number) => handleChange('city', val)}
+                labelKey="name"
+                valueKey="id"
+              />
+            </View>
           </View>
 
-          <View style={{ flex: 1 }}>
-            <Label text="City" />
-            <CustomDropdown
-              data={cities}
-              placeholder="Select"
-              selectedValue={formData.city}
-              onSelect={(val: number) => handleChange('city', val)}
-              labelKey="name"
-              valueKey="id"
-            />
-          </View>
-        </View>
-
-        {/* Start Date */}
-        <Label text="Experience Start Date" />
-        <TouchableOpacity
-          onPress={() => setStartDateOpen(true)}
-          style={{
-            ...inputStyle,
-            justifyContent: 'center',
-          }}
-        >
-          <Text style={{ fontSize: responsiveScreenFontSize(1.8), color: colors.textPrimary }}>
-            {formatDate(formData.startDate)}
-          </Text>
-        </TouchableOpacity>
-
-        {/* End Date */}
-        <Label text="Experience End Date" />
-        <TouchableOpacity
-          onPress={() => {
-            if (!formData.currentlyWorking) setEndDateOpen(true);
-          }}
-          style={{
-            ...inputStyle,
-            justifyContent: 'center',
-            opacity: formData.currentlyWorking ? 0.5 : 1,
-          }}
-          disabled={formData.currentlyWorking}
-        >
-          <Text style={{ fontSize: responsiveScreenFontSize(1.8), color: colors.textPrimary }}>
-            {formData.currentlyWorking ? 'Present' : formatDate(formData.endDate)}
-          </Text>
-        </TouchableOpacity>
-
-        {/* Currently Working */}
-        <View
-          style={{
-            marginTop: responsiveScreenHeight(1.5),
-            width: '100%',
-            borderColor: colors.mediumGray,
-            borderRadius: 6,
-            paddingVertical: responsiveScreenHeight(1.3),
-          }}
-        >
-          <Text
+          {/* Start Date */}
+          <Label text="Experience Start Date" />
+          <TouchableOpacity
+            onPress={() => setStartDateOpen(true)}
             style={{
-              color: colors.textPrimary,
-              fontSize: responsiveScreenFontSize(1.8),
-              marginBottom: responsiveScreenHeight(1),
+              ...inputStyle,
+              justifyContent: 'center',
             }}
           >
-            Currently Working?
-          </Text>
+            <Text style={{ fontSize: responsiveScreenFontSize(1.8), color: colors.textPrimary }}>
+              {formatDate(formData.startDate)}
+            </Text>
+          </TouchableOpacity>
 
-          <View style={{ flexDirection: 'row', gap: responsiveScreenWidth(6) }}>
-            <Pressable
-              onPress={() => handleChange('currentlyWorking', true)}
-              style={{ flexDirection: 'row', alignItems: 'center' }}
-            >
-              <View
-                style={{
-                  height: 18,
-                  width: 18,
-                  borderRadius: 9,
-                  borderWidth: 2,
-                  borderColor: colors.primary,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginRight: 8,
-                }}
-              >
-                {formData.currentlyWorking && (
-                  <View
-                    style={{
-                      height: 10,
-                      width: 10,
-                      borderRadius: 5,
-                      backgroundColor: colors.primary,
-                    }}
-                  />
-                )}
-              </View>
-              <Text style={{ color: colors.textPrimary }}>Yes</Text>
-            </Pressable>
+          {/* End Date */}
+          <Label text="Experience End Date" />
+          <TouchableOpacity
+            onPress={() => {
+              if (!formData.currentlyWorking) setEndDateOpen(true);
+            }}
+            style={{
+              ...inputStyle,
+              justifyContent: 'center',
+              opacity: formData.currentlyWorking ? 0.5 : 1,
+            }}
+            disabled={formData.currentlyWorking}
+          >
+            <Text style={{ fontSize: responsiveScreenFontSize(1.8), color: colors.textPrimary }}>
+              {formData.currentlyWorking ? 'Present' : formatDate(formData.endDate)}
+            </Text>
+          </TouchableOpacity>
 
-            {/* NO */}
-            <Pressable
-              onPress={() => handleChange('currentlyWorking', false)}
-              style={{ flexDirection: 'row', alignItems: 'center' }}
+          {/* Currently Working */}
+          <View
+            style={{
+              marginTop: responsiveScreenHeight(1.5),
+              width: '100%',
+              borderColor: colors.mediumGray,
+              borderRadius: 6,
+              paddingVertical: responsiveScreenHeight(1.3),
+            }}
+          >
+            <Text
+              style={{
+                color: colors.textPrimary,
+                fontSize: responsiveScreenFontSize(1.8),
+                marginBottom: responsiveScreenHeight(1),
+              }}
             >
-              <View
-                style={{
-                  height: 18,
-                  width: 18,
-                  borderRadius: 9,
-                  borderWidth: 2,
-                  borderColor: colors.primary,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginRight: 8,
-                }}
+              Currently Working?
+            </Text>
+
+            <View style={{ flexDirection: 'row', gap: responsiveScreenWidth(6) }}>
+              <Pressable
+                onPress={() => handleChange('currentlyWorking', true)}
+                style={{ flexDirection: 'row', alignItems: 'center' }}
               >
-                {!formData.currentlyWorking && (
-                  <View
-                    style={{
-                      height: 10,
-                      width: 10,
-                      borderRadius: 5,
-                      backgroundColor: colors.primary,
-                    }}
-                  />
-                )}
-              </View>
-              <Text style={{ color: colors.textPrimary }}>No</Text>
-            </Pressable>
+                <View
+                  style={{
+                    height: 18,
+                    width: 18,
+                    borderRadius: 9,
+                    borderWidth: 2,
+                    borderColor: colors.primary,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginRight: 8,
+                  }}
+                >
+                  {formData.currentlyWorking && (
+                    <View
+                      style={{
+                        height: 10,
+                        width: 10,
+                        borderRadius: 5,
+                        backgroundColor: colors.primary,
+                      }}
+                    />
+                  )}
+                </View>
+                <Text style={{ color: colors.textPrimary }}>Yes</Text>
+              </Pressable>
+
+              {/* NO */}
+              <Pressable
+                onPress={() => handleChange('currentlyWorking', false)}
+                style={{ flexDirection: 'row', alignItems: 'center' }}
+              >
+                <View
+                  style={{
+                    height: 18,
+                    width: 18,
+                    borderRadius: 9,
+                    borderWidth: 2,
+                    borderColor: colors.primary,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginRight: 8,
+                  }}
+                >
+                  {!formData.currentlyWorking && (
+                    <View
+                      style={{
+                        height: 10,
+                        width: 10,
+                        borderRadius: 5,
+                        backgroundColor: colors.primary,
+                      }}
+                    />
+                  )}
+                </View>
+                <Text style={{ color: colors.textPrimary }}>No</Text>
+              </Pressable>
+            </View>
           </View>
-        </View>
 
-        {/* Description */}
-        <Label text="Experience Description" />
-        <TextInput
-          value={formData.description}
-          onChangeText={t => handleChange('description', t)}
-          multiline
-          style={[inputStyle, { minHeight: responsiveScreenHeight(12), textAlignVertical: 'top' }]}
-          placeholderTextColor={colors.gray}
-          placeholder="Describe your role, responsibilities, achievements..."
-        />
+          {/* Description */}
+          <Label text="Experience Description" />
+          <CustomTextInput
+            value={formData.description}
+            onChangeText={t => handleChange('description', t)}
+            multiline
+            style={[inputStyle, { minHeight: responsiveScreenHeight(12), textAlignVertical: 'top' }]}
+            placeholderTextColor={colors.gray}
+            placeholder="Describe your role, responsibilities, achievements..."
+          />
 
-        {/* Submit */}
-        <Pressable
-          onPress={onSubmit}
-          style={{
-            width: '100%',
-            justifyContent: 'center',
-            marginTop: responsiveScreenHeight(2),
-            borderRadius: 6,
-            gap: responsiveScreenWidth(1),
-            flexDirection: 'row',
-            alignItems: 'center',
-            backgroundColor: colors.primary,
-            paddingHorizontal: responsiveScreenWidth(3),
-            paddingVertical: responsiveScreenHeight(1.5),
-            marginBottom: responsiveScreenHeight(3)
-          }}
-        >{
-            loading ? <ActivityIndicator color={"white"} /> :
-              <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8) }}>
-                {data?.id ? "Update Experience" : "Add Experience"}
+          {/* Submit */}
+          <Pressable
+            onPress={onSubmit}
+            style={{
+              width: '100%',
+              justifyContent: 'center',
+              marginTop: responsiveScreenHeight(2),
+              borderRadius: 6,
+              gap: responsiveScreenWidth(1),
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: colors.primary,
+              paddingHorizontal: responsiveScreenWidth(3),
+              paddingVertical: responsiveScreenHeight(1.5),
+              marginBottom: responsiveScreenHeight(3)
+            }}
+          >{
+              loading ? <ActivityIndicator color={"white"} /> :
+                <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8) }}>
+                  {data?.id ? "Update Experience" : "Add Experience"}
 
-              </Text>
-          }
-        </Pressable>
+                </Text>
+            }
+          </Pressable>
 
-        {/* Date Pickers */}
-        <DatePicker
-          modal
-          open={startDateOpen}
-          date={formData.startDate}
-          mode="date"
-          onConfirm={(date) => {
-            setStartDateOpen(false);
-            handleChange('startDate', date);
-          }}
-          onCancel={() => setStartDateOpen(false)}
-        />
+          {/* Date Pickers */}
+          <DatePicker
+            modal
+            open={startDateOpen}
+            date={formData.startDate}
+            mode="date"
+            onConfirm={(date) => {
+              setStartDateOpen(false);
+              handleChange('startDate', date);
+            }}
+            onCancel={() => setStartDateOpen(false)}
+          />
 
-        <DatePicker
-          modal
-          open={endDateOpen}
-          date={formData.endDate}
-          maximumDate={new Date()}
-          minimumDate={formData.startDate || new Date()}
-          mode="date"
-          onConfirm={(date) => {
-            setEndDateOpen(false);
-            handleChange('endDate', date);
-          }}
-          onCancel={() => setEndDateOpen(false)}
-        />
-      </ScrollView>
-                    </KeyboardAvoidingView>
+          <DatePicker
+            modal
+            open={endDateOpen}
+            date={formData.endDate}
+            maximumDate={new Date()}
+            minimumDate={formData.startDate || new Date()}
+            mode="date"
+            onConfirm={(date) => {
+              setEndDateOpen(false);
+              handleChange('endDate', date);
+            }}
+            onCancel={() => setEndDateOpen(false)}
+          />
+        </ScrollView>
+      </KeyboardAvoidingView>
 
     </NavigationBar>
   );

@@ -112,7 +112,7 @@ function CvCard({
 
   return (
     <TouchableWithoutFeedback style={{ flex: 1 }} onPress={() => setActive(0)}>
-      
+
       <View style={[styles.card, { marginTop: responsiveScreenHeight(2), borderColor: colors.surfaces, backgroundColor: colors.lightGrayNatural, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(1), borderWidth: 1 }]}>
         <View style={styles.topRow}>
           <Text style={[styles.title, { fontSize: responsiveScreenFontSize(2.2), fontWeight: "800", color: colors.textPrimary }]} numberOfLines={1}>
@@ -176,8 +176,11 @@ function CvCard({
           <Text style={[styles.metaText, { fontSize: responsiveScreenFontSize(1.8), color: colors.darkGray, fontWeight: "600", }]}>{item.city}</Text>
         </View>
         <View style={[styles.metaRow, { gap: responsiveScreenWidth(2), marginTop: responsiveScreenHeight(1), }]}>
-          <Image source={imagePath.company3} />
-          <Text style={[styles.metaText, { fontSize: responsiveScreenFontSize(1.8), color: colors.darkGray, fontWeight: "600", }]}>{item.company}</Text>
+          <View style={{ width: responsiveScreenWidth(4) }}>
+            <Image source={imagePath.company3} />
+          </View>
+
+          <Text style={[styles.metaText, { flex: 1, fontSize: responsiveScreenFontSize(1.8), color: colors.darkGray, fontWeight: "600", }]}>{item.company}</Text>
         </View>
         <View style={[styles.metaRow, { marginTop: responsiveScreenHeight(1), }]}>
           <Image source={imagePath.calender2} />

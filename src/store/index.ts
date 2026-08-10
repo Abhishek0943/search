@@ -8,12 +8,14 @@ import userReducer from '../reducer/userReducer'
 import storyReducer from '../reducer/storyReducer'
 import jobsReducer from '../reducer/jobsReducer'
 import recruiterReducer from '../reducer/recruiterReducer'
+import chatReducer from '../reducer/chatReducer'
 
 const rootReducer = combineReducers({
   userStore: userReducer,
   storyStore: storyReducer,
   jobsReducer:jobsReducer,
   recruiterReducer:recruiterReducer,
+  chatStore: chatReducer,
 });
 
 

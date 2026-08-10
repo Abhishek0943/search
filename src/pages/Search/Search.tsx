@@ -34,6 +34,7 @@ import { formatSalaryRange } from '../../utils';
 import { JobCard } from '../CompanyDetails/CompanyDetails';
 import { EmptyComp } from '../../recruiter/pages/OpenJobs/OpenJobs';
 import Text from '../../components/Text';
+import { CustomTextInput } from '../../components';
 type FilterValue = string | number;
 type FilterState = Partial<Record<string, FilterValue[]>>;
 const formatCamelCase = (str = '') =>
@@ -241,7 +242,7 @@ const Search = () => {
                   <TouchableOpacity onPress={() => setActiveSearch(false)}>
                     <Image style={{}} source={imagePath.search} />
                   </TouchableOpacity>
-                  <TextInput
+                  <CustomTextInput
                     value={search}
                     onFocus={() => { setActiveSearch(true) }}
                     onChangeText={e => setSearch(e)}
@@ -386,13 +387,12 @@ const SalaryFooter = React.memo(function SalaryFooter({
   return (
     <View style={{ gap: responsiveScreenHeight(1), width: '100%', marginBottom: responsiveScreenHeight(2) }}>
       <View style={{ flexDirection: 'row', gap: responsiveScreenWidth(3) }}>
-        {/* Min */}
         <View style={{ flex: 1 }}>
           <Label text="Min Salary" />
-          <TextInput
+          <CustomTextInput
             value={temFilter.min_salary ?? ''}
             keyboardType="number-pad"
-
+            maxLength={10}
             placeholder="0"
             placeholderTextColor={colors.textDisabled}
             onChangeText={(t) =>
@@ -405,13 +405,13 @@ const SalaryFooter = React.memo(function SalaryFooter({
           />
         </View>
 
-        {/* Max */}
         <View style={{ flex: 1 }}>
           <Label text="Max Salary" />
-          <TextInput
+          <CustomTextInput
             value={temFilter.max_salary ?? ''}
             keyboardType="number-pad"
             placeholder="100000"
+            maxLength={10}
             placeholderTextColor={colors.textDisabled}
             onChangeText={(t) =>
               setTemFilter((prev: any) => ({
@@ -543,7 +543,7 @@ export const CustomMultiDropdown = ({
                 marginBottom: 10,
               }}
             >
-              <TextInput
+              <CustomTextInput
                 value={query}
                 onChangeText={setQuery}
                 placeholder="Search..."

@@ -1,5 +1,6 @@
-import { Alert, FlatList, Image, KeyboardAvoidingView, Platform, Pressable, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import { CustomTextInput } from '../../components';
+import { ActivityIndicator, Alert, FlatList, Image, KeyboardAvoidingView, Linking, Modal, Platform, Pressable, SafeAreaView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { NavigationProp, ParamListBase, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native'
 import { useAppDispatch, useAppSelector } from '../../store'
 import { GetChats, GetMessage, GetMessageSeeker, ProfileData2, UploadCV, UploadDocument } from '../../reducer/jobsReducer'
@@ -14,6 +15,7 @@ import { SendMessage, SendMessageSeeker } from '../../reducer/recruiterReducer'
 import { pick, types } from '@react-native-documents/picker'
 import Icon from '../../utils/Icon'
 import { downloadCV } from '../../recruiter/pages/CandidateProfile/CandidateProfile'
+import { updateChatMessage, setActiveChat } from '../../reducer/chatReducer'
 
 const Messages = () => {
     const route = useRoute()
@@ -28,6 +30,7 @@ const Messages = () => {
     const [data, setData] = useState([])
     const [role, setRole] = useState<"seeker" | "recruiter" | "">()
     const { socket, isConnected } = useSocket();
+    const { active } = useAppSelector(state => state.chatStore);
     const onLoadMore = React.useCallback(() => {
         if (!meta?.last_page) return;
         if (meta?.current_page >= meta.last_page) return;
@@ -51,6 +54,13 @@ const Messages = () => {
         }
         login()
     }, [])
+    // Set this conversation as the active one so Chat.tsx won't increment unread count
+    useFocusEffect(
+        useCallback(() => {
+            if (dataa?.id) dispatch(setActiveChat(dataa.id));
+            return () => { dispatch(setActiveChat(0)); };
+        }, [dataa?.id])
+    );
     useEffect(() => {
         const a = async () => {
             if (!dataa?.id) return
@@ -68,7 +78,12 @@ const Messages = () => {
             } else {
                 dispatch(GetMessageSeeker({ id: dataa.id, pages })).unwrap().then((res) => {
                     if (res.success) {
-                        setData(res.data.groups)
+                        console.log(res.data.groups, "data");
+                        const incomingGroups = res.data.groups;
+                        setData((prev) => {
+                            if (pages === 1) return incomingGroups;
+                            return mergeGroupedMessages(prev, incomingGroups);
+                        });
                         setMeta(res.data.pagination)
 
                     }
@@ -85,7 +100,7 @@ const Messages = () => {
             if (!msg?.id) return;
 
             setData((prev) => {
-                const incomingLabel = "Today"; // or "Today" if you really want
+                const incomingLabel = "Today";
                 const list = Array.isArray(prev) ? prev : [];
                 if (list.length === 0) {
                     return [{ label: incomingLabel, messages: [msg] }];
@@ -103,14 +118,38 @@ const Messages = () => {
                 }
                 return [...list, { label: incomingLabel, messages: [msg] }];
             });
+
+            // Update chat list in Redux (unread count will stay 0 because active === dataa.id)
+            const num = Number(e?.from_id);
+            if (!Number.isNaN(num)) {
+                dispatch(updateChatMessage({ companyId: num, lastMessage: e?.message?.message, active }));
+            }
         };
         socket.on("message_received", handler);
         return () => {
             socket.off("message_received", handler);
         };
-    }, [socket, isConnected, item.id]);
+    }, [socket, isConnected, item.id, active]);
     const [document, setDocument] = useState({})
     const [sending, setSending] = useState(false);
+    // Track which message IDs are currently being downloaded
+    const [downloadingIds, setDownloadingIds] = useState<Set<number>>(new Set());
+    // Image preview modal
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
+
+    const handleDownload = async (id: number, url: string) => {
+        if (downloadingIds.has(id)) return;
+        setDownloadingIds(prev => new Set(prev).add(id));
+        try {
+            await downloadCV(url);
+        } finally {
+            setDownloadingIds(prev => {
+                const next = new Set(prev);
+                next.delete(id);
+                return next;
+            });
+        }
+    };
 
     const onSend = async () => {
         if (sending) return;
@@ -196,16 +235,46 @@ const Messages = () => {
                                                     <>
                                                         {e.message && <Text style={{ backgroundColor: e.type === "reply" ? colors.primary : colors.lightGray, maxWidth: responsiveScreenWidth(70), alignSelf: e.type === "reply" ? "flex-end" : "flex-start", color: e.type === "reply" ? colors.white : colors.darkGray, paddingHorizontal: responsiveScreenWidth(4), paddingVertical: responsiveScreenHeight(1.3), borderTopRightRadius: e.type === "reply" ? 0 : 20, borderTopLeftRadius: e.type === "reply" ? 20 : 0, borderRadius: 20, fontSize: responsiveScreenFontSize(1.8), }}>{e.message}</Text>}
                                                         {
-                                                            e.attachment_type === "file" &&
-                                                            <Pressable onPress={() => downloadCV(e.url)} style={{ alignSelf: e.type === "reply" ? "flex-end" : "flex-start", borderRadius: 16, marginVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), paddingVertical: responsiveScreenHeight(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.lightGrayNatural, maxWidth: responsiveScreenWidth(70) }}>
-                                                                <Icon icon={{ type: "Ionicons", name: "document-outline" }} /> <Text>{e.name}</Text>
-                                                            </Pressable>
+                                                            (e.attachment_type === "file" || e.attachment_type === "pdf") && (() => {
+                                                                const isLoading = downloadingIds.has(e.id);
+                                                                return (
+                                                                    <Pressable
+                                                                        onPress={() => Linking.openURL(e.url).catch(() => Alert.alert("Cannot open file"))}
+                                                                        onLongPress={() => handleDownload(e.id, e.url)}
+                                                                        style={{ alignSelf: e.type === "reply" ? "flex-end" : "flex-start", borderRadius: 16, marginVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), paddingVertical: responsiveScreenHeight(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.lightGrayNatural, maxWidth: responsiveScreenWidth(70), gap: responsiveScreenWidth(2) }}
+                                                                    >
+                                                                        {isLoading
+                                                                            ? <ActivityIndicator size="small" color={colors.primary} />
+                                                                            : <Icon icon={{ type: "Ionicons", name: "document-outline" }} />
+                                                                        }
+                                                                        <View style={{ flex: 1 }}>
+                                                                            <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(1.7) }}>{e.name}</Text>
+                                                                            {isLoading && <Text style={{ fontSize: responsiveScreenFontSize(1.4), color: colors.primary }}>Downloading…</Text>}
+                                                                            {!isLoading && <Text style={{ fontSize: responsiveScreenFontSize(1.4), color: colors.darkGrayNatural }}>Tap to open · Hold to save</Text>}
+                                                                        </View>
+                                                                    </Pressable>
+                                                                );
+                                                            })()
                                                         }
                                                         {
-                                                            e.attachment_type === "image" &&
-                                                            <Pressable onPress={() => downloadCV(e.url)} style={{ overflow: "hidden", alignSelf: e.type === "reply" ? "flex-end" : "flex-start", borderRadius: 16, marginVertical: responsiveScreenHeight(.5), }}>
-                                                                <Image source={{ uri: e.url }} style={{ height: responsiveScreenWidth(50), aspectRatio: 1 }} />
-                                                            </Pressable>
+                                                            e.attachment_type === "image" && (() => {
+                                                                const isLoading = downloadingIds.has(e.id);
+                                                                return (
+                                                                    <Pressable
+                                                                        onPress={() => setPreviewImage(e.url)}
+                                                                        onLongPress={() => handleDownload(e.id, e.url)}
+                                                                        style={{ overflow: "hidden", alignSelf: e.type === "reply" ? "flex-end" : "flex-start", borderRadius: 16, marginVertical: responsiveScreenHeight(.5) }}
+                                                                    >
+                                                                        <Image source={{ uri: e.url }} style={{ height: responsiveScreenWidth(50), aspectRatio: 1 }} />
+                                                                        {isLoading && (
+                                                                            <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.4)", justifyContent: "center", alignItems: "center", borderRadius: 16 }}>
+                                                                                <ActivityIndicator size="large" color="#fff" />
+                                                                                <Text style={{ color: "#fff", fontSize: responsiveScreenFontSize(1.5), marginTop: 6 }}>Saving…</Text>
+                                                                            </View>
+                                                                        )}
+                                                                    </Pressable>
+                                                                );
+                                                            })()
                                                         }
                                                         <Text style={{ marginTop: responsiveScreenHeight(1), alignSelf: e.type === "reply" ? "flex-end" : "flex-start", color: colors.darkGrayNatural, fontSize: responsiveScreenFontSize(1.5), }}>{new Date(e.created_at).toLocaleTimeString("en", { hour: "numeric", minute: "numeric" })}</Text>
                                                     </>
@@ -216,16 +285,46 @@ const Messages = () => {
 
                                                     {e.message && <Text style={{ backgroundColor: e.type !== "reply" ? colors.primary : colors.lightGray, maxWidth: responsiveScreenWidth(70), alignSelf: e.type !== "reply" ? "flex-end" : "flex-start", color: e.type !== "reply" ? colors.white : colors.darkGray, paddingHorizontal: responsiveScreenWidth(4), paddingVertical: responsiveScreenHeight(1.3), borderTopRightRadius: e.type !== "reply" ? 0 : 20, borderTopLeftRadius: e.type !== "reply" ? 20 : 0, borderRadius: 20, fontSize: responsiveScreenFontSize(1.8), }}>{e.message}</Text>}
                                                     {
-                                                        e.attachment_type === "file" &&
-                                                        <Pressable onPress={() => downloadCV(e.url)} style={{ alignSelf: e.type !== "reply" ? "flex-end" : "flex-start", borderRadius: 16, marginVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), paddingVertical: responsiveScreenHeight(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.lightGrayNatural, maxWidth: responsiveScreenWidth(70) }}>
-                                                            <Icon icon={{ type: "Ionicons", name: "document-outline" }} /> <Text>{e.name}</Text>
-                                                        </Pressable>
+                                                        (e.attachment_type === "file" || e.attachment_type === "pdf") && (() => {
+                                                            const isLoading = downloadingIds.has(e.id);
+                                                            return (
+                                                                <Pressable
+                                                                    onPress={() => Linking.openURL(e.url).catch(() => Alert.alert("Cannot open file"))}
+                                                                    onLongPress={() => handleDownload(e.id, e.url)}
+                                                                    style={{ alignSelf: e.type !== "reply" ? "flex-end" : "flex-start", borderRadius: 16, marginVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), paddingVertical: responsiveScreenHeight(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.lightGrayNatural, maxWidth: responsiveScreenWidth(70), gap: responsiveScreenWidth(2) }}
+                                                                >
+                                                                    {isLoading
+                                                                        ? <ActivityIndicator size="small" color={colors.primary} />
+                                                                        : <Icon icon={{ type: "Ionicons", name: "document-outline" }} />
+                                                                    }
+                                                                    <View style={{ flex: 1 }}>
+                                                                        <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(1.7) }}>{e.name}</Text>
+                                                                        {isLoading && <Text style={{ fontSize: responsiveScreenFontSize(1.4), color: colors.primary }}>Downloading…</Text>}
+                                                                        {!isLoading && <Text style={{ fontSize: responsiveScreenFontSize(1.4), color: colors.darkGrayNatural }}>Tap to open · Hold to save</Text>}
+                                                                    </View>
+                                                                </Pressable>
+                                                            );
+                                                        })()
                                                     }
                                                     {
-                                                        e.attachment_type === "image" &&
-                                                        <Pressable onPress={() => downloadCV(e.url)} style={{ overflow: "hidden", alignSelf: e.type !== "reply" ? "flex-end" : "flex-start", borderRadius: 16, marginVertical: responsiveScreenHeight(.5), }}>
-                                                            <Image source={{ uri: e.url }} style={{ height: responsiveScreenWidth(50), aspectRatio: 1 }} />
-                                                        </Pressable>
+                                                        e.attachment_type === "image" && (() => {
+                                                            const isLoading = downloadingIds.has(e.id);
+                                                            return (
+                                                                <Pressable
+                                                                    onPress={() => setPreviewImage(e.url)}
+                                                                    onLongPress={() => handleDownload(e.id, e.url)}
+                                                                    style={{ overflow: "hidden", alignSelf: e.type !== "reply" ? "flex-end" : "flex-start", borderRadius: 16, marginVertical: responsiveScreenHeight(.5) }}
+                                                                >
+                                                                    <Image source={{ uri: e.url }} style={{ height: responsiveScreenWidth(50), aspectRatio: 1 }} />
+                                                                    {isLoading && (
+                                                                        <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.4)", justifyContent: "center", alignItems: "center", borderRadius: 16 }}>
+                                                                            <ActivityIndicator size="large" color="#fff" />
+                                                                            <Text style={{ color: "#fff", fontSize: responsiveScreenFontSize(1.5), marginTop: 6 }}>Saving…</Text>
+                                                                        </View>
+                                                                    )}
+                                                                </Pressable>
+                                                            );
+                                                        })()
                                                     }
                                                     <Text style={{ marginTop: responsiveScreenHeight(1), alignSelf: e.type !== "reply" ? "flex-end" : "flex-start", color: colors.darkGrayNatural, fontSize: responsiveScreenFontSize(1.5), }}>{new Date(e.created_at).toLocaleTimeString("en", { hour: "numeric", minute: "numeric" })}</Text>
                                                 </>
@@ -260,7 +359,7 @@ const Messages = () => {
                             document?.cvFile?.name && <Text onPress={() => setDocument({})} style={{ marginLeft: responsiveScreenWidth(5), marginTop: responsiveScreenHeight(1.4), fontSize: responsiveScreenFontSize(1.8) }}>{document?.cvFile?.name}</Text>
                         }
                         <View style={{ flexDirection: "row" }}>
-                            <TextInput
+                            <CustomTextInput
                                 placeholder="Type something"
                                 placeholderTextColor="#555"
                                 value={comment}
@@ -366,6 +465,40 @@ const Messages = () => {
                     }
                 </View>
             </KeyboardAvoidingView>
+
+            {/* ── Full-screen image preview modal ── */}
+            <Modal visible={!!previewImage} transparent animationType="fade" onRequestClose={() => setPreviewImage(null)}>
+                <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.92)", justifyContent: "center", alignItems: "center" }}>
+                    <SafeAreaView style={{ flex: 1, width: "100%", justifyContent: "center", alignItems: "center" }}>
+                        {previewImage && (
+                            <Image
+                                source={{ uri: previewImage }}
+                                style={{ width: "100%", height: "80%" }}
+                                resizeMode="contain"
+                            />
+                        )}
+                        <View style={{ flexDirection: "row", gap: responsiveScreenWidth(5), marginTop: responsiveScreenHeight(3) }}>
+                            <TouchableOpacity
+                                onPress={() => {
+                                    const fakeId = Date.now();
+                                    if (previewImage) handleDownload(fakeId, previewImage);
+                                    setPreviewImage(null);
+                                }}
+                                style={{ backgroundColor: colors.primary, paddingVertical: responsiveScreenHeight(1.2), paddingHorizontal: responsiveScreenWidth(8), borderRadius: 25, flexDirection: "row", alignItems: "center", gap: 8 }}
+                            >
+                                <Icon icon={{ type: "Ionicons", name: "download-outline" }} color="#fff" />
+                                <Text style={{ color: "#fff", fontSize: responsiveScreenFontSize(1.8), fontWeight: "600" }}>Save</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => setPreviewImage(null)}
+                                style={{ backgroundColor: "rgba(255,255,255,0.15)", paddingVertical: responsiveScreenHeight(1.2), paddingHorizontal: responsiveScreenWidth(8), borderRadius: 25 }}
+                            >
+                                <Text style={{ color: "#fff", fontSize: responsiveScreenFontSize(1.8), fontWeight: "600" }}>Close</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </SafeAreaView>
+                </View>
+            </Modal>
         </NavigationBar>
     )
 }

@@ -1,3 +1,4 @@
+import { CustomTextInput } from '../../components';
 import { FlatList, Image, TouchableOpacity, ScrollView, StyleSheet, View, ActivityIndicator, Pressable, TextInput } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { NavigationBar } from '../../components'
@@ -116,7 +117,7 @@ const Company = () => {
           <Pressable>
             <Image style={{}} source={imagePath.search} />
           </Pressable>
-          <TextInput
+          <CustomTextInput
             value={search}
             onChangeText={e => setSearch(e)}
             placeholder="Search"

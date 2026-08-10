@@ -14,6 +14,7 @@ import Text from '../../components/Text';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getFCMToken } from '../../utils/notificationService';
 import { Tokien } from '../../reducer/recruiterReducer';
+import { CustomTextInput } from '../../components';
 function Home() {
   const { colors } = useContext(ThemeContext)
   const navigation: NavigationProp<ParamListBase> = useNavigation()
@@ -48,6 +49,7 @@ function Home() {
     dispatch(GetBanners())
     dispatch(GetRecentJobs({})).unwrap().then((res) => {
       if (res.success) {
+        console.log(res.data)
         setRecent(res.data.jobs)
         setMeta(res.data.meta)
       }
@@ -114,7 +116,7 @@ function Home() {
               </View>
               <View style={{ backgroundColor: "white", paddingVertical: responsiveScreenHeight(2), paddingHorizontal: responsiveScreenWidth(4), borderRadius: 10, marginHorizontal: responsiveScreenWidth(5), marginTop: responsiveScreenHeight(5), elevation: 6 }}>
                 <Text style={{ fontSize: responsiveScreenFontSize(2.4), fontWeight: "700" }}>Find your dream job!</Text>
-                <TextInput
+                <CustomTextInput
                   value={search}
                   onChangeText={t => setSearch(t)}
                   style={{
@@ -172,7 +174,7 @@ function Home() {
                 </Pressable>
                 <Pressable onPress={() => navigation.navigate(routes.PROFILE)} style={{ flex: 1, justifyContent: "space-between", }}>
                   <Text style={{ fontSize: responsiveScreenFontSize(1.6) }}>Welcome Back!</Text>
-                  <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "800", textTransform: "capitalize", }}>Hello! {user.name}👋</Text>
+                  <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "800", textTransform: "capitalize", maxWidth: responsiveScreenWidth(65) }}>Hello! {user.name}👋 </Text>
                 </Pressable>
                 <TouchableOpacity style={{ alignSelf: "center" }} onPress={() => navigation.navigate(routes.NOTIFICATION)}>
                   <Image
@@ -199,7 +201,7 @@ function Home() {
                   <TouchableOpacity onPress={() => { }}>
                     <Image style={{}} source={imagePath.search} />
                   </TouchableOpacity>
-                  <TextInput
+                  <CustomTextInput
                     value={search}
                     editable={false}
                     onChangeText={e => setSearch(e)}
@@ -291,8 +293,9 @@ function Home() {
                           </View>
                           <View style={{ flexDirection: "row", alignItems: "center", }}>
                             <Text numberOfLines={2} style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
+
                               {
-                                item.salary && item.salary_period && <>
+                                !item.is_hide_salary && item.salary && item.salary_period && <>
                                   <Text numberOfLines={1} style={{ fontSize: responsiveScreenFontSize(2.2), fontWeight: "500" }}>{item.salary_currency}{formatSalaryRange(item.salary)}/</Text>
                                   <Text style={{ flex: 1, marginTop: responsiveScreenHeight(.3) }}>{item.salary_period}</Text>
                                 </>
@@ -377,9 +380,9 @@ function Home() {
                           }
                           <View style={{ flexDirection: "row", gap: responsiveScreenWidth(2), flexWrap: "wrap", marginVertical: responsiveScreenHeight(.5) }}>
                             {
-                              (job?.salary && job?.salary_period) ? (
+                              (job?.salary && job?.salary_period && !job?.is_hide_salary) ? (
                                 <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>{job.salary_currency}{job.salary}/{job.salary_period}</Text>
-                              ) : (job?.salary_from || job?.salary_to) ? (
+                              ) : (job?.salary_from || job?.salary_to) && !job?.is_hide_salary ? (
                                 <Text numberOfLines={1} style={{ backgroundColor: "#F5F5F5", textTransform: "capitalize", borderWidth: 1, borderColor: "#F5F5F5", paddingVertical: responsiveScreenHeight(.5), paddingHorizontal: responsiveScreenWidth(2), borderRadius: 5, fontSize: responsiveScreenFontSize(1.8) }}>Salary : {job.salary_currency}{job.salary_from} - {job.salary_to}</Text>
                               ) : null
                             }

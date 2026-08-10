@@ -7,6 +7,7 @@ import {
 } from 'react-native-responsive-dimensions';
 import { ThemeContext } from '../context/ThemeProvider';
 import Icon from '../utils/Icon';
+import { CustomTextInput } from './';
 interface TextInputCompProps {
   value: string;
   onChangeText?: (text: string) => void;
@@ -20,7 +21,7 @@ interface TextInputCompProps {
   keyboardType?: KeyboardType
   inputAlternate?: () => React.ReactNode;
 }
-const InputWithLabel: React.FC<TextInputCompProps> = ({
+const InputWithLabel: React.FC<CustomTextInputCompProps> = ({
   value,
   onChangeText,
   placeholder = '',
@@ -42,7 +43,7 @@ const InputWithLabel: React.FC<TextInputCompProps> = ({
         return (
           <>
             <View style={[styles.inputContainer, { borderColor: colors.mediumGray }]}>
-              <TextInput
+              <CustomTextInput
                 style={[styles.input, { color: colors.textPrimary }]}
                 value={value}
                 onChangeText={onChangeText}
@@ -85,7 +86,7 @@ const InputWithLabel: React.FC<TextInputCompProps> = ({
         return (
           <>
             <View style={[styles.inputContainer,{ borderColor: colors.mediumGray } ]}>
-              <TextInput
+              <CustomTextInput
                 style={[styles.input, { color: colors.textPrimary }]}
                 value={value}
                 onChangeText={onChangeText}

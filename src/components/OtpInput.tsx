@@ -19,13 +19,14 @@ import {
   responsiveScreenWidth,
 } from 'react-native-responsive-dimensions';
 import { ThemeContext } from '../context/ThemeProvider';
+import { CustomTextInput } from './';
 export const OtpInput: React.FunctionComponent<OTPInputProps> = ({
   length,
   disabled,
   value,
   onChange,
 }) => {
-  const inputRefs = useRef<Array<Nullable<TextInput>>>([]);
+  const inputRefs = useRef<Array<Nullable<CustomTextInput>>>([]);
     const { colors } = useContext(ThemeContext)
   
   const onChangeValue = (text: string, index: number) => {
@@ -50,7 +51,7 @@ export const OtpInput: React.FunctionComponent<OTPInputProps> = ({
   };
 
   const handleBackspace = (
-    event: NativeSyntheticEvent<TextInputKeyPressEventData>,
+    event: NativeSyntheticEvent<CustomTextInputKeyPressEventData>,
     index: number,
   ) => {
     const {nativeEvent} = event;
@@ -62,7 +63,7 @@ export const OtpInput: React.FunctionComponent<OTPInputProps> = ({
   return (
     <View style={styles.container}>
       {[...Array(length)].map((_, index) => (
-        <TextInput
+        <CustomTextInput
           key={index} 
           style={[
             styles.input,

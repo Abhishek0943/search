@@ -28,6 +28,7 @@ import { pick, types, keepLocalCopy, } from '@react-native-documents/picker';
 import DatePicker from 'react-native-date-picker';
 import { Header } from '../Company/Company';
 import { useAlert } from '../../context/AlertContext';
+import { CustomTextInput } from '../../components';
 
 const EducationForm = () => {
     const { colors } = useContext(ThemeContext);
@@ -122,7 +123,13 @@ const EducationForm = () => {
             .unwrap()
             .then(res => {
                 setLoading(false);
-                if (res.success) navigation.goBack();
+                if (res.success) navigation.goBack()
+                else {
+                    showAlert({
+                        title: "Error",
+                        message: res?.message || "Something went wrong",
+                    });
+                }
             })
             .catch(err => {
                 setLoading(false);
@@ -156,7 +163,7 @@ const EducationForm = () => {
                 <Header title="Add New CV" />
 
                 <Label text="CV" />
-                <TextInput
+                <CustomTextInput
                     value={formData.cvTitle}
                     onChangeText={t => handleChange('cvTitle', t)}
                     style={inputStyle}

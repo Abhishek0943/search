@@ -105,6 +105,12 @@ const SkillExperienceForm = () => {
           if (res?.success) {
             navigation.goBack();
           }
+          else {
+            showAlert({
+              title: "Error",
+              message: res?.message || "Something went wrong",
+            });
+          }
         })
         .catch(err => {
           showAlert({
@@ -120,6 +126,12 @@ const SkillExperienceForm = () => {
 
           if (res?.success) {
             navigation.goBack();
+          }
+          else {
+            showAlert({
+              title: "Error",
+              message: res?.message || "Something went wrong",
+            });
           }
         })
         .catch(err => {

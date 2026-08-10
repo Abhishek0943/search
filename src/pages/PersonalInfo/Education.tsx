@@ -135,25 +135,33 @@ function CvCard({
               }
             }
             } hitSlop={10} style={styles.iconBtn}>
-              <Image source={imagePath.delete} style={{transform:[{scale:1.2}]}} />
+              <Image source={imagePath.delete} style={{ transform: [{ scale: 1.2 }] }} />
             </Pressable>
-            
-           
+
+
           </View>
         </View>
         <Text style={{ marginTop: responsiveScreenHeight(.8), fontSize: responsiveScreenFontSize(1.7), }}>{item.date_completion} - {item.country.country} - {item.state.state}</Text>
 
-        <View style={[styles.metaRow, { gap: responsiveScreenWidth(2), marginTop: responsiveScreenHeight(1) }]}>
-          <Image source={imagePath.education} />
-          <Text style={[styles.metaText, { fontSize: responsiveScreenFontSize(1.7), color: colors.textSecondary, fontWeight: "700", }]}>{item.majorSubjects.map((e) => `${e.name},`)}</Text>
+        <View style={[styles.metaRow, { gap: responsiveScreenWidth(2), flex: 1, marginTop: responsiveScreenHeight(1), }]}>
+          <View style={{ width: responsiveScreenWidth(4) }}>
+            <Image source={imagePath.education} />
+          </View>
+          <Text style={[styles.metaText, { flex: 1, fontSize: responsiveScreenFontSize(1.7), color: colors.textSecondary, fontWeight: "700", }]}>
+            {item.majorSubjects?.length > 3
+              ? `${item.majorSubjects?.map((e, i) => i + " " + e.id + " " + e.name).join(', ')} and ${item.majorSubjects.length - 2} more...`
+              : item.majorSubjects?.map((e) => e.name).join(', ')}
+          </Text>
         </View>
         <View style={[styles.metaRow, { gap: responsiveScreenWidth(2), marginTop: responsiveScreenHeight(.8) }]}>
           <Image source={imagePath.location2} />
           <Text style={[styles.metaText, { fontSize: responsiveScreenFontSize(1.7), color: colors.textSecondary, fontWeight: "700", }]}>{item.country.country} - {item.state.state}</Text>
         </View>
         <View style={[styles.metaRow, { gap: responsiveScreenWidth(2), marginTop: responsiveScreenHeight(.8) }]}>
-          <Image source={imagePath.company3} />
-          <Text style={[styles.metaText, { fontSize: responsiveScreenFontSize(1.7), color: colors.textSecondary, fontWeight: "700", }]}>{item.institution}</Text>
+          <View style={{ width: responsiveScreenWidth(4) }}>
+            <Image source={imagePath.company3} />
+          </View>
+          <Text numberOfLines={2} style={[styles.metaText, { flex: 1, fontSize: responsiveScreenFontSize(1.7), color: colors.textSecondary, fontWeight: "700", }]}>{item.institution}</Text>
         </View>
 
 

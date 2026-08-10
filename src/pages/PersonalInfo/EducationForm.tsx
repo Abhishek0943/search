@@ -26,6 +26,7 @@ import { GetCountry, GetState, GetCity, DegreeLevel, DegreeType, Subject, Result
 import { CustomMultiDropdown } from '../Search/Search';
 import { Header } from '../Company/Company';
 import { useAlert } from '../../context/AlertContext';
+import { CustomTextInput } from '../../components';
 
 const EducationForm = () => {
   const { colors } = useContext(ThemeContext);
@@ -45,7 +46,7 @@ const EducationForm = () => {
   const data = route.params
   const [formData, setFormData] = useState({
     degreeLevelId: 0,
-    degreeTypeId: 0,
+    degreeTypeId: null,
     degreeTitle: '',
     subjectIds: [] as number[],
     countryId: 0,
@@ -149,12 +150,15 @@ const EducationForm = () => {
         if (res?.success) setCities(res.data || []);
       });
   };
-  const Label = ({ text }: { text: string }) => (
+  const Label = ({ text, isRequired = true }: { text: string, isRequired?: boolean }) => (
     <View style={{ flexDirection: 'row', width: '100%', marginTop: responsiveScreenHeight(1) }}>
       <Text style={{ color: colors.textPrimary, fontSize: responsiveScreenFontSize(1.8) }}>
         {text}
       </Text>
-      <Text style={{ color: colors.red, fontSize: responsiveScreenFontSize(1.8) }}> *</Text>
+      {
+        isRequired &&
+        <Text style={{ color: colors.red, fontSize: responsiveScreenFontSize(1.8) }}> *</Text>
+      }
     </View>
   );
 
@@ -261,16 +265,29 @@ const EducationForm = () => {
           if (res?.success) {
             navigation.goBack();
           }
+          else {
+            showAlert({
+              title: "Error",
+              message: res?.message || "Something went wrong",
+            });
+          }
           setLoading(false)
         })
         .catch(err => {
         });
     } else {
+      console.log(payload)
       dispatch(AddEducation(payload))
         .unwrap()
         .then(res => {
           if (res?.success) {
             navigation.goBack();
+          }
+          else {
+            showAlert({
+              title: "Error",
+              message: res?.message || "Something went wrong",
+            });
           }
           setLoading(false)
 
@@ -305,7 +322,7 @@ const EducationForm = () => {
           />
 
           {/* Degree Type */}
-          <Label text="Degree Type" />
+          <Label text="Degree Type" isRequired={false} />
           <CustomDropdown
             data={degreeTypes}
             placeholder="Select"
@@ -316,12 +333,13 @@ const EducationForm = () => {
           />
 
           <Label text="Degree Title" />
-          <TextInput
+          <CustomTextInput
             value={formData.degreeTitle}
             onChangeText={t => handleChange('degreeTitle', t)}
             style={inputStyle}
             placeholderTextColor={colors.gray}
             autoFocus={true}
+            maxLength={30}
             placeholder="e.g., Bachelor of Computer Science"
           />
           <Label text="Major Subjects" />
@@ -374,10 +392,11 @@ const EducationForm = () => {
 
           {/* Institution */}
           <Label text="Institution" />
-          <TextInput
+          <CustomTextInput
             value={formData.institution}
             onChangeText={t => handleChange('institution', t)}
             style={inputStyle}
+            maxLength={30}
             placeholderTextColor={colors.gray}
             placeholder="e.g., Panjab University"
           />
@@ -395,11 +414,12 @@ const EducationForm = () => {
 
           {/* Degree Result (single line) */}
           <Label text="Degree Result" />
-          <TextInput
+          <CustomTextInput
             value={formData.degreeResult}
             onChangeText={t => handleChange('degreeResult', t)}
             style={inputStyle}
             placeholderTextColor={colors.gray}
+            maxLength={4}
             placeholder="e.g., 7.8"
             keyboardType="decimal-pad"
           />

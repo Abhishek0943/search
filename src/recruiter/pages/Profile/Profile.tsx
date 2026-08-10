@@ -5,6 +5,7 @@ import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth
 import { ThemeContext } from '../../../context/ThemeProvider'
 import imagePath from '../../../assets/imagePath'
 import { actions, RichEditor, RichToolbar } from 'react-native-pell-rich-editor';
+import { CustomTextInput } from '../../../components';
 import { routes } from '../../../constants/values'
 import { CustomDropdown } from '../../../pages/PersonalInfo/PersonalInfo'
 import { useAppDispatch, useAppSelector } from '../../../store'
@@ -120,7 +121,8 @@ const Profile = () => {
             twitter: formData.twitter,
             linkedin: formData.linkedin,
             pinterest: formData.pinterest,
-            map: formData.companyAddress,
+            location: formData.companyAddress,
+            company_address: formData.companyAddress,
             contact_name: formData.hrName,
             contact_email: formData.hrEmail,
             ceo: formData.hrDesignation,
@@ -420,7 +422,7 @@ const Profile = () => {
                     </Pressable>
 
                     <Label text="Company Name" />
-                    <TextInput
+                    <CustomTextInput
                         // 🟢 fixed
                         value={formData.companyName}
                         onChangeText={t => handleChange('companyName', t)}
@@ -518,7 +520,7 @@ const Profile = () => {
 
                         <View style={{ flex: 1 }}>
                             <Label text="Phone" />
-                            <TextInput
+                            <CustomTextInput
                                 value={formData.phone}
                                 onChangeText={t => handleChange('phone', t)}
                                 style={inputStyle}
@@ -531,7 +533,7 @@ const Profile = () => {
                     </View>
 
                     <Label text="Website URL" require={false} />
-                    <TextInput
+                    <CustomTextInput
                         value={formData.website}
                         onChangeText={t => handleChange('website', t)}
                         style={inputStyle}
@@ -543,7 +545,7 @@ const Profile = () => {
                     <View style={{ width: '100%', flexDirection: 'row', gap: responsiveScreenWidth(3) }}>
                         <View style={{ flex: 1 }}>
                             <Label text="Facebook" require={false} />
-                            <TextInput
+                            <CustomTextInput
                                 value={formData.facebook}
                                 onChangeText={t => handleChange('facebook', t)}
                                 style={inputStyle}
@@ -555,7 +557,7 @@ const Profile = () => {
 
                         <View style={{ flex: 1 }}>
                             <Label text="Twitter" require={false} />
-                            <TextInput
+                            <CustomTextInput
                                 value={formData.twitter}
                                 onChangeText={t => handleChange('twitter', t)}
                                 style={inputStyle}
@@ -569,7 +571,7 @@ const Profile = () => {
                     <View style={{ width: '100%', flexDirection: 'row', gap: responsiveScreenWidth(3) }}>
                         <View style={{ flex: 1 }}>
                             <Label text="LinkedIn" require={false} />
-                            <TextInput
+                            <CustomTextInput
                                 value={formData.linkedin}
                                 onChangeText={t => handleChange('linkedin', t)}
                                 style={inputStyle}
@@ -581,7 +583,7 @@ const Profile = () => {
 
                         <View style={{ flex: 1 }}>
                             <Label text="Pinterest" require={false} />
-                            <TextInput
+                            <CustomTextInput
                                 value={formData.pinterest}
                                 onChangeText={t => handleChange('pinterest', t)}
                                 style={inputStyle}
@@ -629,7 +631,7 @@ const Profile = () => {
                     </View>
 
                     <Label text="Company Address" />
-                    <TextInput
+                    <CustomTextInput
                         // 🟢 fixed
                         value={formData.companyAddress}
                         onChangeText={t => handleChange('companyAddress', t)}
@@ -647,7 +649,7 @@ const Profile = () => {
                     <View style={{ width: '100%', flexDirection: 'row', gap: responsiveScreenWidth(3) }}>
                         <View style={{ flex: 1 }}>
                             <Label text="Name" require={false} />
-                            <TextInput
+                            <CustomTextInput
                                 // 🟢 fixed
                                 value={formData.hrName}
                                 onChangeText={t => handleChange('hrName', t)}
@@ -659,7 +661,7 @@ const Profile = () => {
 
                         <View style={{ flex: 1 }}>
                             <Label text="Email" require={false} />
-                            <TextInput
+                            <CustomTextInput
                                 // 🟢 fixed
                                 value={formData.hrEmail}
                                 onChangeText={t => handleChange('hrEmail', t)}
@@ -675,7 +677,7 @@ const Profile = () => {
                     <View style={{ width: '100%', flexDirection: 'row', gap: responsiveScreenWidth(3) }}>
                         <View style={{ flex: 1 }}>
                             <Label text="Designation" require={false} />
-                            <TextInput
+                            <CustomTextInput
                                 // 🟢 fixed
                                 value={formData.hrDesignation}
                                 onChangeText={t => handleChange('hrDesignation', t)}
@@ -687,7 +689,7 @@ const Profile = () => {
 
                         <View style={{ flex: 1 }}>
                             <Label text="Company Registration no" require={false} />
-                            <TextInput
+                            <CustomTextInput
                                 // 🟢 fixed
                                 value={formData.companyRegistrationNo}
                                 onChangeText={t => handleChange('companyRegistrationNo', t)}
@@ -1241,7 +1243,7 @@ const Editor = ({ onChange, initialContent }: { onChange?: (html: string) => voi
                                     </View>
                                 )}
                                 {/* Actual TextInput for editing */}
-                                <TextInput
+                                <CustomTextInput
                                     ref={(ref) => { inputRefs.current[block.id] = ref; }}
                                     style={[
                                         getBlockStyle(block),

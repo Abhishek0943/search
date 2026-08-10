@@ -28,6 +28,7 @@ export async function postApiCall<T>(
       // signal: controller.signal,
     });
     const text = await res.text(); // <-- better than res.json() first
+    console.log(text)
     let data: any = null;
     try { data = text ? JSON.parse(text) : null; } catch { data = text; }
 

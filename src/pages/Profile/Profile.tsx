@@ -151,7 +151,7 @@ const Profile = () => {
                                                     <Image source={imagePath.camera2} style={{}} />
                                                 </TouchableOpacity>
                                             </View>
-                                            <Text style={{ textAlign: "center", color: colors.textPrimary, fontSize: responsiveScreenFontSize(2.1), position: "relative", top: "-30%", fontWeight: "600", textTransform: "capitalize" }}>{profile.name}</Text>
+                                            <Text style={{ textAlign: "center", color: colors.textPrimary, fontSize: responsiveScreenFontSize(2), position: "relative", top: "-30%", fontWeight: "600", textTransform: "capitalize" }}>{profile.name}</Text>
                                             <Text style={{ position: "relative", top: "-30%", textAlign: "center", color: colors.textSecondary, fontSize: responsiveScreenFontSize(1.8), textTransform: "lowercase" }}>{profile.email}</Text>
                                             <View style={{ position: "relative", top: "-30%", width: "100%", borderBottomWidth: 1, borderBottomColor: colors.textDisabled }}></View>
                                             <View style={{ position: "relative", top: "-30%", flexDirection: "row", justifyContent: "space-between", paddingHorizontal: responsiveScreenWidth(2) }}>

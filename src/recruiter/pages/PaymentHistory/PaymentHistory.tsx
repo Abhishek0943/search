@@ -15,13 +15,12 @@ const downloadInvoice = async (
   fileName: string,
   setDownloadingId: (id: string | null) => void,
   id: string,
+  setDownloadProgress: (progress: number) => void,
 ) => {
   try {
     setDownloadingId(id);
+    setDownloadProgress(0);
     const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9.]/g, '_');
-    // On iOS we save to DocumentDirectory (app sandbox), then offer a Share Sheet
-    // so the user can move the file to Files app, iCloud, Mail, etc.
-    // On Android we save directly to the Downloads folder.
     const baseDir =
       Platform.OS === 'ios'
         ? RNFS.DocumentDirectoryPath
@@ -31,28 +30,29 @@ const downloadInvoice = async (
     const result = await RNFS.downloadFile({
       fromUrl: invoiceUrl,
       toFile: destPath,
+      progressDivider: 1,
+      begin: () => {
+        setDownloadProgress(0);
+      },
+      progress: (res) => {
+        let progressPercent = (res.bytesWritten / res.contentLength) * 100;
+        setDownloadProgress(Math.round(progressPercent));
+      }
     }).promise;
 
     if (result.statusCode === 200) {
-      // if (Platform.OS === 'ios') {
-      //   await Share.share({
-      //     url: `file://${destPath}`,
-      //     title: fileName,
-      //   });
-      // } else {
       Alert.alert('Downloaded', 'Invoice saved to Downloads folder.');
-      // }
     } else {
       Alert.alert('Error', 'Failed to download invoice.');
     }
   } catch (e: any) {
-    // User cancelled the share sheet — not an error
     console.log(e)
     if (e?.message !== 'User did not share') {
       Alert.alert('Error', 'Something went wrong while downloading.');
     }
   } finally {
     setDownloadingId(null);
+    setDownloadProgress(0);
   }
 };
 
@@ -63,10 +63,10 @@ const PaymentHistory = () => {
   const [cvs, setCvs] = useState([])
   const [loading, setLoading] = useState(true)
   const [downloadingId, setDownloadingId] = useState<string | null>(null)
+  const [downloadProgress, setDownloadProgress] = useState<number>(0)
   const [meta, setMeta] = useState()
   const [pages, setPages] = useState(1)
   const onLoadMore = React.useCallback(() => {
-    // guard: agar last page aa chuka hai
     if (!meta?.last_page) return;
     if (meta?.current_page >= meta.last_page) return;
     setPages((p) => p + 1);
@@ -127,21 +127,6 @@ const PaymentHistory = () => {
                     <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "600" }}>Package End Date</Text>
                     <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "400", color: colors.darkGrayNatural }}>{item?.end_date}</Text>
                   </View>
-                  {/* <View style={{ borderRadius: 100, borderWidth: 1, borderColor: colors.primary, padding: 2, backgroundColor: colors.white, overflow: "hidden", height: responsiveScreenHeight(8), aspectRatio: 1, marginHorizontal: "auto" }}>
-                    <Image source={{ uri: item.image || item.user.image }} style={{ borderRadius: 100, height: "100%", backgroundColor: "white", }} />
-                  </View>
-                  <Text style={{ textTransform: "capitalize", textAlign: "center", marginTop: responsiveScreenHeight(.5), fontSize: responsiveScreenFontSize(2), fontWeight: "700" }}>{item.name || item.user.name}</Text>
-                  {
-                    item.profile_summary &&
-                    <Text numberOfLines={2} style={{ textAlign: "center", marginTop: responsiveScreenHeight(.5), color: colors.darkGray, fontSize: responsiveScreenFontSize(1.5), fontWeight: "500" }}>{item.profile_summary}</Text>
-                  }
-                  {
-                    item.location &&
-                    <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", gap: responsiveScreenWidth(.5), marginTop: responsiveScreenHeight(.5) }}>
-                      <Image source={imagePath.location} style={{ transform: [{ scale: 0.8 }] }} />
-                      <Text numberOfLines={1} style={{ textAlign: "center", color: colors.darkGray, fontSize: responsiveScreenFontSize(1.5), fontWeight: "500" }}>{item.location}</Text>
-                    </View>
-                  } */}
 
                   {item?.invoice_url && (
                     <TouchableOpacity
@@ -151,6 +136,7 @@ const PaymentHistory = () => {
                         `invoice_${item?.package_title ? `${item.package_title}_` : ''}${Date.now()}.pdf`,
                         setDownloadingId,
                         String(item?.id ?? item?.invoice_url),
+                        setDownloadProgress,
                       )}
                       style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-end", gap: responsiveScreenWidth(1.5), backgroundColor: colors.primary, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(0.8), borderRadius: 8, opacity: downloadingId === String(item?.id ?? item?.invoice_url) ? 0.7 : 1 }}
                     >
@@ -160,7 +146,7 @@ const PaymentHistory = () => {
                         <Image source={require('./downlod.png')} style={{ width: 18, height: 18, tintColor: '#fff' }} />
                       )}
                       <Text style={{ color: '#fff', fontSize: responsiveScreenFontSize(1.7), fontWeight: '600' }}>
-                        {downloadingId === String(item?.id ?? item?.invoice_url) ? 'Downloading...' : 'Download Invoice'}
+                        {downloadingId === String(item?.id ?? item?.invoice_url) ? `Downloading... ${downloadProgress}%` : 'Download Invoice'}
                       </Text>
                     </TouchableOpacity>
                   )}

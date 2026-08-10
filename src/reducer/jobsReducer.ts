@@ -200,6 +200,15 @@ export const ContactT = createAsyncThunk<
     return postApiCall<{ success: true, data: { companies: Company[] } }>('/contact-us', body);
   }
 );
+export const GetContactDetails = createAsyncThunk<
+  { success: true, data: { phone: string; email: string; address: string } } | ErrorResponse, void
+>(
+  'GetContactDetails',
+  () => {
+    return getApiCall<{ success: true, data: { phone: string; email: string; address: string } }>('/contact-us-details');
+  }
+);
+
 export const GetCompany = createAsyncThunk<
   { success: true, data: Company } | ErrorResponse, { id: number }
 >(

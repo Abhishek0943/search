@@ -7,3 +7,4 @@ export {default as InPutWithLabel} from './InPutWithLabel'
 
 
 
+export { default as CustomTextInput } from './CustomTextInput';
