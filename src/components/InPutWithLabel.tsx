@@ -7,7 +7,7 @@ import {
 } from 'react-native-responsive-dimensions';
 import { ThemeContext } from '../context/ThemeProvider';
 import Icon from '../utils/Icon';
-import { CustomTextInput } from './';
+import { CustomTextInput } from '.';
 interface TextInputCompProps {
   value: string;
   onChangeText?: (text: string) => void;
@@ -31,7 +31,7 @@ const InputWithLabel: React.FC<CustomTextInputCompProps> = ({
   options,
   type = "text",
   keyboardType = "default",
-  inputAlternate, 
+  inputAlternate,
   max
 }) => {
   const { colors } = useContext(ThemeContext);
@@ -79,20 +79,20 @@ const InputWithLabel: React.FC<CustomTextInputCompProps> = ({
 
         return (
           <>
-           
+
           </>
         )
       case "number":
         return (
           <>
-            <View style={[styles.inputContainer,{ borderColor: colors.mediumGray } ]}>
+            <View style={[styles.inputContainer, { borderColor: colors.mediumGray }]}>
               <CustomTextInput
                 style={[styles.input, { color: colors.textPrimary }]}
                 value={value}
                 onChangeText={onChangeText}
                 placeholder={placeholder}
-                maxLength={max|| 10}
-                  
+                maxLength={max || 10}
+
 
                 placeholderTextColor={colors.placeholder}
                 keyboardType='decimal-pad'
@@ -112,7 +112,7 @@ const InputWithLabel: React.FC<CustomTextInputCompProps> = ({
         <Text style={[styles.label, { color: colors.textPrimary, marginBottom: responsiveScreenHeight(.5) }]}>
           {label}
         </Text>
-        {inputAlternate&& inputAlternate()}
+        {inputAlternate && inputAlternate()}
       </View>
       {elem()}
     </>
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1.5,
     borderRadius: 10,
-    marginBottom:responsiveScreenHeight(2),
+    marginBottom: responsiveScreenHeight(2),
     height: responsiveScreenHeight(6),
     paddingHorizontal: responsiveScreenWidth(4),
   },

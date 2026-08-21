@@ -12,14 +12,14 @@ import {
   TextInputKeyPressEventData,
   View,
 } from 'react-native';
-import React, {useContext, useRef} from 'react';
+import React, { useContext, useRef } from 'react';
 import {
   responsiveScreenFontSize,
   responsiveScreenHeight,
   responsiveScreenWidth,
 } from 'react-native-responsive-dimensions';
 import { ThemeContext } from '../context/ThemeProvider';
-import { CustomTextInput } from './';
+import { CustomTextInput } from '.';
 export const OtpInput: React.FunctionComponent<OTPInputProps> = ({
   length,
   disabled,
@@ -27,8 +27,8 @@ export const OtpInput: React.FunctionComponent<OTPInputProps> = ({
   onChange,
 }) => {
   const inputRefs = useRef<Array<Nullable<CustomTextInput>>>([]);
-    const { colors } = useContext(ThemeContext)
-  
+  const { colors } = useContext(ThemeContext)
+
   const onChangeValue = (text: string, index: number) => {
     const newValue = value.map((item, valueIndex) => {
       if (valueIndex === index) {
@@ -54,7 +54,7 @@ export const OtpInput: React.FunctionComponent<OTPInputProps> = ({
     event: NativeSyntheticEvent<CustomTextInputKeyPressEventData>,
     index: number,
   ) => {
-    const {nativeEvent} = event;
+    const { nativeEvent } = event;
 
     if (nativeEvent.key === 'Backspace') {
       handleChange('', index);
@@ -64,10 +64,10 @@ export const OtpInput: React.FunctionComponent<OTPInputProps> = ({
     <View style={styles.container}>
       {[...Array(length)].map((_, index) => (
         <CustomTextInput
-          key={index} 
+          key={index}
           style={[
             styles.input,
-            {borderWidth: 1, borderColor: colors.secondary, backgroundColor:colors.white},
+            { borderWidth: 1, borderColor: colors.secondary, backgroundColor: colors.white },
           ]}
           ref={ref => {
             if (ref && !inputRefs.current.includes(ref)) {
@@ -102,10 +102,10 @@ const styles = StyleSheet.create({
   input: {
     fontSize: responsiveScreenFontSize(2.2),
     textAlign: 'center',
-    fontWeight:"500",
+    fontWeight: "500",
     height: responsiveScreenHeight(7),
     width: responsiveScreenWidth(12),
     borderRadius: 6,
-    color:"black"
+    color: "black"
   },
 });
