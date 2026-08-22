@@ -2,7 +2,8 @@
 export const routes: RoutesType = {
     SPLASH: "SPLASH",
     WELCOME: "WELCOME",
-    WELCOMETWO: "WELCOMETWO",
+    WELCOME2: "WELCOME2",
+    COMPLOGIN: "COMPLOGIN",
     RECRUITERPROFILE: "RECRUITERPROFILE",
     CONTACT: "CONTACT",
     CHAT: "CHAT",
@@ -52,6 +53,8 @@ export default interface RoutesType {
     SPLASH: "SPLASH",
     EDUCATION: "EDUCATION",
     BLOGPAGE: "BLOGPAGE",
+    WELCOME2: "WELCOME2",
+
     EDUCATIONFORM: "EDUCATIONFORM",
     NOTIFICATION: "NOTIFICATION",
     ACCOUNT: "ACCOUNT",
@@ -83,7 +86,6 @@ export default interface RoutesType {
     SUGGESTEDJOB: "SUGGESTEDJOB",
     WELCOME: "WELCOME",
     OPENJOBS: "OPENJOBS",
-    WELCOMETWO: "WELCOMETWO",
     JOBDETAIL: "JOBDETAIL",
     COMPANY: "COMPANY",
     LOGIN: "LOGIN",
@@ -95,7 +97,7 @@ export default interface RoutesType {
     APPLY: "APPLY",
     ACTIVECANDIDATE: "ACTIVECANDIDATE",
     BROWSER: "BROWSER",
-
+    COMPLOGIN: "COMPLOGIN",
 
 
 }

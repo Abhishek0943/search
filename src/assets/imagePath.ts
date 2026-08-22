@@ -109,6 +109,14 @@ export default {
 
     // dummy
     companyDummy: require('./Icon/company-dummy.png'),
+
+
+
+    //new 
+    leftAngle: require('./Icons/leftAngle.png'),
+    EyeOpen: require('./Icons/EyeOpen.png'),
+    Check: require('./Icons/Check.png'),
+
 }
 export const Fonts = {
     GilroyBold: 'Gilroy-Bold',

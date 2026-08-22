@@ -4,9 +4,7 @@ import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/
 import { ThemeContext } from '../../context/ThemeProvider';
 import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions';
 import Icon from '../../utils/Icon';
-import { SignupStyle } from './Signup';
 import { InPutWithLabel } from '../../components';
-import { OrSeparator, SocialButton } from '../Welcome/WelcomeTwo';
 import { routes } from '../../constants/values';
 import { useAppDispatch } from '../../store';
 import { LoginByPassword, setUser } from '../../reducer/userReducer';
@@ -46,7 +44,7 @@ const Login = () => {
   }, [])
   return (
     <KeyboardAvoidingView behavior='padding' style={{ flex: 1, backgroundColor: colors.background, paddingHorizontal: responsiveScreenWidth(4), paddingVertical: responsiveScreenHeight(5) }}>
-      <ScrollView style={{ flex: 1 }}>
+      {/* <ScrollView style={{ flex: 1 }}>
         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(10), }}>
             <Icon onPress={() => navigation.goBack()} icon={{ type: "Feather", name: "chevron-left" }} size={responsiveScreenFontSize(2.5)} style={{ backgroundColor: colors.gray, borderRadius: 10, color: colors.hardGray, padding: responsiveScreenWidth(1.2) }} />
@@ -127,7 +125,7 @@ const Login = () => {
           </Text>}
           rightIcon={(color) => <Icon onPress={() => setUserData({ ...userData, passwordVisible: !userData.passwordVisible })} icon={{ type: "Feather", name: userData.passwordVisible ? 'eye' : 'eye-off' }} size={responsiveScreenFontSize(2.8)} style={{ color: colors.gray }} />}
         />
-        {/* <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", }}>
+       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(1.5), }}>
             <Icon onPress={() => setUserData({ ...userData, rememberMe: !userData.rememberMe })} icon={{ name: !userData.rememberMe ? 'checkbox' : 'checkbox-outline', type: "Ionicons" }} size={responsiveScreenFontSize(2.8)} style={{ color: userData.rememberMe ? colors.textPrimary : colors.primary }} />
             <Text style={[{
@@ -137,7 +135,7 @@ const Login = () => {
               Keep me signed in
             </Text>
           </View>
-        </View> */}
+        </View> 
         <Button onPress={async () => {
           setLoading(true)
           const FCM = await getFCMToken()
@@ -192,7 +190,7 @@ const Login = () => {
             {" "} Sign up here
           </Text>
         </View>
-      </ScrollView>
+      </ScrollView> */}
     </KeyboardAvoidingView>
   )
 }

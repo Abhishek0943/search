@@ -1,6 +1,5 @@
 export { default as Splash } from "./Splash/Splash"
 export { default as Welcome } from "./Welcome/Welcome"
-export { default as WelcomeTwo } from "./Welcome/WelcomeTwo"
 export { default as Login } from "./Auth/Login"
 export { default as Home } from './Home/Home'
 export { default as Signup } from "./Auth/Signup"

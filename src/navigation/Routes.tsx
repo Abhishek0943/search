@@ -2,7 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useEffect, useRef, useState } from 'react';
 import { useAppSelector } from '../store';
 import { routes } from '../constants/values';
-import { AddJob, Apply, ApplyJob, Browser, Candidate, CandidateProfile, BlogPage, Chat, Company, CompanyDetails, CV, Education, ForgotPassword, Home, Jobdetail, Language, LanguageForm, Login, Messages, Notification, OpenJobs, PaymentHistory, PersonalInfo, Profile, Project, ProjectForm, RecentJob, RecruiterAccount, RecruiterHome, RecruiterProfile, Search, Signup, Skill, SkillAdd, Splash, SuggestedJob, Welcome, WelcomeTwo, WorkExperience, WorkExperienceForm } from '../pages';
+import { AddJob, Apply, ApplyJob, Browser, Candidate, CandidateProfile, BlogPage, Chat, Company, CompanyDetails, CV, Education, ForgotPassword, Home, Jobdetail, Language, LanguageForm, Login, Messages, Notification, OpenJobs, PaymentHistory, PersonalInfo, Profile, Project, ProjectForm, RecentJob, RecruiterAccount, RecruiterHome, RecruiterProfile, Search, Signup, Skill, SkillAdd, Splash, SuggestedJob, Welcome, WorkExperience, WorkExperienceForm } from '../pages';
 
 import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -14,6 +14,8 @@ import { logScreen } from '../utils/analytics';
 import messaging from '@react-native-firebase/messaging';
 import notifee, { EventType } from '@notifee/react-native';
 import { Linking } from 'react-native';
+import Welcome2 from '../pages/Welcome/Welcome2';
+import CompLogin from '../pages/Auth/CompLogin';
 
 const Stack = createNativeStackNavigator();
 const Routes = () => {
@@ -146,7 +148,8 @@ const Routes = () => {
         {
           !isAuth && <>
             <Stack.Screen name={routes.WELCOME} component={Welcome} options={{ headerShown: false }} />
-            <Stack.Screen name={routes.WELCOMETWO} component={WelcomeTwo} options={{ headerShown: false }} />
+            <Stack.Screen name={routes.WELCOME2} component={Welcome2} options={{ headerShown: false }} />
+            <Stack.Screen name={routes.COMPLOGIN} component={CompLogin} options={{ headerShown: false }} />
             <Stack.Screen name={routes.LOGIN} component={Login} options={{ headerShown: false }} />
             <Stack.Screen name={routes.SIGNUP} component={Signup} options={{ headerShown: false }} />
             <Stack.Screen name={routes.FORGOTPASSWORD} component={ForgotPassword} options={{ headerShown: false }} />

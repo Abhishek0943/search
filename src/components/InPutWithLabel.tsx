@@ -1,13 +1,14 @@
 import React, { useContext, useState } from 'react';
-import { KeyboardType, Pressable, StyleSheet, Text, TextInput, View, } from 'react-native';
+import { KeyboardType, Pressable, StyleSheet, TextInput, View, } from 'react-native';
 import {
-  responsiveScreenFontSize,
-  responsiveScreenHeight,
-  responsiveScreenWidth,
+  responsiveFontSize,
+  responsiveHeight,
+  responsiveWidth,
 } from 'react-native-responsive-dimensions';
 import { ThemeContext } from '../context/ThemeProvider';
 import Icon from '../utils/Icon';
 import { CustomTextInput } from '.';
+import Text from './Text';
 interface TextInputCompProps {
   value: string;
   onChangeText?: (text: string) => void;
@@ -15,13 +16,15 @@ interface TextInputCompProps {
   secureText?: boolean;
   label: string;
   isRequired?: boolean;
-  rightIcon?: (color: string) => React.ReactNode;
+  rightIcon?: () => React.ReactNode;
+  sideOption?: () => React.ReactNode;
   options?: string[];
   type?: "text" | "radio" | "date" | "number";
   keyboardType?: KeyboardType
   inputAlternate?: () => React.ReactNode;
+  max?: number
 }
-const InputWithLabel: React.FC<CustomTextInputCompProps> = ({
+const InputWithLabel: React.FC<TextInputCompProps> = ({
   value,
   onChangeText,
   placeholder = '',
@@ -32,6 +35,7 @@ const InputWithLabel: React.FC<CustomTextInputCompProps> = ({
   type = "text",
   keyboardType = "default",
   inputAlternate,
+  sideOption = () => null,
   max
 }) => {
   const { colors } = useContext(ThemeContext);
@@ -42,7 +46,7 @@ const InputWithLabel: React.FC<CustomTextInputCompProps> = ({
       case "text":
         return (
           <>
-            <View style={[styles.inputContainer, { borderColor: colors.mediumGray }]}>
+            <View style={[styles.inputContainer, { borderColor: colors.surfaces }]}>
               <CustomTextInput
                 style={[styles.input, { color: colors.textPrimary }]}
                 value={value}
@@ -54,20 +58,20 @@ const InputWithLabel: React.FC<CustomTextInputCompProps> = ({
                 onFocus={() => setActiveColor(colors.primary)}
                 onBlur={() => setActiveColor(colors.secondary)}
               />
-              {rightIcon(activeColor)}
+              {rightIcon()}
             </View>
           </>
         )
       case "radio":
         return (
           <>
-            <View style={{ flexDirection: "row", gap: responsiveScreenWidth(3), marginTop: responsiveScreenHeight(1.3), alignItems: "center" }}>
+            <View style={{ flexDirection: "row", gap: responsiveWidth(3), marginTop: responsiveHeight(1.3), alignItems: "center" }}>
               {
                 options?.map((e) => {
                   return (
-                    <Pressable onPress={() => onChangeText && onChangeText(e)} style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(1) }}>
-                      <Icon style={{ fontSize: responsiveScreenFontSize(2.4), color: value === e ? colors.primary : colors.textPrimary }} icon={{ type: 'MaterialIcons', name: value === e ? "radio-button-checked" : "radio-button-off" }} />
-                      <Text style={{ color: colors.textPrimary, fontSize: responsiveScreenFontSize(1.8), fontWeight: "400" }}>{e}</Text>
+                    <Pressable onPress={() => onChangeText && onChangeText(e)} style={{ flexDirection: "row", alignItems: "center", gap: responsiveWidth(1) }}>
+                      <Icon style={{ fontSize: responsiveFontSize(2.4), color: value === e ? colors.primary : colors.textPrimary }} icon={{ type: 'MaterialIcons', name: value === e ? "radio-button-checked" : "radio-button-off" }} />
+                      <Text style={{ color: colors.textPrimary, fontSize: responsiveFontSize(1.8), fontWeight: "400" }}>{e}</Text>
                     </Pressable>
                   )
                 })
@@ -100,7 +104,7 @@ const InputWithLabel: React.FC<CustomTextInputCompProps> = ({
                 onFocus={() => setActiveColor(colors.primary)}
                 onBlur={() => setActiveColor(colors.secondary)}
               />
-              {rightIcon(activeColor)}
+              {rightIcon()}
             </View>
           </>
         )
@@ -109,9 +113,14 @@ const InputWithLabel: React.FC<CustomTextInputCompProps> = ({
   return (
     <>
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-        <Text style={[styles.label, { color: colors.textPrimary, marginBottom: responsiveScreenHeight(.5) }]}>
-          {label}
-        </Text>
+        <View style={{ flexDirection: "row", alignItems: "center", flex: 1, justifyContent: "space-between" }}>
+
+          <Text style={[styles.label, { color: colors.textPrimary, marginBottom: responsiveHeight(.5) }]}>
+            {label}
+          </Text>
+          {sideOption()}
+        </View>
+
         {inputAlternate && inputAlternate()}
       </View>
       {elem()}
@@ -121,25 +130,25 @@ const InputWithLabel: React.FC<CustomTextInputCompProps> = ({
 
 const styles = StyleSheet.create({
   label: {
-    fontSize: responsiveScreenFontSize(1.8),
-    fontWeight: '600',
+    fontSize: responsiveFontSize(1.8),
+    fontWeight: '700',
   },
   requiredAsterisk: {
-    fontSize: responsiveScreenFontSize(1.8),
+    fontSize: responsiveFontSize(1.8),
     fontWeight: '700',
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1.5,
-    borderRadius: 10,
-    marginBottom: responsiveScreenHeight(2),
-    height: responsiveScreenHeight(6),
-    paddingHorizontal: responsiveScreenWidth(4),
+    borderRadius: 15,
+    marginBottom: responsiveHeight(2),
+    height: responsiveHeight(6),
+    paddingHorizontal: responsiveWidth(4),
   },
   input: {
     flex: 1,
-    fontSize: responsiveScreenFontSize(2.2),
+    fontSize: responsiveFontSize(2),
     fontWeight: '400',
     paddingVertical: 0,
   },

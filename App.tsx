@@ -68,7 +68,6 @@ const AppContent: React.FC = React.memo(() => {
         })();
     }, []);
 
-    // In-app updates (android only)
     const checkForUpdates = useCallback(async () => {
         if (Platform.OS !== "android") return;
         try {
