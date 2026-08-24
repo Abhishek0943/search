@@ -7,6 +7,7 @@ import InputWithLabel from '../../components/InPutWithLabel'
 import Text from '../../components/Text'
 import { ThemeContext } from '../../context/ThemeProvider'
 import { routes } from '../../constants/values'
+import Button from '../../components/Button'
 const CompLogin = () => {
     const navigation = useNavigation<NavigationProp<ParamListBase>>();
     const [hidePassword, setHidePassword] = useState(false);
@@ -53,9 +54,17 @@ const CompLogin = () => {
                         Keep me logged in on this phone
                     </Text>
                 </View>
-                <View style={{ width: responsiveWidth(90), marginTop: responsiveHeight(2.5), aspectRatio: 350 / 56 }}>
-                    <Image style={{ height: "100%", width: "100%", }} source={require("./CompLoginButton.png")} />
-                </View>
+         <Button
+              label="Log in"
+              backgroundColor={colors.primary}
+             onPress={() => {
+        //   dispatch(LoginByPassword({ email: user.email, password: user.password })).unwrap().then(() => {
+        //     console.log("login successfully")
+        //   }).catch((error) => {
+        //     console.log("login failed", error)
+        //   })
+        }} 
+            />
                 <Pressable style={{ width: responsiveWidth(90), marginTop: responsiveHeight(2.5), aspectRatio: 350 / 16 }}>
                     <Image style={{ height: "100%", width: "100%", }} source={require("./Devider.png")} />
                 </Pressable>

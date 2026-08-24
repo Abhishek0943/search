@@ -1,45 +1,43 @@
-import { View,  TextStyle, ActivityIndicator, TouchableOpacity } from 'react-native'
-import React, { useContext } from 'react'
-import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions'
-import { ThemeContext } from '../context/ThemeProvider'
-import Text from './Text'
+import React, { useContext } from 'react';
+import {TouchableOpacity} from 'react-native';
+import { responsiveWidth } from 'react-native-responsive-dimensions';
+import { ThemeContext } from '../context/ThemeProvider';
+import Text from './Text';
 
-const Button = ({ isLoading = false, style, isActive = false, label, onPress = () => { }, rightIcon, leftIcon }: { isLoading?: boolean; style: TextStyle, isActive?: boolean, label: string, onPress?: () => void, rightIcon?: React.JSX.Element, leftIcon?: React.JSX.Element }) => {
-    const { colors } = useContext(ThemeContext)
+type ButtonProps = {
+  label: string;
+  backgroundColor?: string;
+    onPress?: () => void;
+};
 
-    return (
-        <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
-            <View
-                style={[
-                    {
-                        paddingVertical: responsiveScreenHeight(1.5),
-                        paddingHorizontal: responsiveScreenWidth(5),
-                        alignItems: "center",
-                        justifyContent: "center",
-                        backgroundColor: isActive ? colors.primary : colors.gray,
-                        borderRadius: 10,
-                    },
-                    style,
-                ]}
-            >
-                {isLoading ? (
-                    <ActivityIndicator size="small" color={colors.white} />
-                ) : (
-                    <Text
-                        style={{
-                            color: isActive ? colors.white : colors.darkGray,
-                            fontSize: responsiveScreenFontSize(1.8),
-                            fontWeight: "500",
-                        }}
-                    >
-                        {label}
-                    </Text>
-                )}
-            </View>
-        </TouchableOpacity>
+const Button = ({ label, backgroundColor, onPress = () => {} }: ButtonProps) => {
+  const { colors } = useContext(ThemeContext);
 
-        // <Text onPress={onPress} style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "500", borderColor: colors.primary, borderWidth: 2, borderRadius: 100, textTransform: "capitalize", backgroundColor: isActive ? colors.primary : "transparent", color: isActive ? colors.background : colors.textPrimary, ...style }}>{label} </Text>
-    )
-}
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.7}
+      style={{
+        width: responsiveWidth(90),
+        aspectRatio: 350 / 56,
+        backgroundColor: backgroundColor || colors.primary,
+        height: 'auto',
+        borderRadius: 15,
+      }}
+    >
+      <Text
+        style={{
+          color: colors.white,
+          fontSize: 19,
+          fontWeight: 'bold',
+          textAlign: 'center',
+          paddingVertical: 15,
+        }}
+      >
+        {label}
+      </Text>
+    </TouchableOpacity>
+  );
+};
 
-export default Button
+export default Button;
