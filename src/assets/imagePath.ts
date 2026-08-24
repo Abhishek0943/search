@@ -116,6 +116,7 @@ export default {
     leftAngle: require('./Icons/leftAngle.png'),
     EyeOpen: require('./Icons/EyeOpen.png'),
     Check: require('./Icons/Check.png'),
+    Check2: require('./Icons/Check2.png'),
 
 }
 export const Fonts = {
