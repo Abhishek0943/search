@@ -4,6 +4,7 @@ export const routes: RoutesType = {
     WELCOME: "WELCOME",
     WELCOME2: "WELCOME2",
     COMPLOGIN: "COMPLOGIN",
+    COMPSINGUP: "COMPSINGUP",
     RECRUITERPROFILE: "RECRUITERPROFILE",
     CONTACT: "CONTACT",
     CHAT: "CHAT",
@@ -62,6 +63,7 @@ export default interface RoutesType {
     MESSAGE: "MESSAGE",
     CONTACT: "CONTACT",
     BLOG: "BLOG",
+    COMPSINGUP: "COMPSINGUP",
 
     LANGUAGE: "LANGUAGE",
     LANGUAGEFORM: "LANGUAGEFORM",

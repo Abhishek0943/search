@@ -16,6 +16,7 @@ import notifee, { EventType } from '@notifee/react-native';
 import { Linking } from 'react-native';
 import Welcome2 from '../pages/Welcome/Welcome2';
 import CompLogin from '../pages/Auth/CompLogin';
+import CompSingUp from '../pages/Auth/CompSingUp';
 
 const Stack = createNativeStackNavigator();
 const Routes = () => {
@@ -150,6 +151,7 @@ const Routes = () => {
             <Stack.Screen name={routes.WELCOME} component={Welcome} options={{ headerShown: false }} />
             <Stack.Screen name={routes.WELCOME2} component={Welcome2} options={{ headerShown: false }} />
             <Stack.Screen name={routes.COMPLOGIN} component={CompLogin} options={{ headerShown: false }} />
+            <Stack.Screen name={routes.COMPSINGUP} component={CompSingUp} options={{ headerShown: false }} />
             <Stack.Screen name={routes.LOGIN} component={Login} options={{ headerShown: false }} />
             <Stack.Screen name={routes.SIGNUP} component={Signup} options={{ headerShown: false }} />
             <Stack.Screen name={routes.FORGOTPASSWORD} component={ForgotPassword} options={{ headerShown: false }} />

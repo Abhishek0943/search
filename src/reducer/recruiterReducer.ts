@@ -9,7 +9,7 @@ export const RecruiterGetCountries = createAsyncThunk<GetCountriesResponse | Err
   'GetCountries',
   () => getApiCall<GetCountriesResponse>('country'),
 );
-export const RecruiterRegister = createAsyncThunk<{ success: true, token: string } | ErrorResponse, { acn_number: string, abn_number: string, first_name: string, last_name: string, email: string, password: string, password_confirmation: string, terms_of_use: boolean }>(
+export const RecruiterRegister = createAsyncThunk<{ success: true, token: string } | ErrorResponse, { acn_number?: string, abn_number?: string, first_name?: string, last_name?: string, email: string, password: string, password_confirmation: string, terms_of_use?: boolean }>(
   'RecruiterRegister',
   (body) => postApiCall<{ success: true, token: string }>('/auth/companies/register', body),
 );

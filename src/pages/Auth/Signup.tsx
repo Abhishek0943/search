@@ -39,7 +39,11 @@
 // import RNRestart from 'react-native-restart';
 // import { getFCMToken } from '../../utils/notificationService';
 
-const Signup = () => {
+import { useContext } from "react";
+import { ThemeContext } from "../../context/ThemeProvider";
+import { ComponentSingUp } from "./CompSingUp";
+
+const Signup1 = () => {
   //   const navigation: NavigationProp<ParamListBase> = useNavigation();
   //   const { colors } = useContext(ThemeContext)
   //   const [currentStep, setCurrentStep] = useState(1)
@@ -520,6 +524,14 @@ const Signup = () => {
 //   },
 // })
 // export const SignupStyle = styles
+const Signup = () => {
+  const { colors } = useContext(ThemeContext);
+  return (
+    <>
+      <ComponentSingUp type={"jobSeeker"} mainColor={colors.primary} secondaryColor={colors.primary} />
+    </>
+  )
+}
 export default Signup;
 
 

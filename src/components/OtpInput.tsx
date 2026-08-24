@@ -3,6 +3,8 @@ type OTPInputProps = {
   value: Array<string>;
   disabled: boolean;
   onChange(value: Array<string>): void;
+  mainColor: string
+  secondaryColor: string
 };
 type Nullable<T> = T | null;
 import {
@@ -14,9 +16,9 @@ import {
 } from 'react-native';
 import React, { useContext, useRef } from 'react';
 import {
-  responsiveScreenFontSize,
-  responsiveScreenHeight,
-  responsiveScreenWidth,
+  responsiveFontSize,
+  responsiveHeight,
+  responsiveWidth,
 } from 'react-native-responsive-dimensions';
 import { ThemeContext } from '../context/ThemeProvider';
 import { CustomTextInput } from '.';
@@ -25,8 +27,10 @@ export const OtpInput: React.FunctionComponent<OTPInputProps> = ({
   disabled,
   value,
   onChange,
+  mainColor,
+  secondaryColor
 }) => {
-  const inputRefs = useRef<Array<Nullable<CustomTextInput>>>([]);
+  const inputRefs = useRef<Array<Nullable<TextInput>>>([]);
   const { colors } = useContext(ThemeContext)
 
   const onChangeValue = (text: string, index: number) => {
@@ -51,7 +55,7 @@ export const OtpInput: React.FunctionComponent<OTPInputProps> = ({
   };
 
   const handleBackspace = (
-    event: NativeSyntheticEvent<CustomTextInputKeyPressEventData>,
+    event: NativeSyntheticEvent<TextInputKeyPressEventData>,
     index: number,
   ) => {
     const { nativeEvent } = event;
@@ -67,7 +71,7 @@ export const OtpInput: React.FunctionComponent<OTPInputProps> = ({
           key={index}
           style={[
             styles.input,
-            { borderWidth: 1, borderColor: colors.secondary, backgroundColor: colors.white },
+            { borderWidth: 2, color: secondaryColor, borderColor: value[index] != "" ? mainColor : colors.gray, backgroundColor: value[index] != "" ? colors.white : colors.compPrimaryBg },
           ]}
           ref={ref => {
             if (ref && !inputRefs.current.includes(ref)) {
@@ -96,16 +100,16 @@ const styles = StyleSheet.create({
   container: {
     alignSelf: 'center',
     flexDirection: 'row',
-    marginTop: responsiveScreenHeight(1),
-    gap: responsiveScreenWidth(4),
+    marginTop: responsiveHeight(3),
+    gap: responsiveWidth(2),
   },
   input: {
-    fontSize: responsiveScreenFontSize(2.2),
+    fontSize: responsiveFontSize(2.4),
     textAlign: 'center',
-    fontWeight: "500",
-    height: responsiveScreenHeight(7),
-    width: responsiveScreenWidth(12),
-    borderRadius: 6,
+    fontWeight: "800",
+    height: responsiveHeight(7),
+    flex: 1,
+    borderRadius: 18,
     color: "black"
   },
 });

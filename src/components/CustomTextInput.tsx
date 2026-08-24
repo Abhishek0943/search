@@ -3,7 +3,6 @@ import { TextInput, TextInputProps } from 'react-native';
 
 const CustomTextInput = forwardRef<TextInput, TextInputProps>((props, ref) => {
   const { onChangeText, ...rest } = props;
-
   const handleChangeText = (text: string) => {
     // Regex to remove emojis
     const noEmojiText = text.replace(

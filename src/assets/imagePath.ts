@@ -117,6 +117,7 @@ export default {
     EyeOpen: require('./Icons/EyeOpen.png'),
     Check: require('./Icons/Check.png'),
     Check2: require('./Icons/Check2.png'),
+    CompCheck: require('./Icons/CompCheck.png'),
 
 }
 export const Fonts = {

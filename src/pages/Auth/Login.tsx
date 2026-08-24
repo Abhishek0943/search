@@ -1,203 +1,91 @@
-import { View, StyleSheet, Platform, KeyboardAvoidingView, ScrollView, } from 'react-native'
-import React, { useContext, useEffect, useState } from 'react'
-import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
-import { ThemeContext } from '../../context/ThemeProvider';
-import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions';
-import Icon from '../../utils/Icon';
-import { InPutWithLabel } from '../../components';
-import { routes } from '../../constants/values';
-import { useAppDispatch } from '../../store';
-import { LoginByPassword, setUser } from '../../reducer/userReducer';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Button from '../../components/Button';
-import { RecruiterLoginByPassword } from '../../reducer/recruiterReducer';
-import { useAlert } from '../../context/AlertContext';
-import Text from '../../components/Text';
-import { googleLogin } from '../../utils/socialLogin';
-import { postApiCall } from '../../api';
-import imagePath from '../../assets/imagePath';
-import RNRestart from 'react-native-restart';
-import { getFCMToken } from '../../utils/notificationService';
-
+import React, { useContext, useState } from 'react'
+import { Image, Pressable, TouchableOpacity, View } from 'react-native'
+import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
+import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native'
+import imagePath from '../../assets/imagePath'
+import InputWithLabel from '../../components/InPutWithLabel'
+import Text from '../../components/Text'
+import { ThemeContext } from '../../context/ThemeProvider'
+import { useAppDispatch } from '../../store'
+import { LoginByPassword } from '../../reducer/userReducer'
+import { routes } from '../../constants/values'
 const Login = () => {
-  const { colors } = useContext(ThemeContext);
-  const navigation = useNavigation<NavigationProp<ParamListBase>>()
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const [hidePassword, setHidePassword] = useState(false);
   const dispatch = useAppDispatch()
-  const { showAlert } = useAlert();
-  const [userData, setUserData] = useState({
-    // email: "a1@yopmail.com",
-    // password: "12121212",
-    // username: "a1@yopmail.com",
-    password: "",
-    username: "",
-    passwordVisible: false,
-    rememberMe: false
-  })
-  const [loading, setLoading] = useState(false)
-  const [role, setRole] = useState<"seeker" | "recruiter">()
-  useEffect(() => {
-    const set = async () => {
-      const a = await AsyncStorage.getItem("role") as "seeker" | "recruiter"
-      setRole(a)
-    }
-    set()
-  }, [])
+  const [user, setUser] = useState<{
+    email: string,
+    password: string
+  }>({
+    email: '',
+    password: '',
+  });
+  const { colors } = useContext(ThemeContext);
+  const handleInputChange = (data: { name: string; value: string }) => {
+    setUser(prev => ({ ...prev, [data.name]: data.value }));
+  };
   return (
-    <KeyboardAvoidingView behavior='padding' style={{ flex: 1, backgroundColor: colors.background, paddingHorizontal: responsiveScreenWidth(4), paddingVertical: responsiveScreenHeight(5) }}>
-      {/* <ScrollView style={{ flex: 1 }}>
-        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(10), }}>
-            <Icon onPress={() => navigation.goBack()} icon={{ type: "Feather", name: "chevron-left" }} size={responsiveScreenFontSize(2.5)} style={{ backgroundColor: colors.gray, borderRadius: 10, color: colors.hardGray, padding: responsiveScreenWidth(1.2) }} />
-          </View>
-          {
-            role === "recruiter" ? <Text onPress={() => navigation.navigate(routes.WELCOMETWO)} style={{ color: colors.primary, fontWeight: "700", fontSize: responsiveScreenFontSize(1.6), textTransform: "capitalize" }}>Switch to Seeker</Text> : <Text onPress={() => navigation.navigate(routes.WELCOMETWO)} style={{ color: colors.primary, fontWeight: "700", fontSize: responsiveScreenFontSize(1.6), textTransform: "capitalize" }}>Switch to recruiter</Text>
-          }
+    <View style={{ height: responsiveHeight(100), width: responsiveWidth(100), flex: 1, }}>
+      <Image style={{ height: "100%", width: "100%", }} source={require("../Welcome/BgGradiant.png")} />
+      <View style={{ position: "absolute", paddingVertical: responsiveHeight(5), paddingHorizontal: responsiveWidth(5), top: 0, left: 0, height: responsiveHeight(100), width: responsiveWidth(100), }}>
+        <Pressable onPress={() => navigation.goBack()} style={{ width: responsiveWidth(2.8), aspectRatio: 1 / 2 }}>
+          <Image style={{ height: "100%", width: "100%", }} source={imagePath.leftAngle} />
+        </Pressable>
+        <View style={{ width: responsiveWidth(75), marginBottom: responsiveHeight(3), marginTop: responsiveHeight(3), aspectRatio: 238 / 120.5 }}>
+          <Image style={{ height: "100%", width: "100%", }} source={require("./UserLoginTop.png")} />
         </View>
-        <Text style={[SignupStyle.title, { marginBottom: responsiveScreenHeight(3), color: colors.textPrimary }]}>
-          Login
-        </Text>
-        {
-          role !== "recruiter" && Platform.OS === "android" && (
-            <>
-              <SocialButton onPress={async () => {
-                try {
-                  const a = await googleLogin()
-                  if (!a?.data?.user) {
-                    // User cancelled the Google sign-in or no user data returned
-                    return;
-                  }
-                  const FCM = await getFCMToken()
-                  const b = await postApiCall("/auth/jobseekers/social-login", {
-                    device_token: FCM,
-                    device_type: Platform.OS,
-                    type: "google", auth_id: a.data.user.id, first_name: a.data.user.givenName,
-                    last_name: a.data.user.familyName, email: a.data.user.email
-                  })
-                  if (b?.data?.token) {
-                    await AsyncStorage.setItem("token", b.data.token)
-                    RNRestart.restart();
-                  } else {
-                    showAlert({
-                      title: "Login Failed",
-                      message: b?.message || "Something went wrong. Please try again.",
-                    })
-                  }
-                } catch (error: any) {
-                  // Google sign-in throws a specific code when user cancels
-                  if (error?.code === '-5' || error?.code === 'SIGN_IN_CANCELLED' || error?.message?.includes('cancel')) {
-                    return;
-                  }
-                  showAlert({
-                    title: "Google Sign-In Failed",
-                    message: error?.message || "Something went wrong. Please try again.",
-                  })
-                }
-              }} key={"Google"} logo={imagePath.googleLogo} children="Sign in with Google" />
-              <OrSeparator text="or sign in with" />
-
-            </>
-          )
-        }
-        <InPutWithLabel
-          onChangeText={function (text: string): void {
-            setUserData({ ...userData, username: text })
-          }}
-          keyboardType='email-address'
-          value={userData.username}
-          label={'Email'}
-          placeholder='Type your Email'
-          isRequired
-        />
-        <InPutWithLabel
-          onChangeText={function (text: string): void {
-            setUserData({ ...userData, password: text })
-          }}
-          value={userData.password}
-          label={'Password'}
-          placeholder='●●●●●●●●'
-          isRequired
-          secureText={!userData.passwordVisible}
-          inputAlternate={() => <Text onPress={() => navigation.navigate(routes.FORGOTPASSWORD)} style={[{
-            fontSize: responsiveScreenFontSize(1.8),
-            fontWeight: '500',
-          }, { color: colors.primary, textAlign: "center" }]}>
-            Forgot Password
-          </Text>}
-          rightIcon={(color) => <Icon onPress={() => setUserData({ ...userData, passwordVisible: !userData.passwordVisible })} icon={{ type: "Feather", name: userData.passwordVisible ? 'eye' : 'eye-off' }} size={responsiveScreenFontSize(2.8)} style={{ color: colors.gray }} />}
-        />
-       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", }}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(1.5), }}>
-            <Icon onPress={() => setUserData({ ...userData, rememberMe: !userData.rememberMe })} icon={{ name: !userData.rememberMe ? 'checkbox' : 'checkbox-outline', type: "Ionicons" }} size={responsiveScreenFontSize(2.8)} style={{ color: userData.rememberMe ? colors.textPrimary : colors.primary }} />
-            <Text style={[{
-              fontSize: responsiveScreenFontSize(1.8),
-              fontWeight: '500',
-            }, { color: colors.textPrimary, }]}>
-              Keep me signed in
+        <InputWithLabel label='Email address' value={user.email} onChangeText={(text) => handleInputChange({ name: "email", value: text })} placeholder="Email" />
+        <InputWithLabel sideOption={() => {
+          return (
+            <Text style={{ color: colors.primary, fontSize: responsiveFontSize(1.6), fontWeight: '800' }}>
+              Forgot?
             </Text>
-          </View>
-        </View> 
-        <Button onPress={async () => {
-          setLoading(true)
-          const FCM = await getFCMToken()
-          if (role === "recruiter") {
-            dispatch(RecruiterLoginByPassword({
-              device_token: FCM,
-              device_type: Platform.OS, email: userData.username, password: userData.password
-            })).unwrap().then((res) => {
-              if (res.success) {
-                AsyncStorage.setItem("token", res.data.token)
-                RNRestart.restart();
-              }
-              else {
-                showAlert({
-                  title: "Validation",
-                  message: res.message,
-                })
-              }
-              setLoading(false)
-            })
-          } else {
-            dispatch(LoginByPassword({
-              device_token: FCM,
-              device_type: Platform.OS, email: userData.username, password: userData.password
-            })).unwrap().then((res) => {
-              if (res.success) {
-                AsyncStorage.setItem("token", res.data.token)
-                RNRestart.restart();
-              }
-              else {
-                showAlert({
-                  title: "Validation",
-                  message: res.message,
-                })
-              }
-              setLoading(false)
-            }).catch((err) => { })
-          }
-
-        }} isLoading={loading} label='Login' style={{ marginTop: responsiveScreenHeight(2) }} isActive={true} />
-        <View style={{ flexDirection: "row", marginTop: responsiveScreenHeight(2), justifyContent: "center" }}>
-          <Text onPress={() => navigation.navigate(routes.FORGOTPASSWORD)} style={[{
-            fontSize: responsiveScreenFontSize(1.8),
-            fontWeight: '500',
-          }, { color: colors.textPrimary, textAlign: "center" }]}>
-            Don’t have an Account?
-          </Text>
-          <Text onPress={() => navigation.navigate(routes.SIGNUP)} style={[{
-            fontSize: responsiveScreenFontSize(1.8),
-            fontWeight: '500',
-          }, { color: colors.primary, textAlign: "center" }]}>
-            {" "} Sign up here
+          )
+        }} label='Password' secureText={hidePassword} rightIcon={() => {
+          return (
+            <TouchableOpacity onPress={() => setHidePassword(!hidePassword)}>
+              <Image style={{ width: responsiveWidth(2.8), aspectRatio: 20 / 11.4 }} source={imagePath.EyeOpen} />
+            </TouchableOpacity>
+          )
+        }} value={user.password} onChangeText={(text) => handleInputChange({ name: "password", value: text })} placeholder="Password" />
+        <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveWidth(2) }}>
+          <Pressable style={{ width: responsiveWidth(4), aspectRatio: 1 / 1 }}>
+            <Image style={{ height: "100%", width: "100%", }} source={imagePath.Check} />
+          </Pressable>
+          <Text style={{ color: colors.primary2, fontSize: responsiveFontSize(1.8), fontWeight: '600' }}>
+            Keep me logged in on this phone
           </Text>
         </View>
-      </ScrollView> */}
-    </KeyboardAvoidingView>
+        <Pressable onPress={() => {
+          dispatch(LoginByPassword({ email: user.email, password: user.password })).unwrap().then(() => {
+            console.log("login successfully")
+          }).catch((error) => {
+            console.log("login failed", error)
+          })
+        }} style={{ width: responsiveWidth(90), marginTop: responsiveHeight(2.5), aspectRatio: 350 / 56 }}>
+          <Image style={{ height: "100%", width: "100%", }} source={require("./LoginButton.png")} />
+        </Pressable>
+        <Pressable style={{ width: responsiveWidth(90), marginTop: responsiveHeight(2.5), aspectRatio: 350 / 16 }}>
+          <Image style={{ height: "100%", width: "100%", }} source={require("./Devider.png")} />
+        </Pressable>
+        <View style={{ flexDirection: "row", marginTop: responsiveHeight(2.5), gap: responsiveWidth(3), width: responsiveWidth(90) }}>
+          <Pressable style={{ flex: 1, aspectRatio: 169 / 56 }}>
+            <Image style={{ height: "100%", width: "100%", }} source={require("./GoogleButton.png")} />
+          </Pressable>
+          <Pressable style={{ flex: 1, aspectRatio: 169 / 56 }}>
+            <Image style={{ height: "100%", width: "100%", }} source={require("./GoogleButton.png")} />
+          </Pressable>
+        </View>
+        <Pressable style={{ width: responsiveWidth(90), marginTop: responsiveHeight(2.5), aspectRatio: 350 / 66 }}>
+          <Image style={{ height: "100%", width: "100%", }} source={require("./SweechToEmployer.png")} />
+        </Pressable>
+        <View style={{ marginTop: responsiveHeight(2), flexDirection: "row", justifyContent: 'center' }}>
+          <Text style={{ color: colors.primary2, fontSize: responsiveFontSize(1.6), }}>New to SearchTalents?</Text>
+          <Text onPress={() => navigation.navigate(routes.SIGNUP)} style={{ color: colors.primary, fontSize: responsiveFontSize(1.6), fontWeight: '800' }}> Create an account</Text>
+        </View>
+      </View>
+    </View>
   )
 }
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: responsiveScreenWidth(2),
-  }
-})
+
 export default Login

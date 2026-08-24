@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { KeyboardType, Pressable, StyleSheet, TextInput, View, } from 'react-native';
+import { KeyboardType, Pressable, StyleSheet, TextInput, View, ViewStyle, } from 'react-native';
 import {
   responsiveFontSize,
   responsiveHeight,
@@ -15,7 +15,7 @@ interface TextInputCompProps {
   placeholder?: string;
   secureText?: boolean;
   label: string;
-  isRequired?: boolean;
+  isRequired?: boolean | (() => React.ReactNode);
   rightIcon?: () => React.ReactNode;
   sideOption?: () => React.ReactNode;
   options?: string[];
@@ -23,6 +23,9 @@ interface TextInputCompProps {
   keyboardType?: KeyboardType
   inputAlternate?: () => React.ReactNode;
   max?: number
+  mainColor: string
+  secondaryColor: string
+  inputContainerStyle?: ViewStyle
 }
 const InputWithLabel: React.FC<TextInputCompProps> = ({
   value,
@@ -36,17 +39,21 @@ const InputWithLabel: React.FC<TextInputCompProps> = ({
   keyboardType = "default",
   inputAlternate,
   sideOption = () => null,
-  max
+  max,
+  mainColor,
+  secondaryColor,
+  isRequired,
+  inputContainerStyle
 }) => {
   const { colors } = useContext(ThemeContext);
-  const [activeColor, setActiveColor] = useState(colors.secondary);
+  const [activeColor, setActiveColor] = useState(colors.surfaces);
   const [datePickerVisible, setDatePickerVisible] = useState(false)
   const elem = () => {
     switch (type) {
       case "text":
         return (
           <>
-            <View style={[styles.inputContainer, { borderColor: colors.surfaces }]}>
+            <View style={[styles.inputContainer, { marginBottom: responsiveHeight(2), borderColor: activeColor || colors.surfaces }, inputContainerStyle]}>
               <CustomTextInput
                 style={[styles.input, { color: colors.textPrimary }]}
                 value={value}
@@ -55,8 +62,8 @@ const InputWithLabel: React.FC<TextInputCompProps> = ({
                 placeholderTextColor={colors.placeholder}
                 secureTextEntry={secureText}
                 keyboardType={keyboardType}
-                onFocus={() => setActiveColor(colors.primary)}
-                onBlur={() => setActiveColor(colors.secondary)}
+                onFocus={() => setActiveColor(mainColor)}
+                onBlur={() => setActiveColor(colors.surfaces)}
               />
               {rightIcon()}
             </View>
@@ -89,7 +96,7 @@ const InputWithLabel: React.FC<TextInputCompProps> = ({
       case "number":
         return (
           <>
-            <View style={[styles.inputContainer, { borderColor: colors.mediumGray }]}>
+            <View style={[styles.inputContainer, { marginBottom: responsiveHeight(2), borderColor: colors.mediumGray }]}>
               <CustomTextInput
                 style={[styles.input, { color: colors.textPrimary }]}
                 value={value}
@@ -114,13 +121,14 @@ const InputWithLabel: React.FC<TextInputCompProps> = ({
     <>
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
         <View style={{ flexDirection: "row", alignItems: "center", flex: 1, justifyContent: "space-between" }}>
-
-          <Text style={[styles.label, { color: colors.textPrimary, marginBottom: responsiveHeight(.5) }]}>
-            {label}
-          </Text>
+          <View style={{ flexDirection: "row", alignItems: "center", flex: 1, gap: responsiveWidth(2) }}>
+            <Text style={[styles.label, { color: secondaryColor || colors.textPrimary, marginBottom: responsiveHeight(.5) }]}>
+              {label}
+            </Text>
+            {typeof (isRequired) == "function" ? isRequired() : isRequired && <Text style={styles.requiredAsterisk}>*</Text>}
+          </View>
           {sideOption()}
         </View>
-
         {inputAlternate && inputAlternate()}
       </View>
       {elem()}
@@ -132,6 +140,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: responsiveFontSize(1.8),
     fontWeight: '700',
+    marginTop: responsiveHeight(1)
   },
   requiredAsterisk: {
     fontSize: responsiveFontSize(1.8),
@@ -142,7 +151,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1.5,
     borderRadius: 15,
-    marginBottom: responsiveHeight(2),
+
     height: responsiveHeight(6),
     paddingHorizontal: responsiveWidth(4),
   },
