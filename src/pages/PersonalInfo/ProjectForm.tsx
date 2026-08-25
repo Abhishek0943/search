@@ -35,7 +35,7 @@ const addProjectWithFetch = async (fd: FormData, navigation: any, fun) => {
     const token = await AsyncStorage.getItem('token');
 
     const res = await fetch(
-      'https://searchtalents.co/api/v1/jobseeker/projects',
+      'https://dev.searchtalents.co/api/v1/jobseeker/projects',
       {
         method: 'POST',
         headers: {
@@ -72,7 +72,7 @@ const updateProjectWithFetch = async (fd: FormData, navigation: any, fun, id) =>
     const token = await AsyncStorage.getItem('token');
 
     const res = await fetch(
-      'https://searchtalents.co/api/v1/jobseeker/projects/' + id,
+      'https://dev.searchtalents.co/api/v1/jobseeker/projects/' + id,
       {
         method: 'POST',
         headers: {

@@ -55,7 +55,7 @@ const Notification = () => {
   );
   const openURL = (url: any) => {
     if (!url) return;
-    if (url === "https://searchtalents.co/creator-dashboard") {
+    if (url === "https://dev.searchtalents.co/creator-dashboard") {
       navigation.navigate(routes.BLOGPAGE as never, { isFavorite: true } as never);
     } else {
       navigation.navigate(routes.BROWSER as never, { url } as never);

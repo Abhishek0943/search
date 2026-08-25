@@ -60,6 +60,7 @@ interface User {
     email: string;
     name: string;
     creator_data?: CreatorData;
+    login_step: number,
 }
 interface Recruiter {
     _id: string;

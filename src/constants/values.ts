@@ -4,6 +4,7 @@ export const routes: RoutesType = {
     WELCOME: "WELCOME",
     WELCOME2: "WELCOME2",
     COMPLOGIN: "COMPLOGIN",
+    USERSTEPS: "USERSTEPS",
     COMPSINGUP: "COMPSINGUP",
     RECRUITERPROFILE: "RECRUITERPROFILE",
     CONTACT: "CONTACT",
@@ -61,6 +62,7 @@ export default interface RoutesType {
     ACCOUNT: "ACCOUNT",
     PAYMENTHISTORY: "PAYMENTHISTORY",
     MESSAGE: "MESSAGE",
+    USERSTEPS: "USERSTEPS",
     CONTACT: "CONTACT",
     BLOG: "BLOG",
     COMPSINGUP: "COMPSINGUP",
@@ -302,7 +304,7 @@ export const COUNTRIES = [
 export const HOST = `192.168.1.2`
 
 
-export const API_URL = `https://searchtalents.co/api/v1`
+export const API_URL = `https://dev.searchtalents.co/api/v1`
 
 
 

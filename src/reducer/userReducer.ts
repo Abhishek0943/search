@@ -11,17 +11,17 @@ export const GetCountries = createAsyncThunk<GetCountriesResponse | ErrorRespons
   'GetCountries',
   () => getApiCall<GetCountriesResponse>('country'),
 );
-export const UserRegister = createAsyncThunk<{ success: true, token: string } | ErrorResponse, { first_name: string, last_name: string, email: string, password: string, password_confirmation: string, terms_of_use: boolean }>(
+export const UserRegister = createAsyncThunk<{ success: true, token: string } | ErrorResponse, { email: string, password: string, password_confirmation: string, terms_of_use: boolean }>(
   'UserRegister',
   (body) => postApiCall<{ success: true, token: string }>('/auth/jobseekers/register', body),
 );
-export const UserVerification = createAsyncThunk<{ success: true, user: User, token: string } | ErrorResponse, { email: string, code: string }>(
+export const UserVerification = createAsyncThunk<{ success: true, data: { user: User, token: string } } | ErrorResponse, { email: string, code: string }>(
   'UserVerification',
-  (body) => postApiCall<{ success: true, user: User, token: string }>('/auth/jobseekers/otp/verify', body),
+  (body) => postApiCall<{ success: true, data: { user: User, token: string } }>('/auth/jobseekers/otp/verify', body),
 );
-export const CompanyVerification = createAsyncThunk<{ success: true, user: User, token: string } | ErrorResponse, { email: string, code: string }>(
+export const CompanyVerification = createAsyncThunk<{ success: true, data: { user: User, token: string } } | ErrorResponse, { email: string, code: string }>(
   'CompanyVerification',
-  (body) => postApiCall<{ success: true, user: User, token: string }>('/auth/companies/otp/verify', body),
+  (body) => postApiCall<{ success: true, data: { user: User, token: string } }>('/auth/companies/otp/verify', body),
 );
 export const UserReSentOtp = createAsyncThunk<{ success: true, user: User, token: string } | ErrorResponse, { email: string }>(
   'UserReSentOtp',

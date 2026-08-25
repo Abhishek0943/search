@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react'
-import {  Image, Pressable, TouchableOpacity, View } from 'react-native'
+import { Image, Pressable, TouchableOpacity, View } from 'react-native'
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
 import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native'
 import imagePath from '../../assets/imagePath'
@@ -59,18 +59,18 @@ const Login = () => {
             Keep me logged in on this phone
           </Text>
         </View>
-    
+
         <Button
-              label="Log in"
-              backgroundColor={colors.primary}
-             onPress={() => {
-          dispatch(LoginByPassword({ email: user.email, password: user.password })).unwrap().then(() => {
-            console.log("login successfully")
-          }).catch((error) => {
-            console.log("login failed", error)
-          })
-        }} 
-            />
+          label="Log in"
+          backgroundColor={colors.primary}
+          onPress={() => {
+            dispatch(LoginByPassword({ email: user.email, password: user.password })).unwrap().then((res) => {
+              console.log("login successfully", res)
+            }).catch((error) => {
+              console.log("login failed", error)
+            })
+          }}
+        />
         <Pressable style={{ width: responsiveWidth(90), marginTop: responsiveHeight(2.5), aspectRatio: 350 / 16 }}>
           <Image style={{ height: "100%", width: "100%", }} source={require("./Devider.png")} />
         </Pressable>

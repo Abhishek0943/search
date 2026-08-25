@@ -341,11 +341,11 @@ export const GetMessageSeeker = createAsyncThunk<
   }
 );
 export const ProfileData = createAsyncThunk<
-  { success: true, data: User } | ErrorResponse
+  { success: true, data: { login_step: number, user: User } } | ErrorResponse
 >(
   'ProfileData',
   () => {
-    return getApiCall<{ success: true, data: User }>('/auth/jobseekers/me');
+    return getApiCall<{ success: true, data: { user: User } }>('/auth/jobseekers/me');
   }
 );
 export const ProfileData2 = createAsyncThunk<

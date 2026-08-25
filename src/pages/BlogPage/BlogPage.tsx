@@ -285,7 +285,7 @@ const ApprovedCreatorView = ({ allData, data, blogIds, blogsById, blogsLoading, 
                     label="✍️ Create Blog"
                     isActive={true}
                     onPress={() => {
-                        Linking.openURL(`https://searchtalents.co/blog-create-by-creator?user_type=${userType}&user_id=${user?.id}`)
+                        Linking.openURL(`https://dev.searchtalents.co/blog-create-by-creator?user_type=${userType}&user_id=${user?.id}`)
                     }}
                     style={styles.actionButton}
                 />
@@ -302,7 +302,7 @@ const ApprovedCreatorView = ({ allData, data, blogIds, blogsById, blogsLoading, 
                             key={id}
                             post={blogsById[id]}
                             onEdit={(post) => {
-                                Linking.openURL(`https://searchtalents.co/blog-edit-by-creator/${post.slug}?user_type=${userType}&user_id=${user?.id}`)
+                                Linking.openURL(`https://dev.searchtalents.co/blog-edit-by-creator/${post.slug}?user_type=${userType}&user_id=${user?.id}`)
                             }}
                             onDelete={async (post) => {
                                 const a = await showConfirm({

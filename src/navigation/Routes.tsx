@@ -96,7 +96,7 @@ const Routes = () => {
   const linking = {
     prefixes: [
       "searchtalents.co/app",
-      "https://searchtalents.co",
+      "https://dev.searchtalents.co",
       "https://www.searchtalents.co",
     ],
     config: {
@@ -163,6 +163,7 @@ const Routes = () => {
         <Stack.Screen name={routes.ADDJOB} component={AddJob} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.MESSAGE} component={Messages} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.BLOG} component={Blog} options={{ headerShown: false, animation: 'none' }} />
+        <Stack.Screen name={routes.USERSTEPS} component={Blog} options={{ headerShown: false, animation: 'none' }} />
 
         <Stack.Screen name={routes.RECRUITERPROFILE} component={RecruiterProfile} options={{ headerShown: false, animation: 'none' }} />
 
