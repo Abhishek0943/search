@@ -38,8 +38,10 @@ const Login = () => {
         <InputWithLabel label='Email address' value={user.email} onChangeText={(text) => handleInputChange({ name: "email", value: text })} placeholder="Email" />
         <InputWithLabel sideOption={() => {
           return (
-            <Text style={{ color: colors.primary, fontSize: responsiveFontSize(1.6), fontWeight: '800' }}>
-              Forgot?
+            <Text onPress={() => {
+              navigation.navigate(routes.FORGOTPASSWORD)
+            }} style={{ color: colors.primary, fontSize: responsiveFontSize(1.6), fontWeight: '800' }}>
+              Forget?
             </Text>
           )
         }} label='Password' secureText={hidePassword} rightIcon={() => {
@@ -49,7 +51,7 @@ const Login = () => {
             </TouchableOpacity>
           )
         }} value={user.password} onChangeText={(text) => handleInputChange({ name: "password", value: text })} placeholder="Password" />
-        <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveWidth(2) }}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveWidth(2), marginBottom: responsiveHeight(3) }}>
           <Pressable style={{ width: responsiveWidth(4), aspectRatio: 1 / 1 }}>
             <Image style={{ height: "100%", width: "100%", }} source={imagePath.Check} />
           </Pressable>

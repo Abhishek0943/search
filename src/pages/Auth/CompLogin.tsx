@@ -46,7 +46,7 @@ const CompLogin = () => {
                         </TouchableOpacity>
                     )
                 }} value={user.password} onChangeText={(text) => handleInputChange({ name: "password", value: text })} placeholder="Password" />
-                <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveWidth(2) }}>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveWidth(2), marginBottom: responsiveHeight(3) }}>
                     <Pressable style={{ width: responsiveWidth(4), aspectRatio: 1 / 1 }}>
                         <Image style={{ height: "100%", width: "100%", }} source={imagePath.CompCheck} />
                     </Pressable>
@@ -56,7 +56,7 @@ const CompLogin = () => {
                 </View>
          <Button
               label="Log in"
-              backgroundColor={colors.primary}
+              backgroundColor={colors.compPrimary}
              onPress={() => {
         //   dispatch(LoginByPassword({ email: user.email, password: user.password })).unwrap().then(() => {
         //     console.log("login successfully")
