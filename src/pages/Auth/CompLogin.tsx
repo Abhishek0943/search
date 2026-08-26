@@ -8,6 +8,7 @@ import Text from '../../components/Text'
 import { ThemeContext } from '../../context/ThemeProvider'
 import { routes } from '../../constants/values'
 import Button from '../../components/Button'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 const CompLogin = () => {
     const navigation = useNavigation<NavigationProp<ParamListBase>>();
     const [hidePassword, setHidePassword] = useState(false);
@@ -22,12 +23,13 @@ const CompLogin = () => {
     const handleInputChange = (data: { name: string; value: string }) => {
         setUser(prev => ({ ...prev, [data.name]: data.value }));
     };
+    const insets = useSafeAreaInsets();
     return (
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flex: 1, height: responsiveHeight(100) }}>
                 <View style={{ height: responsiveHeight(100), width: responsiveWidth(100), flex: 1, }}>
                     <Image style={{ height: "100%", width: "100%", }} source={require("../Welcome/BgGradiant.png")} />
-                    <View style={{ position: "absolute", paddingVertical: responsiveHeight(5), paddingHorizontal: responsiveWidth(5), top: 0, left: 0, height: responsiveHeight(100), width: responsiveWidth(100), }}>
+                    <View style={{ position: "absolute", paddingTop: insets.top, paddingBottom: insets.bottom, paddingHorizontal: responsiveWidth(5), top: 0, left: 0, height: responsiveHeight(100), width: responsiveWidth(100), }}>
                         <Pressable onPress={() => navigation.goBack()} style={{ width: responsiveWidth(2.8), aspectRatio: 1 / 2 }}>
                             <Image style={{ height: "100%", width: "100%", }} source={imagePath.leftAngle} />
                         </Pressable>
@@ -37,8 +39,10 @@ const CompLogin = () => {
                         <InputWithLabel label='Work Email' value={user.email} onChangeText={(text) => handleInputChange({ name: "email", value: text })} placeholder="Email" />
                         <InputWithLabel sideOption={() => {
                             return (
-                                <Text style={{ color: colors.compPrimary, fontSize: responsiveFontSize(1.6), fontWeight: '800' }}>
-                                    Forgot?
+                                <Text onPress={() => {
+                                    navigation.navigate(routes.FORGOTPASSWORD, { type: 'comp' })
+                                }} style={{ color: colors.primary, fontSize: responsiveFontSize(1.6), fontWeight: '800' }}>
+                                    Forget?
                                 </Text>
                             )
                         }} label='Password' secureText={hidePassword} rightIcon={() => {

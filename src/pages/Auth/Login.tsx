@@ -31,10 +31,9 @@ const Login = () => {
   };
   const { showAlert } = useAlert();
   const insets = useSafeAreaInsets();
-
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-      <ScrollView showsVerticalScrollIndicator={false} >
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flex: 1, height: responsiveHeight(100) }}>
         <View style={{ height: responsiveHeight(100), width: responsiveWidth(100), flex: 1, }}>
           <Image style={{ height: "100%", width: "100%", }} source={require("../Welcome/BgGradiant.png")} />
           <View style={{ position: "absolute", paddingTop: insets.top, paddingBottom: insets.bottom, paddingHorizontal: responsiveWidth(5), top: 0, left: 0, height: responsiveHeight(100), width: responsiveWidth(100), }}>
@@ -119,6 +118,7 @@ const Login = () => {
               <Text style={{ color: colors.primary2, fontSize: responsiveFontSize(1.6), }}>New to SearchTalents?</Text>
               <Text onPress={() => navigation.navigate(routes.SIGNUP)} style={{ color: colors.primary, fontSize: responsiveFontSize(1.6), fontWeight: '800' }}> Create an account</Text>
             </View>
+
           </View>
         </View>
       </ScrollView>
