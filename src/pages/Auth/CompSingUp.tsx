@@ -12,7 +12,7 @@ import React, {
     useRef,
     useState,
 } from 'react';
-import { Image, Pressable, TouchableOpacity, View } from 'react-native';
+import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, TouchableOpacity, View } from 'react-native';
 import {
     responsiveFontSize,
     responsiveHeight,
@@ -33,15 +33,21 @@ import { CompanyVerification, UserRegister, UserReSentOtp, UserVerification } fr
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { ProfileData } from '../../reducer/jobsReducer'
 import { routes } from '../../constants/values';
+import { SafeAreaView } from 'react-native-safe-area-context';
 const CompSingUp = () => {
     const { colors } = useContext(ThemeContext);
     return (
         <>
-            <ComponentSingUp
-                type={'comp'}
-                mainColor={colors.compPrimary}
-                secondaryColor={colors.compPrimary2}
-            />
+            <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+                <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+                    <ComponentSingUp
+                        type={'comp'}
+                        mainColor={colors.compPrimary}
+                        secondaryColor={colors.compPrimary2}
+                    />
+                </KeyboardAvoidingView>
+            </SafeAreaView>
+
         </>
     );
 };
@@ -267,7 +273,7 @@ export const ComponentSingUp = ({
                             </Pressable>
                             <View style={{}}>
                                 <Text style={{ color: mainColor, borderWidth: 1, fontSize: responsiveFontSize(1.8), fontWeight: '800' }}>
-                                    Step 1 of 3
+                                    Step 1 of 2
                                 </Text>
                                 <Text style={{ color: secondaryColor, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(3), fontWeight: '800' }}>
                                     Your account
@@ -275,7 +281,7 @@ export const ComponentSingUp = ({
                             </View>
                         </View>
                         <View style={{ width: responsiveWidth(90), marginTop: responsiveHeight(2), flexDirection: "row", alignItems: 'center', gap: responsiveWidth(1.5), marginBottom: responsiveHeight(1) }}>
-                            {[1, 2, 3].map((i) => (
+                            {[1, 2].map((i) => (
                                 <View
                                     key={i}
                                     style={{
@@ -291,57 +297,59 @@ export const ComponentSingUp = ({
                         <Pressable style={{ width: responsiveWidth(100), marginTop: responsiveHeight(2.5), position: "relative", right: responsiveWidth(5), aspectRatio: 350 / 1 }}>
                             <Image style={{ height: "100%", width: "100%", resizeMode: "contain" }} source={require("./Devider2.png")} />
                         </Pressable>
-                        <Text style={{ color: colors.textSecondary, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '600', marginTop: responsiveHeight(1.5) }}>Three short steps. Then you're in.</Text>
-                        <InPutWithLabel inputContainerStyle={{ marginBottom: responsiveHeight(.5) }} mainColor={mainColor} secondaryColor={secondaryColor} label={type === "comp" ? 'Work Email' : 'Email address'} value={user.email} onChangeText={(text) => handleInputChange({ name: "email", value: text })} placeholder="Email" />
-                        <Text style={{ marginBottom: responsiveHeight(1), color: colors.textSecondary, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '600', }}>{emailText}</Text>
-                        <InPutWithLabel inputContainerStyle={{ marginBottom: responsiveHeight(0.3) }} mainColor={mainColor} secondaryColor={secondaryColor} label='Create a password' secureText={hidePassword} rightIcon={() => {
-                            return (
-                                <TouchableOpacity onPress={() => setHidePassword(!hidePassword)}>
-                                    <Image style={{ width: responsiveWidth(2.8), aspectRatio: 20 / 11.5 }} source={imagePath.EyeOpen} />
-                                </TouchableOpacity>
-                            )
-                        }} value={user.password} onChangeText={(text) => handleInputChange({ name: "password", value: text })} placeholder="Password" />
-                        <PasswordStrengthIndicator password={user.password} mainColor={mainColor} secondaryColor={secondaryColor} />
-                        <InPutWithLabel inputContainerStyle={{ marginBottom: responsiveHeight(0.3) }} mainColor={mainColor} secondaryColor={secondaryColor} label='Confirm password' secureText={hideConfirmPassword} rightIcon={() => {
-                            return (
-                                <TouchableOpacity onPress={() => setHideConfirmPassword(!hideConfirmPassword)}>
-                                    <Image style={{ width: responsiveWidth(2.8), aspectRatio: 20 / 11.5 }} source={imagePath.EyeOpen} />
-                                </TouchableOpacity>
-                            )
-                        }} value={user.confirmPassword} onChangeText={(text) => handleInputChange({ name: "confirmPassword", value: text })} placeholder="Password" />
-                        {user.confirmPassword.length > 0 && (
-                            <RequirementRow color={user.password === user.confirmPassword ? secondaryColor : colors.textSecondary} text="Both passwords match" />
-                        )}
-                        <View style={{ flexDirection: 'row', alignItems: "baseline", gap: responsiveWidth(1), marginBottom: responsiveHeight(0.5), marginTop: responsiveHeight(1) }}>
-                            <Text style={{ color: secondaryColor || colors.textPrimary, fontSize: responsiveFontSize(1.8), fontWeight: '700' }}>Mobile number</Text>
-                            <Text style={{
-                                fontSize: responsiveFontSize(1.2),
-                                fontWeight: "400",
-                                lineHeight: responsiveFontSize(1.9),
-                                color: colors.textSecondary,
-                                flexWrap: "wrap",
-                            }}>(Optional)</Text>
-                        </View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderRadius: 15, borderColor: colors.surfaces, borderStyle: 'dashed', height: responsiveHeight(6), paddingHorizontal: responsiveWidth(4), marginBottom: responsiveHeight(1) }}>
-                            <Text style={{ color: colors.textPrimary, fontSize: responsiveFontSize(2), fontWeight: '600', marginRight: responsiveWidth(2) }}>{countryCode || "+61"}</Text>
-                            <View style={{ width: 1, height: '60%', backgroundColor: colors.surfaces, marginRight: responsiveWidth(2) }} />
-                            <CustomTextInput
-                                style={{ flex: 1, fontSize: responsiveFontSize(2), fontWeight: '400', color: colors.textPrimary, paddingVertical: 0 }}
-                                value={user.mobile}
-                                onChangeText={(text: string) => handleInputChange({ name: "mobile", value: text })}
-                                placeholder="For urgent shift alerts only"
-                                placeholderTextColor={colors.placeholder}
-                                keyboardType="phone-pad"
-                            />
-                        </View>
-                        <View style={{ flex: 1 }}>
+                        <ScrollView showsVerticalScrollIndicator={false}>
+                            <Text style={{ color: colors.textSecondary, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '600', marginTop: responsiveHeight(1.5) }}>Three short steps. Then you're in.</Text>
+                            <InPutWithLabel inputContainerStyle={{ marginBottom: responsiveHeight(.5) }} mainColor={mainColor} secondaryColor={secondaryColor} label={type === "comp" ? 'Work Email' : 'Email address'} value={user.email} onChangeText={(text) => handleInputChange({ name: "email", value: text })} placeholder="Email" />
+                            <Text style={{ marginBottom: responsiveHeight(1), color: colors.textSecondary, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '600', }}>{emailText}</Text>
+                            <InPutWithLabel inputContainerStyle={{ marginBottom: responsiveHeight(0.3) }} mainColor={mainColor} secondaryColor={secondaryColor} label='Create a password' secureText={hidePassword} rightIcon={() => {
+                                return (
+                                    <TouchableOpacity onPress={() => setHidePassword(!hidePassword)}>
+                                        <Image style={{ width: responsiveWidth(2.8), aspectRatio: 20 / 11.5 }} source={imagePath.EyeOpen} />
+                                    </TouchableOpacity>
+                                )
+                            }} value={user.password} onChangeText={(text) => handleInputChange({ name: "password", value: text })} placeholder="Password" />
+                            <PasswordStrengthIndicator password={user.password} mainColor={mainColor} secondaryColor={secondaryColor} />
+                            <InPutWithLabel inputContainerStyle={{ marginBottom: responsiveHeight(0.3) }} mainColor={mainColor} secondaryColor={secondaryColor} label='Confirm password' secureText={hideConfirmPassword} rightIcon={() => {
+                                return (
+                                    <TouchableOpacity onPress={() => setHideConfirmPassword(!hideConfirmPassword)}>
+                                        <Image style={{ width: responsiveWidth(2.8), aspectRatio: 20 / 11.5 }} source={imagePath.EyeOpen} />
+                                    </TouchableOpacity>
+                                )
+                            }} value={user.confirmPassword} onChangeText={(text) => handleInputChange({ name: "confirmPassword", value: text })} placeholder="Password" />
+                            {user.confirmPassword.length > 0 && (
+                                <RequirementRow color={user.password === user.confirmPassword ? secondaryColor : colors.textSecondary} text="Both passwords match" />
+                            )}
+                            <View style={{ flexDirection: 'row', alignItems: "baseline", gap: responsiveWidth(1), marginBottom: responsiveHeight(0.5), marginTop: responsiveHeight(1) }}>
+                                <Text style={{ color: secondaryColor || colors.textPrimary, fontSize: responsiveFontSize(1.8), fontWeight: '700' }}>Mobile number</Text>
+                                <Text style={{
+                                    fontSize: responsiveFontSize(1.2),
+                                    fontWeight: "400",
+                                    lineHeight: responsiveFontSize(1.9),
+                                    color: colors.textSecondary,
+                                    flexWrap: "wrap",
+                                }}>(Optional)</Text>
+                            </View>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderRadius: 15, borderColor: colors.surfaces, borderStyle: 'dashed', height: responsiveHeight(6), paddingHorizontal: responsiveWidth(4), marginBottom: responsiveHeight(1) }}>
+                                <Text style={{ color: colors.textPrimary, fontSize: responsiveFontSize(2), fontWeight: '600', marginRight: responsiveWidth(2) }}>{countryCode || "+61"}</Text>
+                                <View style={{ width: 1, height: '60%', backgroundColor: colors.surfaces, marginRight: responsiveWidth(2) }} />
+                                <CustomTextInput
+                                    style={{ flex: 1, fontSize: responsiveFontSize(2), fontWeight: '400', color: colors.textPrimary, paddingVertical: 0 }}
+                                    value={user.mobile}
+                                    onChangeText={(text: string) => handleInputChange({ name: "mobile", value: text })}
+                                    placeholder="For urgent shift alerts only"
+                                    placeholderTextColor={colors.placeholder}
+                                    keyboardType="phone-pad"
+                                />
+                            </View>
+                            <View style={{ flex: 1 }}>
 
-                        </View>
-                        <Pressable style={{ width: responsiveWidth(100), marginTop: responsiveHeight(2.5), aspectRatio: 350 / 1, position: "relative", right: responsiveWidth(5), }}>
+                            </View>
+                        </ScrollView>
+
+                        <Pressable style={{ width: responsiveWidth(100), marginVertical: responsiveHeight(2.5), aspectRatio: 350 / 1, position: "relative", right: responsiveWidth(5), }}>
                             <Image style={{ height: "100%", width: "100%", resizeMode: "contain" }} source={require("./Devider2.png")} />
                         </Pressable>
                         <Button
-
                             label="Send Verification Code"
                             backgroundColor={mainColor}
                             onPress={() => {
@@ -385,7 +393,7 @@ export const ComponentSingUp = ({
                             </Pressable>
                             <View style={{}}>
                                 <Text style={{ color: mainColor, borderWidth: 1, fontSize: responsiveFontSize(1.8), fontWeight: '800' }}>
-                                    Step 2 of 3
+                                    Step 2 of 2
                                 </Text>
                                 <Text style={{ color: secondaryColor, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(3), fontWeight: '800' }}>
                                     Verify your email
@@ -393,7 +401,7 @@ export const ComponentSingUp = ({
                             </View>
                         </View>
                         <View style={{ width: responsiveWidth(90), marginTop: responsiveHeight(2), flexDirection: "row", alignItems: 'center', gap: responsiveWidth(1.5), marginBottom: responsiveHeight(1) }}>
-                            {[1, 2, 3].map((i) => (
+                            {[1, 2].map((i) => (
                                 <View
                                     key={i}
                                     style={{
@@ -409,96 +417,101 @@ export const ComponentSingUp = ({
                         <Pressable style={{ width: responsiveWidth(100), marginTop: responsiveHeight(2.5), position: "relative", right: responsiveWidth(5), aspectRatio: 350 / 1 }}>
                             <Image style={{ height: "100%", width: "100%", resizeMode: "contain" }} source={require("./Devider2.png")} />
                         </Pressable>
-                        <Text style={{ color: colors.textSecondary, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '600', marginTop: responsiveHeight(1.5) }}>We sent a 6-digit code by email.</Text>
-                        <Text style={{ color: colors.textSecondary, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '600', }}>It expires in 10 minutes.</Text>
+                        <ScrollView showsVerticalScrollIndicator={false}>
 
-                        <View
-                            style={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                borderRadius: 15,
-                                backgroundColor: colors.compPrimaryBg,
-                                height: responsiveHeight(6),
-                                paddingHorizontal: responsiveWidth(4),
-                                justifyContent: 'space-between',
-                                marginTop: responsiveHeight(2),
-                            }}
-                        >
-                            <Text
-                                numberOfLines={1}
+
+                            <Text style={{ color: colors.textSecondary, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '600', marginTop: responsiveHeight(1.5) }}>We sent a 6-digit code by email.</Text>
+                            <Text style={{ color: colors.textSecondary, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '600', }}>It expires in 10 minutes.</Text>
+
+                            <View
                                 style={{
-                                    color: secondaryColor,
-                                    fontSize: responsiveFontSize(2),
-                                    fontWeight: '800',
-                                    marginRight: responsiveWidth(2),
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    borderRadius: 15,
+                                    backgroundColor: colors.compPrimaryBg,
+                                    height: responsiveHeight(6),
+                                    paddingHorizontal: responsiveWidth(4),
+                                    justifyContent: 'space-between',
+                                    marginTop: responsiveHeight(2),
                                 }}
                             >
-                                {user.email || 'abhishek'}
-                            </Text>
-                            <Text
-                                onPress={() => {
-                                    setStep(1);
-                                }}
-                                style={{
-                                    color: mainColor,
-                                    fontSize: responsiveFontSize(1.8),
-                                    fontWeight: '800',
-                                    marginRight: responsiveWidth(2),
-                                }}
-                            >
-                                Change
-                            </Text>
-                        </View>
+                                <Text
+                                    numberOfLines={1}
+                                    style={{
+                                        color: secondaryColor,
+                                        fontSize: responsiveFontSize(2),
+                                        fontWeight: '800',
+                                        marginRight: responsiveWidth(2),
+                                    }}
+                                >
+                                    {user.email || 'abhishek'}
+                                </Text>
+                                <Text
+                                    onPress={() => {
+                                        setStep(1);
+                                    }}
+                                    style={{
+                                        color: mainColor,
+                                        fontSize: responsiveFontSize(1.8),
+                                        fontWeight: '800',
+                                        marginRight: responsiveWidth(2),
+                                    }}
+                                >
+                                    Change
+                                </Text>
+                            </View>
 
-                        <OtpInput
-                            length={6}
-                            value={otp}
-                            disabled={false}
-                            onChange={handleOtpChange}
-                            mainColor={mainColor}
-                            secondaryColor={secondaryColor}
+                            <OtpInput
+                                length={6}
+                                value={otp}
+                                disabled={false}
+                                onChange={handleOtpChange}
+                                mainColor={mainColor}
+                                secondaryColor={secondaryColor}
 
-                        />
-                        <View style={{ marginTop: responsiveHeight(3), flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(1) }}>
-                            <Text style={{ color: colors.textSecondary, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '600', }}>Didn't get the code?</Text>
-                            {
-                                remainingSeconds === 0 ?
-                                    <Text onPress={() => {
-                                        if (type = "jobSeeker") {
-                                            dispatch(UserReSentOtp({ email: user.email })).unwrap().then((res) => {
-                                                if (res.success) {
-                                                    startTimer()
-                                                } else {
-                                                    showAlert({
-                                                        title: "Validation",
-                                                        message: res.message,
-                                                    })
-                                                }
-                                            })
-                                        } else {
-                                            dispatch(RecruiterRecruiterReSentOtp({ email: user.email })).unwrap().then((res) => {
-                                                if (res.success) {
-                                                    startTimer()
-                                                } else {
-                                                    showAlert({
-                                                        title: "Validation",
-                                                        message: res.message,
-                                                    })
-                                                }
-                                            })
-                                        }
+                            />
+                            <View style={{ marginTop: responsiveHeight(3), flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(1) }}>
+                                <Text style={{ color: colors.textSecondary, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '600', }}>Didn't get the code?</Text>
+                                {
+                                    remainingSeconds === 0 ?
+                                        <Text onPress={() => {
+                                            if (type = "jobSeeker") {
+                                                dispatch(UserReSentOtp({ email: user.email })).unwrap().then((res) => {
+                                                    if (res.success) {
+                                                        startTimer()
+                                                    } else {
+                                                        showAlert({
+                                                            title: "Validation",
+                                                            message: res.message,
+                                                        })
+                                                    }
+                                                })
+                                            } else {
+                                                dispatch(RecruiterRecruiterReSentOtp({ email: user.email })).unwrap().then((res) => {
+                                                    if (res.success) {
+                                                        startTimer()
+                                                    } else {
+                                                        showAlert({
+                                                            title: "Validation",
+                                                            message: res.message,
+                                                        })
+                                                    }
+                                                })
+                                            }
 
-                                    }} style={{ color: mainColor, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '800', }}>Resend OTP</Text> :
-                                    <Text style={{ color: mainColor, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '800', }}>Resend in {remainingSeconds}s</Text>
-                            }
-                        </View>
-                        <Text style={{ color: colors.textSecondary, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '600', }}>Check your spam or junk folder before resending.</Text>
-                        <Pressable style={{ width: responsiveWidth(90), marginTop: responsiveHeight(1.5), aspectRatio: 350 / 57.2, }}>
-                            <Image style={{ height: "100%", width: "100%", resizeMode: "cover" }} source={require("./OpenEmailApp.png")} />
-                        </Pressable>
-                        <Pressable style={{ width: responsiveWidth(90), marginTop: responsiveHeight(1.5), aspectRatio: 350 / 62, }}>
-                            <Image style={{ height: "100%", width: "100%", resizeMode: "cover" }} source={require("./NeverShareCode.png")} />
-                        </Pressable>
+                                        }} style={{ color: mainColor, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '800', }}>Resend OTP</Text> :
+                                        <Text style={{ color: mainColor, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '800', }}>Resend in {remainingSeconds}s</Text>
+                                }
+                            </View>
+                            <Text style={{ color: colors.textSecondary, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '600', }}>Check your spam or junk folder before resending.</Text>
+                            <Pressable style={{ width: responsiveWidth(90), marginTop: responsiveHeight(1.5), aspectRatio: 350 / 57.2, }}>
+                                <Image style={{ height: "100%", width: "100%", resizeMode: "cover" }} source={require("./OpenEmailApp.png")} />
+                            </Pressable>
+                            <Pressable style={{ width: responsiveWidth(90), marginTop: responsiveHeight(1.5), aspectRatio: 350 / 62, }}>
+                                <Image style={{ height: "100%", width: "100%", resizeMode: "cover" }} source={require("./NeverShareCode.png")} />
+                            </Pressable>
+                        </ScrollView>
+
                         <View style={{ flex: 1 }}>
                         </View>
                         <Pressable style={{ width: responsiveWidth(100), marginTop: responsiveHeight(2.5), aspectRatio: 350 / 1, position: "relative", right: responsiveWidth(5), }}>
@@ -514,7 +527,6 @@ export const ComponentSingUp = ({
                                     dispatch(UserVerification({ email: user.email, code: a }))
                                         .unwrap()
                                         .then(async (res) => {
-                                            console.log(res)
                                             if (res.success) {
                                                 showAlert({
                                                     title: "Success",
@@ -523,16 +535,14 @@ export const ComponentSingUp = ({
                                                 await AsyncStorage.setItem('token', res.data.token)
                                                 dispatch(ProfileData()).unwrap().then((res) => {
                                                     if (res.success) {
-                                                        if (res.data.user.login_step === 1) {
+                                                        if (res.data.login_step === 1) {
                                                             navigation.reset({
                                                                 index: 0,
                                                                 routes: [{ name: routes.USERSTEPS }]
                                                             });
 
                                                         }
-
                                                     }
-                                                    // console.log("Profile Data", res.data.login)
                                                 });
                                             } else {
                                                 showAlert({
@@ -598,11 +608,11 @@ export const ComponentSingUp = ({
             <View
                 style={{
                     backgroundColor: colors.background,
-                    paddingBottom: responsiveHeight(8),
                     height: responsiveHeight(100),
                     width: responsiveWidth(100),
                     flex: 1,
-                    paddingVertical: responsiveHeight(5),
+                    paddingBottom: responsiveHeight(2),
+                    paddingVertical: responsiveHeight(1),
                     paddingHorizontal: responsiveWidth(5),
                 }}
             >

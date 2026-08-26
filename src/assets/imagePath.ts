@@ -118,6 +118,7 @@ export default {
     Check: require('./Icons/Check.png'),
     Check2: require('./Icons/Check2.png'),
     CompCheck: require('./Icons/CompCheck.png'),
+    DownAngle: require('./Icons/DownAngle.png'),
 
 }
 export const Fonts = {

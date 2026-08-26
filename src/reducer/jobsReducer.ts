@@ -1,5 +1,24 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { deleteApiCall, getApiCall, patchApiCall, postApiCall, putApiCall } from '../api';
+
+export const GetAllAvailabilities = createAsyncThunk<
+  { success: true; data: { id: string; name: string }[] } | ErrorResponse
+>(
+  'GetAllAvailabilities',
+  () => {
+    return getApiCall<{ success: true; data: { id: string; name: string }[] }>('/get-all-availabilities');
+  }
+);
+
+export const GetAllWorkRights = createAsyncThunk<
+  { success: true; data: { id: string; name: string }[] } | ErrorResponse
+>(
+  'GetAllWorkRights',
+  () => {
+    return getApiCall<{ success: true; data: { id: string; name: string }[] }>('/get-all-work-rights');
+  }
+);
+
 export const GetSuggestedJobs = createAsyncThunk<
   { success: true, data: Job[] } | ErrorResponse
 >(
@@ -69,7 +88,7 @@ export const GetCv = createAsyncThunk<
 >(
   'GetCv',
   ({ id }) => {
-    return getApiCall<{ success: true, data: Job[] }>('/jobseekers/get-cvs?user_id=' + id,);
+    return getApiCall<{ success: true, data: Job[] }>('/jobseekers/get-cvs?userid=' + id,);
   }
 );
 export const GetNotification = createAsyncThunk<
@@ -125,7 +144,7 @@ export const DeleteCv = createAsyncThunk<
 >(
   'DeleteCv',
   ({ id, cvid }) => {
-    return deleteApiCall<{ success: true, data: Job[] }>(`/jobseekers/cv-delete?cv_id=${cvid}&user_id=${id}`);
+    return deleteApiCall<{ success: true, data: Job[] }>(`/jobseekers/cv-delete?cvid=${cvid}&userid=${id}`);
   }
 );
 export const DeleteExperience = createAsyncThunk<
@@ -153,7 +172,7 @@ export const DeleteEducation = createAsyncThunk<
   }
 );
 export const GetJobs = createAsyncThunk<
-  { success: true, data: { jobs: Job[] } } | ErrorResponse, { search?: string, job_type_id: number[], job_skill_id: number[], company_id: number[], job_title: string[], job_experience_id: number[], degree_level_id: number[], job_shift_id: number[], gender_id: number[], career_level_id: number[], functional_area_id: number[], city_id: number[], salary_from: number, salary_to: number }
+  { success: true, data: { jobs: Job[] } } | ErrorResponse, { search?: string, job_typeid: number[], job_skillid: number[], companyid: number[], job_title: string[], job_experienceid: number[], degree_levelid: number[], job_shiftid: number[], genderid: number[], career_levelid: number[], functional_areaid: number[], cityid: number[], salary_from: number, salary_to: number }
 >(
   'GetJobs',
   ({ pages, ...body }) => {
@@ -161,7 +180,7 @@ export const GetJobs = createAsyncThunk<
   }
 );
 export const DeleteRecruter = createAsyncThunk<
-  { success: true, data: { jobs: Job[] } } | ErrorResponse, { search?: string, job_type_id: number[], job_skill_id: number[], company_id: number[], job_title: string[], job_experience_id: number[], degree_level_id: number[], job_shift_id: number[], gender_id: number[], career_level_id: number[], functional_area_id: number[], city_id: number[], salary_from: number, salary_to: number }
+  { success: true, data: { jobs: Job[] } } | ErrorResponse, { search?: string, job_typeid: number[], job_skillid: number[], companyid: number[], job_title: string[], job_experienceid: number[], degree_levelid: number[], job_shiftid: number[], genderid: number[], career_levelid: number[], functional_areaid: number[], cityid: number[], salary_from: number, salary_to: number }
 >(
   'DeleteRecruter',
   ({ ...body }) => {
@@ -169,7 +188,7 @@ export const DeleteRecruter = createAsyncThunk<
   }
 );
 export const DeleteSesdkfjds = createAsyncThunk<
-  { success: true, data: { jobs: Job[] } } | ErrorResponse, { search?: string, job_type_id: number[], job_skill_id: number[], company_id: number[], job_title: string[], job_experience_id: number[], degree_level_id: number[], job_shift_id: number[], gender_id: number[], career_level_id: number[], functional_area_id: number[], city_id: number[], salary_from: number, salary_to: number }
+  { success: true, data: { jobs: Job[] } } | ErrorResponse, { search?: string, job_typeid: number[], job_skillid: number[], companyid: number[], job_title: string[], job_experienceid: number[], degree_levelid: number[], job_shiftid: number[], genderid: number[], career_levelid: number[], functional_areaid: number[], cityid: number[], salary_from: number, salary_to: number }
 >(
   'DeleteSesdkfjds',
   ({ ...body }) => {
@@ -329,7 +348,7 @@ export const GetMessage = createAsyncThunk<
 >(
   'GetFilter',
   ({ id, pages }) => {
-    return getApiCall<{ success: true, data: { filter: { filter: string, option: string[] | { id: number, name: string }[] }[] } }>('/company/messages?seeker_id=' + id + '&page=' + pages);
+    return getApiCall<{ success: true, data: { filter: { filter: string, option: string[] | { id: number, name: string }[] }[] } }>('/company/messages?seekerid=' + id + '&page=' + pages);
   }
 );
 export const GetMessageSeeker = createAsyncThunk<
@@ -337,7 +356,7 @@ export const GetMessageSeeker = createAsyncThunk<
 >(
   'GetFilter',
   ({ id }) => {
-    return getApiCall<{ success: true, data: { filter: { filter: string, option: string[] | { id: number, name: string }[] }[] } }>('/jobseeker/messages?company_id=' + id);
+    return getApiCall<{ success: true, data: { filter: { filter: string, option: string[] | { id: number, name: string }[] }[] } }>('/jobseeker/messages?companyid=' + id);
   }
 );
 export const ProfileData = createAsyncThunk<
@@ -442,7 +461,7 @@ export const GetState = createAsyncThunk<
 >(
   'GetState',
   ({ id }) => {
-    return getApiCall<{ success: true, data: User }>('/get-states?country_id=' + id);
+    return getApiCall<{ success: true, data: User }>('/get-states?countryid=' + id);
   }
 );
 export const Currencies = createAsyncThunk<
@@ -474,7 +493,7 @@ export const GetCity = createAsyncThunk<
 >(
   'GetCity',
   ({ id }) => {
-    return getApiCall<{ success: true, data: User }>('/get-cities?state_id=' + id);
+    return getApiCall<{ success: true, data: User }>('/get-cities?stateid=' + id);
   }
 );
 export const GetEducation = createAsyncThunk<
@@ -547,7 +566,7 @@ export const DegreeType = createAsyncThunk<
 >(
   'DegreeType',
   ({ id }) => {
-    return getApiCall<{ success: true, data: User }>('/get-degree-types?degree_level_id=' + id);
+    return getApiCall<{ success: true, data: User }>('/get-degree-types?degree_levelid=' + id);
   }
 );
 export const AddEducation = createAsyncThunk<
@@ -588,27 +607,27 @@ export const ResultType = createAsyncThunk<
 
 
 export const LikeJob = createAsyncThunk<
-  { success: true, jobs: Job[] } | ErrorResponse, { _id: string, isLiked: boolean }
+  { success: true, jobs: Job[] } | ErrorResponse, { id: string, isLiked: boolean }
 >(
   'LikeJob',
-  ({ _id, isLiked }) => {
-    return patchApiCall<{ success: true, jobs: Job[], }>('job/' + _id + "/like", { isLiked });
+  ({ id, isLiked }) => {
+    return patchApiCall<{ success: true, jobs: Job[], }>('job/' + id + "/like", { isLiked });
   }
 );
 export const BookmarkJob = createAsyncThunk<
-  { success: true, jobs: Job[] } | ErrorResponse, { _id: string, isBookmarked: boolean }
+  { success: true, jobs: Job[] } | ErrorResponse, { id: string, isBookmarked: boolean }
 >(
   'LikeJob',
-  ({ _id, isBookmarked }) => {
-    return patchApiCall<{ success: true, jobs: Job[], }>('job/' + _id + "/bookmark", { isBookmarked });
+  ({ id, isBookmarked }) => {
+    return patchApiCall<{ success: true, jobs: Job[], }>('job/' + id + "/bookmark", { isBookmarked });
   }
 );
 export const RejobJob = createAsyncThunk<
-  { success: true, jobs: Job[] } | ErrorResponse, { _id: string, isRejobed: boolean }
+  { success: true, jobs: Job[] } | ErrorResponse, { id: string, isRejobed: boolean }
 >(
   'LikeJob',
-  ({ _id, isRejobed }) => {
-    return patchApiCall<{ success: true, jobs: Job[], }>('job/' + _id + "/rejob", { isRejobed });
+  ({ id, isRejobed }) => {
+    return patchApiCall<{ success: true, jobs: Job[], }>('job/' + id + "/rejob", { isRejobed });
   }
 );
 export const AddWorkExperience = createAsyncThunk<
@@ -761,33 +780,33 @@ const jobSlice = createSlice({
   initialState,
   reducers: {
     // likeReducers: (state, { payload }) => {
-    //   if (state.jobs.jobObject[payload._id].isLiked) {
-    //     state.jobs.jobObject[payload._id].isLiked = false
-    //     state.jobs.jobObject[payload._id].likesCount = state.jobs.jobObject[payload._id].likesCount - 1
+    //   if (state.jobs.jobObject[payload.id].isLiked) {
+    //     state.jobs.jobObject[payload.id].isLiked = false
+    //     state.jobs.jobObject[payload.id].likesCount = state.jobs.jobObject[payload.id].likesCount - 1
     //   }
     //   else {
-    //     state.jobs.jobObject[payload._id].isLiked = true
-    //     state.jobs.jobObject[payload._id].likesCount = state.jobs.jobObject[payload._id].likesCount ? state.jobs.jobObject[payload._id].likesCount + 1 : 1
+    //     state.jobs.jobObject[payload.id].isLiked = true
+    //     state.jobs.jobObject[payload.id].likesCount = state.jobs.jobObject[payload.id].likesCount ? state.jobs.jobObject[payload.id].likesCount + 1 : 1
     //   }
     // },
     // bookmarkReducers: (state, { payload }) => {
-    //   if (state.jobs.jobObject[payload._id].isBookmarked) {
-    //     state.jobs.jobObject[payload._id].isBookmarked = false
-    //     state.jobs.jobObject[payload._id].bookmarksCount = state.jobs.jobObject[payload._id].bookmarksCount - 1
+    //   if (state.jobs.jobObject[payload.id].isBookmarked) {
+    //     state.jobs.jobObject[payload.id].isBookmarked = false
+    //     state.jobs.jobObject[payload.id].bookmarksCount = state.jobs.jobObject[payload.id].bookmarksCount - 1
     //   }
     //   else {
-    //     state.jobs.jobObject[payload._id].isBookmarked = true
-    //     state.jobs.jobObject[payload._id].bookmarksCount = state.jobs.jobObject[payload._id].bookmarksCount ? state.jobs.jobObject[payload._id].bookmarksCount + 1 : 1
+    //     state.jobs.jobObject[payload.id].isBookmarked = true
+    //     state.jobs.jobObject[payload.id].bookmarksCount = state.jobs.jobObject[payload.id].bookmarksCount ? state.jobs.jobObject[payload.id].bookmarksCount + 1 : 1
     //   }
     // },
     // rejobReducers: (state, { payload }) => {
-    //   if (state.jobs.jobObject[payload._id].isRejobed) {
-    //     state.jobs.jobObject[payload._id].isRejobed = false
-    //     state.jobs.jobObject[payload._id].rejobCount = state.jobs.jobObject[payload._id].rejobCount - 1
+    //   if (state.jobs.jobObject[payload.id].isRejobed) {
+    //     state.jobs.jobObject[payload.id].isRejobed = false
+    //     state.jobs.jobObject[payload.id].rejobCount = state.jobs.jobObject[payload.id].rejobCount - 1
     //   }
     //   else {
-    //     state.jobs.jobObject[payload._id].isRejobed = true
-    //     state.jobs.jobObject[payload._id].rejobCount = state.jobs.jobObject[payload._id].rejobCount ? state.jobs.jobObject[payload._id].rejobCount + 1 : 1
+    //     state.jobs.jobObject[payload.id].isRejobed = true
+    //     state.jobs.jobObject[payload.id].rejobCount = state.jobs.jobObject[payload.id].rejobCount ? state.jobs.jobObject[payload.id].rejobCount + 1 : 1
     //   }
     // },
     setAppliedJobId: (state, { payload }) => {

@@ -42,6 +42,8 @@
 import { useContext } from "react";
 import { ThemeContext } from "../../context/ThemeProvider";
 import { ComponentSingUp } from "./CompSingUp";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { KeyboardAvoidingView, Platform } from "react-native";
 
 const Signup1 = () => {
   //   const navigation: NavigationProp<ParamListBase> = useNavigation();
@@ -528,7 +530,11 @@ const Signup = () => {
   const { colors } = useContext(ThemeContext);
   return (
     <>
-      <ComponentSingUp type={"jobSeeker"} mainColor={colors.primary} secondaryColor={colors.primary} />
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+          <ComponentSingUp type={"jobSeeker"} mainColor={colors.primary} secondaryColor={colors.primary} />
+        </KeyboardAvoidingView>
+      </SafeAreaView>
     </>
   )
 }

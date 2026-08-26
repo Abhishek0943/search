@@ -38,8 +38,18 @@ const Splash = () => {
         });
       } else {
         dispatch(ProfileData()).unwrap().then((res) => {
-          console.log("res", res)
-          navigation.navigate(routes.HOME);
+          if (res.success) {
+            if (res.data.login_step === 1) {
+              navigation.reset({
+                index: 0,
+                routes: [{ name: routes.USERSTEPS }]
+              });
+            } else {
+              navigation.navigate(routes.HOME);
+            }
+          } else {
+            navigation.navigate(routes.WELCOME);
+          }
         });
       }
     };

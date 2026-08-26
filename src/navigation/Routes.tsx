@@ -17,6 +17,7 @@ import { Linking } from 'react-native';
 import Welcome2 from '../pages/Welcome/Welcome2';
 import CompLogin from '../pages/Auth/CompLogin';
 import CompSingUp from '../pages/Auth/CompSingUp';
+import ProfileCompelete from '../pages/ProfileCompelete/ProfileCompelete';
 
 const Stack = createNativeStackNavigator();
 const Routes = () => {
@@ -163,13 +164,9 @@ const Routes = () => {
         <Stack.Screen name={routes.ADDJOB} component={AddJob} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.MESSAGE} component={Messages} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.BLOG} component={Blog} options={{ headerShown: false, animation: 'none' }} />
-        <Stack.Screen name={routes.USERSTEPS} component={Blog} options={{ headerShown: false, animation: 'none' }} />
-
+        <Stack.Screen name={routes.USERSTEPS} component={ProfileCompelete} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.RECRUITERPROFILE} component={RecruiterProfile} options={{ headerShown: false, animation: 'none' }} />
-
-
         <Stack.Screen name={routes.PROFILE} component={Profile} options={{ headerShown: false, animation: 'none' }} />
-
         <Stack.Screen name={routes.OPENJOBS} component={OpenJobs} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.ACCOUNT} component={RecruiterAccount} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.CANDIDATEPROFILE} component={CandidateProfile} options={{ headerShown: false, animation: 'none' }} />

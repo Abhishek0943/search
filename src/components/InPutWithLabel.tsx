@@ -47,7 +47,6 @@ const InputWithLabel: React.FC<TextInputCompProps> = ({
 }) => {
   const { colors } = useContext(ThemeContext);
   const [activeColor, setActiveColor] = useState(colors.surfaces);
-  const [datePickerVisible, setDatePickerVisible] = useState(false)
   const elem = () => {
     switch (type) {
       case "text":
@@ -151,8 +150,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1.5,
     borderRadius: 15,
-
-    height: responsiveHeight(6),
+    width: responsiveWidth(90),
+    aspectRatio: 350 / 52,
     paddingHorizontal: responsiveWidth(4),
   },
   input: {
