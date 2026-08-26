@@ -113,7 +113,7 @@ const getPasswordStrength = (
     }
 };
 
-const PasswordStrengthIndicator = ({
+export const PasswordStrengthIndicator = ({
     password,
     mainColor,
     secondaryColor,
