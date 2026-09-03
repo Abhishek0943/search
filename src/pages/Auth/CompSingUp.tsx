@@ -542,6 +542,12 @@ export const ComponentSingUp = ({
                                                             });
 
                                                         }
+                                                        else {
+                                                            navigation.reset({
+                                                                index: 0,
+                                                                routes: [{ name: routes.HOME }]
+                                                            });
+                                                        }
                                                     }
                                                 });
                                             } else {
@@ -579,15 +585,10 @@ export const ComponentSingUp = ({
         const a = async () => {
             const ipResponse = await fetch('https://api64.ipify.org?format=json');
             const { ip } = await ipResponse.json();
-
-            console.log('IP:', ip);
-
-            // Get country information
             const response = await fetch(
                 `http://ip-api.com/json/${ip}?fields=2158591`,
             );
             const data = await response.json();
-
             const callingCodes: Record<string, string> = {
                 IN: '+91',
                 PK: '+92',
@@ -597,7 +598,6 @@ export const ComponentSingUp = ({
                 CA: '+1',
                 JP: '+81',
             };
-
             setCountryCode(callingCodes[data.countryCode] || '');
         };
         a();

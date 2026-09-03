@@ -36,7 +36,6 @@ const ApplyJob = () => {
     dispatch(GetJobApplication({ search: debouncedSearch, page }))
       .unwrap()
       .then(res => {
-        console.log(res)
         setLoading(false)
         if (res.success !== false) {
           if (page === 1) {

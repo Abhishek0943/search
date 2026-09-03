@@ -7,7 +7,7 @@ import imagePath from '../../assets/imagePath'
 import { ThemeContext } from '../../context/ThemeProvider'
 import { NavigationProp, ParamListBase, useNavigation, useRoute } from '@react-navigation/native'
 import { useAppDispatch } from '../../store'
-import { GetBookmarkJobs, GetCompanies, GetSuggestedJobs } from '../../reducer/jobsReducer'
+import { GetBookmarkJobs, } from '../../reducer/jobsReducer'
 import Icon from '../../utils/Icon'
 import { formatSalaryRange } from '../../utils'
 import { JobCard } from '../CompanyDetails/CompanyDetails'
@@ -35,12 +35,7 @@ const SuggestedJob = () => {
       })
     }
     else {
-      dispatch(GetSuggestedJobs()).unwrap().then((res) => {
-        setLoading(false)
-        if (res.success) {
-          setJob(res.data)
-        }
-      })
+
     }
   }, [isBookmark])
   return (
@@ -93,12 +88,7 @@ const SuggestedJob = () => {
                         })
                       }
                       else {
-                        dispatch(GetSuggestedJobs()).unwrap().then((res) => {
-                          setLoading(false)
-                          if (res.success) {
-                            setJob(res.data)
-                          }
-                        })
+
                       }
                     }} item={item} />
                   </>

@@ -47,16 +47,15 @@ const WrapperContainer: React.FC<WrapperContainerProps> = ({
         }
         unsubscribe = messaging().onMessage(async remoteMessage => {
           const { title, body } = remoteMessage.notification || {}
-          const imageUrl = remoteMessage.notification?.android?.imageUrl || remoteMessage.data?.imageUrl || remoteMessage.data?.image;
-          if (title && body) {
-            onDisplayNotification(title, body, imageUrl, remoteMessage.data)
-          }
-          console.log(remoteMessage?.data, `remoteMessage?.data?.unread_message_count`)
-          dispatch(
-            setMessageCount({
-              messages_count: remoteMessage?.data?.unread_message_count || 0,
-            })
-          );
+          // const imageUrl = remoteMessage.notification?.android?.imageUrl || remoteMessage.data?.imageUrl || remoteMessage.data?.image;
+          // if (title && body) {
+          //   onDisplayNotification(title, body, imageUrl, remoteMessage.data)
+          // }
+          // dispatch(
+          //   setMessageCount({
+          //     messages_count: remoteMessage?.data?.unread_message_count || 0,
+          //   })
+          // );
         });
       } catch (e) {
       }

@@ -119,6 +119,12 @@ export default {
     Check2: require('./Icons/Check2.png'),
     CompCheck: require('./Icons/CompCheck.png'),
     DownAngle: require('./Icons/DownAngle.png'),
+    Filter: require('./Icons/Filter.png'),
+    SearchIcon: require('./Icons/SearchIcon.png'),
+    Bookmark: require('./Icons/Bookmark.png'),
+    Bookmarked: require('./Icons/Bookmarked.png'),
+    Shear: require('./Icons/Shear.png'),
+    Clock: require('./Icons/Clock.png'),
 
 }
 export const Fonts = {

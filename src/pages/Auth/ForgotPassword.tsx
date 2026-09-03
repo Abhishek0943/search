@@ -671,18 +671,18 @@ const ForgotPassword = () => {
                             <InPutWithLabel inputContainerStyle={{ marginTop: responsiveHeight(0.5), marginBottom: responsiveHeight(0.5) }} mainColor={mainColor} secondaryColor={secondaryColor} label='Confirm password' secureText={hideConfirmPassword} rightIcon={() => {
                                 return (
                                     <TouchableOpacity onPress={() => setHideConfirmPassword(prev => !prev)}>
-                                    <Image
-                                        style={{
-                                            width: responsiveWidth(2.8),
-                                            aspectRatio: 20 / 11.5
-                                        }}
-                                        source={
-                                            hidePassword
-                                                ? imagePath.EyeOpen
-                                                : imagePath.EyeOpen
-                                        }
-                                    />
-                                </TouchableOpacity>
+                                        <Image
+                                            style={{
+                                                width: responsiveWidth(2.8),
+                                                aspectRatio: 20 / 11.5
+                                            }}
+                                            source={
+                                                hidePassword
+                                                    ? imagePath.EyeOpen
+                                                    : imagePath.EyeOpen
+                                            }
+                                        />
+                                    </TouchableOpacity>
                                 )
                             }} value={user.confirmPassword} onChangeText={(text) => handleInputChange({ name: "confirmPassword", value: text })} placeholder="Password" />
                             {user.confirmPassword.length > 0 && (
@@ -769,15 +769,10 @@ const ForgotPassword = () => {
         const a = async () => {
             const ipResponse = await fetch('https://api64.ipify.org?format=json');
             const { ip } = await ipResponse.json();
-
-            console.log('IP:', ip);
-
-            // Get country information
             const response = await fetch(
                 `http://ip-api.com/json/${ip}?fields=2158591`,
             );
             const data = await response.json();
-
             const callingCodes: Record<string, string> = {
                 IN: '+91',
                 PK: '+92',
@@ -787,7 +782,6 @@ const ForgotPassword = () => {
                 CA: '+1',
                 JP: '+81',
             };
-
             setCountryCode(callingCodes[data.countryCode] || '');
         };
         a();

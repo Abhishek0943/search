@@ -2,7 +2,6 @@ import { ActivityIndicator, FlatList, View, StyleSheet } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { NavigationBar } from '../../components'
 import { useAppDispatch } from '../../store'
-import { GetRecentJobs } from '../../reducer/jobsReducer'
 import { Header } from '../Company/Company'
 import { JobCard } from '../CompanyDetails/CompanyDetails'
 import { responsiveScreenFontSize, responsiveScreenHeight } from 'react-native-responsive-dimensions'
@@ -21,24 +20,7 @@ const SuggestedJob = () => {
     } else {
       setLoadingMore(true)
     }
-    dispatch(GetRecentJobs({ page: pageNumber })).unwrap().then((res) => {
-      console.log('res', res)
-      setLoading(false)
-      setLoadingMore(false)
-      if (res.success) {
-        setMeta(res.data.meta)
-        if (pageNumber === 1) {
-          setJob(res.data.jobs)
-          setPage(2)
-        } else {
-          setJob(prev => [...(prev || []), ...res.data.jobs])
-          setPage(pageNumber + 1)
-        }
-      }
-    }).catch(() => {
-      setLoading(false)
-      setLoadingMore(false)
-    })
+
   }
 
   useEffect(() => {

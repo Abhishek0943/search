@@ -1,27 +1,37 @@
+interface RoleItem {
+  id: number;
+  jobTitle: string;
+  businessName: string;
+  startDate: string;
+  endDate: string;
+  stillHere: boolean;
+  description: string;
+}
 interface Job {
-  id: number,
-  company_info: {
-    name: string;
+  id: number;
+  company_info?: {
     image: string;
-    description?: string;
-  }
-  title: string;
-  job_description?:{title:string, data:string|{skill:string}[]}[]
-  salary_period?: string;
-  salary_currency?: string;
-  salary?: string;
-  is_applied: boolean;
-  is_favorited: boolean;
-  jobType: string;
+    name: string;
+    description: string
+  };
   jobLocation: string;
-  functionalArea?: string;
-  expired?: boolean;
-  jobUrl?: string;
+  title: string;
+  expiredAt: string;
+  salary_currency: string;
+  salary: string;
+  is_hide_salary: boolean;
+  jobType: string;
+  salary_period: string;
+  functionalArea: string;
+  job_description: {
+    title: string,
+    data: string
+  }[]
 }
 interface Company {
   id: number,
   description: string,
-  jobs:job[]
+  jobs: job[]
   name: string;
   city?: string;
   country?: string;
@@ -29,7 +39,7 @@ interface Company {
   phone: string;
   logo: string;
   slug: string;
-  
+
 }
 
 
@@ -50,8 +60,8 @@ interface JobInitialState {
     userObject: Record<string, Job>,
     userIds: string[],
   }
-  suggested:any[]
-  recent:any[]
+  suggested: any[]
+  recent: any[]
   appliedJobIds: any[]
   banners: any[]
 }

@@ -6,9 +6,11 @@ type ApiResponse<T> = T | ErrorResponse
 export async function postApiCall<T>(
   url: string,
   body: object | FormData,
-  opts: { as?: 'json' | 'form'; timeoutMs?: number } = {}
+  opts: { as?: 'json' | 'form'; } = {}
 ): Promise<ApiResponse<T>> {
-  const { as = 'json', timeoutMs = 30000 } = opts;
+  const { as = 'json', } = opts;
+  console.log(`${API_URL}${url}`, JSON.stringify(body), "resssssssssssss")
+
   const token = await AsyncStorage.getItem("token")
   const isForm = as === 'form';
   // const controller = new AbortController();
@@ -27,8 +29,8 @@ export async function postApiCall<T>(
       body: isForm ? (body as FormData) : JSON.stringify(body),
       // signal: controller.signal,
     });
+    console.log(`${API_URL}${url}`, JSON.stringify(body), headers, "resssssssssssss")
     const text = await res.text(); // <-- better than res.json() first
-    console.log(text)
     let data: any = null;
     try { data = text ? JSON.parse(text) : null; } catch { data = text; }
 
@@ -38,7 +40,6 @@ export async function postApiCall<T>(
 
     return data;
   } catch (err: any) {
-
     return {
       success: false,
       message: err?.message ?? 'Network Error',

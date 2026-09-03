@@ -61,6 +61,7 @@ interface User {
     name: string;
     creator_data?: CreatorData;
     login_step: number,
+    messages_count: number
 }
 interface Recruiter {
     _id: string;

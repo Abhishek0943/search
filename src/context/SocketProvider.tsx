@@ -34,7 +34,6 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             });
             newSocket.connect()
             newSocket.on("connect", () => {
-                console.log("newSocket", newSocket)
                 setIsConnected(true);
             });
             setSocket(newSocket);

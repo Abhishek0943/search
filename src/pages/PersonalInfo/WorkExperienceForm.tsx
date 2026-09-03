@@ -21,7 +21,6 @@ import {
 import { ThemeContext } from '../../context/ThemeProvider';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NavigationBar } from '../../components';
-import imagePath from '../../assets/imagePath';
 import { CustomDropdown, formatDate } from './PersonalInfo';
 import { useAppDispatch } from '../../store';
 import { GetCountry, GetState, GetCity, AddWorkExperience, EditWorkExperience } from '../../reducer/jobsReducer';
@@ -53,16 +52,13 @@ const WorkExperienceForm = () => {
     country: 0,
     state: 0,
     city: 0,
-
     startDate: new Date(),
     endDate: new Date(),
     currentlyWorking: false,
-
     description: '',
   });
   useEffect(() => {
     if (!data?.id) return;
-
     setFormData(prev => ({
       ...prev,
       experienceTitle: data.title ?? '',

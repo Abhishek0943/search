@@ -24,8 +24,7 @@ const Routes = () => {
   const { isAuth, user } = useAppSelector(state => state.userStore);
   const [role, setRole] = useState<"seeker" | "recruiter">()
   const navigationRef = useRef<NavigationContainerRef<any>>(null);
-  const routeNameRef = useRef<string | undefined>();
-
+  const routeNameRef = useRef<string | null>(null);
   useEffect(() => {
     const set = async () => {
       const a = await AsyncStorage.getItem("role") as "seeker" | "recruiter"
@@ -35,7 +34,6 @@ const Routes = () => {
   }, [])
 
   const handleNotificationNavigation = async (data: any) => {
-    console.log("🚀 ~ handleNotificationNavigation ~ data:", data)
     if (!data) {
       navigationRef.current?.navigate(routes.NOTIFICATION);
     }

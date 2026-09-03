@@ -18,7 +18,7 @@ const Splash = () => {
   useEffect(() => {
     const login = async () => {
       // 500 ms delay
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve: any) => setTimeout(resolve, 500));
 
       const token = await AsyncStorage.getItem("token");
       const role = (await AsyncStorage.getItem("role")) as "seeker" | "recruiter";
@@ -43,9 +43,13 @@ const Splash = () => {
               navigation.reset({
                 index: 0,
                 routes: [{ name: routes.USERSTEPS }]
+              })
+            }
+            else {
+              navigation.reset({
+                index: 0,
+                routes: [{ name: routes.HOME }]
               });
-            } else {
-              navigation.navigate(routes.HOME);
             }
           } else {
             navigation.navigate(routes.WELCOME);

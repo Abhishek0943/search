@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import {TouchableOpacity} from 'react-native';
+import { TouchableOpacity, ViewStyle } from 'react-native';
 import { responsiveWidth } from 'react-native-responsive-dimensions';
 import { ThemeContext } from '../context/ThemeProvider';
 import Text from './Text';
@@ -7,12 +7,12 @@ import Text from './Text';
 type ButtonProps = {
   label: string;
   backgroundColor?: string;
-    onPress?: () => void;
+  onPress?: () => void;
+  style?: ViewStyle
 };
 
-const Button = ({ label, backgroundColor, onPress = () => {} }: ButtonProps) => {
+const Button = ({ style = {}, label, backgroundColor, onPress = () => { } }: ButtonProps) => {
   const { colors } = useContext(ThemeContext);
-
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -23,6 +23,7 @@ const Button = ({ label, backgroundColor, onPress = () => {} }: ButtonProps) => 
         backgroundColor: backgroundColor || colors.primary,
         height: 'auto',
         borderRadius: 15,
+        ...style
       }}
     >
       <Text

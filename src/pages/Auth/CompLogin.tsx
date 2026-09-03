@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react'
 import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, TouchableOpacity, View } from 'react-native'
-import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
-import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native'
+import { responsiveFontSize, responsiveHeight, responsiveScreenHeight, responsiveWidth } from 'react-native-responsive-dimensions'
+import { ParamListBase, useNavigation } from '@react-navigation/native'
 import imagePath from '../../assets/imagePath'
 import InputWithLabel from '../../components/InPutWithLabel'
 import Text from '../../components/Text'
@@ -9,8 +9,9 @@ import { ThemeContext } from '../../context/ThemeProvider'
 import { routes } from '../../constants/values'
 import Button from '../../components/Button'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 const CompLogin = () => {
-    const navigation = useNavigation<NavigationProp<ParamListBase>>();
+    const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
     const [hidePassword, setHidePassword] = useState(false);
     const [user, setUser] = useState<{
         email: string,
@@ -26,7 +27,7 @@ const CompLogin = () => {
     const insets = useSafeAreaInsets();
     return (
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flex: 1, height: responsiveHeight(100) }}>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ height: responsiveScreenHeight(100) - insets.bottom, }}>
                 <View style={{ height: responsiveHeight(100), width: responsiveWidth(100), flex: 1, }}>
                     <Image style={{ height: "100%", width: "100%", }} source={require("../Welcome/BgGradiant.png")} />
                     <View style={{ position: "absolute", paddingTop: insets.top, paddingBottom: insets.bottom, paddingHorizontal: responsiveWidth(5), top: 0, left: 0, height: responsiveHeight(100), width: responsiveWidth(100), }}>
@@ -65,9 +66,7 @@ const CompLogin = () => {
                             backgroundColor={colors.compPrimary}
                             onPress={() => {
                                 //   dispatch(LoginByPassword({ email: user.email, password: user.password })).unwrap().then(() => {
-                                //     console.log("login successfully")
                                 //   }).catch((error) => {
-                                //     console.log("login failed", error)
                                 //   })
                             }}
                         />
@@ -82,7 +81,7 @@ const CompLogin = () => {
                                 <Image style={{ height: "100%", width: "100%", }} source={require("./GoogleButton.png")} />
                             </Pressable>
                         </View>
-                        <Pressable style={{ width: responsiveWidth(90), marginTop: responsiveHeight(2.5), aspectRatio: 350 / 66 }}>
+                        <Pressable onPress={() => { navigation.replace(routes.LOGIN) }} style={{ width: responsiveWidth(90), marginTop: responsiveHeight(2.5), aspectRatio: 350 / 66 }}>
                             <Image style={{ height: "100%", width: "100%", }} source={require("./SweechToEmploye.png")} />
                         </Pressable>
                         <View style={{ marginTop: responsiveHeight(2), flexDirection: "row", justifyContent: 'center' }}>

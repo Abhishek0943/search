@@ -25,7 +25,6 @@ import { useAppDispatch } from '../../store';
 import { GetCountry, GetState, GetCity, AddWorkExperience, UploadCV } from '../../reducer/jobsReducer';
 import { pick, types, keepLocalCopy, } from '@react-native-documents/picker';
 // If you use react-native-date-picker
-import DatePicker from 'react-native-date-picker';
 import { Header } from '../Company/Company';
 import { useAlert } from '../../context/AlertContext';
 import { CustomTextInput } from '../../components';
