@@ -17,7 +17,7 @@ export type DropdownOption = {
     name: string;
 };
 
-type SingleProps = {
+type SingleProps = { 
     multiSelect: false;
     selectedId: string;
     onSelect: (id: string) => void;
@@ -41,6 +41,7 @@ type Props = CommonProps & (SingleProps | MultiProps);
 const SearchSelectDropdown: React.FC<Props> = (props) => {
     const { colors } = useContext(ThemeContext);
     const { label, options, placeholder = 'Search...', maxDropdownHeight = 22 } = props;
+    console.log(props, "hii")
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState('');
     const [singleSelectedName, setSingleSelectedName] = useState(!props.multiSelect ? options.find(o => o.id === props.selectedId)?.name : '')
