@@ -336,9 +336,7 @@ import {
     useRoute,
     RouteProp,
 } from '@react-navigation/native';
-import {
-    RecruiterRecruiterReSentOtp,
-} from '../../reducer/recruiterReducer';
+import { ComOtpVerify, ComResetPassword, ForgetPassword, OtpVerify, RecruiterForgetPassword, RecruiterLoginByPassword, RecruiterRecruiterReSentOtp, ResetPassword } from '../../reducer/recruiterReducer';
 import { useAlert } from '../../context/AlertContext';
 import Button from '../../components/Button';
 import { CompanyVerification, UserReSentOtp, UserVerification } from '../../reducer/userReducer'
@@ -352,7 +350,14 @@ const ForgotPassword = () => {
     const navigation =
         useNavigation<NativeStackNavigationProp<ParamListBase>>();
     const [hidePassword, setHidePassword] = useState(true);
-
+const [role, setRole] = useState<"seeker" | "recruiter">()
+  useEffect(() => {
+    const set = async () => {
+      const a = await AsyncStorage.getItem("role") as "seeker" | "recruiter"
+      setRole(a)
+    }
+    set()
+  }, [])
     const route = useRoute<RouteProp<ParamListBase>>();
 
     const { colors } = useContext(ThemeContext);
