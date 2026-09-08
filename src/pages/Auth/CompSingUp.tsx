@@ -24,6 +24,7 @@ import Text from '../../components/Text';
 import { InPutWithLabel, CustomTextInput, OtpInput } from '../../components';
 import { useAppDispatch } from '../../store';
 import {
+    RecruiterProfile,
     RecruiterRecruiterReSentOtp,
     RecruiterRegister,
 } from '../../reducer/recruiterReducer';
@@ -31,10 +32,10 @@ import { useAlert } from '../../context/AlertContext';
 import Button from '../../components/Button';
 import { CompanyVerification, UserRegister, UserReSentOtp, UserVerification } from '../../reducer/userReducer'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { Industries, ProfileData } from '../../reducer/jobsReducer'
+import { ProfileData } from '../../reducer/jobsReducer'
 import { routes } from '../../constants/values';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import SearchSelectDropdown from '../../components/SearchSelectDropdown';
+
 const CompSingUp = () => {
     const { colors } = useContext(ThemeContext);
     return (
@@ -71,6 +72,7 @@ const getPasswordStrength = (
     const hasNumberOrSymbol = /[\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(
         password,
     );
+
     const hasUpperCase = /[A-Z]/.test(password);
     const hasLowerCase = /[a-z]/.test(password);
 
@@ -222,44 +224,75 @@ export const ComponentSingUp = ({
     type: 'comp' | 'jobSeeker';
     emailText?: string;
 }) => {
-    const staffSizeOptions = [
-        { id: '1', name: '1–10 employees' },
-        { id: '2', name: '11–50 employees' },
-        { id: '3', name: '51–200 employees' },
-        { id: '4', name: '201–500 employees' },
-        { id: '5', name: '501–1,000 employees' },
-        { id: '6', name: '1,001–5,000 employees' },
-        { id: '7', name: '5,001+ employees' },
-    ];
-
     const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
     const { colors } = useContext(ThemeContext);
     const [hidePassword, setHidePassword] = useState(false);
     const [hideConfirmPassword, setHideConfirmPassword] = useState(false);
-    const [industries, setIndustries] = useState([]);
     const [user, setUser] = useState<{
-        industryIds: string[];
-        availabilityIds: string[];
-        abn: string;
-        businessaddress: string;
-        trendingname: string;
         email: string,
         password: string,
         confirmPassword: string,
         mobile: string,
-        aboutCompany: string
     }>({
-        industryIds: [],
-        aboutCompany: '',
-        availabilityIds: [],
-        abn: '',
-        businessaddress: '',
-        trendingname: '',
         email: '',
         password: '',
         confirmPassword: '',
         mobile: ''
     });
+    const checkCompanyRegistration = async () => {
+        try {
+            const profileRes: any = await dispatch(
+                RecruiterProfile()
+            ).unwrap();
+
+            console.log(
+                "Company Profile:",
+                JSON.stringify(profileRes, null, 2)
+            );
+
+            if (!profileRes.success) {
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: routes.DETAILS }],
+                });
+                return;
+            }
+
+            const company =
+                profileRes.data ||
+                profileRes.company ||
+                profileRes.recruiter;
+
+            const detailsCompleted =
+                !!company?.name &&
+                !!company?.location &&
+                !!company?.no_of_employees &&
+                !!company?.industry_id;
+
+            if (detailsCompleted) {
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: routes.HOME }],
+                });
+            } else {
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: routes.DETAILS }],
+                });
+            }
+
+        } catch (error) {
+            console.log(
+                "Company profile check error:",
+                error
+            );
+
+            navigation.reset({
+                index: 0,
+                routes: [{ name: routes.DETAILS }],
+            });
+        }
+    };
     const [countryCode, setCountryCode] = useState("");
     const handleInputChange = (data: { name: string; value: string }) => {
         setUser(prev => ({ ...prev, [data.name]: data.value }));
@@ -373,7 +406,7 @@ export const ComponentSingUp = ({
                         <Pressable style={{ width: responsiveWidth(100), marginVertical: responsiveHeight(2.5), aspectRatio: 350 / 1, position: "relative", right: responsiveWidth(5), }}>
                             <Image style={{ height: "100%", width: "100%", resizeMode: "contain" }} source={require("./Devider2.png")} />
                         </Pressable>
-                        {/* <Button
+                        <Button
                             label="Send Verification Code"
                             backgroundColor={mainColor}
                             onPress={() => {
@@ -405,14 +438,6 @@ export const ComponentSingUp = ({
 
                                 }
                             }}
-                        /> */}
-                        <Button
-                            label="Send Verification Code"
-                            backgroundColor={mainColor}
-                            onPress={() => {
-                                setStep(3)
-                            }
-                            }
                         />
 
                     </>
@@ -508,7 +533,7 @@ export const ComponentSingUp = ({
                                 {
                                     remainingSeconds === 0 ?
                                         <Text onPress={() => {
-                                            if (type = "jobSeeker") {
+                                            if (type === "jobSeeker") {
                                                 dispatch(UserReSentOtp({ email: user.email })).unwrap().then((res) => {
                                                     if (res.success) {
                                                         startTimer()
@@ -590,12 +615,30 @@ export const ComponentSingUp = ({
                                             }
                                         });
                                 } else {
-                                    dispatch(CompanyVerification({ email: user.email, code: a }))
+                                    dispatch(
+                                        CompanyVerification({
+                                            email: user.email,
+                                            code: a,
+                                        })
+                                    )
                                         .unwrap()
                                         .then(async (res) => {
                                             if (res.success) {
-                                                setStep(3)
-                                                await AsyncStorage.setItem('token', res.data.token)
+
+                                                if (res.data?.token) {
+                                                    await AsyncStorage.setItem(
+                                                        'token',
+                                                        res.data.token
+                                                    );
+                                                }
+
+                                                await AsyncStorage.setItem(
+                                                    'role',
+                                                    'recruiter'
+                                                );
+
+                                                await checkCompanyRegistration();
+
                                             } else {
                                                 showAlert({
                                                     title: "Error",
@@ -608,676 +651,6 @@ export const ComponentSingUp = ({
                         />
                     </>
                 )
-            case 3:
-                return (
-                    <>
-                        <View
-                            style={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                gap: responsiveWidth(4),
-                            }}
-                        >
-                            <Pressable
-                                onPress={() => setStep(2)}
-                                style={{
-                                    width: responsiveWidth(2.8),
-                                    aspectRatio: 1 / 2,
-                                }}
-                            >
-                                <Image
-                                    style={{
-                                        height: '100%',
-                                        width: '100%',
-                                    }}
-                                    source={imagePath.leftAngle}
-                                />
-                            </Pressable>
-
-                            <View>
-                                <Text
-                                    style={{
-                                        color: mainColor,
-                                        fontSize: responsiveFontSize(1.8),
-                                        fontWeight: '800',
-                                    }}
-                                >
-                                    Step 2 of 3
-                                </Text>
-
-                                <Text
-                                    style={{
-                                        color: secondaryColor,
-                                        lineHeight: responsiveFontSize(2.6),
-                                        fontSize: responsiveFontSize(3),
-                                        fontWeight: '800',
-                                    }}
-                                >
-                                    Your business
-                                </Text>
-                            </View>
-                        </View>
-
-                        <View
-                            style={{
-                                width: responsiveWidth(90),
-                                marginTop: responsiveHeight(2),
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                gap: responsiveWidth(1.5),
-                                marginBottom: responsiveHeight(1),
-                            }}
-                        >
-                            {[1, 2, 3].map(i => (
-                                <View
-                                    key={i}
-                                    style={{
-                                        flex: 1,
-                                        height: 5,
-                                        borderRadius: 2,
-                                        backgroundColor:
-                                            i <= step ? mainColor : colors.gray,
-                                    }}
-                                />
-                            ))}
-                        </View>
-
-                        <Pressable
-                            style={{
-                                width: responsiveWidth(100),
-                                marginTop: responsiveHeight(2.5),
-                                position: 'relative',
-                                right: responsiveWidth(5),
-                                aspectRatio: 350 / 1,
-                            }}
-                        >
-                            <Image
-                                style={{
-                                    height: '100%',
-                                    width: '100%',
-                                    resizeMode: 'contain',
-                                }}
-                                source={require('./Devider2.png')}
-                            />
-                        </Pressable>
-
-                        <ScrollView
-                            showsVerticalScrollIndicator={false}
-                            keyboardShouldPersistTaps="handled"
-                            nestedScrollEnabled
-                            contentContainerStyle={{
-                                paddingBottom: responsiveHeight(5),
-                            }}
-                        >
-                            <Text
-                                style={{
-                                    color: colors.textSecondary,
-                                    lineHeight: responsiveFontSize(2.6),
-                                    fontSize: responsiveFontSize(1.9),
-                                    fontWeight: '600',
-                                    marginTop: responsiveHeight(1.5),
-                                }}
-                            >
-                                This is what appears on every job ad.
-                            </Text>
-
-                            {/* ABN */}
-                            <InPutWithLabel
-                                inputContainerStyle={{
-                                    marginBottom: responsiveHeight(0.5),
-                                }}
-                                mainColor={mainColor}
-                                secondaryColor={secondaryColor}
-                                label="ABN"
-                                value={user.abn}
-                                onChangeText={text =>
-                                    handleInputChange({
-                                        name: 'abn',
-                                        value: text,
-                                    })
-                                }
-                                placeholder="51 824 753 556"
-                            />
-
-                            {/* ACN */}
-                            <View
-                                style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'baseline',
-                                    gap: responsiveWidth(1),
-                                    marginBottom: responsiveHeight(0.5),
-                                    marginTop: responsiveHeight(1),
-                                }}
-                            >
-                                <Text
-                                    style={{
-                                        color: secondaryColor,
-                                        fontSize: responsiveFontSize(1.8),
-                                        fontWeight: '700',
-                                    }}
-                                >
-                                    ACN
-                                </Text>
-
-                                <Text
-                                    style={{
-                                        fontSize: responsiveFontSize(1.2),
-                                        fontWeight: '400',
-                                        lineHeight: responsiveFontSize(1.9),
-                                        color: colors.textSecondary,
-                                    }}
-                                >
-                                    (Optional)
-                                </Text>
-                            </View>
-
-                            <View
-                                style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    borderWidth: 1.5,
-                                    borderRadius: 15,
-                                    borderColor: colors.surfaces,
-                                    borderStyle: 'dashed',
-                                    height: responsiveHeight(6),
-                                    paddingHorizontal: responsiveWidth(4),
-                                    marginBottom: responsiveHeight(1),
-                                }}
-                            >
-                                <CustomTextInput
-                                    style={{
-                                        flex: 1,
-                                        fontSize: responsiveFontSize(2),
-                                        fontWeight: '400',
-                                        color: colors.textPrimary,
-                                        paddingVertical: 0,
-                                    }}
-                                    value={user.mobile}
-                                    onChangeText={(text: string) =>
-                                        handleInputChange({
-                                            name: 'mobile',
-                                            value: text,
-                                        })
-                                    }
-                                    placeholder="ACN"
-                                    placeholderTextColor={colors.placeholder}
-                                    keyboardType="number-pad"
-                                />
-                            </View>
-
-                            {/* Trading Name */}
-                            <InPutWithLabel
-                                inputContainerStyle={{
-                                    marginBottom: responsiveHeight(0.5),
-                                }}
-                                mainColor={mainColor}
-                                secondaryColor={secondaryColor}
-                                label="Trading name"
-                                value={user.trendingname}
-                                onChangeText={text =>
-                                    handleInputChange({
-                                        name: 'trendingname',
-                                        value: text,
-                                    })
-                                }
-                                placeholder="Roza Mexicano"
-                            />
-
-                            <Text
-                                style={{
-                                    color: colors.textSecondary,
-                                    lineHeight: responsiveFontSize(2.6),
-                                    fontSize: responsiveFontSize(1.9),
-                                    fontWeight: '600',
-                                    marginBottom: responsiveHeight(1),
-                                }}
-                            >
-                                The name candidates see on every job ad.
-                            </Text>
-
-                            {/* Business Address */}
-                            <InPutWithLabel
-                                inputContainerStyle={{
-                                    marginBottom: responsiveHeight(0.5),
-                                }}
-                                mainColor={mainColor}
-                                secondaryColor={secondaryColor}
-                                label="Business address"
-                                value={user.businessaddress}
-                                onChangeText={text =>
-                                    handleInputChange({
-                                        name: 'businessaddress',
-                                        value: text,
-                                    })
-                                }
-                                placeholder="142 The Parade, Norwood SA 5067"
-                            />
-
-                            {/* Staff Size */}
-                            <SearchSelectDropdown
-                                label="Staff Size"
-                                options={staffSizeOptions}
-                                placeholder="Search staff size..."
-                                multiSelect={true}
-                                selectedIds={user.availabilityIds}
-                                onToggle={(id: string) => {
-                                    setUser(prev => ({
-                                        ...prev,
-
-                                        // Staff size should only have one selected value
-                                        availabilityIds:
-                                            prev.availabilityIds.includes(id)
-                                                ? []
-                                                : [id],
-                                    }));
-                                }}
-                            />
-                        </ScrollView>
-
-                        <View style={{ flex: 1 }}>
-                        </View>
-                        <Pressable style={{ width: responsiveWidth(100), marginTop: responsiveHeight(2.5), aspectRatio: 350 / 1, position: "relative", right: responsiveWidth(5), }}>
-                            <Image style={{ height: "100%", width: "100%", resizeMode: "contain" }} source={require("./Devider2.png")} />
-                        </Pressable>
-                        <Button
-                            label="Continue"
-                            backgroundColor={mainColor}
-                            onPress={() => {
-
-                                setStep(4)
-
-                            }}
-                        />
-                        <Text style={{ color: colors.textSecondary, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '600', marginTop: responsiveHeight(1), textAlign: 'center' }}>Next Your venue</Text>
-                    </>
-                );
-
-            case 4:
-                return (
-                    <>
-                        <View
-                            style={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                gap: responsiveWidth(4),
-                            }}
-                        >
-                            <Pressable
-                                onPress={() => setStep(3)}
-                                style={{
-                                    width: responsiveWidth(2.8),
-                                    aspectRatio: 1 / 2,
-                                }}
-                            >
-                                <Image
-                                    style={{
-                                        height: '100%',
-                                        width: '100%',
-                                    }}
-                                    source={imagePath.leftAngle}
-                                />
-                            </Pressable>
-
-                            <View>
-                                <Text
-                                    style={{
-                                        color: mainColor,
-                                        fontSize: responsiveFontSize(1.8),
-                                        fontWeight: '800',
-                                    }}
-                                >
-                                    Step 3 of 3
-                                </Text>
-
-                                <Text
-                                    style={{
-                                        color: secondaryColor,
-                                        lineHeight: responsiveFontSize(2.6),
-                                        fontSize: responsiveFontSize(3),
-                                        fontWeight: '800',
-                                    }}
-                                >
-                                    Your venue
-                                </Text>
-                            </View>
-                        </View>
-
-                        <View
-                            style={{
-                                width: responsiveWidth(90),
-                                marginTop: responsiveHeight(2),
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                gap: responsiveWidth(1.5),
-                                marginBottom: responsiveHeight(1),
-                            }}
-                        >
-                            {[1, 2, 3].map(i => (
-                                <View
-                                    key={i}
-                                    style={{
-                                        flex: 1,
-                                        height: 5,
-                                        borderRadius: 2,
-                                        backgroundColor:
-                                            i <= step ? mainColor : colors.gray,
-                                    }}
-                                />
-                            ))}
-                        </View>
-
-                        <Pressable
-                            style={{
-                                width: responsiveWidth(100),
-                                marginTop: responsiveHeight(2.5),
-                                position: 'relative',
-                                right: responsiveWidth(5),
-                                aspectRatio: 350 / 1,
-                            }}
-                        >
-                            <Image
-                                style={{
-                                    height: '100%',
-                                    width: '100%',
-                                    resizeMode: 'contain',
-                                }}
-                                source={require('./Devider2.png')}
-                            />
-                        </Pressable>
-
-                        <ScrollView
-                            showsVerticalScrollIndicator={false}
-                            keyboardShouldPersistTaps="handled"
-                            nestedScrollEnabled
-                            contentContainerStyle={{
-                                paddingBottom: responsiveHeight(5),
-                            }}
-                        >
-                            <Text
-                                style={{
-                                    color: colors.textSecondary,
-                                    lineHeight: responsiveFontSize(2.6),
-                                    fontSize: responsiveFontSize(1.9),
-                                    fontWeight: '600',
-                                    marginTop: responsiveHeight(1.5),
-                                }}
-                            >
-                                Only the industry is needed. The rest can wait.
-                            </Text>
-
-                            <View
-                                style={{
-                                    width: responsiveWidth(90),
-                                    marginTop: responsiveHeight(1),
-                                    marginBottom: responsiveHeight(2),
-                                }}
-                            >
-                                <SearchSelectDropdown
-                                    label="Industry"
-                                    options={industries} 
-                                    placeholder="Search or add an industry"
-                                    multiSelect={true}
-                                    selectedIds={user.industryIds}
-                                    onToggle={(id: string) => {
-                                        setUser(prev => ({
-                                            ...prev,
-                                            industryIds: prev.industryIds.includes(id)
-                                                ? prev.industryIds.filter(itemId => itemId !== id)
-                                                : [...prev.industryIds, id],
-                                        }));
-                                    }}
-                                />
-                            </View>
-
-
-                            <View
-                                style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'baseline',
-                                    gap: responsiveWidth(1),
-                                    marginBottom: responsiveHeight(0.5),
-                                    marginTop: responsiveHeight(1),
-                                }}
-                            >
-                                <Text
-                                    style={{
-                                        color: secondaryColor,
-                                        fontSize: responsiveFontSize(1.8),
-                                        fontWeight: '700',
-                                    }}
-                                >
-                                    About the company
-                                </Text>
-                            </View>
-
-                            <View
-                                style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    borderWidth: 1.5,
-                                    borderRadius: 15,
-                                    borderColor: colors.surfaces,
-                                    borderStyle: 'dashed',
-                                    height: responsiveHeight(6),
-                                    paddingHorizontal: responsiveWidth(4),
-                                    marginBottom: responsiveHeight(1),
-                                }}
-                            >
-                                <CustomTextInput
-                                    style={{
-                                        flex: 1,
-                                        fontSize: responsiveFontSize(1.9),
-                                        fontWeight: '400',
-                                        color: colors.textPrimary,
-                                        minHeight: responsiveHeight(25),
-                                        lineHeight: responsiveFontSize(2.4),
-                                        paddingVertical: responsiveHeight(1),
-                                    }}
-                                    value={user.aboutCompany}
-                                    onChangeText={(text: string) => {
-                                        if (text.length <= 300) {
-                                            handleInputChange({
-                                                name: 'aboutCompany',
-                                                value: text,
-                                            });
-                                        }
-                                    }}
-                                    placeholder={`Two or three lines on who you are and what\nit is like to work here.`} placeholderTextColor={colors.placeholder}
-                                    numberOfLines={2}
-                                    multiline={true}
-                                    maxLength={300}
-                                />
-                                <Text
-                                    style={{
-                                        position: 'absolute',
-                                        right: responsiveWidth(3),
-                                        bottom: responsiveHeight(0.7),
-                                        color: colors.textSecondary,
-                                        fontSize: responsiveFontSize(1.2),
-                                        fontWeight: '400',
-                                    }}
-                                >
-                                    {user.aboutCompany.length} / 300
-                                </Text>
-                            </View>
-
-                            <View
-                                style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'baseline',
-                                    gap: responsiveWidth(1),
-                                    marginBottom: responsiveHeight(0.5),
-                                    marginTop: responsiveHeight(1),
-                                }}
-                            >
-                                <Text
-                                    style={{
-                                        color: secondaryColor,
-                                        fontSize: responsiveFontSize(1.8),
-                                        fontWeight: '700',
-                                    }}
-                                >
-                                    Logo
-                                </Text>
-
-                            </View>
-
-                            <View
-                                style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    borderWidth: 1.5,
-                                    borderRadius: 15,
-                                    borderColor: colors.surfaces,
-                                    borderStyle: 'dashed',
-                                    height: responsiveHeight(6),
-                                    paddingHorizontal: responsiveWidth(4),
-                                    marginBottom: responsiveHeight(1),
-                                }}
-                            >
-                                <CustomTextInput
-                                    style={{
-                                        flex: 1,
-                                        fontSize: responsiveFontSize(1.8),
-                                        fontWeight: '400',
-                                        color: colors.textPrimary,
-                                        minHeight: responsiveHeight(25),
-                                        lineHeight: responsiveFontSize(2.4),
-                                        paddingVertical: responsiveHeight(1),
-                                    }}
-                                    value={user.aboutCompany}
-                                    onChangeText={(text: string) => {
-                                        if (text.length <= 300) {
-                                            handleInputChange({
-                                                name: 'aboutCompany',
-                                                value: text,
-                                            });
-                                        }
-                                    }}
-                                    placeholder="Square image works best — shows on every ad."
-                                    placeholderTextColor={colors.placeholder}
-                                    numberOfLines={2}
-                                />
-                            </View>
-
-                            <View
-                                style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'baseline',
-                                    gap: responsiveWidth(1),
-                                    marginBottom: responsiveHeight(0.5),
-                                    marginTop: responsiveHeight(1),
-                                }}
-                            >
-                                <Text
-                                    style={{
-                                        color: secondaryColor,
-                                        fontSize: responsiveFontSize(1.8),
-                                        fontWeight: '700',
-                                    }}
-                                >
-                                    Workplace photos
-                                </Text>
-
-                            </View>
-
-                            <View
-                                style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    borderWidth: 1.5,
-                                    borderRadius: 15,
-                                    borderColor: colors.surfaces,
-                                    borderStyle: 'dashed',
-                                    height: responsiveHeight(6),
-                                    paddingHorizontal: responsiveWidth(4),
-                                    marginBottom: responsiveHeight(1),
-                                }}
-                            >
-                                <CustomTextInput
-                                    style={{
-                                        flex: 1,
-                                        fontSize: responsiveFontSize(1.8),
-                                        fontWeight: '400',
-                                        color: colors.textPrimary,
-                                        minHeight: responsiveHeight(25),
-                                        lineHeight: responsiveFontSize(2.4),
-                                        paddingVertical: responsiveHeight(1),
-                                    }}
-                                    value={user.aboutCompany}
-                                    onChangeText={(text: string) => {
-                                        if (text.length <= 300) {
-                                            handleInputChange({
-                                                name: 'aboutCompany',
-                                                value: text,
-                                            });
-                                        }
-                                    }}
-                                    placeholder="Up to 5. The floor, the team, a busy night."
-                                    placeholderTextColor={colors.placeholder}
-                                    numberOfLines={2}
-                                />
-                            </View>
-                        </ScrollView>
-
-                        <View style={{ flex: 1 }}>
-                        </View>
-                        <Pressable style={{ width: responsiveWidth(100), marginTop: responsiveHeight(2.5), aspectRatio: 350 / 1, position: "relative", right: responsiveWidth(5), }}>
-                            <Image style={{ height: "100%", width: "100%", resizeMode: "contain" }} source={require("./Devider2.png")} />
-                        </Pressable>
-                        <Button
-                            label="Finish"
-                            backgroundColor={mainColor}
-                            onPress={() => {
-                                const a = otp.join("")
-                                if (type === "jobSeeker") {
-                                    dispatch(UserVerification({ email: user.email, code: a }))
-                                        .unwrap()
-                                        .then(async (res) => {
-                                            if (res.success) {
-                                                showAlert({
-                                                    title: "Success",
-                                                    message: "Your account registered successfully",
-                                                });
-                                                await AsyncStorage.setItem('token', res.data.token)
-                                                dispatch(ProfileData()).unwrap().then((res) => {
-                                                    if (res.success) {
-                                                        if (res.data.login_step === 1) {
-                                                            navigation.reset({
-                                                                index: 0,
-                                                                routes: [{ name: routes.USERSTEPS }]
-                                                            });
-
-                                                        }
-                                                    }
-                                                });
-                                            } else {
-                                                showAlert({
-                                                    title: "Error",
-                                                    message: res.message,
-                                                });
-                                            }
-                                        });
-                                } else {
-                                    dispatch(CompanyVerification({ email: user.email, code: a }))
-                                        .unwrap()
-                                        .then(async (res) => {
-                                            if (res.success) {
-                                                setStep(4)
-                                                await AsyncStorage.setItem('token', res.data.token)
-                                            } else {
-                                                showAlert({
-                                                    title: "Error",
-                                                    message: res.message,
-                                                });
-                                            }
-                                        });
-                                }
-                            }}
-                        />
-                        <Text style={{ color: colors.compPrimary, borderWidth: 1, lineHeight: responsiveFontSize(3), fontSize: responsiveFontSize(2), fontWeight: '900', marginTop: responsiveHeight(1), textAlign: 'center' }}>Skip - finish this step</Text>
-                    </>
-                );
         }
     };
     useEffect(() => {
@@ -1301,26 +674,6 @@ export const ComponentSingUp = ({
         };
         a();
     }, []);
-
-    useEffect(() => {
-        dispatch(Industries())
-            .unwrap()
-            .then(res => {
-                console.log('Industries API:', res);
-
-                if (res?.success) {
-                    const industryList = (res.data || []).map((item: any) => ({
-                        id: String(item.id),
-                        name: item.name,
-                    }));
-
-                    setIndustries(industryList);
-                }
-            })
-            .catch(error => {
-                console.log('Industries API Error:', error);
-            });
-    }, [dispatch]);
 
     return (
         <>

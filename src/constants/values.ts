@@ -1,9 +1,9 @@
 
 export const routes: RoutesType = {
+    COMPLOGIN: "COMPLOGIN",
     SPLASH: "SPLASH",
     WELCOME: "WELCOME",
     WELCOME2: "WELCOME2",
-    COMPLOGIN: "COMPLOGIN",
     USERSTEPS: "USERSTEPS",
     COMPSINGUP: "COMPSINGUP",
     RECRUITERPROFILE: "RECRUITERPROFILE",
@@ -47,11 +47,10 @@ export const routes: RoutesType = {
     LANGUAGEFORM: "LANGUAGEFORM",
     ACTIVECANDIDATE: "ACTIVECANDIDATE",
     BROWSER: "BROWSER",
-
-
-
+    DETAILS: "DETAILS"
 }
 export default interface RoutesType {
+    DETAILS: "DETAILS",
     SPLASH: "SPLASH",
     EDUCATION: "EDUCATION",
     BLOGPAGE: "BLOGPAGE",

@@ -10,9 +10,18 @@ import { routes } from '../../constants/values'
 import Button from '../../components/Button'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { ComLoginByPassword } from '../../reducer/recruiterReducer'
+import { useAppDispatch } from '../../store';
+import { useAlert } from '../../context/AlertContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { RecruiterProfile } from '../../reducer/recruiterReducer';
+
 const CompLogin = () => {
     const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
     const [hidePassword, setHidePassword] = useState(false);
+    const dispatch = useAppDispatch();
+    const { showAlert } = useAlert();
+    const [loading, setLoading] = useState(false);
     const [user, setUser] = useState<{
         email: string,
         password: string
@@ -21,6 +30,160 @@ const CompLogin = () => {
         password: '',
     });
     const { colors } = useContext(ThemeContext);
+
+    const handleLogin = async () => {
+        const email = user.email.trim();
+
+        if (!email) {
+            showAlert({
+                title: "Validation",
+                message: "Please enter your work email.",
+            });
+            return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailRegex.test(email)) {
+            showAlert({
+                title: "Validation",
+                message: "Please enter a valid email address.",
+            });
+            return;
+        }
+
+        if (!user.password) {
+            showAlert({
+                title: "Validation",
+                message: "Please enter your password.",
+            });
+            return;
+        }
+
+        if (loading) return;
+
+        try {
+            setLoading(true);
+
+            const res = await dispatch(
+                ComLoginByPassword({
+                    email,
+                    password: user.password,
+                })
+            ).unwrap();
+
+            console.log(
+                "Company login:",
+                JSON.stringify(res, null, 2)
+            );
+
+            // Check response success first
+            if (!res.success) {
+                showAlert({
+                    title: "Login Failed",
+                    message: res.message || "Invalid email or password.",
+                });
+                return;
+            }
+
+            // Login successful
+            const token = res.data.token;
+
+            if (!token) {
+                showAlert({
+                    title: "Error",
+                    message: "Login successful but token was not received.",
+                });
+                return;
+            }
+
+            // Save token and role
+            await AsyncStorage.setItem("token", token);
+            await AsyncStorage.setItem("role", "recruiter");
+
+            // Check recruiter onboarding status
+            await checkCompanyRegistration();
+
+        } catch (error) {
+            console.log(
+                "Company login error:",
+                error
+            );
+
+            showAlert({
+                title: "Login Failed",
+                message:
+                    error instanceof Error
+                        ? error.message
+                        : "Something went wrong. Please try again.",
+            });
+
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+    const checkCompanyRegistration = async () => {
+        try {
+            const profileRes = await dispatch(
+                RecruiterProfile()
+            ).unwrap();
+
+            console.log(
+                "Company Profile:",
+                JSON.stringify(profileRes, null, 2)
+            );
+
+            // First check success
+            if (!profileRes.success) {
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: routes.DETAILS }],
+                });
+                return;
+            }
+
+            // Now TypeScript knows this is the successful response
+            const onboardingStep = profileRes.data.onboarding_step;
+
+            console.log("Onboarding Step:", onboardingStep);
+
+            if (onboardingStep === 1) {
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: routes.DETAILS }],
+                });
+                return;
+            }
+
+            if (onboardingStep === 2) {
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: routes.HOME }],
+                });
+                return;
+            }
+
+            // Unknown onboarding step
+            navigation.reset({
+                index: 0,
+                routes: [{ name: routes.DETAILS }],
+            });
+
+        } catch (error) {
+            console.log(
+                "Company profile check error:",
+                error
+            );
+
+            navigation.reset({
+                index: 0,
+                routes: [{ name: routes.DETAILS }],
+            });
+        }
+    };
+
     const handleInputChange = (data: { name: string; value: string }) => {
         setUser(prev => ({ ...prev, [data.name]: data.value }));
     };
@@ -37,7 +200,7 @@ const CompLogin = () => {
                         <View style={{ width: responsiveWidth(75), marginBottom: responsiveHeight(3), marginTop: responsiveHeight(3), aspectRatio: 238 / 120.5 }}>
                             <Image style={{ height: "100%", width: "100%", }} source={require("./LoginTop.png")} />
                         </View>
-                        <InputWithLabel label='Work Email' value={user.email} onChangeText={(text) => handleInputChange({ name: "email", value: text })} placeholder="Email" />
+                        <InputWithLabel label='Work Email' value={user.email} onChangeText={(text) => handleInputChange({ name: "email", value: text })} placeholder="Email" mainColor={''} secondaryColor={''} />
                         <InputWithLabel sideOption={() => {
                             return (
                                 <Text onPress={() => {
@@ -52,7 +215,7 @@ const CompLogin = () => {
                                     <Image style={{ width: responsiveWidth(2.8), aspectRatio: 20 / 11.4 }} source={imagePath.EyeOpen} />
                                 </TouchableOpacity>
                             )
-                        }} value={user.password} onChangeText={(text) => handleInputChange({ name: "password", value: text })} placeholder="Password" />
+                        }} value={user.password} onChangeText={(text) => handleInputChange({ name: "password", value: text })} placeholder="Password" mainColor={''} secondaryColor={''} />
                         <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveWidth(2), marginBottom: responsiveHeight(3) }}>
                             <Pressable style={{ width: responsiveWidth(4), aspectRatio: 1 / 1 }}>
                                 <Image style={{ height: "100%", width: "100%", }} source={imagePath.CompCheck} />
@@ -62,13 +225,9 @@ const CompLogin = () => {
                             </Text>
                         </View>
                         <Button
-                            label="Log in"
+                            label={loading ? "Logging in..." : "Log in"}
                             backgroundColor={colors.compPrimary}
-                            onPress={() => {
-                                //   dispatch(LoginByPassword({ email: user.email, password: user.password })).unwrap().then(() => {
-                                //   }).catch((error) => {
-                                //   })
-                            }}
+                            onPress={handleLogin}
                         />
                         <Pressable style={{ width: responsiveWidth(90), marginTop: responsiveHeight(2.5), aspectRatio: 350 / 16 }}>
                             <Image style={{ height: "100%", width: "100%", }} source={require("./Devider.png")} />

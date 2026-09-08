@@ -1,313 +1,3 @@
-// import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-// import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
-// import { ThemeContext } from '../../context/ThemeProvider';
-// import { NavigationProp, ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native';
-// import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions';
-// import { SignupStyle } from './Signup';
-// import Icon from '../../utils/Icon';
-// import { InPutWithLabel, OtpInput } from '../../components';
-// import imagePath from '../../assets/imagePath';
-// import Button from '../../components/Button';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
-// import { useAppDispatch } from '../../store';
-// import { ComOtpVerify, ComResetPassword, ForgetPassword, OtpVerify, RecruiterForgetPassword, RecruiterLoginByPassword, RecruiterRecruiterReSentOtp, ResetPassword } from '../../reducer/recruiterReducer';
-// import { UserReSentOtp } from '../../reducer/userReducer';
-// import { useAlert } from '../../context/AlertContext';
-
-// const ForgotPassword = () => {
-//   const { colors } = useContext(ThemeContext);
-//   const navigation = useNavigation<NavigationProp<ParamListBase>>()
-//   const [currentStep, setCurrentStep] = useState(1)
-//   const [userData, setUserData] = useState({
-//     username: "",
-//     password: "",
-//     confirmPassword: "",
-//     passwordVisible: false,
-//     cPasswordVisible: false,
-//     rememberMe: false
-
-//   })
-//   const [otp, setOtp] = useState<Array<string>>(Array(6).fill(''));
-//   const handleOtpChange = (newOtp: Array<string>) => {
-//     setOtp(newOtp);
-//   };
-//   const [remainingSeconds, setRemainingSeconds] = useState(60);
-//   const intervalRef = useRef<NodeJS.Timeout>(null);
-//   const [role, setRole] = useState<"seeker" | "recruiter">()
-//   useEffect(() => {
-//     const set = async () => {
-//       const a = await AsyncStorage.getItem("role") as "seeker" | "recruiter"
-//       setRole(a)
-//     }
-//     set()
-//   }, [])
-//   const startTimer = useCallback(() => {
-//     setRemainingSeconds(60);
-//     if (intervalRef.current) clearInterval(intervalRef.current);
-//     intervalRef.current = setInterval(() => {
-//       setRemainingSeconds(prev => {
-//         if (prev <= 1) {
-//           clearInterval(intervalRef.current!);
-//           return 0;
-//         }
-//         return prev - 1;
-//       });
-//     }, 1000);
-//   }, []);
-//   useFocusEffect(
-//     useCallback(() => {
-//       if (currentStep === 2) {
-//         startTimer();
-//       }
-//       return () => {
-//         if (intervalRef.current) clearInterval(intervalRef.current);
-//       };
-//     }, [currentStep, startTimer])
-//   );
-//   const dispatch = useAppDispatch()
-//   const { showAlert } = useAlert();
-
-//   const [loading, setLoading] = useState(false)
-//   const elemRender = () => {
-//     switch (currentStep) {
-//       case 1:
-//         return (
-//           <>
-//             <Text style={[SignupStyle.title, { fontSize: responsiveScreenFontSize(2.7), textAlign: "left", marginTop: responsiveScreenHeight(4) }]}>Forgot Password
-//             </Text>
-//             <Text style={[SignupStyle.description, { color: colors.darkGray, marginBottom: responsiveScreenHeight(2) }]}>
-//               Enter your Email address. We will send an OTP for verification in the next step
-//             </Text>
-//             <InPutWithLabel
-//               onChangeText={function (text: string): void {
-//                 setUserData({ ...userData, username: text })
-//               }}
-//               value={userData.username}
-//               label={'Enter Code'}
-//               placeholder='example@gmail.com'
-//               isRequired
-//             />
-//             <Button onPress={() => {
-//               setLoading(true)
-//               if (role === "recruiter") {
-//                 dispatch(RecruiterForgetPassword({ email: userData.username })).unwrap().then((res) => {
-//                   if (res.success) {
-//                     setCurrentStep(2)
-//                   }
-//                   else {
-//                     showAlert({
-//                       title: "Validation",
-//                       message: res.message,
-//                     })
-//                   }
-//                   setLoading(false)
-//                 })
-//               } else {
-//                 dispatch(ForgetPassword({ email: userData.username })).unwrap().then((res) => {
-//                   if (res.success) {
-//                     setCurrentStep(2)
-//                   }
-//                   else {
-//                     showAlert({
-//                       title: "Validation",
-//                       message: res.message,
-//                     })
-//                   }
-//                   setLoading(false)
-//                 })
-//               }
-
-//             }} isLoading={loading} label='Submit' style={{ marginTop: responsiveScreenHeight(2) }} isActive={true} />
-//             <View style={{ flexDirection: "row", marginTop: responsiveScreenHeight(2), justifyContent: "flex-start" }}>
-//               <Text style={[{
-//                 fontSize: responsiveScreenFontSize(1.8),
-//                 fontWeight: '500',
-//               }, { color: colors.darkGray, textAlign: "center" }]}>
-//                 Remember Password?
-//               </Text>
-//               <Text onPress={() => navigation.goBack()} style={[{
-//                 fontSize: responsiveScreenFontSize(1.8),
-//                 fontWeight: '500',
-//               }, { color: colors.primary, textAlign: "center" }]}>
-//                 {" "} Login to your account
-//               </Text>
-//             </View>
-//           </>
-//         )
-//       case 2:
-//         return (
-//           <>
-
-//             <Text style={[SignupStyle.title, { fontSize: responsiveScreenFontSize(2.7), textAlign: "left", marginTop: responsiveScreenHeight(4) }]}>You've got mail
-//             </Text>
-//             <Text style={[SignupStyle.description, { color: colors.darkGray, marginBottom: responsiveScreenHeight(1) }]}>
-//               We have sent the OTP verification code to {userData.username}. Check your email and enter the code below.
-//             </Text>
-//             <TouchableOpacity onPress={() => setCurrentStep(1)}>
-//               <Text style={{ color: colors.primary, fontSize: responsiveScreenFontSize(1.8), fontWeight: "600", marginBottom: responsiveScreenHeight(2) }}>Change Email</Text>
-//             </TouchableOpacity>
-//             <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Enter Code</Text>
-//             <OtpInput
-//               length={6}
-//               value={otp}
-//               disabled={false}
-//               onChange={handleOtpChange} />
-//             <View style={{ borderBottomColor: colors.surfaces, borderBottomWidth: .5, }}></View>
-//             <Button onPress={() => {
-//               setLoading(true)
-//               if (role === "recruiter") {
-//                 dispatch(ComOtpVerify({ email: userData.username, code: otp.join('') })).unwrap().then((res) => {
-//                   if (res.success) {
-//                     setCurrentStep(3)
-//                   }
-//                   else {
-//                     showAlert({
-//                       title: "Validation",
-//                       message: res.message,
-//                     })
-//                   }
-//                   setLoading(false)
-//                 })
-//               } else {
-//                 dispatch(OtpVerify({ email: userData.username, code: otp.join('') })).unwrap().then((res) => {
-//                   if (res.success) {
-//                     setCurrentStep(3)
-//                   }
-//                   else {
-//                     showAlert({
-//                       title: "Validation",
-//                       message: res.message,
-//                     })
-//                   }
-//                   setLoading(false)
-//                 })
-//               }
-
-//             }} isLoading={loading} label='Submit' style={{ marginTop: responsiveScreenHeight(2) }} isActive={true} />
-//             <View style={{ flexDirection: "row", marginTop: responsiveScreenHeight(2), justifyContent: "flex-start" }}>
-//               <Text style={[{
-//                 fontSize: responsiveScreenFontSize(1.8),
-//                 fontWeight: '500',
-//               }, { color: colors.darkGray, textAlign: "center" }]}>
-//                 Didn’t see your email?
-//               </Text>
-//               {
-//                 remainingSeconds <= 0 ? <Text onPress={() => {
-//                   startTimer();
-//                   if (role === "recruiter") {
-
-//                     dispatch(RecruiterRecruiterReSentOtp({ email: userData.username }))
-//                   } else {
-
-//                     dispatch(UserReSentOtp({ email: userData.username }))
-//                   }
-//                 }} style={[{
-//                   fontSize: responsiveScreenFontSize(1.8),
-//                   fontWeight: '500',
-//                 }, { color: colors.primary, textAlign: "center" }]}>
-//                   {" "} Resend
-//                 </Text> :
-//                   <Text style={[SignupStyle.description, { marginTop: 0, color: colors.primary, textAlign: "center", fontSize: responsiveScreenFontSize(1.8), }]}>
-//                     {" "} {remainingSeconds}
-
-//                   </Text>
-//               }
-
-//             </View>
-//           </>
-//         )
-//       case 3:
-//         return (
-//           <>
-//             <Text style={[SignupStyle.title, { fontSize: responsiveScreenFontSize(2.7), textAlign: "left", marginTop: responsiveScreenHeight(4) }]}>Reset your Password
-//             </Text>
-//             <Text style={[SignupStyle.description, { color: colors.darkGray, marginBottom: responsiveScreenHeight(2) }]}>
-//               Please select your country of origin for a better recommendations.
-//             </Text>
-//             <InPutWithLabel
-//               onChangeText={function (text: string): void {
-//                 setUserData({ ...userData, password: text })
-//               }}
-//               value={userData.password}
-//               label={'New Password'}
-//               placeholder='●●●●●●●●'
-//               isRequired
-//               secureText={!userData.passwordVisible}
-
-//               rightIcon={(color) => <Icon onPress={() => setUserData({ ...userData, passwordVisible: !userData.passwordVisible })} icon={{ type: "Feather", name: userData.passwordVisible ? 'eye' : 'eye-off' }} size={responsiveScreenFontSize(2.8)} style={{ color: colors.gray }} />}
-//             />
-//             <InPutWithLabel
-//               onChangeText={function (text: string): void {
-//                 setUserData({ ...userData, confirmPassword: text })
-//               }}
-//               value={userData.confirmPassword}
-//               label={'Confirm Password'}
-//               placeholder='●●●●●●●●'
-//               isRequired
-//               secureText={!userData.cPasswordVisible}
-//               rightIcon={(color) => <Icon onPress={() => setUserData({ ...userData, cPasswordVisible: !userData.cPasswordVisible })} icon={{ type: "Feather", name: userData.cPasswordVisible ? 'eye' : 'eye-off' }} size={responsiveScreenFontSize(2.8)} style={{ color: colors.gray }} />}
-//             />
-//             <Button onPress={() => {
-//               setLoading(true)
-//               if (role === "recruiter") {
-//                 dispatch(ComResetPassword({ email: userData.username, password: userData.password, password_confirmation: userData.confirmPassword })).unwrap().then(async (res) => {
-//                   if (res.success) {
-//                     await showAlert({
-//                       title: "Success",
-//                       message: "Password Reset Successfully",
-//                     })
-//                     navigation.goBack()
-//                   }
-//                   else {
-//                     showAlert({
-//                       title: "Validation",
-//                       message: res.message,
-//                     })
-//                   }
-//                   setLoading(false)
-//                 })
-//               } else {
-//                 dispatch(ResetPassword({ email: userData.username, password: userData.password, password_confirmation: userData.confirmPassword })).unwrap().then(async (res) => {
-//                   if (res.success) {
-//                     await showAlert({
-//                       title: "Success",
-//                       message: "Password Reset Successfully",
-//                     })
-//                     navigation.goBack()
-//                   }
-//                   else {
-//                     showAlert({
-//                       title: "Validation",
-//                       message: res.message,
-//                     })
-//                   }
-//                   setLoading(false)
-//                 })
-//               }
-//             }} isLoading={loading} label='Submit' style={{ marginTop: responsiveScreenHeight(2) }} isActive={true} />
-//           </>
-//         )
-
-//     }
-//   }
-//   return (
-//     <View style={{ flex: 1, backgroundColor: colors.background, paddingHorizontal: responsiveScreenWidth(5) }}>
-//       <View style={{ flexDirection: "row", marginTop: responsiveScreenHeight(2), alignItems: "center", gap: responsiveScreenWidth(10) }}>
-//         <TouchableOpacity onPress={() => navigation.goBack()}>
-//           <Image source={imagePath.backIcon} style={{ resizeMode: 'contain', transform: [{ scale: 1.1 }] }} />
-//         </TouchableOpacity>
-//         <View></View>
-//       </View>
-//       {elemRender()}
-//     </View>
-//   )
-// }
-
-// export default ForgotPassword
-
-// const styles = StyleSheet.create({})
-
-
 import {
     ParamListBase,
     useNavigation,
@@ -336,7 +26,6 @@ import {
     useRoute,
     RouteProp,
 } from '@react-navigation/native';
-import { ComOtpVerify, ComResetPassword, ForgetPassword, OtpVerify, RecruiterForgetPassword, RecruiterLoginByPassword, RecruiterRecruiterReSentOtp, ResetPassword } from '../../reducer/recruiterReducer';
 import { useAlert } from '../../context/AlertContext';
 import Button from '../../components/Button';
 import { CompanyVerification, UserReSentOtp, UserVerification } from '../../reducer/userReducer'
@@ -344,20 +33,29 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { ProfileData } from '../../reducer/jobsReducer'
 import { routes } from '../../constants/values';
 import { PasswordStrengthIndicator } from './CompSingUp';
-
+import {
+    ComOtpVerify,
+    ComResetPassword,
+    ForgetPassword,
+    OtpVerify,
+    RecruiterForgetPassword,
+    RecruiterLoginByPassword,
+    RecruiterRecruiterReSentOtp,
+    ResetPassword
+} from '../../reducer/recruiterReducer';
 
 const ForgotPassword = () => {
     const navigation =
         useNavigation<NativeStackNavigationProp<ParamListBase>>();
     const [hidePassword, setHidePassword] = useState(true);
-const [role, setRole] = useState<"seeker" | "recruiter">()
-  useEffect(() => {
-    const set = async () => {
-      const a = await AsyncStorage.getItem("role") as "seeker" | "recruiter"
-      setRole(a)
-    }
-    set()
-  }, [])
+    const [role, setRole] = useState<"seeker" | "recruiter">()
+    useEffect(() => {
+        const set = async () => {
+            const a = await AsyncStorage.getItem("role") as "seeker" | "recruiter"
+            setRole(a)
+        }
+        set()
+    }, [])
     const route = useRoute<RouteProp<ParamListBase>>();
 
     const { colors } = useContext(ThemeContext);
@@ -425,6 +123,7 @@ const [role, setRole] = useState<"seeker" | "recruiter">()
     const handleInputChange = (data: { name: string; value: string }) => {
         setUser(prev => ({ ...prev, [data.name]: data.value }));
     };
+    const [loading, setLoading] = useState(false);
     const [hideConfirmPassword, setHideConfirmPassword] = useState(false);
     const [step, setStep] = useState(1)
     const [remainingSeconds, setRemainingSeconds] = useState(60);
@@ -432,17 +131,162 @@ const [role, setRole] = useState<"seeker" | "recruiter">()
     const dispatch = useAppDispatch()
     const startTimer = useCallback(() => {
         setRemainingSeconds(60);
-        if (intervalRef.current) clearInterval(intervalRef.current);
+
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+        }
+
         intervalRef.current = setInterval(() => {
             setRemainingSeconds(prev => {
                 if (prev <= 1) {
-                    clearInterval(intervalRef.current!);
+                    if (intervalRef.current) {
+                        clearInterval(intervalRef.current);
+                    }
+
                     return 0;
                 }
+
                 return prev - 1;
             });
         }, 1000);
     }, []);
+    const handleSendCode = async () => {
+        const email = user.email.trim();
+
+        if (!email) {
+            showAlert({
+                title: "Validation",
+                message: "Please enter your email address.",
+            });
+            return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailRegex.test(email)) {
+            showAlert({
+                title: "Validation",
+                message: "Please enter a valid email address.",
+            });
+            return;
+        }
+
+        try {
+            setLoading(true);
+
+            if (type === "jobSeeker") {
+                const res = await dispatch(
+                    ForgetPassword({
+                        email,
+                    })
+                ).unwrap();
+
+                console.log("Job seeker forgot password:", res);
+
+                if (res.success) {
+                    setOtp(["", "", "", "", "", ""]);
+                    startTimer();
+
+                    setStep(2);
+                } else {
+                    showAlert({
+                        title: "Validation",
+                        message: res.message || "Unable to send OTP.",
+                    });
+                }
+            } else {
+                const res = await dispatch(
+                    RecruiterForgetPassword({ email })
+                ).unwrap();
+
+                console.log("Company forgot password:", res);
+
+                if (res.success) {
+                    setOtp(["", "", "", "", "", ""]);
+                    startTimer();
+
+                    setStep(2);
+                } else {
+                    showAlert({
+                        title: "Validation",
+                        message: res.message || "Unable to send OTP.",
+                    });
+                }
+            }
+        } catch (error) {
+            console.log("Forgot password error:", error);
+
+            showAlert({
+                title: "Error",
+                message: "Something went wrong. Please try again.",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleVerifyOtp = async () => {
+        const code = otp.join("");
+
+        if (code.length !== 6) {
+            showAlert({
+                title: "Validation",
+                message: "Please enter the 6-digit OTP.",
+            });
+            return;
+        }
+
+        try {
+            setLoading(true);
+
+            if (type === "jobSeeker") {
+                const res = await dispatch(
+                    OtpVerify({
+                        email: user.email.trim(),
+                        code,
+                    })
+                ).unwrap();
+
+                console.log("Job seeker OTP verification:", res);
+
+                if (res.success) {
+                    setStep(3);
+                } else {
+                    showAlert({
+                        title: "Invalid OTP",
+                        message: res.message || "Invalid OTP.",
+                    });
+                }
+            } else {
+                const res = await dispatch(
+                    ComOtpVerify({
+                        email: user.email.trim(),
+                        code,
+                    })
+                ).unwrap();
+
+                console.log("Company OTP verification:", res);
+
+                if (res.success) {
+                    setStep(3);
+                } else {
+                    showAlert({
+                        title: "Invalid OTP",
+                        message: res.message || "Invalid OTP.",
+                    });
+                }
+            }
+        } catch (error) {
+            console.log("OTP verification error:", error);
+
+            showAlert({
+                title: "Error",
+                message: "Unable to verify OTP.",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
     const { showAlert } = useAlert();
     const renderElem = () => {
         switch (step) {
@@ -467,13 +311,16 @@ const [role, setRole] = useState<"seeker" | "recruiter">()
                         <Text style={{ color: colors.textSecondary, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.7), fontWeight: '600', marginTop: responsiveHeight(1.5), marginBottom: responsiveHeight(1.5) }}>Tell us the email you signed up with and we
                             {'\n'}will send a 6-digit code.</Text>
 
-                        <InPutWithLabel inputContainerStyle={{ marginBottom: responsiveHeight(0.5) }} mainColor={mainColor} secondaryColor={secondaryColor} label={type === "comp" ? 'Email address' : 'Email address'} value={user.email} onChangeText={(text) => handleInputChange({ name: "email", value: text })} placeholder="manager@rozamexicano.com.au" />
-                        <Text style={{ color: colors.textSecondary, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.8), fontWeight: '600', marginTop: responsiveHeight(1.5), marginBottom: responsiveHeight(4) }}>The code lasts 10 minutes.</Text>
+                        <InPutWithLabel inputContainerStyle={{ marginBottom: responsiveHeight(0.5) }} mainColor={mainColor} secondaryColor={secondaryColor} label='Email address' value={user.email} onChangeText={(text) => handleInputChange({ name: "email", value: text })} placeholder="manager@rozamexicano.com.au" />
+                        <Text style={{ color: colors.textSecondary, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.8), fontWeight: '600', marginTop: responsiveHeight(1.5), marginBottom: responsiveHeight(4) }}>The code lasts 1 minutes.</Text>
 
 
-                        <Button label="Send the code"
+                        <Button
+                            label="Send the code"
                             backgroundColor={mainColor}
-                            onPress={() => setStep(2)} />
+                            onPress={handleSendCode}
+                        />
+
                         <Image
                             style={{
                                 width: responsiveWidth(90),
@@ -608,7 +455,7 @@ const [role, setRole] = useState<"seeker" | "recruiter">()
                         <Button
                             label="Verify and Continue"
                             backgroundColor={mainColor}
-                            onPress={() => setStep(3)}
+                            onPress={handleVerifyOtp}
                         />
                     </>
                 );
@@ -696,58 +543,102 @@ const [role, setRole] = useState<"seeker" | "recruiter">()
                         </View>
 
                         <Button
-                            label="Save and log in"
+                            label={loading ? "Saving..." : "Save and log in"}
                             backgroundColor={mainColor}
-                            onPress={() => {
-                                const a = otp.join("")
-                                if (type === "jobSeeker") {
-                                    dispatch(UserVerification({ email: user.email, code: a }))
-                                        .unwrap()
-                                        .then(async (res) => {
-                                            console.log(res)
-                                            if (res.success) {
-                                                showAlert({
-                                                    title: "Success",
-                                                    message: "Your account registered successfully",
-                                                });
-                                                await AsyncStorage.setItem('token', res.data.token)
-                                                dispatch(ProfileData()).unwrap().then((res) => {
-                                                    if (res.success) {
-                                                        if (res.data.user.login_step === 1) {
-                                                            navigation.reset({
-                                                                index: 0,
-                                                                routes: [{ name: routes.USERSTEPS }]
-                                                            });
+                            onPress={async () => {
+                                const email = user.email.trim();
 
-                                                        }
+                                if (!user.password) {
+                                    showAlert({
+                                        title: "Validation",
+                                        message: "Please enter a new password.",
+                                    });
+                                    return;
+                                }
 
-                                                    }
-                                                    // console.log("Profile Data", res.data.login)
-                                                });
-                                            } else {
-                                                showAlert({
-                                                    title: "Error",
-                                                    message: res.message,
-                                                });
-                                            }
-                                        });
-                                } else {
-                                    dispatch(CompanyVerification({ email: user.email, code: a }))
-                                        .unwrap()
-                                        .then(async (res) => {
-                                            if (res.success) {
-                                                showAlert({
-                                                    title: "Success",
-                                                    message: "Your account registered successfully",
-                                                });
-                                                await AsyncStorage.setItem('token', res.data.token)
-                                            } else {
-                                                showAlert({
-                                                    title: "Error",
-                                                    message: res.message,
-                                                });
-                                            }
-                                        });
+                                if (!user.confirmPassword) {
+                                    showAlert({
+                                        title: "Validation",
+                                        message: "Please confirm your new password.",
+                                    });
+                                    return;
+                                }
+
+                                if (user.password !== user.confirmPassword) {
+                                    showAlert({
+                                        title: "Validation",
+                                        message: "Passwords do not match.",
+                                    });
+                                    return;
+                                }
+
+                                if (loading) return;
+
+                                try {
+                                    setLoading(true);
+
+                                    if (type === "jobSeeker") {
+                                        const res = await dispatch(
+                                            ResetPassword({
+                                                email,
+                                                password: user.password,
+                                                password_confirmation: user.confirmPassword,
+                                            })
+                                        ).unwrap();
+
+                                        console.log("Job seeker reset password:", res);
+
+                                        if (res.success) {
+                                            showAlert({
+                                                title: "Success",
+                                                message: "Password reset successfully.",
+                                            });
+
+                                            navigation.goBack();
+                                        } else {
+                                            showAlert({
+                                                title: "Error",
+                                                message: res.message || "Unable to reset password.",
+                                            });
+                                        }
+
+                                    } else {
+                                        const res = await dispatch(
+                                            ComResetPassword({
+                                                email,
+                                                password: user.password,
+                                                password_confirmation: user.confirmPassword,
+                                            })
+                                        ).unwrap();
+
+                                        console.log("Company reset password:", res);
+
+                                        if (res.success) {
+                                            showAlert({
+                                                title: "Success",
+                                                message: "Password reset successfully.",
+                                            });
+
+                                            navigation.goBack();
+                                        } else {
+                                            showAlert({
+                                                title: "Error",
+                                                message: res.message || "Unable to reset password.",
+                                            });
+                                        }
+                                    }
+
+                                } catch (error: any) {
+                                    console.log("Reset password error:", error);
+
+                                    showAlert({
+                                        title: "Error",
+                                        message:
+                                            error?.message ||
+                                            "Something went wrong while resetting your password.",
+                                    });
+                                } finally {
+                                    setLoading(false);
                                 }
                             }}
                         />

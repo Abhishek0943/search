@@ -18,7 +18,7 @@ import Welcome2 from '../pages/Welcome/Welcome2';
 import CompLogin from '../pages/Auth/CompLogin';
 import CompSingUp from '../pages/Auth/CompSingUp';
 import ProfileCompelete from '../pages/ProfileCompelete/ProfileCompelete';
-
+import Details from '../pages/Details/Details';
 const Stack = createNativeStackNavigator();
 const Routes = () => {
   const { isAuth, user } = useAppSelector(state => state.userStore);
@@ -156,7 +156,7 @@ const Routes = () => {
             <Stack.Screen name={routes.FORGOTPASSWORD} component={ForgotPassword} options={{ headerShown: false }} />
           </>
         }
-
+        <Stack.Screen name={routes.DETAILS} component={Details} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.RECRUITERHOME} component={RecruiterHome} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.ACTIVECANDIDATE} component={Candidate} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.ADDJOB} component={AddJob} options={{ headerShown: false, animation: 'none' }} />

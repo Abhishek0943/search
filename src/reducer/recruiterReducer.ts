@@ -9,6 +9,47 @@ export const RecruiterGetCountries = createAsyncThunk<GetCountriesResponse | Err
   'GetCountries',
   () => getApiCall<GetCountriesResponse>('country'),
 );
+export const ComLoginByPassword = createAsyncThunk<
+  {
+    success: true;
+    message: string;
+    data: {
+      token: string;
+      company: Recruiter;
+    };
+  } | ErrorResponse,
+  {
+    email: string;
+    password: string;
+  }
+>(
+  'ComLoginByPassword',
+  body =>
+    postApiCall<{
+      success: true;
+      message: string;
+      data: {
+        token: string;
+        company: Recruiter;
+      };
+    }>('/auth/companies/login', body),
+);
+type CompanyProfile = {
+  id: number;
+  name: string | null;
+  email: string;
+  username?: string | null;
+  abn?: string | null;
+  acn?: string | null;
+  location?: string | null;
+  no_of_employees?: string | null;
+  industry_id?: number | null;
+  description?: string | null;
+  logo?: string | null;
+  step?: number | null;
+  onboarding_step?: number | null;
+};
+
 export const RecruiterRegister = createAsyncThunk<{ success: true, token: string } | ErrorResponse, { acn_number?: string, abn_number?: string, first_name?: string, last_name?: string, email: string, password: string, password_confirmation: string, terms_of_use?: boolean }>(
   'RecruiterRegister',
   (body) => postApiCall<{ success: true, token: string }>('/auth/companies/register', body),
@@ -30,9 +71,8 @@ export const RecruiterCompleteSteps = createAsyncThunk<{ success: true, recruite
   'CompleteSteps',
   ({ step, ...body }) => patchApiCall<{ success: true, recruiter: Recruiter, token: string }>('recruiter/' + step, body),
 );
-export const RecruiterProfile = createAsyncThunk<{ success: true, topic: TopicItem[], } | ErrorResponse>(
-  'RecruiterProfile',
-  () => getApiCall<{ success: true, topic: TopicItem[], token: string }>('/auth/companies/me'),
+export const RecruiterProfile = createAsyncThunk< {success: true; message: string; data: CompanyProfile;} | ErrorResponse >(
+  'RecruiterProfile', () => getApiCall<{ success: true; message: string; data: CompanyProfile; }>('/auth/companies/me'),
 );
 export const RecruiterPlans = createAsyncThunk<{ success: true, topic: TopicItem[], } | ErrorResponse>(
   'RecruiterPlans',
@@ -46,32 +86,49 @@ export const RecruiterLoginByPassword = createAsyncThunk<{ success: true, recrui
   'RecruiterLoginByPassword',
   (body) => postApiCall<{ success: true, recruiter: Recruiter, token: string }>('/auth/companies/login', body),
 );
-export const RecruiterForgetPassword = createAsyncThunk<{ success: true, recruiter: Recruiter, token: string } | ErrorResponse, { email: string, password: string }>(
+export const RecruiterForgetPassword = createAsyncThunk<{ success: true, recruiter: Recruiter, token: string } | ErrorResponse, { email: string }>(
   'RecruiterForgetPassword',
   (body) => postApiCall<{ success: true, recruiter: Recruiter, token: string }>('/auth/companies/password/forgot', body),
 );
-export const OtpVerify = createAsyncThunk<{ success: true, recruiter: Recruiter, token: string } | ErrorResponse, { email: string, password: string }>(
+export const OtpVerify = createAsyncThunk<{ success: true, recruiter: Recruiter, token: string } | ErrorResponse, { email: string, code: string }>(
   'OtpVerify',
   (body) => postApiCall<{ success: true, recruiter: Recruiter, token: string }>('/auth/jobseekers/password/verify-otp', body),
 );
-export const ComOtpVerify = createAsyncThunk<{ success: true, recruiter: Recruiter, token: string } | ErrorResponse, { email: string, password: string }>(
+export const ComOtpVerify = createAsyncThunk<{ success: true, recruiter: Recruiter, token: string } | ErrorResponse, { email: string, code: string }>(
   'ComOtpVerify',
   (body) => postApiCall<{ success: true, recruiter: Recruiter, token: string }>('/auth/companies/password/verify-otp', body),
 );
-export const ResetPassword = createAsyncThunk<{ success: true, recruiter: Recruiter, token: string } | ErrorResponse, { email: string, password: string }>(
+export const ResetPassword = createAsyncThunk<{ success: true, recruiter: Recruiter, token: string } | ErrorResponse, { email: string, password: string, password_confirmation: string; }>(
   'ResetPassword',
   (body) => postApiCall<{ success: true, recruiter: Recruiter, token: string }>('/auth/jobseekers/password/reset', body),
 );
-export const ComResetPassword = createAsyncThunk<{ success: true, recruiter: Recruiter, token: string } | ErrorResponse, { email: string, password: string }>(
+export const ComResetPassword = createAsyncThunk<{ success: true, recruiter: Recruiter, token: string } | ErrorResponse, { email: string, password: string, password_confirmation: string; }>(
   'ComResetPassword',
   (body) => postApiCall<{ success: true, recruiter: Recruiter, token: string }>('/auth/companies/password/reset', body),
+);
+export const UpdateRegistrationDetails = createAsyncThunk<
+  { success: true; message?: string; data?: any } | ErrorResponse,
+  {
+    abn?: string;
+    acn?: string;
+    name?: string;
+    location?: string;
+    no_of_employees?: number;
+    industry_id?: number;
+    description?: string;
+    logo?: string;
+  }
+>(
+  'UpdateRegistrationDetails',
+  body => postApiCall<{ success: true; message?: string; data?: any; }>(
+      '/company/update-registration', body ),
 );
 export const ForgetPassword = createAsyncThunk<{ success: true, recruiter: Recruiter, token: string } | ErrorResponse, { email: string, }>(
   'ForgetPassword',
   (body) => postApiCall<{ success: true, recruiter: Recruiter, token: string }>('/auth/jobseekers/password/forgot', body),
 );
 export const GetCandidates = createAsyncThunk<
-  { success: true, data: User } | ErrorResponse, { pages }
+  { success: true, data: User } | ErrorResponse, { pages: any }
 >(
   'GetCandidates',
   ({ pages }) => {
@@ -79,7 +136,7 @@ export const GetCandidates = createAsyncThunk<
   }
 );
 export const Followers = createAsyncThunk<
-  { success: true, data: User } | ErrorResponse, { pages }
+  { success: true, data: User } | ErrorResponse, { pages: any }
 >(
   'Followers',
   ({ pages }) => {
