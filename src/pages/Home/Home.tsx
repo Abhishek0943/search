@@ -14,8 +14,6 @@ import Text from '../../components/Text';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getFCMToken } from '../../utils/notificationService';
 import { Tokien } from '../../reducer/recruiterReducer';
-import { CustomTextInput } from '../../components';
-import { getApiCall, postApiCall } from '../../api';
 function Home() {
   const { colors } = useContext(ThemeContext)
   const navigation: NavigationProp<ParamListBase> = useNavigation()
@@ -209,7 +207,10 @@ function Home() {
                       </View>
                       <TouchableOpacity onPress={() => {
                         dispatch(toggleBookmark({ id: job.id, is_favorited: isBookmarked }))
-                        dispatch(Bookmark({ id: job.id }))
+                        dispatch(Bookmark({ id: job.id })).unwrap().then((res) => {
+                          console.log(res)
+
+                        })
                       }} style={{ width: responsiveWidth(5), aspectRatio: 1 }}>
                         <Image source={isBookmarked ? imagePath.Bookmarked : imagePath.Bookmark} style={{ resizeMode: "contain", width: "100%", height: "100%" }} />
                       </TouchableOpacity>

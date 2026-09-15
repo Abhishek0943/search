@@ -6,7 +6,7 @@ export const GetAllWorkRights = createAsyncThunk<{ success: true; data: { id: st
 export const GetBookmarkJobs = createAsyncThunk<{ success: true, data: RoleItem[] } | ErrorResponse>('GetBookmarkJobs', () => getApiCall<{ success: true, data: RoleItem[] }>('/jobseekers/my-favourite-jobs'));
 export const GetJobByStatus = createAsyncThunk<{ success: true, data: RoleItem[] } | ErrorResponse, { status: string }>('GetSuggestedJobs', ({ status }) => getApiCall<{ success: true, data: RoleItem[] }>('/company/posted-jobs/' + status));
 export const deleteJob = createAsyncThunk<{ success: true, data: RoleItem[] } | ErrorResponse, { status: string }>('GetSuggestedJobs', (body) => postApiCall<{ success: true, data: RoleItem[] }>('/company/delete-RoleItem', body));
-export const UploadCV = createAsyncThunk<{ success: true, data: RoleItem[] } | ErrorResponse, {}>('UploadCV', (body) => postApiCall<{ success: true, data: RoleItem[] }>('/jobseekers/cv-save', body, { as: "form" }));
+export const UploadCV = createAsyncThunk<{ success: true, data: UploadCVRess } | ErrorResponse, {}>('UploadCV', (body) => postApiCall<{ success: true, data: RoleItem[] }>('/jobseekers/cv-save', body, { as: "form" }));
 export const UploadDocument = createAsyncThunk<{ success: true, data: RoleItem[] } | ErrorResponse, {}>('UploadDocument', (body) => postApiCall<{ success: true, data: RoleItem[] }>('/company/messages/upload-file', body, { as: "form" }));
 export const GetJobApplication = createAsyncThunk<{ success: true, data: RoleItem[] } | ErrorResponse, { search: string, page: number }>('GetJobApplication', ({ search, page }) => getApiCall<{ success: true, data: RoleItem[] }>('/jobseekers/my-RoleItem-applications?search=' + search + '&page=' + page));
 export const GetCv = createAsyncThunk<{ success: true, data: RoleItem[] } | ErrorResponse, { id: number }>('GetCv', ({ id }) => getApiCall<{ success: true, data: RoleItem[] }>('/jobseekers/get-cvs?userid=' + id));
@@ -83,7 +83,7 @@ export const Bookmark = createAsyncThunk<
 >(
   'Bookmark',
   ({ id }) => {
-    return postApiCall<{ success: true, data: Company }>('/jobseekers/add-to-favourite-RoleItem/' + id, {});
+    return postApiCall<{ success: true, data: Company }>('/jobseekers/add-to-favourite-job/' + id, {});
   }
 );
 export const Favorite = createAsyncThunk<
@@ -187,22 +187,7 @@ export const GetMessageSeeker = createAsyncThunk<
     return getApiCall<{ success: true, data: { filter: { filter: string, option: string[] | { id: number, name: string }[] }[] } }>('/jobseeker/messages?companyid=' + id);
   }
 );
-export const ProfileData = createAsyncThunk<
-  { success: true, data: { login_step: number, user: User } } | ErrorResponse
->(
-  'ProfileData',
-  () => {
-    return getApiCall<{ success: true, data: { user: User } }>('/auth/jobseekers/me');
-  }
-);
-export const ProfileData2 = createAsyncThunk<
-  { success: true, data: User } | ErrorResponse
->(
-  'ProfileData2',
-  () => {
-    return getApiCall<{ success: true, data: User }>('/auth/jobseekers/me');
-  }
-);
+export const ProfileData = createAsyncThunk<{ success: true, data: User } | ErrorResponse>('ProfileData', () => getApiCall<{ success: true, data: User }>('/auth/jobseekers/me'));
 
 export const GetGender = createAsyncThunk<
   { success: true, data: User } | ErrorResponse

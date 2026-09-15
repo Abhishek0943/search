@@ -10,7 +10,6 @@ import { routes } from '../../../constants/values'
 import { CustomDropdown } from '../../../pages/PersonalInfo/PersonalInfo'
 import { useAppDispatch, useAppSelector } from '../../../store'
 import { GetCity, GetCountry, GetNumberOfEmployees, GetNumberOfOffices, GetOwnership, GetSkills, GetState, Industries, NumberOfPositions, UpdateProfile3 } from '../../../reducer/jobsReducer'
-import { launchImageLibrary } from 'react-native-image-picker'
 import Text from '../../../components/Text'
 import { useAlert } from '../../../context/AlertContext'
 import { RecruiterProfile } from '../../../reducer/recruiterReducer'
@@ -223,28 +222,28 @@ const Profile = () => {
         fontWeight: '500',
     } as const;
     const pickImage = async () => {
-        const res = await launchImageLibrary({
-            mediaType: 'photo',
-            selectionLimit: 1,
-            quality: 0.8,
-        });
+        // const res = await launchImageLibrary({
+        //     mediaType: 'photo',
+        //     selectionLimit: 1,
+        //     quality: 0.8,
+        // });
 
-        if (res.didCancel) return;
+        // if (res.didCancel) return;
 
-        const asset = res.assets?.[0];
-        if (!asset?.uri) return;
+        // const asset = res.assets?.[0];
+        // if (!asset?.uri) return;
 
-        const fileName =
-            asset.fileName ||
-            `company_${Date.now()}.${asset.type?.includes('png') ? 'png' : 'jpg'}`;
-        setFormData(prev => ({
-            ...prev,
-            companyLogo: {
-                uri: asset.uri,
-                name: fileName,
-                type: asset.type || 'image/jpeg',
-            },
-        }));
+        // const fileName =
+        //     asset.fileName ||
+        //     `company_${Date.now()}.${asset.type?.includes('png') ? 'png' : 'jpg'}`;
+        // setFormData(prev => ({
+        //     ...prev,
+        //     companyLogo: {
+        //         uri: asset.uri,
+        //         name: fileName,
+        //         type: asset.type || 'image/jpeg',
+        //     },
+        // }));
     };
     const startYear = 1918;
     const currentYear = new Date().getFullYear(); // e.g. 2025

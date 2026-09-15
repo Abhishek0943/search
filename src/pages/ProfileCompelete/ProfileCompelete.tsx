@@ -15,7 +15,6 @@ import { GetAllAvailabilities, GetAllWorkRights, GetSkills, Industries, AddWorkE
 import SearchSelectDropdown from '../../components/SearchSelectDropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ImagePicker from 'react-native-image-crop-picker';
-import { launchImageLibrary } from 'react-native-image-picker';
 import { pick, types } from '@react-native-documents/picker';
 import { WebView } from 'react-native-webview';
 import { createThumbnail } from 'react-native-create-thumbnail';
@@ -25,7 +24,13 @@ import { useAlert } from '../../context/AlertContext';
 import RNFS from 'react-native-fs';
 import PdfThumbnail from 'react-native-pdf-thumbnail';
 import { routes } from '../../constants/values';
-
+const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+export const formatDateToMonthYear = (dateStr?: string | null) => {
+    if (!dateStr) return 'Still here';
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return dateStr;
+    return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+};
 function ProfileCompelete(): ReactElement {
     const { colors } = useContext(ThemeContext);
     const { showConfirm } = useAlert();
@@ -105,7 +110,6 @@ function ProfileCompelete(): ReactElement {
     const [startDatePickerVisible, setStartDatePickerVisible] = useState(false);
     const [endDatePickerVisible, setEndDatePickerVisible] = useState(false);
 
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const parseDateString = (dateStr: string) => {
         if (!dateStr || dateStr === 'Still here') return new Date();
         const [monthStr, yearStr] = dateStr.split(' ');
@@ -114,12 +118,7 @@ function ProfileCompelete(): ReactElement {
         return new Date(parseInt(yearStr), monthIndex, 1);
     };
 
-    const formatDateToMonthYear = (dateStr?: string | null) => {
-        if (!dateStr) return 'Still here';
-        const date = new Date(dateStr);
-        if (isNaN(date.getTime())) return dateStr;
-        return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
-    };
+
 
     const fetchExperiences = () => {
         dispatch(GetExperience()).unwrap().then(res => {
@@ -228,19 +227,19 @@ function ProfileCompelete(): ReactElement {
     };
 
     const pickVideoIntro = async () => {
-        try {
-            const res = await launchImageLibrary({
-                mediaType: 'video',
-                selectionLimit: 1,
-            });
-            if (res.didCancel) return;
-            const asset = res.assets?.[0];
-            if (!asset?.uri) return;
-            const fileName = asset.fileName || `video_${Date.now()}.mp4`;
-            const file = { uri: asset.uri, name: fileName, type: asset.type || 'video/mp4' };
-            setVideoIntro(file);
-            uploadMediaToApi('video', file);
-        } catch (e) { }
+        // try {
+        //     const res = await launchImageLibrary({
+        //         mediaType: 'video',
+        //         selectionLimit: 1,
+        //     });
+        //     if (res.didCancel) return;
+        //     const asset = res.assets?.[0];
+        //     if (!asset?.uri) return;
+        //     const fileName = asset.fileName || `video_${Date.now()}.mp4`;
+        //     const file = { uri: asset.uri, name: fileName, type: asset.type || 'video/mp4' };
+        //     setVideoIntro(file);
+        //     uploadMediaToApi('video', file);
+        // } catch (e) { }
     };
 
     const pickCertImage = async () => {
@@ -332,7 +331,6 @@ function ProfileCompelete(): ReactElement {
             if (res.success) setIndustryOptions(res.data || []);
         }).catch(() => { });
         dispatch(GetSkills()).unwrap().then((res: any) => {
-            console.log(res, "skill")
             if (res.success) setSkillOptions(res.data || res.jobs || []);
         }).catch(() => { });
     }, []);

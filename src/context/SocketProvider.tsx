@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { useAppDispatch, useAppSelector } from '../store';
+import { useAppSelector } from '../store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface SocketContextType {

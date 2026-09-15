@@ -60,8 +60,21 @@ interface User {
     email: string;
     name: string;
     creator_data?: CreatorData;
+    portfolio_link?: string;
     login_step: number,
-    messages_count: number
+    messages_count: number,
+    video: {
+        video_url: string,
+        uploaded_at: string,
+        video_name: string
+    } | null,
+    cv: {
+        cv_url: string,
+        uploaded_at: string,
+        cv_file: string
+    } | null,
+    skills: { skill_name: string, job_skill_id: string }[],
+    certificates: any[]
 }
 interface Recruiter {
     _id: string;

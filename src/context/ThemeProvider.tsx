@@ -8,10 +8,7 @@ import React, {
   ReactNode,
 } from 'react';
 import {
-  Text,
-  TouchableHighlight,
   useColorScheme,
-  View,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ColorPalette, darkColors, lightColors } from './theme';
@@ -30,7 +27,7 @@ const STORAGE_KEY = 'themeMode';
 export const ThemeContext = createContext<ThemeContextType>({
   mode: 'light',
   isDark: false,
-  colors: lightColors ,
+  colors: lightColors,
   setMode: () => { },
 });
 

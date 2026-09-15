@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { TouchableOpacity, ViewStyle } from 'react-native';
-import { responsiveWidth } from 'react-native-responsive-dimensions';
+import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 import { ThemeContext } from '../context/ThemeProvider';
 import Text from './Text';
 
@@ -23,16 +23,17 @@ const Button = ({ style = {}, label, backgroundColor, onPress = () => { } }: But
         backgroundColor: backgroundColor || colors.primary,
         height: 'auto',
         borderRadius: 15,
+        justifyContent: 'center',
+        alignItems: 'center',
         ...style
       }}
     >
       <Text
         style={{
           color: colors.white,
-          fontSize: 19,
+          fontSize: responsiveFontSize(2),
           fontWeight: 'bold',
           textAlign: 'center',
-          paddingVertical: 15,
         }}
       >
         {label}

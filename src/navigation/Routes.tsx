@@ -2,23 +2,24 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useEffect, useRef, useState } from 'react';
 import { useAppSelector } from '../store';
 import { routes } from '../constants/values';
-import { AddJob, Apply, ApplyJob, Browser, Candidate, CandidateProfile, BlogPage, Chat, Company, CompanyDetails, CV, Education, ForgotPassword, Home, Jobdetail, Language, LanguageForm, Login, Messages, Notification, OpenJobs, PaymentHistory, PersonalInfo, Profile, Project, ProjectForm, RecentJob, RecruiterAccount, RecruiterHome, RecruiterProfile, Search, Signup, Skill, SkillAdd, Splash, SuggestedJob, Welcome, WorkExperience, WorkExperienceForm } from '../pages';
-
+import { AddJob, Apply, ApplyJob, Browser, Candidate, CandidateProfile, BlogPage, Chat, Company, CompanyDetails, CV, Education, ForgotPassword, Home, Jobdetail, Language, LanguageForm, Login, Messages, Notification, OpenJobs, PaymentHistory, PersonalInfo, Profile, Project, ProjectForm, RecentJob, RecruiterAccount, RecruiterHome, RecruiterProfile, Search, Signup, Skill, SkillAdd, Splash, SuggestedJob, Welcome, WorkExperience, WorkExperienceForm, Certifications, SkillsPage, AvailabilityPage, WhereICanWorkPage, ExperiencePage, Bookmarked } from '../pages';
 import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import EducationForm from '../pages/PersonalInfo/EducationForm';
 import CVAdd from '../pages/PersonalInfo/CVAdd';
 import Contact from '../pages/PersonalInfo/Contact';
 import Blog from '../pages/Blog';
-import { logScreen } from '../utils/analytics';
-import messaging from '@react-native-firebase/messaging';
-import notifee, { EventType } from '@notifee/react-native';
+// import { logScreen } from '../utils/analytics';
 import { Linking } from 'react-native';
 import Welcome2 from '../pages/Welcome/Welcome2';
 import CompLogin from '../pages/Auth/CompLogin';
 import CompSingUp from '../pages/Auth/CompSingUp';
 import ProfileCompelete from '../pages/ProfileCompelete/ProfileCompelete';
 import Details from '../pages/Details/Details';
+import Resume from '../pages/Resume/Resume';
+import Video from '../pages/Video/Video';
+import Link from '../pages/Link/Link';
+import ProfilePreview from '../pages/ProfilePreview/ProfilePreview';
 const Stack = createNativeStackNavigator();
 const Routes = () => {
   const { isAuth, user } = useAppSelector(state => state.userStore);
@@ -68,30 +69,30 @@ const Routes = () => {
     // }
   };
 
-  useEffect(() => {
-    const unsubscribeFCM = messaging().onNotificationOpenedApp(remoteMessage => {
-      handleNotificationNavigation(remoteMessage?.data);
-    });
+  // useEffect(() => {
+  //   const unsubscribeFCM = messaging().onNotificationOpenedApp(remoteMessage => {
+  //     handleNotificationNavigation(remoteMessage?.data);
+  //   });
 
-    messaging().getInitialNotification().then(remoteMessage => {
-      if (remoteMessage) {
-        setTimeout(() => {
-          handleNotificationNavigation(remoteMessage?.data);
-        }, 1000);
-      }
-    });
+  //   messaging().getInitialNotification().then(remoteMessage => {
+  //     if (remoteMessage) {
+  //       setTimeout(() => {
+  //         handleNotificationNavigation(remoteMessage?.data);
+  //       }, 1000);
+  //     }
+  //   });
 
-    const unsubscribeNotifee = notifee.onForegroundEvent(({ type, detail }) => {
-      if (type === EventType.PRESS) {
-        handleNotificationNavigation(detail.notification?.data);
-      }
-    });
+  //   const unsubscribeNotifee = notifee.onForegroundEvent(({ type, detail }) => {
+  //     if (type === EventType.PRESS) {
+  //       handleNotificationNavigation(detail.notification?.data);
+  //     }
+  //   });
 
-    return () => {
-      unsubscribeFCM();
-      unsubscribeNotifee();
-    };
-  }, []);
+  //   return () => {
+  //     unsubscribeFCM();
+  //     unsubscribeNotifee();
+  //   };
+  // }, []);
   const linking = {
     prefixes: [
       "searchtalents.co/app",
@@ -131,7 +132,7 @@ const Routes = () => {
     const previousRoute = routeNameRef.current;
     const currentRoute = navigationRef.current?.getCurrentRoute()?.name;
     if (currentRoute && currentRoute !== previousRoute) {
-      await logScreen(currentRoute);
+      // await logScreen(currentRoute);
     }
     routeNameRef.current = currentRoute;
   };
@@ -157,6 +158,7 @@ const Routes = () => {
           </>
         }
         <Stack.Screen name={routes.DETAILS} component={Details} options={{ headerShown: false, animation: 'none' }} />
+        <Stack.Screen name={routes.BOOKMARKED} component={Bookmarked} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.RECRUITERHOME} component={RecruiterHome} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.ACTIVECANDIDATE} component={Candidate} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.ADDJOB} component={AddJob} options={{ headerShown: false, animation: 'none' }} />
@@ -182,7 +184,6 @@ const Routes = () => {
         <Stack.Screen name={routes.WORKEXPERIENCEFORM} component={WorkExperienceForm} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.EDUCATION} component={Education} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.EDUCATIONFORM} component={EducationForm} options={{ headerShown: false, animation: 'none' }} />
-        <Stack.Screen name={routes.CV} component={CV} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.CVADD} component={CVAdd} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.RECENTJOB} component={RecentJob} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.APPLYJOB} component={ApplyJob} options={{ headerShown: false, animation: 'none' }} />
@@ -196,7 +197,16 @@ const Routes = () => {
         <Stack.Screen name={routes.NOTIFICATION} component={Notification} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.CONTACT} component={Contact} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.BROWSER} component={Browser} options={{ headerShown: false }} />
-
+        {/* new  */}
+        <Stack.Screen name={routes.RESUME} component={Resume} options={{ headerShown: false }} />
+        <Stack.Screen name={routes.VIDEO} component={Video} options={{ headerShown: false }} />
+        <Stack.Screen name={routes.LINK} component={Link} options={{ headerShown: false }} />
+        <Stack.Screen name={routes.PROFILEPREVIEW} component={ProfilePreview} options={{ headerShown: false }} />
+        <Stack.Screen name={routes.CERTIFICATIONS} component={Certifications} options={{ headerShown: false, animation: 'none' }} />
+        <Stack.Screen name={routes.SKILLS} component={SkillsPage} options={{ headerShown: false, animation: 'none' }} />
+        <Stack.Screen name={routes.AVAILABILITY} component={AvailabilityPage} options={{ headerShown: false, animation: 'none' }} />
+        <Stack.Screen name={routes.WHEREICANWORK} component={WhereICanWorkPage} options={{ headerShown: false, animation: 'none' }} />
+        <Stack.Screen name={routes.EXPERIENCEPAGE} component={ExperiencePage} options={{ headerShown: false, animation: 'none' }} />
 
       </Stack.Navigator>
     </NavigationContainer>

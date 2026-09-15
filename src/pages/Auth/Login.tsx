@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react'
-import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, TouchableOpacity, View } from 'react-native'
 import { responsiveFontSize, responsiveHeight, responsiveScreenHeight, responsiveWidth } from 'react-native-responsive-dimensions'
 import { ParamListBase, useNavigation } from '@react-navigation/native'
 import imagePath from '../../assets/imagePath'
@@ -15,6 +15,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { ProfileData } from '../../reducer/jobsReducer'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { googleLogin } from '../../utils/socialLogin'
+import { postApiCall } from '../../api'
+import { getFCMToken } from '../../utils/notificationService'
 const Login = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const [hidePassword, setHidePassword] = useState(false);
@@ -32,6 +35,54 @@ const Login = () => {
   };
   const { showAlert } = useAlert();
   const insets = useSafeAreaInsets();
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  const handleGoogleLogin = async () => {
+    if (googleLoading) return;
+    setGoogleLoading(true);
+    try {
+      const result = await googleLogin();
+      if ('code' in result) {
+        // User cancelled or error
+        return;
+      }
+      const userInfo = result as any;
+      const userData = userInfo?.data?.user || userInfo?.user || userInfo;
+      if (!userData?.email) {
+        showAlert({ title: 'Error', message: 'Could not get email from Google account' });
+        return;
+      }
+      const FCM = await getFCMToken();
+      const res: any = await postApiCall('/auth/jobseekers/social-login', {
+        device_token: FCM,
+        device_type: Platform.OS,
+        type: 'google',
+        auth_id: userData.id,
+        first_name: userData.givenName || userData.name?.split(' ')[0] || '',
+        last_name: userData.familyName || userData.name?.split(' ').slice(1).join(' ') || '',
+        email: userData.email,
+      });
+      if (res?.success || res?.data?.token) {
+        await AsyncStorage.setItem('token', res.data.token);
+        dispatch(ProfileData()).unwrap().then((profileRes) => {
+          if (profileRes.success) {
+            if (profileRes.data.login_step === 1) {
+              navigation.reset({ index: 0, routes: [{ name: routes.USERSTEPS }] });
+            } else {
+              navigation.reset({ index: 0, routes: [{ name: routes.HOME }] });
+            }
+          }
+        });
+      } else {
+        showAlert({ title: 'Error', message: res?.message || 'Google login failed' });
+      }
+    } catch (error: any) {
+      console.log('Google login error', error);
+      showAlert({ title: 'Error', message: error?.message || 'Google login failed' });
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
   return (
 
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
@@ -112,8 +163,15 @@ const Login = () => {
               <Image style={{ height: "100%", width: "100%", }} source={require("./Devider.png")} />
             </Pressable>
             <View style={{ flexDirection: "row", marginTop: responsiveHeight(2.5), gap: responsiveWidth(3), width: responsiveWidth(90) }}>
-              <Pressable style={{ flex: 1, aspectRatio: 169 / 56 }}>
+              <Pressable onPress={handleGoogleLogin} disabled={googleLoading} style={{ flex: 1, aspectRatio: 169 / 56, opacity: googleLoading ? 0.6 : 1 }}>
                 <Image style={{ height: "100%", width: "100%", }} source={require("./GoogleButton.png")} />
+                {googleLoading && (
+                  <ActivityIndicator
+                    size="small"
+                    color="#1A5FA8"
+                    style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
+                  />
+                )}
               </Pressable>
               <Pressable style={{ flex: 1, aspectRatio: 169 / 56 }}>
                 <Image style={{ height: "100%", width: "100%", }} source={require("./GoogleButton.png")} />

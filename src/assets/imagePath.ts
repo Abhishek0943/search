@@ -125,6 +125,7 @@ export default {
     Bookmarked: require('./Icons/Bookmarked.png'),
     Shear: require('./Icons/Shear.png'),
     Clock: require('./Icons/Clock.png'),
+    UserIcon: require('./Icons/UserIcon.png'),
 
 }
 export const Fonts = {

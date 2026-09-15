@@ -22,7 +22,6 @@ import { NavigationBar } from '../../components';
 import imagePath from '../../assets/imagePath';
 import { formatDate } from './PersonalInfo';
 import { useAppDispatch } from '../../store';
-import { launchImageLibrary } from 'react-native-image-picker';
 // If you use react-native-date-picker
 import DatePicker from 'react-native-date-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -155,29 +154,29 @@ const ProjectForm = () => {
   };
 
   const pickImage = async () => {
-    const res = await launchImageLibrary({
-      mediaType: 'photo',
-      selectionLimit: 1,
-      quality: 0.8,
-    });
+    // const res = await launchImageLibrary({
+    //   mediaType: 'photo',
+    //   selectionLimit: 1,
+    //   quality: 0.8,
+    // });
 
-    if (res.didCancel) return;
+    // if (res.didCancel) return;
 
-    const asset = res.assets?.[0];
-    if (!asset?.uri) return;
+    // const asset = res.assets?.[0];
+    // if (!asset?.uri) return;
 
-    const fileName =
-      asset.fileName ||
-      `project_${Date.now()}.${asset.type?.includes('png') ? 'png' : 'jpg'}`;
+    // const fileName =
+    //   asset.fileName ||
+    //   `project_${Date.now()}.${asset.type?.includes('png') ? 'png' : 'jpg'}`;
 
-    setFormData(prev => ({
-      ...prev,
-      image: {
-        uri: asset.uri,
-        name: fileName,
-        type: asset.type || 'image/jpeg',
-      },
-    }));
+    // setFormData(prev => ({
+    //   ...prev,
+    //   image: {
+    //     uri: asset.uri,
+    //     name: fileName,
+    //     type: asset.type || 'image/jpeg',
+    //   },
+    // }));
   };
   const isValidUrl = (url) => {
     try {

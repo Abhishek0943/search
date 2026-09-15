@@ -18,6 +18,7 @@ export const lightColors: ColorPalette = {
   // Brand colors
   primary: "#1A5FA8",
   primary2: "#455A75",
+  primary50: "#E8F1FA",
   compPrimary: "#0E8A5A",
   compPrimary2: "#0B4F42",
   compPrimaryBg: "#F6F8FB",
@@ -65,6 +66,7 @@ export const darkColors: ColorPalette = {
 export interface ColorPalette {
   background: string;
   primary: string;
+  primary50: string;
   compPrimary: string;
   compPrimary2: string,
   compPrimaryBg: string,

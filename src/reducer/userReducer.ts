@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { getApiCall, patchApiCall, postApiCall } from '../api';
-import { ProfileData } from './jobsReducer';
+import { ProfileData, UploadCV } from './jobsReducer';
 import { RecruiterLoginByPassword, RecruiterProfile } from './recruiterReducer';
 
 export const GetWelcomeScreen = createAsyncThunk<WelcomeScreenResponse | ErrorResponse>(
@@ -94,7 +94,10 @@ export const userSlice = createSlice({
       if (payload.success) {
         state.user = payload.data.user;
         state.isAuth = true
-
+      }
+    }).addCase(UploadCV.fulfilled, (state, { payload }) => {
+      if (payload.success && state.user) {
+        state.user.cv = { cv_url: payload.data.file_url, cv_file: payload.data.title, uploaded_at: payload.data.created_at };
       }
     })
       .addCase(RecruiterLoginByPassword.fulfilled, (state, { payload }) => {

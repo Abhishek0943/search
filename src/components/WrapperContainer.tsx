@@ -8,10 +8,8 @@ import {
 } from 'react-native';
 import { ThemeContext } from '../context/ThemeProvider';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import messaging from '@react-native-firebase/messaging';
+// import messaging from '@react-native-firebase/messaging';
 import { useAppDispatch, useAppSelector } from '../store';
-import { setMessageCount } from '../reducer/userReducer';
-import { onDisplayNotification } from '../utils/notificationService';
 
 interface WrapperContainerProps {
   children: ReactNode;
@@ -23,48 +21,44 @@ const WrapperContainer: React.FC<WrapperContainerProps> = ({
   children,
 }) => {
   const { colors } = useContext(ThemeContext);
-  const { user } = useAppSelector(state => state.userStore);
   const containerStyle: ViewStyle = {
     flex: 1,
     backgroundColor: colors.statusBar,
   };
-  const insets = useSafeAreaInsets();
-
   const innerStyle: ViewStyle = {
     flex: 1,
     backgroundColor: colors.background,
-    // marginTop: insets.top, marginBottom: insets.bottom, marginLeft: insets.left, marginRight: insets.right,
   };
 
   const dispatch = useAppDispatch()
-  useEffect(() => {
-    if (!user?.id) return;
-    let unsubscribe: undefined | (() => void);
-    const start = async () => {
-      try {
-        if (Platform.OS === "ios") {
-          await messaging().requestPermission();
-        }
-        unsubscribe = messaging().onMessage(async remoteMessage => {
-          const { title, body } = remoteMessage.notification || {}
-          // const imageUrl = remoteMessage.notification?.android?.imageUrl || remoteMessage.data?.imageUrl || remoteMessage.data?.image;
-          // if (title && body) {
-          //   onDisplayNotification(title, body, imageUrl, remoteMessage.data)
-          // }
-          // dispatch(
-          //   setMessageCount({
-          //     messages_count: remoteMessage?.data?.unread_message_count || 0,
-          //   })
-          // );
-        });
-      } catch (e) {
-      }
-    };
-    start();
-    return () => {
-      if (unsubscribe) unsubscribe();
-    };
-  }, [user?.id]);
+  // useEffect(() => {
+  //   if (!user?.id) return;
+  //   let unsubscribe: undefined | (() => void);
+  //   const start = async () => {
+  //     try {
+  //       if (Platform.OS === "ios") {
+  //         await messaging().requestPermission();
+  //       }
+  //       unsubscribe = messaging().onMessage(async remoteMessage => {
+  //         const { title, body } = remoteMessage.notification || {}
+  //         // const imageUrl = remoteMessage.notification?.android?.imageUrl || remoteMessage.data?.imageUrl || remoteMessage.data?.image;
+  //         // if (title && body) {
+  //         //   onDisplayNotification(title, body, imageUrl, remoteMessage.data)
+  //         // }
+  //         // dispatch(
+  //         //   setMessageCount({
+  //         //     messages_count: remoteMessage?.data?.unread_message_count || 0,
+  //         //   })
+  //         // );
+  //       });
+  //     } catch (e) {
+  //     }
+  //   };
+  //   start();
+  //   return () => {
+  //     if (unsubscribe) unsubscribe();
+  //   };
+  // }, [user?.id]);
   return (
     <View style={[containerStyle,]}>
       <StatusBar hidden={true} />

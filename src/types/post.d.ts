@@ -7,6 +7,14 @@ interface RoleItem {
   stillHere: boolean;
   description: string;
 }
+interface UploadCVRess {
+  file_url: string;
+  title: string;
+  created_at: string;
+  endDate: string;
+  stillHere: boolean;
+  description: string;
+}
 interface Job {
   id: number;
   company_info?: {

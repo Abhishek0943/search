@@ -126,7 +126,10 @@ export async function getApiCall<T>(url: string): Promise<ApiResponse<T>> {
         Authorization: `Bearer ${token}`
       },
     })
+
     const data = await res.json().catch(() => null)
+    console.info(`${API_URL}${url}`, data, "resssssssssssss")
+
     if (!res.ok) {
       const msg = data?.message ?? res.statusText
       return { success: false, message: msg }

@@ -3,7 +3,7 @@ import { FlatList, Image, TouchableOpacity, ScrollView, StyleSheet, View, Activi
 import React, { useContext, useEffect, useState } from 'react'
 import { NavigationBar } from '../../components'
 import { routes } from '../../constants/values'
-import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions'
+import { responsiveHeight, responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth, responsiveWidth } from 'react-native-responsive-dimensions'
 import imagePath from '../../assets/imagePath'
 import { ThemeContext } from '../../context/ThemeProvider'
 import { NavigationProp, ParamListBase, useNavigation, useRoute } from '@react-navigation/native'
@@ -12,40 +12,32 @@ import { Favorite, GetCompanies, GetFavoriteCompanies } from '../../reducer/jobs
 import Icon from '../../utils/Icon'
 import Text from '../../components/Text'
 import { EmptyComp } from '../../recruiter/pages/OpenJobs/OpenJobs'
-export const Header = ({ title }) => {
-  const { colors } = useContext(ThemeContext)
+export const Header = ({ title, subtitle }: { title: string, subtitle: string }) => {
   const navigation: NavigationProp<ParamListBase> = useNavigation();
-
+  const { colors } = useContext(ThemeContext)
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        position: "relative",
-        alignItems: 'center',
-        borderBottomColor: colors.textDisabled,
-        borderBottomWidth: 0.5,
-        paddingBottom: responsiveScreenHeight(2),
-        width: responsiveScreenWidth(100),
-        paddingHorizontal: responsiveScreenWidth(5)
-      }}
-    >
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Image source={imagePath.backIcon} style={{ resizeMode: 'contain', transform: [{ scale: 1.1 }] }} />
-      </TouchableOpacity>
-      <Text
-        style={{
-          flex: 1,
-          textAlign: 'center',
-          fontSize: responsiveScreenFontSize(2),
-          color: colors.textPrimary,
-          fontWeight: '800',
-        }}
-      >
+    <View style={{ width: responsiveWidth(100), paddingHorizontal: responsiveScreenWidth(5) }}>
+      <Pressable onPress={() => navigation.goBack()} style={{ width: responsiveWidth(2.8), aspectRatio: 1 / 2 }}>
+        <Image style={{ height: "100%", width: "100%", }} source={imagePath.leftAngle} />
+      </Pressable>
+      <Text style={{
+        fontSize: responsiveScreenFontSize(3.2),
+        color: colors.textPrimary,
+        fontWeight: '800',
+        marginTop: responsiveHeight(1)
+      }}>
         {title}
       </Text>
-      <Image source={imagePath.backIcon} style={{ opacity: 0, resizeMode: 'contain' }} />
+      <Text style={{
+        fontSize: responsiveScreenFontSize(1.6),
+        color: colors.textSecondary,
+        marginTop: responsiveHeight(0.2),
+        fontWeight: "600"
+      }}>
+        {subtitle}
+      </Text>
     </View>
+
   )
 }
 const Company = () => {

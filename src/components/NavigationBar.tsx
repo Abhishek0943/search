@@ -9,7 +9,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Text from './Text'
 import { useAppSelector } from '../store'
 
-const NavigationBar = ({ onPress, bottomPadding = false, children, statusbar = true, name, navigationBar = true }: { onPress?: () => void, navigationBar?: boolean, statusbar?: boolean, bottomPadding?: boolean, children: React.JSX.Element, name?: RoutesType["HOME"] | RoutesType["CHAT"] | RoutesType["PROFILE"] | RoutesType["APPLYJOB"] | RoutesType["BLOG"] }) => {
+const NavigationBar = ({ onPress, bottomPadding = false, children, statusbar = true, name, navigationBar = true }: { onPress?: () => void, navigationBar?: boolean, statusbar?: boolean, bottomPadding?: boolean, children: React.JSX.Element, name?: RoutesType["HOME"] | RoutesType["CHAT"] | RoutesType["PROFILE"] | RoutesType["APPLYJOB"] | RoutesType["BOOKMARKED"] }) => {
     const { colors } = useContext(ThemeContext)
     const navigation: NavigationProp<ParamListBase> = useNavigation();
     const { user } = useAppSelector((state) => state.userStore);
@@ -25,25 +25,25 @@ const NavigationBar = ({ onPress, bottomPadding = false, children, statusbar = t
         {
             name: "Home",
             path: routes.HOME,
-            icon: <Image source={name === routes.HOME ? imagePath.activeHome : imagePath.home} />
+            icon: <Image source={name === routes.HOME ? require("./ActiveSearch.png") : imagePath.home} />
         },
         {
-            name: "Insights",
-            path: routes.BLOG,
-            icon: <Image source={name === routes.BLOG ? imagePath.activeBlog : imagePath.blog} />
+            name: "Bookmarked",
+            path: routes.BOOKMARKED,
+            icon: <Image source={name === routes.BOOKMARKED ? imagePath.activeBlog : require("./Bookmark.png")} />
         },
         {
             name: "Applications",
             path: routes.APPLYJOB,
-            icon: <Image source={name === routes.APPLYJOB ? imagePath.activeApplication : imagePath.application} />
+            icon: <Image source={name === routes.APPLYJOB ? imagePath.activeApplication : require("./Applied.png")} />
         }, {
             name: "Chat",
             path: routes.CHAT,
-            icon: <Image source={name === routes.CHAT ? imagePath.chat : imagePath.chat2} />
+            icon: <Image source={name === routes.CHAT ? imagePath.chat : require("./Inbox.png")} />
         }, {
             name: "Profile",
             path: routes.PROFILE,
-            icon: <Image source={name === routes.PROFILE ? imagePath.activeProfile : imagePath.profile} />
+            icon: <Image source={name === routes.PROFILE ? imagePath.activeProfile : require("./Profile.png")} />
         },
     ]
     return (
@@ -65,7 +65,6 @@ const NavigationBar = ({ onPress, bottomPadding = false, children, statusbar = t
                                             <Text style={{ color: "white", fontSize: responsiveScreenFontSize(1), fontWeight: "800" }}>{user?.messages_count}</Text>
                                         </View>
                                     }
-                                    <Text numberOfLines={1} ellipsizeMode='clip' style={{ fontSize: responsiveFontSize(1.6), color: e.path === name ? colors.black : colors.darkGray, fontWeight: e.path === name ? "900" : "400", }}>{e.name}</Text>
                                 </TouchableOpacity>
                             )
                         })
