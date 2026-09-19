@@ -24,6 +24,7 @@ import { useAlert } from '../../context/AlertContext';
 import RNFS from 'react-native-fs';
 import PdfThumbnail from 'react-native-pdf-thumbnail';
 import { routes } from '../../constants/values';
+import authStyles from './styles';
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 export const formatDateToMonthYear = (dateStr?: string | null) => {
     if (!dateStr) return 'Still here';
@@ -321,18 +322,10 @@ function ProfileCompelete(): ReactElement {
         } catch (e) { }
     };
     useEffect(() => {
-        dispatch(GetAllAvailabilities()).unwrap().then((res) => {
-            if (res.success) setAvailabilityOptions(res.data);
-        }).catch(() => { });
-        dispatch(GetAllWorkRights()).unwrap().then((res) => {
-            if (res.success) setWorkRightsOptions(res.data);
-        }).catch(() => { });
-        dispatch(Industries()).unwrap().then((res: any) => {
-            if (res.success) setIndustryOptions(res.data || []);
-        }).catch(() => { });
-        dispatch(GetSkills()).unwrap().then((res: any) => {
-            if (res.success) setSkillOptions(res.data || res.jobs || []);
-        }).catch(() => { });
+        dispatch(GetAllAvailabilities()).unwrap().then((res: any) => res.success && setAvailabilityOptions(res.data))
+        dispatch(GetAllWorkRights()).unwrap().then((res: any) => res.success && setWorkRightsOptions(res.data))
+        dispatch(Industries()).unwrap().then((res: any) => res.success ? setIndustryOptions(res.data || []) : null)
+        dispatch(GetSkills()).unwrap().then((res: any) => res.success ? setSkillOptions(res.data || res.jobs || []) : null)
     }, []);
 
     const handleInputChange = (data: { name: string; value: string }) => {
@@ -371,7 +364,7 @@ function ProfileCompelete(): ReactElement {
                             ))}
                         </View>
                         <Pressable style={{ width: responsiveWidth(100), marginTop: responsiveHeight(2), aspectRatio: 350 / 1, position: "relative", right: responsiveWidth(5), }}>
-                            <Image style={{ height: "100%", width: "100%", resizeMode: "contain" }} source={require("../Auth/Devider2.png")} />
+                            <Image style={authStyles.bgImageContain} source={require("./images/Devider2.png")} />
                         </Pressable>
 
                         <ScrollView showsVerticalScrollIndicator={false}>
@@ -407,7 +400,7 @@ function ProfileCompelete(): ReactElement {
                         <View style={{ flex: 1 }}>
                         </View>
                         <Pressable style={{ width: responsiveWidth(100), marginBottom: responsiveHeight(2.5), aspectRatio: 350 / 1, position: "relative", right: responsiveWidth(5), }}>
-                            <Image style={{ height: "100%", width: "100%", resizeMode: "contain" }} source={require("../Auth/Devider2.png")} />
+                            <Image style={authStyles.bgImageContain} source={require("./images/Devider2.png")} />
                         </Pressable>
                         <Button
                             label="Continue"
@@ -450,7 +443,7 @@ function ProfileCompelete(): ReactElement {
 
                         </View>
                         <Pressable style={{ width: responsiveWidth(100), marginTop: responsiveHeight(2), aspectRatio: 350 / 1, position: "relative", right: responsiveWidth(5), }}>
-                            <Image style={{ height: "100%", width: "100%", resizeMode: "contain" }} source={require("../Auth/Devider2.png")} />
+                            <Image style={authStyles.bgImageContain} source={require("./images/Devider2.png")} />
                         </Pressable>
                         <SearchSelectDropdown
                             label="Industries"
@@ -479,7 +472,7 @@ function ProfileCompelete(): ReactElement {
                         <View style={{ flex: 1 }}>
                         </View>
                         <Pressable style={{ width: responsiveWidth(100), marginBottom: responsiveHeight(2.5), aspectRatio: 350 / 1, position: "relative", right: responsiveWidth(5), }}>
-                            <Image style={{ height: "100%", width: "100%", resizeMode: "contain" }} source={require("../Auth/Devider2.png")} />
+                            <Image style={authStyles.bgImageContain} source={require("./images/Devider2.png")} />
                         </Pressable>
 
                         <Button
@@ -514,7 +507,7 @@ function ProfileCompelete(): ReactElement {
                             ))}
                         </View>
                         <Pressable style={{ width: responsiveWidth(100), marginTop: responsiveHeight(2), aspectRatio: 350 / 1, position: "relative", right: responsiveWidth(5) }}>
-                            <Image style={{ height: "100%", width: "100%", resizeMode: "contain" }} source={require("../Auth/Devider2.png")} />
+                            <Image style={authStyles.bgImageContain} source={require("./images/Devider2.png")} />
                         </Pressable>
                         <ScrollView showsVerticalScrollIndicator={false}>
                             <Text style={{ color: colors.textSecondary, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '600', marginTop: responsiveHeight(1.5) }}>
@@ -760,14 +753,14 @@ function ProfileCompelete(): ReactElement {
                                 width: responsiveWidth(90),
                                 aspectRatio: 350 / 70
                             }}>
-                                <Image style={{ height: "100%", width: "100%", resizeMode: "contain" }} source={require("./InfoButton.png")} />
+                                <Image style={authStyles.bgImageContain} source={require("./images/InfoButton.png")} />
                             </View>
                         </ScrollView >
 
                         <View style={{ flex: 1 }} />
 
                         <Pressable style={{ width: responsiveWidth(100), marginBottom: responsiveHeight(2), aspectRatio: 350 / 1, position: "relative", right: responsiveWidth(5) }}>
-                            <Image style={{ height: "100%", width: "100%", resizeMode: "contain" }} source={require("../Auth/Devider2.png")} />
+                            <Image style={authStyles.bgImageContain} source={require("./images/Devider2.png")} />
                         </Pressable>
 
                         <Button
@@ -824,7 +817,7 @@ function ProfileCompelete(): ReactElement {
                             ))}
                         </View>
                         <Pressable style={{ width: responsiveWidth(100), marginTop: responsiveHeight(2), aspectRatio: 350 / 1, position: "relative", right: responsiveWidth(5), }}>
-                            <Image style={{ height: "100%", width: "100%", resizeMode: "contain" }} source={require("../Auth/Devider2.png")} />
+                            <Image style={authStyles.bgImageContain} source={require("./images/Devider2.png")} />
                         </Pressable>
 
                         <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
@@ -1151,7 +1144,7 @@ function ProfileCompelete(): ReactElement {
                         </ScrollView>
 
                         <Pressable style={{ width: responsiveWidth(100), marginBottom: responsiveHeight(1), aspectRatio: 350 / 1, position: "relative", right: responsiveWidth(5) }}>
-                            <Image style={{ height: "100%", width: "100%", resizeMode: "contain" }} source={require("../Auth/Devider2.png")} />
+                            <Image style={authStyles.bgImageContain} source={require("./images/Devider2.png")} />
                         </Pressable>
 
                         <Button

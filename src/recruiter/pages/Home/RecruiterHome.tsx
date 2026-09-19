@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useEffect, useRef, useState } from 'rea
 import { ActivityIndicator, Alert, BackHandler, FlatList, Image, Platform, Pressable, ScrollView, StyleSheet, TouchableHighlight, TouchableOpacity, View } from 'react-native'
 import NavigationBar from '../../components/NavigationBar'
 import { API_URL, routes } from '../../../constants/values'
-import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions'
+import { responsiveHeight, responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth, responsiveWidth } from 'react-native-responsive-dimensions'
 import imagePath from '../../../assets/imagePath'
 import { ThemeContext } from '../../../context/ThemeProvider'
 import { useAppDispatch, useAppSelector } from '../../../store'
@@ -28,6 +28,7 @@ function RecruiterHome() {
     const { showAlert } = useAlert();
     const pendingPackageIdRef = { current: null as number | null };
     const [isSelecting, setIsSelecting] = useState(false);
+    const [expandedPlanId, setExpandedPlanId] = useState<number | null>(null);
     async function buyIosWithRevenueCat(item: any) {
         const key = item?.apple_package_id
         if (!key) {
@@ -234,252 +235,512 @@ function RecruiterHome() {
     )
 
     const flatListRef = useRef<FlatList>(null);
+
+    // Derived values for the UI
+    const companyInitial = user?.name ? user.name.charAt(0).toUpperCase() : 'R';
+    const companyName = user?.name || 'Company Name';
+    const companyLocation = user?.location || 'Location Not Set';
+    const liveJobs = user?.jobs_count ?? 0;
+
     return (
         <NavigationBar name={routes.RECRUITERHOME}>
-            <>
-                <Image source={require("./Ellipse44.png")} style={{ position: "absolute", width: responsiveScreenWidth(100), height: responsiveScreenHeight(100), top: -100, }} />
-                <View style={{ width: "90%", flex: 1, marginTop: responsiveScreenHeight(2), alignSelf: "center", borderRadius: 10, }}>
-                    {/* {
-                        plan?.plans?.length > 0 ? <> */}
-                    <FlatList
-                        showsVerticalScrollIndicator={false}
-                        scrollEnabled={true}
-                        ref={flatListRef}
-                        ListEmptyComponent={() => {
-                            if (!user?.is_active) {
-                                return null
-                            }
-                            return (
-                                <View style={{ flex: 1, marginTop: responsiveScreenHeight(15), }}><ActivityIndicator size={responsiveScreenFontSize(3)} /></View>
-
-                            )
-                        }}
-                        ListHeaderComponent={() => {
-                            return (
-                                <>
-                                    <View style={styles.headerRow}>
-                                        <View style={styles.logoWrap}>
-                                            <Image source={imagePath.logo} style={styles.logoImg} />
+            <View style={styles.container}>
+                <FlatList
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={styles.listContent}
+                    ref={flatListRef}
+                    ListEmptyComponent={() => {
+                        if (!user?.is_active) return null;
+                        return (
+                            <View style={{ flex: 1, marginTop: responsiveScreenHeight(15) }}>
+                                <ActivityIndicator size={responsiveScreenFontSize(3)} />
+                            </View>
+                        );
+                    }}
+                    ListHeaderComponent={() => {
+                        return (
+                            <View style={styles.headerContainer}>
+                                <View style={styles.headerRow}>
+                                    <View style={styles.companyInfoRow}>
+                                        <View style={styles.avatarWrap}>
+                                            <Text style={[styles.avatarText,]}>{companyInitial}</Text>
                                         </View>
+                                        <View style={styles.companyTextWrap}>
+                                            <Text style={[styles.companyNameText, { color: colors.textPrimary }]}>{companyName}</Text>
+                                            <Text style={[styles.companyLocationText, { color: colors.textSecondary }]}>{companyLocation}</Text>
+                                        </View>
+                                    </View>
+                                    <TouchableOpacity onPress={() => navigation.navigate(routes.NOTIFICATION, { company: true })} style={styles.notifBtn}>
+                                        <Image source={imagePath.NotificationIcon} style={styles.notifIcon} />
+                                    </TouchableOpacity>
+                                </View>
 
-                                        <TouchableOpacity onPress={() => navigation.navigate(routes.COMPANY, { company: true })} style={styles.btnWrap}>
-                                            <Image source={imagePath.button} style={styles.btnImg} />
-                                        </TouchableOpacity>
+                                <View style={styles.welcomeWrap}>
+                                    <Text style={[styles.welcomeTitle, { color: colors.textPrimary }]}>Let’s get you hiring</Text>
+                                    <Text style={[styles.welcomeSubtitle, { color: colors.textSecondary }]}>Your venue is set up. One post and you're live.</Text>
+                                </View>
 
-                                        <TouchableOpacity onPress={() => navigation.navigate(routes.NOTIFICATION, { company: true })} style={styles.notifWrap}>
-                                            <Image source={imagePath.notification} style={styles.notifImg} />
+                                <TouchableOpacity
+                                    style={[styles.ctaCard, { backgroundColor: colors.primary }]}
+                                    onPress={() => navigation.navigate(routes.ADDJOB)}
+                                    activeOpacity={0.9}
+                                >
+                                    <View style={styles.ctaIconRow}>
+                                        <View style={styles.ctaPlusWrap}>
+                                            <Image source={require("./AddIcon.png")} style={{ height: "100%", width: "100%", resizeMode: "contain" }} />
+                                        </View>
+                                        <View style={styles.ctaPlusWrap}>
+                                            <Image source={require("./GoButton.png")} style={{ height: "100%", width: "100%", resizeMode: "contain" }} />
+
+                                        </View>
+                                    </View>
+                                    <View >
+                                        <Text style={[styles.ctaTitle, { color: colors.white }]}>Post your first job</Text>
+                                        <Text style={[styles.ctaSubtitle, { color: colors.lightGray2 }]}>About 4 minutes · plans from AUD 0</Text>
+                                    </View>
+                                </TouchableOpacity>
+
+                                <View style={styles.statsRow}>
+                                    <View style={[styles.statCard, { borderColor: colors.gray }]}>
+                                        <Text style={[styles.statNumber, { color: colors.textPrimary }]}>{liveJobs}</Text>
+                                        <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Live jobs</Text>
+                                    </View>
+                                    <View style={[styles.statCard, { borderColor: colors.gray }]}>
+                                        <Text style={[styles.statNumber, { color: colors.textPrimary }]}>0</Text>
+                                        <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Applications</Text>
+                                    </View>
+                                    <View style={[styles.statCard, { borderColor: colors.gray }]}>
+                                        <Text style={[styles.statNumber, { color: colors.textPrimary }]}>0</Text>
+                                        <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Shortlisted</Text>
+                                    </View>
+                                </View>
+
+                                {/* Plans Header */}
+                                {user && user.is_active ? (
+                                    <View >
+                                        <View style={styles.planHeaderRow}>
+                                            <Text style={[styles.planHeaderTitle, { color: colors.textPrimary }]}>Choose a plan</Text>
+                                            <TouchableOpacity>
+                                                <Text style={[styles.compareAllText, { color: colors.primary }]}>Compare all</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                        <Text style={[styles.planHeaderSubtitle, { color: colors.textSecondary }]}>You need a plan before a job goes live.</Text>
+                                    </View>
+                                ) : (
+                                    <View style={{ height: responsiveScreenHeight(45), justifyContent: "center", alignItems: "center" }}>
+                                        <Image source={require("./inActive.png")} style={{ marginVertical: responsiveScreenHeight(2) }} />
+                                        <TouchableOpacity onPress={() => navigation.navigate(routes.CONTACT)}>
+                                            {/* <Image source={require("./popupbutton.png")} /> */}
                                         </TouchableOpacity>
                                     </View>
-                                    <Pressable
-
-                                        onPress={() => {
-                                            flatListRef.current?.scrollToOffset({
-                                                offset: responsiveScreenHeight(40),
-                                                animated: true,
-                                            });
-                                        }}
-                                    >
-                                        <View style={styles.bannerWrap}>
-                                            <Image source={imagePath.recruterBanner} style={styles.bannerImg} />
-                                        </View>
-                                    </Pressable>
-                                    <View style={styles.statsRow}>
-
-                                        <TouchableOpacity onPress={() => navigation.navigate(routes.OPENJOBS)} style={[styles.statCard, { backgroundColor: colors.lightGrayNatural, }]}>
-                                            <>
-
-                                                <View style={styles.statIconWrap}>
-                                                    <Image source={imagePath.clock2} style={styles.statIcon} />
-                                                </View>
-                                                <Text style={styles.statTitle}>Opens Jobs</Text>
-                                                <Text style={[styles.statValue, { color: colors.darkGrayNatural, }]}>{user?.jobs_count ?? 0}</Text>
-                                            </>
-                                        </TouchableOpacity>
-                                        {/* 
-                                        <TouchableOpacity style={[styles.statCard, { backgroundColor: colors.lightGrayNatural, }]}>
-                                            <View style={styles.statIconWrap}>
-                                                <Image source={imagePath.activeProfile} style={styles.statIcon} />
+                                )}
+                            </View>
+                        );
+                    }}
+                    ListFooterComponent={() => {
+                        if (!user?.is_active) return null;
+                        return (
+                            <View style={styles.footerWrap}>
+                                <Image source={require("./RecruiterHome.png")} style={{ width: "100%", height: "100%", resizeMode: "contain" }} />
+                            </View>
+                        );
+                    }}
+                    data={user ? (user.is_active ? plan?.plans : []) : []}
+                    keyExtractor={(item) => item.id?.toString() || item.name}
+                    renderItem={({ item }) => {
+                        const isExpanded = expandedPlanId === item.id;
+                        const isPopular = item.name?.toLowerCase().includes('gold') || item.name?.toLowerCase().includes('popular');
+                        return (
+                            <TouchableOpacity
+                                style={[styles.planCard, { borderColor: colors.gray }]}
+                                activeOpacity={0.8}
+                                onPress={() => setExpandedPlanId(isExpanded ? null : item.id)}
+                            >
+                                <View style={styles.planCardHeaderRow}>
+                                    <View style={styles.planCardTitleWrap}>
+                                        <Text style={[styles.planCardTitle, { color: colors.textPrimary }]}>{item.name}</Text>
+                                        {isPopular && (
+                                            <View style={styles.popularBadge}>
+                                                <Text style={styles.popularBadgeText}>POPULAR</Text>
                                             </View>
-                                            <Text style={styles.statTitle}>Followers</Text>
-                                            <Text style={[styles.statValue, { color: colors.darkGrayNatural, }]}>{user?.followers_count ?? 0}</Text>
-                                        </TouchableOpacity> */}
-
-                                        <TouchableOpacity onPress={() => navigation.navigate(routes.CHAT, { followers: true })} style={[styles.statCard, { backgroundColor: colors.lightGrayNatural, }]}>
-                                            <View style={styles.statIconWrap}>
-                                                <Image source={imagePath.chat} style={styles.statIcon} />
-                                            </View>
-                                            <Text style={styles.statTitle}>Messages</Text>
-                                            <Text style={[styles.statValue, { color: colors.darkGrayNatural, }]}>{user?.messages_count ?? 0}</Text>
-
-                                        </TouchableOpacity>
-
+                                        )}
                                     </View>
-                                    {
-                                        user.is_active ?
-                                            <View style={styles.planWrap}>
-                                                <Text style={styles.planTitle}>Choose your plan</Text>
-                                                <Text style={[styles.planSubTitle, { color: colors.hardGray, marginTop: responsiveScreenHeight(.8) }]}>Change or cancel anytime.</Text>
-                                            </View> : <View style={{ height: responsiveScreenHeight(45), justifyContent: "center", alignItems: "center" }}>
-                                                <Image source={require("./inActive.png")} style={{ marginVertical: responsiveScreenHeight(2) }} />
-                                                <TouchableOpacity style={{}} onPress={() => navigation.navigate(routes.CONTACT)}>
+                                    <Text style={[styles.planCardPrice, { color: colors.textPrimary }]}>{item.price?.formatted || `AUD ${item.price?.amount || 0}`}</Text>
+                                </View>
 
-                                                    <Image source={require("./popupbutton.png")} style={{}} />
-                                                </TouchableOpacity>
+                                <View style={styles.planCardSubRow}>
+                                    <Text style={[styles.planCardSubtitle, { color: colors.textPrimary }]}>{item.display?.label || `${item.duration_days || 0} days · ${item.postings || 1} posting`}</Text>
+                                    <Image
+                                        source={imagePath.DownAngle}
+                                        style={[styles.chevronIcon, isExpanded && styles.chevronIconRotated]}
+                                    />
+                                </View>
 
-                                            </View>
-                                    }
-                                </>
-                            )
-                        }}
+                                <View style={styles.planFeatureRow}>
+                                    <Image source={imagePath.Check2} style={[styles.checkIcon, { tintColor: colors.primary }]} />
+                                    <Text style={[styles.planFeatureText, { color: colors.textSecondary }]}>{item.views?.label || 'Standard visibility'}</Text>
+                                </View>
 
-                        contentContainerStyle={{ gap: responsiveScreenHeight(2) }}
-                        data={user.is_active ? plan?.plans : []}
-                        renderItem={({ item, index }) => (
-                            <View style={{ overflow: "hidden", backgroundColor: index === 0 ? "#E5E4E2" : index === 1 ? "#FFD700" : "#AABDE4", borderRadius: 20 }}>
-                                <Text style={{ color: colors.textPrimary, fontWeight: "800", fontSize: responsiveScreenFontSize(2.5), textAlign: "center", paddingVertical: responsiveScreenHeight(1) }}> {item.name}</Text>
-                                <View style={{ justifyContent: "center", alignItems: "center", gap: responsiveScreenWidth(2), backgroundColor: "#09111E", }}>
-                                    <Text style={{ color: colors.white, marginTop: responsiveScreenHeight(2), fontSize: responsiveScreenFontSize(2.4), fontWeight: "600" }}>{item.display.label}</Text>
-                                    <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(2.4), fontWeight: "600" }}>{item.price.formatted}</Text>
-                                    <Text style={{ color: colors.mediumGrayNatural, fontSize: responsiveScreenFontSize(2), fontWeight: "600" }}>{item.views.label}</Text>
-                                    {
-                                        item.sections.map((sectionItem: any, index: number) => (
-                                            <>
-                                                {
-                                                    index !== 0 ? <Text style={{ color: colors.mediumGrayNatural, fontSize: responsiveScreenFontSize(2), width: "94%", marginTop: responsiveScreenHeight(1), fontWeight: "600" }}>{sectionItem.title}</Text> : null
-                                                }
-
-
-                                                {sectionItem.items.map((subItem: any, subIndex: number) => (
-                                                    <View key={subIndex} style={{ width: "94%", flexDirection: "row", alignItems: "flex-start", gap: responsiveScreenWidth(2) }}>
-                                                        <View style={{ width: responsiveScreenHeight(3) }}>
-
-                                                            <Image source={imagePath.check} style={{ height: responsiveScreenHeight(3), resizeMode: "contain" }} />
-                                                        </View>
-                                                        <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.9), fontWeight: "700", flex: 1, }}>{subItem}</Text>
+                                {isExpanded && (
+                                    <View style={styles.expandedContent}>
+                                        {item.sections?.map((sectionItem: any, index: number) => (
+                                            <View key={index} style={styles.sectionWrap}>
+                                                {index !== 0 && (
+                                                    <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>{sectionItem.title}</Text>
+                                                )}
+                                                {sectionItem.items?.map((subItem: any, subIndex: number) => (
+                                                    <View key={subIndex} style={styles.planFeatureRowExpanded}>
+                                                        <Image source={imagePath.Check2} style={[styles.checkIcon, { tintColor: colors.primary }]} />
+                                                        <Text style={[styles.planFeatureTextExpanded, { color: colors.textSecondary }]}>{subItem}</Text>
                                                     </View>
                                                 ))}
+                                            </View>
+                                        ))}
 
-
-                                            </>
-                                        ))
-
-                                    }
-                                    <Pressable
-                                        onPress={() => onSelectPlan(item)}
-                                        disabled={isSelecting}
-                                        style={{
-                                            width: '92%',
-                                            justifyContent: 'center',
-                                            marginTop: responsiveScreenHeight(2),
-                                            borderRadius: 12,
-                                            gap: responsiveScreenWidth(1),
-                                            flexDirection: 'row',
-                                            alignItems: 'center',
-                                            backgroundColor: colors.white,
-                                            paddingHorizontal: responsiveScreenWidth(3),
-                                            paddingVertical: responsiveScreenHeight(1.5),
-                                            marginBottom: responsiveScreenHeight(2),
-                                            opacity: isSelecting ? 0.7 : 1
-
-                                        }}
-                                    >
-                                        {
-                                            isSelecting ? <ActivityIndicator size={responsiveScreenFontSize(2)} color={colors.textPrimary} /> :
-                                                <Text style={{ color: colors.textPrimary, fontSize: responsiveScreenFontSize(1.9), fontWeight: '700' }}>
-                                                    Select Plan
-                                                </Text>
-                                        }
-                                    </Pressable>
-                                </View>
-                            </View>
-                        )} />
-                    {/* </> :
-                            <>
-                                <View style={{ flex: 1, marginTop: responsiveScreenHeight(15) }}><ActivityIndicator size={responsiveScreenFontSize(3)} /></View>
-                            </>
-                    } */}
-
-                </View>
-            </>
-
+                                        <TouchableOpacity
+                                            onPress={() => onSelectPlan(item)}
+                                            disabled={isSelecting}
+                                            style={styles.selectPlanBtn}
+                                        >
+                                            {isSelecting && pendingPackageIdRef.current === item.id ? (
+                                                <ActivityIndicator size={responsiveScreenFontSize(2)} color={colors.white} />
+                                            ) : (
+                                                <Text style={styles.selectPlanBtnText}>Get {item?.name} · {item?.price?.formatted}</Text>
+                                            )}
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+                            </TouchableOpacity>
+                        );
+                    }}
+                />
+            </View>
         </NavigationBar>
-    )
+    );
 }
 
-export default RecruiterHome
+export default RecruiterHome;
 
 const styles = StyleSheet.create({
-    container: {},
-
+    container: {
+        flex: 1,
+        backgroundColor: '#FAFAFC', // Very light background to match screenshot
+    },
+    listContent: {
+        paddingHorizontal: responsiveScreenWidth(5),
+        paddingTop: responsiveScreenHeight(2),
+        paddingBottom: responsiveScreenHeight(5),
+    },
+    headerContainer: {
+        marginBottom: responsiveScreenHeight(2),
+    },
     headerRow: {
-        flexDirection: "row",
-        width: "100%",
-        alignItems: "center",
-        gap: responsiveScreenWidth(3),
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: responsiveScreenHeight(3),
+    },
+    companyInfoRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    avatarWrap: {
+        width: responsiveScreenHeight(5.5),
+        height: responsiveScreenHeight(5.5),
+        borderRadius: responsiveScreenHeight(3),
+        backgroundColor: '#E8F5EE', // Light green background for avatar
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: responsiveScreenWidth(3),
+    },
+    avatarText: {
+        color: '#0B4F42', // Dark green text
+        fontSize: responsiveScreenFontSize(2.5),
+        fontWeight: '700',
+    },
+    companyTextWrap: {
+        justifyContent: 'center',
+    },
+    companyNameText: {
+        fontSize: responsiveScreenFontSize(2.2),
+        fontWeight: '800',
+        marginBottom: responsiveScreenHeight(0.2),
+    },
+    companyLocationText: {
+        fontSize: responsiveScreenFontSize(1.8),
+        fontWeight: '500',
+    },
+    notifBtn: {
+        width: responsiveScreenHeight(5.5),
+        height: responsiveScreenHeight(5.5),
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    notifIcon: {
+        width: '50%',
+        height: '50%',
+        resizeMode: 'contain',
+    },
+    welcomeWrap: {
+        marginBottom: responsiveScreenHeight(3),
+    },
+    welcomeTitle: {
+        fontSize: responsiveScreenFontSize(3.5),
+        fontWeight: '800',
+        marginBottom: responsiveScreenHeight(0.5),
+    },
+    welcomeSubtitle: {
+        fontSize: responsiveScreenFontSize(1.8),
+        fontWeight: '500',
+    },
+    ctaCard: {
+        borderRadius: 20,
+        padding: responsiveScreenWidth(5),
+        marginBottom: responsiveScreenHeight(3),
+    },
+    ctaIconRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        marginBottom: responsiveScreenHeight(2),
+    },
+    ctaPlusWrap: {
+        width: responsiveScreenHeight(6),
+        aspectRatio: 1
+    },
+    ctaPlusText: {
+        color: '#FFF',
+        fontSize: responsiveScreenFontSize(4),
+        fontWeight: '300',
+        lineHeight: responsiveScreenFontSize(4.5),
+    },
+    ctaArrowWrap: {
+        width: responsiveScreenHeight(5),
+        height: responsiveScreenHeight(5),
+        borderRadius: responsiveScreenHeight(2.5),
+        backgroundColor: '#FFF',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    ctaArrowImg: {
+        width: '40%',
+        height: '40%',
+        resizeMode: 'contain',
+        tintColor: '#1A5FA8',
     },
 
-    logoWrap: { flex: 1, height: responsiveScreenHeight(5) },
-    logoImg: {
-        height: "100%",
-        width: responsiveScreenWidth(37),
-        resizeMode: "contain",
+    ctaTitle: {
+        fontSize: responsiveScreenFontSize(2.5),
+        fontWeight: '800',
+        marginBottom: responsiveScreenHeight(0.5),
     },
-
-    btnWrap: { height: responsiveScreenHeight(4) },
-    btnImg: { height: "100%", resizeMode: "contain" },
-
-    notifWrap: { height: responsiveScreenHeight(3), aspectRatio: 1, justifyContent: "center", alignItems: "center", borderRadius: 10, backgroundColor: "white" },
-    notifImg: { height: "100%", resizeMode: "contain" },
-
-    bannerWrap: {
-        width: "100%",
-        alignSelf: "center",
-        marginTop: responsiveScreenHeight(2),
-        aspectRatio: 2.58,
+    ctaSubtitle: {
+        fontSize: responsiveScreenFontSize(1.8),
+        fontWeight: '500',
     },
-    bannerImg: { width: "100%", height: "100%" },
-
     statsRow: {
-        width: "100%",
-        alignSelf: "center",
-        flexDirection: "row",
-        gap: responsiveScreenWidth(2),
-        marginTop: responsiveScreenHeight(2),
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: responsiveScreenHeight(2),
     },
-
     statCard: {
         flex: 1,
-        gap: responsiveScreenHeight(0.6),
+        borderRadius: 16,
+        paddingVertical: responsiveScreenHeight(2),
+        marginHorizontal: responsiveScreenWidth(1),
+        alignItems: 'center',
+        borderWidth: 1,
+    },
+    statNumber: {
+        fontSize: responsiveScreenFontSize(3.5),
+        fontWeight: '800',
+        marginBottom: responsiveScreenHeight(0.5),
+    },
+    statLabel: {
+        fontSize: responsiveScreenFontSize(1.8),
+        fontWeight: '500',
+    },
 
+    planHeaderRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-end',
+        marginBottom: responsiveScreenHeight(0.5),
+    },
+    planHeaderTitle: {
+        fontSize: responsiveScreenFontSize(2.4),
+        fontWeight: '800',
+    },
+    compareAllText: {
+        fontSize: responsiveScreenFontSize(1.8),
+        fontWeight: '700',
+    },
+    planHeaderSubtitle: {
+        fontSize: responsiveScreenFontSize(1.8),
+        fontWeight: '500',
+    },
+    planCard: {
+        borderRadius: 16,
+        padding: responsiveScreenWidth(4),
+        marginBottom: responsiveScreenHeight(1.5),
+        borderWidth: 1,
+    },
+    planCardPopular: {
+        borderColor: '#1A5FA8',
+        borderWidth: 1.5,
+    },
+    planCardHeaderRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: responsiveScreenHeight(0.5),
+    },
+    planCardTitleWrap: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    planCardTitle: {
+        fontSize: responsiveScreenFontSize(2.2),
+        fontWeight: '800',
+    },
+
+    popularBadge: {
+        backgroundColor: '#E8F5EE',
         paddingHorizontal: responsiveScreenWidth(2),
-        paddingVertical: responsiveScreenHeight(1),
-        borderRadius: 15,
+        paddingVertical: responsiveScreenHeight(0.3),
+        borderRadius: 6,
+        marginLeft: responsiveScreenWidth(2),
     },
-
-    statIconWrap: { height: responsiveScreenHeight(3) },
-    statIcon: { height: "100%", resizeMode: "contain" },
-
-    statTitle: {
-        fontSize: responsiveScreenFontSize(2),
-        fontWeight: "800",
+    popularBadgeText: {
+        color: '#0E8A5A',
+        fontSize: responsiveScreenFontSize(1.2),
+        fontWeight: '800',
+        letterSpacing: 0.5,
     },
-    statValue: {
-        fontSize: responsiveScreenFontSize(2),
-        fontWeight: "800",
-
+    planCardPrice: {
+        fontSize: responsiveScreenFontSize(2.2),
+        fontWeight: '800',
     },
-
-    planWrap: {
-        width: "100%",
-        alignSelf: "center",
-        marginTop: responsiveScreenHeight(1.5),
+    planCardSubRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: responsiveScreenHeight(1),
     },
-    planTitle: {
-        fontSize: responsiveScreenFontSize(3.2),
-        fontWeight: "900",
-    },
-    planSubTitle: {
+    planCardSubtitle: {
         fontSize: responsiveScreenFontSize(1.6),
-        fontWeight: "600",
+        color: '#7B8CA3',
+        fontWeight: '500',
     },
+    chevronIcon: {
+        width: responsiveScreenHeight(2),
+        height: responsiveScreenHeight(2),
+        resizeMode: 'contain',
+        tintColor: '#7B8CA3',
+    },
+    chevronIconRotated: {
+        transform: [{ rotate: '180deg' }],
+    },
+    planFeatureRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: responsiveScreenHeight(0.5),
+    },
+    checkIcon: {
+        width: responsiveScreenHeight(1.8),
+        height: responsiveScreenHeight(1.8),
+        resizeMode: 'contain',
+        marginTop: responsiveHeight(.25),
+        marginRight: responsiveScreenWidth(2),
+    },
+    planFeatureText: {
+        fontSize: responsiveScreenFontSize(1.8),
+        fontWeight: '500',
+    },
+    expandedContent: {
+        marginTop: responsiveScreenHeight(2),
+        paddingTop: responsiveScreenHeight(2),
+        borderTopWidth: 1,
+        borderTopColor: '#EFEFEF',
+    },
+    sectionWrap: {
+        marginBottom: responsiveScreenHeight(1.5),
+    },
+    sectionTitle: {
+        fontSize: responsiveScreenFontSize(1.8),
+        fontWeight: '700',
+        marginBottom: responsiveScreenHeight(1),
+    },
+    planFeatureRowExpanded: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        marginBottom: responsiveScreenHeight(1),
+    },
+    planFeatureTextExpanded: {
+        fontSize: responsiveScreenFontSize(1.8),
+        fontWeight: '500',
+        flex: 1,
+    },
+    selectPlanBtn: {
+        backgroundColor: '#1A5FA8',
+        borderRadius: 12,
+        paddingVertical: responsiveScreenHeight(1.5),
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: responsiveScreenHeight(1),
+    },
+    selectPlanBtnText: {
+        color: '#FFF',
+        fontSize: responsiveScreenFontSize(1.8),
+        fontWeight: '700',
+    },
+    footerWrap: {
+        marginTop: responsiveScreenHeight(2),
+        marginBottom: responsiveScreenHeight(2),
+        width: responsiveWidth(80),
+        aspectRatio: 332 / 147
+    },
+    footerTitle: {
+        fontSize: responsiveScreenFontSize(2.4),
+        fontWeight: '800',
+        color: '#1A5FA8',
+        marginBottom: responsiveScreenHeight(3),
+    },
+    stepRow: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        marginBottom: responsiveScreenHeight(2.5),
+        position: 'relative',
+    },
+    stepNumberWrap: {
+        width: responsiveScreenHeight(3.5),
+        height: responsiveScreenHeight(3.5),
+        borderRadius: responsiveScreenHeight(1.75),
+        backgroundColor: '#E8F5EE',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: responsiveScreenWidth(4),
+        zIndex: 2,
+    },
+    stepNumberText: {
+        color: '#0E8A5A',
+        fontSize: responsiveScreenFontSize(1.8),
+        fontWeight: '800',
+    },
+    stepText: {
+        flex: 1,
+        fontSize: responsiveScreenFontSize(1.8),
+        color: '#494949',
+        fontWeight: '500',
+        marginTop: responsiveScreenHeight(0.5),
+    },
+    stepLine: {
+        position: 'absolute',
+        left: responsiveScreenHeight(1.75) - 1, // center of the circle
+        top: responsiveScreenHeight(3.5), // bottom of the circle
+        width: 2,
+        height: responsiveScreenHeight(4.5), // approximate distance to next circle
+        backgroundColor: '#E8F5EE',
+        zIndex: 1,
+    }
 });

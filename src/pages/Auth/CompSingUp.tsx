@@ -35,6 +35,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { ProfileData } from '../../reducer/jobsReducer'
 import { routes } from '../../constants/values';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import authStyles from './styles';
 
 const CompSingUp = () => {
     const { colors } = useContext(ThemeContext);
@@ -226,6 +227,9 @@ export const ComponentSingUp = ({
 }) => {
     const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
     const { colors } = useContext(ThemeContext);
+    const [loading, setLoading] = useState(false);
+    const [resendLoading, setResendLoading] = useState(false);
+    const [verifyLoading, setVerifyLoading] = useState(false);
     const [hidePassword, setHidePassword] = useState(false);
     const [hideConfirmPassword, setHideConfirmPassword] = useState(false);
     const [user, setUser] = useState<{
@@ -244,12 +248,6 @@ export const ComponentSingUp = ({
             const profileRes: any = await dispatch(
                 RecruiterProfile()
             ).unwrap();
-
-            console.log(
-                "Company Profile:",
-                JSON.stringify(profileRes, null, 2)
-            );
-
             if (!profileRes.success) {
                 navigation.reset({
                     index: 0,
@@ -257,7 +255,6 @@ export const ComponentSingUp = ({
                 });
                 return;
             }
-
             const company =
                 profileRes.data ||
                 profileRes.company ||
@@ -282,11 +279,6 @@ export const ComponentSingUp = ({
             }
 
         } catch (error) {
-            console.log(
-                "Company profile check error:",
-                error
-            );
-
             navigation.reset({
                 index: 0,
                 routes: [{ name: routes.DETAILS }],
@@ -324,9 +316,9 @@ export const ComponentSingUp = ({
             case 1:
                 return (
                     <>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(4) }}>
-                            <Pressable onPress={() => navigation.goBack()} style={{ width: responsiveWidth(2.8), aspectRatio: 1 / 2 }}>
-                                <Image style={{ height: "100%", width: "100%", }} source={imagePath.leftAngle} />
+                        <View style={authStyles.stepHeaderRow}>
+                            <Pressable onPress={() => navigation.goBack()} style={authStyles.backButton}>
+                                <Image style={authStyles.bgImage} source={imagePath.leftAngle} />
                             </Pressable>
                             <View style={{}}>
                                 <Text style={{ color: mainColor, borderWidth: 1, fontSize: responsiveFontSize(1.8), fontWeight: '800' }}>
@@ -352,12 +344,12 @@ export const ComponentSingUp = ({
 
                         </View>
                         <Pressable style={{ width: responsiveWidth(100), marginTop: responsiveHeight(2.5), position: "relative", right: responsiveWidth(5), aspectRatio: 350 / 1 }}>
-                            <Image style={{ height: "100%", width: "100%", resizeMode: "contain" }} source={require("./Devider2.png")} />
+                            <Image style={authStyles.bgImageContain} source={require("./images/Devider2.png")} />
                         </Pressable>
                         <ScrollView showsVerticalScrollIndicator={false}>
                             <Text style={{ color: colors.textSecondary, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '600', marginTop: responsiveHeight(1.5) }}>Three short steps. Then you're in.</Text>
                             <InPutWithLabel inputContainerStyle={{ marginBottom: responsiveHeight(.5) }} mainColor={mainColor} secondaryColor={secondaryColor} label={type === "comp" ? 'Work Email' : 'Email address'} value={user.email} onChangeText={(text) => handleInputChange({ name: "email", value: text })} placeholder="Email" />
-                            <Text style={{ marginBottom: responsiveHeight(1), color: colors.textSecondary, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '600', }}>{emailText}</Text>
+                            <Text style={{ color: colors.textSecondary, borderWidth: 1, fontSize: responsiveFontSize(1.9), fontWeight: '600', }}>{emailText}</Text>
                             <InPutWithLabel inputContainerStyle={{ marginBottom: responsiveHeight(0.3) }} mainColor={mainColor} secondaryColor={secondaryColor} label='Create a password' secureText={hidePassword} rightIcon={() => {
                                 return (
                                     <TouchableOpacity onPress={() => setHidePassword(!hidePassword)}>
@@ -376,42 +368,25 @@ export const ComponentSingUp = ({
                             {user.confirmPassword.length > 0 && (
                                 <RequirementRow color={user.password === user.confirmPassword ? secondaryColor : colors.textSecondary} text="Both passwords match" />
                             )}
-                            <View style={{ flexDirection: 'row', alignItems: "baseline", gap: responsiveWidth(1), marginBottom: responsiveHeight(0.5), marginTop: responsiveHeight(1) }}>
-                                <Text style={{ color: secondaryColor || colors.textPrimary, fontSize: responsiveFontSize(1.8), fontWeight: '700' }}>Mobile number</Text>
-                                <Text style={{
-                                    fontSize: responsiveFontSize(1.2),
-                                    fontWeight: "400",
-                                    lineHeight: responsiveFontSize(1.9),
-                                    color: colors.textSecondary,
-                                    flexWrap: "wrap",
-                                }}>(Optional)</Text>
-                            </View>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderRadius: 15, borderColor: colors.surfaces, borderStyle: 'dashed', height: responsiveHeight(6), paddingHorizontal: responsiveWidth(4), marginBottom: responsiveHeight(1) }}>
-                                <Text style={{ color: colors.textPrimary, fontSize: responsiveFontSize(2), fontWeight: '600', marginRight: responsiveWidth(2) }}>{countryCode || "+61"}</Text>
-                                <View style={{ width: 1, height: '60%', backgroundColor: colors.surfaces, marginRight: responsiveWidth(2) }} />
-                                <CustomTextInput
-                                    style={{ flex: 1, fontSize: responsiveFontSize(2), fontWeight: '400', color: colors.textPrimary, paddingVertical: 0 }}
-                                    value={user.mobile}
-                                    onChangeText={(text: string) => handleInputChange({ name: "mobile", value: text })}
-                                    placeholder="For urgent shift alerts only"
-                                    placeholderTextColor={colors.placeholder}
-                                    keyboardType="phone-pad"
-                                />
-                            </View>
+
+                            <InPutWithLabel inputContainerStyle={{ marginBottom: responsiveHeight(0.3) }} mainColor={mainColor} secondaryColor={secondaryColor} label='Mobile number' isRequired={false} value={user.mobile} onChangeText={(text) => handleInputChange({ name: "mobile", value: text })} placeholder="Mobile number" />
                             <View style={{ flex: 1 }}>
 
                             </View>
                         </ScrollView>
 
                         <Pressable style={{ width: responsiveWidth(100), marginVertical: responsiveHeight(2.5), aspectRatio: 350 / 1, position: "relative", right: responsiveWidth(5), }}>
-                            <Image style={{ height: "100%", width: "100%", resizeMode: "contain" }} source={require("./Devider2.png")} />
+                            <Image style={authStyles.bgImageContain} source={require("./images/Devider2.png")} />
                         </Pressable>
                         <Button
-                            label="Send Verification Code"
+                            disabled={loading}
+                            label={loading ? "Sending..." : "Send Verification Code"}
                             backgroundColor={mainColor}
                             onPress={() => {
+                                setLoading(true);
                                 if (type === "jobSeeker") {
                                     dispatch(UserRegister({ email: user.email, password: user.password, password_confirmation: user.confirmPassword, terms_of_use: true })).unwrap().then((res) => {
+                                        setLoading(false);
                                         if (res.success) {
                                             startTimer();
                                             setStep(2)
@@ -421,10 +396,11 @@ export const ComponentSingUp = ({
                                                 message: res.message,
                                             })
                                         }
-                                    })
+                                    }).catch(() => setLoading(false));
 
                                 } else {
                                     dispatch(RecruiterRegister({ email: user.email, password: user.password, password_confirmation: user.confirmPassword, terms_of_use: true })).unwrap().then((res) => {
+                                        setLoading(false);
                                         if (res.success) {
                                             startTimer();
                                             setStep(2)
@@ -434,7 +410,7 @@ export const ComponentSingUp = ({
                                                 message: res.message,
                                             })
                                         }
-                                    })
+                                    }).catch(() => setLoading(false));
 
                                 }
                             }}
@@ -446,8 +422,8 @@ export const ComponentSingUp = ({
                 return (
                     <>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(4) }}>
-                            <Pressable onPress={() => setStep(1)} style={{ width: responsiveWidth(2.8), aspectRatio: 1 / 2 }}>
-                                <Image style={{ height: "100%", width: "100%", }} source={imagePath.leftAngle} />
+                            <Pressable onPress={() => setStep(1)} style={authStyles.backButton}>
+                                <Image style={authStyles.bgImage} source={imagePath.leftAngle} />
                             </Pressable>
                             <View style={{}}>
                                 <Text style={{ color: mainColor, borderWidth: 1, fontSize: responsiveFontSize(1.8), fontWeight: '800' }}>
@@ -473,7 +449,7 @@ export const ComponentSingUp = ({
 
                         </View>
                         <Pressable style={{ width: responsiveWidth(100), marginTop: responsiveHeight(2.5), position: "relative", right: responsiveWidth(5), aspectRatio: 350 / 1 }}>
-                            <Image style={{ height: "100%", width: "100%", resizeMode: "contain" }} source={require("./Devider2.png")} />
+                            <Image style={authStyles.bgImageContain} source={require("./images/Devider2.png")} />
                         </Pressable>
                         <ScrollView showsVerticalScrollIndicator={false}>
 
@@ -532,9 +508,12 @@ export const ComponentSingUp = ({
                                 <Text style={{ color: colors.textSecondary, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '600', }}>Didn't get the code?</Text>
                                 {
                                     remainingSeconds === 0 ?
-                                        <Text onPress={() => {
+                                        <Text                                        onPress={() => {
+                                            if (resendLoading) return;
+                                            setResendLoading(true);
                                             if (type === "jobSeeker") {
                                                 dispatch(UserReSentOtp({ email: user.email })).unwrap().then((res) => {
+                                                    setResendLoading(false);
                                                     if (res.success) {
                                                         startTimer()
                                                     } else {
@@ -543,9 +522,10 @@ export const ComponentSingUp = ({
                                                             message: res.message,
                                                         })
                                                     }
-                                                })
+                                                }).catch(() => setResendLoading(false));
                                             } else {
                                                 dispatch(RecruiterRecruiterReSentOtp({ email: user.email })).unwrap().then((res) => {
+                                                    setResendLoading(false);
                                                     if (res.success) {
                                                         startTimer()
                                                     } else {
@@ -554,31 +534,33 @@ export const ComponentSingUp = ({
                                                             message: res.message,
                                                         })
                                                     }
-                                                })
+                                                }).catch(() => setResendLoading(false));
                                             }
 
-                                        }} style={{ color: mainColor, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '800', }}>Resend OTP</Text> :
+                                        }} style={{ color: mainColor, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '800', opacity: resendLoading ? 0.8 : 1 }}>{resendLoading ? "Resending..." : "Resend OTP"}</Text> :
                                         <Text style={{ color: mainColor, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '800', }}>Resend in {remainingSeconds}s</Text>
                                 }
                             </View>
                             <Text style={{ color: colors.textSecondary, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '600', }}>Check your spam or junk folder before resending.</Text>
                             <Pressable style={{ width: responsiveWidth(90), marginTop: responsiveHeight(1.5), aspectRatio: 350 / 57.2, }}>
-                                <Image style={{ height: "100%", width: "100%", resizeMode: "cover" }} source={require("./OpenEmailApp.png")} />
+                                <Image style={authStyles.bgImageCover} source={require("./images/OpenEmailApp.png")} />
                             </Pressable>
                             <Pressable style={{ width: responsiveWidth(90), marginTop: responsiveHeight(1.5), aspectRatio: 350 / 62, }}>
-                                <Image style={{ height: "100%", width: "100%", resizeMode: "cover" }} source={require("./NeverShareCode.png")} />
+                                <Image style={authStyles.bgImageCover} source={require("./images/NeverShareCode.png")} />
                             </Pressable>
                         </ScrollView>
 
                         <View style={{ flex: 1 }}>
                         </View>
                         <Pressable style={{ width: responsiveWidth(100), marginTop: responsiveHeight(2.5), aspectRatio: 350 / 1, position: "relative", right: responsiveWidth(5), }}>
-                            <Image style={{ height: "100%", width: "100%", resizeMode: "contain" }} source={require("./Devider2.png")} />
+                            <Image style={authStyles.bgImageContain} source={require("./images/Devider2.png")} />
                         </Pressable>
                         <Button
-                            label="Verify and Continue"
+                            disabled={verifyLoading}
+                            label={verifyLoading ? "Verifying..." : "Verify and Continue"}
                             backgroundColor={mainColor}
                             onPress={() => {
+                                setVerifyLoading(true);
                                 const a = otp.join("")
                                 if (type === "jobSeeker") {
                                     dispatch(UserVerification({ email: user.email, code: a }))
@@ -591,6 +573,7 @@ export const ComponentSingUp = ({
                                                 });
                                                 await AsyncStorage.setItem('token', res.data.token)
                                                 dispatch(ProfileData()).unwrap().then((res) => {
+                                                    setVerifyLoading(false);
                                                     if (res.success) {
                                                         if (res.data.login_step === 1) {
                                                             navigation.reset({
@@ -606,14 +589,15 @@ export const ComponentSingUp = ({
                                                             });
                                                         }
                                                     }
-                                                });
+                                                }).catch(() => setVerifyLoading(false));
                                             } else {
+                                                setVerifyLoading(false);
                                                 showAlert({
                                                     title: "Error",
                                                     message: res.message,
                                                 });
                                             }
-                                        });
+                                        }).catch(() => setVerifyLoading(false));
                                 } else {
                                     dispatch(
                                         CompanyVerification({
@@ -624,7 +608,6 @@ export const ComponentSingUp = ({
                                         .unwrap()
                                         .then(async (res) => {
                                             if (res.success) {
-
                                                 if (res.data?.token) {
                                                     await AsyncStorage.setItem(
                                                         'token',
@@ -638,14 +621,15 @@ export const ComponentSingUp = ({
                                                 );
 
                                                 await checkCompanyRegistration();
-
+                                                setVerifyLoading(false);
                                             } else {
+                                                setVerifyLoading(false);
                                                 showAlert({
                                                     title: "Error",
                                                     message: res.message,
                                                 });
                                             }
-                                        });
+                                        }).catch(() => setVerifyLoading(false));
                                 }
                             }}
                         />

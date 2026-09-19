@@ -25,10 +25,10 @@ import { GetExperience, DeleteExperience, AddWorkExperience, EditWorkExperience 
 import Text from '../../components/Text';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAlert } from '../../context/AlertContext';
-import { formatDateToMonthYear } from '../ProfileCompelete/ProfileCompelete';
 import Icon from '../../utils/Icon';
 import MonthPicker from 'react-native-month-year-picker';
 import Button from '../../components/Button';
+import { formatDateToMonthYear } from '../Auth/ProfileCompelete';
 
 const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 

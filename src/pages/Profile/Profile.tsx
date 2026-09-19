@@ -17,9 +17,9 @@ import ImagePicker from 'react-native-image-crop-picker';
 import { useAlert } from '../../context/AlertContext';
 import ResumeCard from '../../components/ResumeCard';
 import { openBrowser } from '../Resume/Resume';
-import { formatDateToMonthYear } from '../ProfileCompelete/ProfileCompelete';
 import { pick, types } from '@react-native-documents/picker';
 import { setUser } from '../../reducer/userReducer';
+import { formatDateToMonthYear } from '../Auth/ProfileCompelete';
 const logoutUser = async () => {
     try {
         await messaging().deleteToken();
@@ -27,20 +27,20 @@ const logoutUser = async () => {
         await AsyncStorage.multiRemove(['token', 'role', 'FCM']);
     } catch (e) { }
 };
-const logoutAndRestart = async () => {
+export const logoutAndRestart = async () => {
     await logoutUser();
     RNRestart.restart();
 };
 
 // --- Helpers ---
-const getInitials = (name: string) => {
+export const getInitials = (name: string) => {
     if (!name) return '?'
     const parts = name.trim().split(/\s+/)
     if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase()
     return parts[0].substring(0, 2).toUpperCase()
 }
 
-const SectionHeader = ({ title, titleColor, actionText, onAction, actionColor }: { titleColor: string, title: string; actionText?: string; onAction?: () => void; actionColor?: string }) => (
+export const SectionHeader = ({ title, titleColor, actionText, onAction, actionColor }: { titleColor: string, title: string; actionText?: string; onAction?: () => void; actionColor?: string }) => (
     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: responsiveHeight(1.2), marginTop: responsiveHeight(2) }}>
         <Text style={{ fontSize: responsiveFontSize(1.5), fontWeight: '700', color: titleColor, letterSpacing: 1, textTransform: 'uppercase' }}>{title}</Text>
         {actionText && (
@@ -51,7 +51,7 @@ const SectionHeader = ({ title, titleColor, actionText, onAction, actionColor }:
     </View>
 )
 
-const ProfileRow = ({ rightIcon, containerStyle, icon, title, subtitle, onPress, actionText }: {
+export const ProfileRow = ({ rightIcon, containerStyle, icon, title, subtitle, onPress, actionText }: {
     rightIcon?: ImageProps; icon?: ImageProps; title: string; subtitle?: string; onPress?: () => void; actionText?: string, containerStyle?: ViewStyle
 }) => {
     const { colors } = useContext(ThemeContext)
@@ -123,7 +123,7 @@ const TagChip = ({ label }: { label: string; }) => {
     )
 }
 
-const Profile = () => {
+const RecruiterProfile = () => {
     const { colors } = useContext(ThemeContext)
     const navigation: NavigationProp<ParamListBase> = useNavigation();
     const { user } = useAppSelector(state => state.userStore)
@@ -608,4 +608,4 @@ const Profile = () => {
     )
 }
 
-export default Profile
+export default RecruiterProfile

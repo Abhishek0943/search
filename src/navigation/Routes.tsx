@@ -14,8 +14,8 @@ import { Linking } from 'react-native';
 import Welcome2 from '../pages/Welcome/Welcome2';
 import CompLogin from '../pages/Auth/CompLogin';
 import CompSingUp from '../pages/Auth/CompSingUp';
-import ProfileCompelete from '../pages/ProfileCompelete/ProfileCompelete';
-import Details from '../pages/Details/Details';
+import ProfileCompelete from '../pages/Auth/ProfileCompelete';
+import Details from '../pages/Auth/Details';
 import Resume from '../pages/Resume/Resume';
 import Video from '../pages/Video/Video';
 import Link from '../pages/Link/Link';
@@ -168,7 +168,7 @@ const Routes = () => {
         <Stack.Screen name={routes.RECRUITERPROFILE} component={RecruiterProfile} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.PROFILE} component={Profile} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.OPENJOBS} component={OpenJobs} options={{ headerShown: false, animation: 'none' }} />
-        <Stack.Screen name={routes.ACCOUNT} component={RecruiterAccount} options={{ headerShown: false, animation: 'none' }} />
+        <Stack.Screen name={routes.ACCOUNT} component={RecruiterProfile} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.CANDIDATEPROFILE} component={CandidateProfile} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.HOME} component={Home} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.BLOGPAGE} component={BlogPage} options={{ headerShown: false, animation: 'none' }} />

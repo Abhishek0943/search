@@ -17,7 +17,7 @@ export type DropdownOption = {
     name: string;
 };
 
-type SingleProps = { 
+type SingleProps = {
     multiSelect: false;
     selectedId: string;
     onSelect: (id: string) => void;
@@ -34,6 +34,8 @@ type CommonProps = {
     options: DropdownOption[];
     placeholder?: string;
     maxDropdownHeight?: number;
+
+    secondaryColor?: string;
 };
 
 type Props = CommonProps & (SingleProps | MultiProps);
@@ -77,7 +79,7 @@ const SearchSelectDropdown: React.FC<Props> = (props) => {
             <Text style={{
                 fontSize: responsiveFontSize(1.8),
                 fontWeight: '700',
-                color: colors.textPrimary,
+                color: props.secondaryColor || colors.textPrimary,
                 marginBottom: responsiveHeight(.5),
                 marginTop: responsiveHeight(1),
             }}>

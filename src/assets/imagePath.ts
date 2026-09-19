@@ -126,7 +126,7 @@ export default {
     Shear: require('./Icons/Shear.png'),
     Clock: require('./Icons/Clock.png'),
     UserIcon: require('./Icons/UserIcon.png'),
-
+    NotificationIcon: require('./Icons/NotificationIcon.png'),
 }
 export const Fonts = {
     GilroyBold: 'Gilroy-Bold',

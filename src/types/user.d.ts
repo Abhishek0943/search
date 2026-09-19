@@ -74,7 +74,10 @@ interface User {
         cv_file: string
     } | null,
     skills: { skill_name: string, job_skill_id: string }[],
-    certificates: any[]
+    certificates: any[],
+    logo: string,
+    images: any[],
+    is_active: boolean
 }
 interface Recruiter {
     _id: string;

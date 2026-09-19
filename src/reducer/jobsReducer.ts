@@ -222,11 +222,11 @@ export const Experiences = createAsyncThunk<
   }
 );
 export const Industries = createAsyncThunk<
-  { success: true, data: User } | ErrorResponse
+  { success: true, data: [] } | ErrorResponse
 >(
   'Industries',
   () => {
-    return getApiCall<{ success: true, data: User }>('/get-industries');
+    return getApiCall<{ success: true, data: [] }>('/get-industries');
   }
 );
 export const GetNationalities = createAsyncThunk<
@@ -366,11 +366,11 @@ export const GetNumberOfOffices = createAsyncThunk<
   }
 );
 export const GetNumberOfEmployees = createAsyncThunk<
-  { success: true, data: User } | ErrorResponse
+  { success: true, data: [] } | ErrorResponse
 >(
   'GetNumberOfEmployees',
   () => {
-    return getApiCall<{ success: true, data: User }>('/number-of-employees',);
+    return getApiCall<{ success: true, data: [] }>('/number-of-employees',);
   }
 );
 

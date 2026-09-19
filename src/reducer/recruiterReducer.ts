@@ -60,7 +60,7 @@ export const RecruiterRecruiterVerification = createAsyncThunk<{ success: true, 
 );
 export const RecruiterRecruiterReSentOtp = createAsyncThunk<{ success: true, recruiter: Recruiter, token: string } | ErrorResponse, { email: string }>(
   'RecruiterReSentOtp',
-  (body) => postApiCall<{ success: true, recruiter: Recruiter, token: string }>('/auth/recruiter/otp/resend', body),
+  (body) => postApiCall<{ success: true, recruiter: Recruiter, token: string }>('/auth/companies/otp/resend', body),
 );
 
 export const RecruiterTokenLogin = createAsyncThunk<{ success: true, recruiter: Recruiter, } | ErrorResponse, { token: string, }>(
@@ -69,9 +69,9 @@ export const RecruiterTokenLogin = createAsyncThunk<{ success: true, recruiter: 
 );
 export const RecruiterCompleteSteps = createAsyncThunk<{ success: true, recruiter: Recruiter, } | ErrorResponse, { id: string, dob?: string, gender?: string, phone?: string, name?: string, step: number, countryId?: string, topics?: string[] }>(
   'CompleteSteps',
-  ({ step, ...body }) => patchApiCall<{ success: true, recruiter: Recruiter, token: string }>('recruiter/' + step, body),
+  ({ step, ...body }) => patchApiCall<{ success: true, recruiter: Recruiter, token: string }>('companies' + step, body),
 );
-export const RecruiterProfile = createAsyncThunk< {success: true; message: string; data: CompanyProfile;} | ErrorResponse >(
+export const RecruiterProfile = createAsyncThunk<{ success: true; message: string; data: CompanyProfile; } | ErrorResponse>(
   'RecruiterProfile', () => getApiCall<{ success: true; message: string; data: CompanyProfile; }>('/auth/companies/me'),
 );
 export const RecruiterPlans = createAsyncThunk<{ success: true, topic: TopicItem[], } | ErrorResponse>(
@@ -109,19 +109,18 @@ export const ComResetPassword = createAsyncThunk<{ success: true, recruiter: Rec
 export const UpdateRegistrationDetails = createAsyncThunk<
   { success: true; message?: string; data?: any } | ErrorResponse,
   {
-    abn?: string;
-    acn?: string;
-    name?: string;
-    location?: string;
-    no_of_employees?: number;
-    industry_id?: number;
-    description?: string;
-    logo?: string;
+    abn: number;
+    acn: number;
+    name: string;
+    location: string;
+    no_of_employees: string;
+    industry_id: number;
+    description: string;
   }
 >(
   'UpdateRegistrationDetails',
   body => postApiCall<{ success: true; message?: string; data?: any; }>(
-      '/company/update-registration', body ),
+    '/company/update-registration', body),
 );
 export const ForgetPassword = createAsyncThunk<{ success: true, recruiter: Recruiter, token: string } | ErrorResponse, { email: string, }>(
   'ForgetPassword',

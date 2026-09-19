@@ -405,7 +405,7 @@ const AddJob = () => {
                     user.is_active ? <>
                         {
                             user.package_end_date && new Date(user.package_end_date.replace(' ', 'T')) >= new Date() ? <>
-                                <View
+                                {/* <View
                                     style={{
                                         flexDirection: 'row',
                                         justifyContent: 'space-between',
@@ -462,7 +462,6 @@ const AddJob = () => {
                                     />
                                 </View>
 
-                                {/* ✅ Toolbar (always render; avoids focus null issues) */}
                                 <RichToolbar
                                     editor={editorRef}
                                     actions={[
@@ -473,7 +472,6 @@ const AddJob = () => {
                                     ]}
                                 />
 
-                                {/* ✅ Benefits */}
                                 <Label text="Benefits" />
                                 <View style={[{ width: '100%', minHeight: responsiveScreenHeight(20) }, { ...inputStyle, paddingHorizontal: 0, paddingVertical: 0 }]}>
                                     <RichEditor
@@ -501,7 +499,6 @@ const AddJob = () => {
                                     ]}
                                 />
 
-                                {/* ✅ Skills */}
                                 <Label text="Skills" />
                                 <CustomMultiDropdown
                                     data={skills}
@@ -517,7 +514,6 @@ const AddJob = () => {
                                     valueKey="id"
                                 />
 
-                                {/* ✅ Country */}
                                 <Label text="Country" />
                                 <CustomDropdown
                                     data={countries}
@@ -554,7 +550,6 @@ const AddJob = () => {
                                     </View>
                                 </View>
 
-                                {/* ✅ Salary + Salary To */}
                                 <View style={{ width: '100%', flexDirection: 'row', gap: responsiveScreenWidth(3) }}>
                                     <View style={{ flex: 1 }}>
                                         <Label text="Salary" />
@@ -581,7 +576,6 @@ const AddJob = () => {
                                     </View>
                                 </View>
 
-                                {/* ✅ Currency + Salary Period */}
                                 <View style={{ width: '100%', flexDirection: 'row', gap: responsiveScreenWidth(3) }}>
                                     <View style={{ flex: 1 }}>
                                         <Label text="Currency" />
@@ -851,13 +845,13 @@ const AddJob = () => {
                                         handleChange('startDate', date);
                                     }}
                                     onCancel={() => setStartDateOpen(false)}
-                                />
+                                /> */}
                             </> :
                                 <>
                                     <View style={{ alignItems: "center", marginTop: responsiveScreenHeight(35), }}>
                                         <Image source={require("./test.png")} style={{ marginVertical: responsiveScreenHeight(2) }} />
                                         <TouchableOpacity style={{}} onPress={() => navigation.navigate(routes.RECRUITERHOME)}>
-                                            <Image source={require("./popupbutton.png")} style={{}} />
+                                            {/* <Image source={require("./popupbutton.png")} style={{}} /> */}
                                         </TouchableOpacity>
                                     </View>
                                 </>
@@ -867,7 +861,6 @@ const AddJob = () => {
                         <View style={{ alignItems: "center", marginTop: responsiveScreenHeight(20), }}>
                             <Image source={require("../Home/inActive.png")} style={{ marginVertical: responsiveScreenHeight(2) }} />
                             <TouchableOpacity style={{}} onPress={() => navigation.navigate(routes.CONTACT)}>
-                                <Image source={require("../Home/popupbutton.png")} style={{}} />
                             </TouchableOpacity>
                         </View>
                 }

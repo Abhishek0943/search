@@ -18,6 +18,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { googleLogin } from '../../utils/socialLogin'
 import { postApiCall } from '../../api'
 import { getFCMToken } from '../../utils/notificationService'
+import authStyles from './styles'
 const Login = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
   const [hidePassword, setHidePassword] = useState(false);
@@ -88,13 +89,13 @@ const Login = () => {
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ height: responsiveScreenHeight(100) - insets.bottom, }}>
         <View style={{ height: responsiveHeight(100), width: responsiveWidth(100), flex: 1, }}>
-          <Image style={{ height: "100%", width: "100%", }} source={require("../Welcome/BgGradiant.png")} />
+          <Image style={authStyles.bgImage} source={require("../Welcome/BgGradiant.png")} />
           <View style={{ position: "absolute", paddingTop: insets.top, paddingBottom: insets.bottom, paddingHorizontal: responsiveWidth(5), top: 0, left: 0, height: responsiveHeight(100), width: responsiveWidth(100), }}>
-            <Pressable onPress={() => navigation.goBack()} style={{ width: responsiveWidth(2.8), aspectRatio: 1 / 2 }}>
-              <Image style={{ height: "100%", width: "100%", }} source={imagePath.leftAngle} />
+            <Pressable onPress={() => navigation.goBack()} style={authStyles.backButton}>
+              <Image style={authStyles.bgImage} source={imagePath.leftAngle} />
             </Pressable>
             <View style={{ width: responsiveWidth(75), marginBottom: responsiveHeight(3), marginTop: responsiveHeight(3), aspectRatio: 238 / 120.5 }}>
-              <Image style={{ height: "100%", width: "100%", }} source={require("./UserLoginTop.png")} />
+              <Image style={authStyles.bgImage} source={require("./images/UserLoginTop.png")} />
             </View>
             <InputWithLabel label='Email address' value={user.email} onChangeText={(text) => handleInputChange({ name: "email", value: text })} placeholder="Email" mainColor={''} secondaryColor={''} />
             <InputWithLabel sideOption={() => {
@@ -112,9 +113,9 @@ const Login = () => {
                 </TouchableOpacity>
               )
             }} value={user.password} onChangeText={(text) => handleInputChange({ name: "password", value: text })} placeholder="Password" mainColor={''} secondaryColor={''} />
-            <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveWidth(2), marginBottom: responsiveHeight(3) }}>
-              <Pressable style={{ width: responsiveWidth(4), aspectRatio: 1 / 1 }}>
-                <Image style={{ height: "100%", width: "100%", }} source={imagePath.Check} />
+            <View style={authStyles.checkboxRow}>
+              <Pressable style={authStyles.checkboxIcon}>
+                <Image style={authStyles.bgImage} source={imagePath.Check} />
               </Pressable>
               <Text style={{ color: colors.primary2, fontSize: responsiveFontSize(1.8), fontWeight: '600' }}>
                 Keep me logged in on this phone
@@ -159,12 +160,12 @@ const Login = () => {
                 })
               }}
             />
-            <Pressable style={{ width: responsiveWidth(90), marginTop: responsiveHeight(2.5), aspectRatio: 350 / 16 }}>
-              <Image style={{ height: "100%", width: "100%", }} source={require("./Devider.png")} />
+            <Pressable style={authStyles.loginDivider}>
+              <Image style={authStyles.bgImage} source={require("./images/Devider.png")} />
             </Pressable>
-            <View style={{ flexDirection: "row", marginTop: responsiveHeight(2.5), gap: responsiveWidth(3), width: responsiveWidth(90) }}>
-              <Pressable onPress={handleGoogleLogin} disabled={googleLoading} style={{ flex: 1, aspectRatio: 169 / 56, opacity: googleLoading ? 0.6 : 1 }}>
-                <Image style={{ height: "100%", width: "100%", }} source={require("./GoogleButton.png")} />
+            <View style={authStyles.socialRow}>
+              <Pressable onPress={handleGoogleLogin} disabled={googleLoading} style={[authStyles.socialButton, { opacity: googleLoading ? 0.6 : 1 }]}>
+                <Image style={authStyles.bgImage} source={require("./images/GoogleButton.png")} />
                 {googleLoading && (
                   <ActivityIndicator
                     size="small"
@@ -173,14 +174,14 @@ const Login = () => {
                   />
                 )}
               </Pressable>
-              <Pressable style={{ flex: 1, aspectRatio: 169 / 56 }}>
-                <Image style={{ height: "100%", width: "100%", }} source={require("./GoogleButton.png")} />
+              <Pressable style={authStyles.socialButton}>
+                <Image style={authStyles.bgImage} source={require("./images/GoogleButton.png")} />
               </Pressable>
             </View>
-            <Pressable onPress={() => { navigation.replace(routes.COMPLOGIN) }} style={{ width: responsiveWidth(90), marginTop: responsiveHeight(2.5), aspectRatio: 350 / 66 }}>
-              <Image style={{ height: "100%", width: "100%", }} source={require("./SweechToEmployer.png")} />
+            <Pressable onPress={() => { navigation.replace(routes.COMPLOGIN) }} style={authStyles.switchLink}>
+              <Image style={authStyles.bgImage} source={require("./images/SweechToEmployer.png")} />
             </Pressable>
-            <View style={{ marginTop: responsiveHeight(2), flexDirection: "row", justifyContent: 'center' }}>
+            <View style={authStyles.createAccountRow}>
               <Text style={{ color: colors.primary2, fontSize: responsiveFontSize(1.6), }}>New to SearchTalents?</Text>
               <Text onPress={() => navigation.navigate(routes.SIGNUP)} style={{ color: colors.primary, fontSize: responsiveFontSize(1.6), fontWeight: '800' }}> Create an account</Text>
             </View>

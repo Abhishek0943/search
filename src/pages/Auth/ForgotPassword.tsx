@@ -28,10 +28,8 @@ import {
 } from '@react-navigation/native';
 import { useAlert } from '../../context/AlertContext';
 import Button from '../../components/Button';
-import { CompanyVerification, UserReSentOtp, UserVerification } from '../../reducer/userReducer'
+import { UserReSentOtp } from '../../reducer/userReducer'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { ProfileData } from '../../reducer/jobsReducer'
-import { routes } from '../../constants/values';
 import { PasswordStrengthIndicator } from './CompSingUp';
 import {
     ComOtpVerify,
@@ -152,17 +150,7 @@ const ForgotPassword = () => {
     }, []);
     const handleSendCode = async () => {
         const email = user.email.trim();
-
-        if (!email) {
-            showAlert({
-                title: "Validation",
-                message: "Please enter your email address.",
-            });
-            return;
-        }
-
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
         if (!emailRegex.test(email)) {
             showAlert({
                 title: "Validation",
@@ -170,23 +158,15 @@ const ForgotPassword = () => {
             });
             return;
         }
-
-        try {
-            setLoading(true);
-
-            if (type === "jobSeeker") {
-                const res = await dispatch(
-                    ForgetPassword({
-                        email,
-                    })
-                ).unwrap();
-
-                console.log("Job seeker forgot password:", res);
+        console.log("type", type)
+        if (type === "jobSeeker") {
+            console.log("hiiii")
+            dispatch(ForgetPassword({ email })).unwrap().then((res) => {
+                setLoading(false);
 
                 if (res.success) {
                     setOtp(["", "", "", "", "", ""]);
                     startTimer();
-
                     setStep(2);
                 } else {
                     showAlert({
@@ -194,37 +174,26 @@ const ForgotPassword = () => {
                         message: res.message || "Unable to send OTP.",
                     });
                 }
-            } else {
-                const res = await dispatch(
-                    RecruiterForgetPassword({ email })
-                ).unwrap();
-
-                console.log("Company forgot password:", res);
-
-                if (res.success) {
-                    setOtp(["", "", "", "", "", ""]);
-                    startTimer();
-
-                    setStep(2);
-                } else {
-                    showAlert({
-                        title: "Validation",
-                        message: res.message || "Unable to send OTP.",
-                    });
-                }
-            }
-        } catch (error) {
-            console.log("Forgot password error:", error);
-
-            showAlert({
-                title: "Error",
-                message: "Something went wrong. Please try again.",
             });
-        } finally {
-            setLoading(false);
-        }
-    };
 
+        } else {
+            console.log("hiiii12121212")
+            dispatch(RecruiterForgetPassword({ email })).unwrap().then((res) => {
+                setLoading(false);
+                if (res.success) {
+                    setOtp(["", "", "", "", "", ""]);
+                    startTimer();
+                    setStep(2);
+                } else {
+                    showAlert({
+                        title: "Validation",
+                        message: res.message || "Unable to send OTP.",
+                    });
+                }
+            })
+
+        };
+    }
     const handleVerifyOtp = async () => {
         const code = otp.join("");
 
@@ -238,7 +207,6 @@ const ForgotPassword = () => {
 
         try {
             setLoading(true);
-
             if (type === "jobSeeker") {
                 const res = await dispatch(
                     OtpVerify({
@@ -304,7 +272,7 @@ const ForgotPassword = () => {
                                     marginTop: responsiveHeight(3),
                                     aspectRatio: 370 / 76
                                 }}
-                                source={require("./Employer.png")}
+                                source={require("./images/Employer.png")}
                             />
                         )}
                         <Text style={{ color: secondaryColor, borderWidth: 1, lineHeight: responsiveFontSize(3.6), fontSize: responsiveFontSize(3.5), fontWeight: '700', marginTop: responsiveHeight(3) }}>Forgot your password?</Text>
@@ -330,8 +298,8 @@ const ForgotPassword = () => {
                             }}
                             source={
                                 type === "comp"
-                                    ? require("./CompSignedUpGoogleApple.png")
-                                    : require("./SignedUpGoogleApple.png")
+                                    ? require("./images/CompSignedUpGoogleApple.png")
+                                    : require("./images/SignedUpGoogleApple.png")
                             }
                         />
                         <Text style={{ color: secondaryColor, textAlign: 'center', borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '900', marginTop: responsiveHeight(1), marginBottom: responsiveHeight(1.5) }}>Back to Log in</Text>
@@ -352,7 +320,7 @@ const ForgotPassword = () => {
                                     marginTop: responsiveHeight(3),
                                     aspectRatio: 370 / 76
                                 }}
-                                source={require("./Employer.png")}
+                                source={require("./images/Employer.png")}
                             />
                         )}
                         <Text style={{ color: secondaryColor, borderWidth: 1, lineHeight: responsiveFontSize(3.6), fontSize: responsiveFontSize(3.5), fontWeight: '700', marginTop: responsiveHeight(3) }}>Check your email</Text>
@@ -441,15 +409,15 @@ const ForgotPassword = () => {
                         </View>
                         <Text style={{ color: colors.textSecondary, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '600', }}>Check your spam or junk folder before resending.</Text>
                         <Pressable style={{ width: responsiveWidth(90), marginTop: responsiveHeight(1.5), aspectRatio: 350 / 57.2, }}>
-                            <Image style={{ height: "100%", width: "100%", resizeMode: "cover" }} source={require("./OpenEmailApp.png")} />
+                            <Image style={{ height: "100%", width: "100%", resizeMode: "cover" }} source={require("./images/OpenEmailApp.png")} />
                         </Pressable>
                         <Pressable style={{ width: responsiveWidth(90), marginTop: responsiveHeight(1.5), aspectRatio: 350 / 62, }}>
-                            <Image style={{ height: "100%", width: "100%", resizeMode: "cover" }} source={require("./NeverShareCode.png")} />
+                            <Image style={{ height: "100%", width: "100%", resizeMode: "cover" }} source={require("./images/NeverShareCode.png")} />
                         </Pressable>
                         <View style={{ flex: 1 }}>
                         </View>
                         <Pressable style={{ width: responsiveWidth(100), marginTop: responsiveHeight(2.5), aspectRatio: 350 / 1, position: "relative", right: responsiveWidth(5), }}>
-                            <Image style={{ height: "100%", width: "100%", resizeMode: "contain" }} source={require("./Devider2.png")} />
+                            <Image style={{ height: "100%", width: "100%", resizeMode: "contain" }} source={require("./images/Devider2.png")} />
                         </Pressable>
 
                         <Button
@@ -475,7 +443,7 @@ const ForgotPassword = () => {
                                     marginTop: responsiveHeight(3),
                                     aspectRatio: 370 / 76
                                 }}
-                                source={require("./Employer.png")}
+                                source={require("./images/Employer.png")}
                             />
                         )}
                         <Text style={{ color: secondaryColor, borderWidth: 1, lineHeight: responsiveFontSize(3.6), fontSize: responsiveFontSize(3.5), fontWeight: '700', marginTop: responsiveHeight(3) }}>Set a new password</Text>
@@ -652,8 +620,8 @@ const ForgotPassword = () => {
                             }}
                             source={
                                 type === "comp"
-                                    ? require("./CompSignedUpGoogleApple.png")
-                                    : require("./SignedUpGoogleApple.png")
+                                    ? require("./images/CompSignedUpGoogleApple.png")
+                                    : require("./images/SignedUpGoogleApple.png")
                             }
                         />
 
@@ -701,5 +669,4 @@ const ForgotPassword = () => {
         </>
     );
 };
-
-export default ForgotPassword;
+export default ForgotPassword

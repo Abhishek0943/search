@@ -12,6 +12,7 @@ const commonColors = {
   black: "black",
   lightGrayNatural: "#F5F5F5",
   lightGray: "#ECECEC",
+
   mediumGrayNatural: "#BEBEBE",
 }
 export const lightColors: ColorPalette = {
@@ -25,7 +26,7 @@ export const lightColors: ColorPalette = {
   onPrimary: "#0057E0",
   secondary: "#EDF1F7",
   surfaces: '#C9D3E0',
-
+  lightGray2: "#CFE2F7",
   // Backgrounds & surfaces
   background: '#FFF',
   backgroundSecondary: '#f5f5f5',
@@ -50,7 +51,7 @@ export const darkColors: ColorPalette = {
   textSecondary: '#7B8CA3',
   surfaces: '#C9D3E0',
   compPrimaryBg: "#F6F8FB",
-
+  lightGray2: "#CFE2F7",
   onPrimary: "#0057E0",
   background: '#000',
   textPrimary: '#0E1F3D',
@@ -60,7 +61,8 @@ export const darkColors: ColorPalette = {
   secondary: "#35383f",
   textDisabled: "#cdcdcdff",
   placeholder: "",
-  ...commonColors
+  ...commonColors,
+  primary50: ""
 };
 
 export interface ColorPalette {
@@ -75,6 +77,7 @@ export interface ColorPalette {
   onPrimary: string;
   hardGray: string;
   darkGray: string;
+  lightGray2: string;
   darkGrayNatural: string;
   surfaces: string;
   secondary: string;

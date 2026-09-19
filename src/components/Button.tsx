@@ -8,13 +8,15 @@ type ButtonProps = {
   label: string;
   backgroundColor?: string;
   onPress?: () => void;
-  style?: ViewStyle
+  style?: ViewStyle;
+  disabled?: boolean;
 };
 
-const Button = ({ style = {}, label, backgroundColor, onPress = () => { } }: ButtonProps) => {
+const Button = ({ style = {}, label, backgroundColor, disabled, onPress = () => { } }: ButtonProps) => {
   const { colors } = useContext(ThemeContext);
   return (
     <TouchableOpacity
+      disabled={disabled}
       onPress={onPress}
       activeOpacity={0.7}
       style={{
@@ -25,6 +27,7 @@ const Button = ({ style = {}, label, backgroundColor, onPress = () => { } }: But
         borderRadius: 15,
         justifyContent: 'center',
         alignItems: 'center',
+        opacity: disabled ? 0.8 : 1,
         ...style
       }}
     >

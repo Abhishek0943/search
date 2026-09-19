@@ -42,7 +42,7 @@ const InputWithLabel: React.FC<TextInputCompProps> = ({
   max,
   mainColor,
   secondaryColor,
-  isRequired,
+  isRequired = true,
   inputContainerStyle
 }) => {
   const { colors } = useContext(ThemeContext);
@@ -120,11 +120,17 @@ const InputWithLabel: React.FC<TextInputCompProps> = ({
     <>
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
         <View style={{ flexDirection: "row", alignItems: "center", flex: 1, justifyContent: "space-between" }}>
-          <View style={{ flexDirection: "row", alignItems: "center", flex: 1, gap: responsiveWidth(2) }}>
-            <Text style={[styles.label, { color: secondaryColor || colors.textPrimary, marginBottom: responsiveHeight(.5) }]}>
+
+          <View style={{ flexDirection: "row", alignItems: "baseline", flex: 1, gap: responsiveWidth(1), marginTop: responsiveHeight(1), marginBottom: responsiveHeight(.3) }}>
+            <Text style={[styles.label, { color: secondaryColor || colors.textPrimary, }]}>
               {label}
             </Text>
-            {typeof (isRequired) == "function" ? isRequired() : isRequired && <Text style={styles.requiredAsterisk}>*</Text>}
+            {typeof (isRequired) == "function" ? isRequired() : !isRequired && <Text style={{
+              fontSize: responsiveFontSize(1.2),
+              fontWeight: "400",
+              color: colors.textSecondary,
+              flexWrap: "wrap",
+            }}>(Optional)</Text>}
           </View>
           {sideOption()}
         </View>
@@ -139,7 +145,6 @@ const styles = StyleSheet.create({
   label: {
     fontSize: responsiveFontSize(1.8),
     fontWeight: '700',
-    marginTop: responsiveHeight(1)
   },
   requiredAsterisk: {
     fontSize: responsiveFontSize(1.8),
