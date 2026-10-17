@@ -31,18 +31,19 @@ const Splash = () => {
       if (role === "recruiter") {
         dispatch(RecruiterProfile()).unwrap().then((res) => {
           if (res.success) {
-            if (res.data.onboarding_step === 1) {
-              navigation.reset({
-                index: 0,
-                routes: [{ name: routes.DETAILS }]
-              })
 
-            } else {
-              navigation.reset({
-                index: 0,
-                routes: [{ name: routes.RECRUITERHOME }]
-              });
-            }
+            // if (res.data.onboarding_step === 1) {
+            //   navigation.reset({
+            //     index: 0,
+            //     routes: [{ name: routes.DETAILS }]
+            //   })
+
+            // } else {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: routes.RECRUITERHOME }]
+            });
+            // }
             console.log("res", res);
 
           } else {

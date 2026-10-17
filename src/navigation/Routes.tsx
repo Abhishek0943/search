@@ -2,7 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useEffect, useRef, useState } from 'react';
 import { useAppSelector } from '../store';
 import { routes } from '../constants/values';
-import { AddJob, Apply, ApplyJob, Browser, Candidate, CandidateProfile, BlogPage, Chat, Company, CompanyDetails, CV, Education, ForgotPassword, Home, Jobdetail, Language, LanguageForm, Login, Messages, Notification, OpenJobs, PaymentHistory, PersonalInfo, Profile, Project, ProjectForm, RecentJob, RecruiterAccount, RecruiterHome, RecruiterProfile, Search, Signup, Skill, SkillAdd, Splash, SuggestedJob, Welcome, WorkExperience, WorkExperienceForm, Certifications, SkillsPage, AvailabilityPage, WhereICanWorkPage, ExperiencePage, Bookmarked } from '../pages';
+import { AddJob, Apply, ApplyJob, Browser, Candidate, CandidateProfile, BlogPage, Chat, Company, CompanyDetails, CV, Education, ForgotPassword, Home, Jobdetail, Language, LanguageForm, Login, Messages, Notification, OpenJobs, PaymentHistory, PersonalInfo, Profile, Project, ProjectForm, RecentJob, RecruiterAccount, RecruiterHome, RecruiterProfile, Search, Signup, Skill, SkillAdd, Splash, SuggestedJob, Welcome, WorkExperience, WorkExperienceForm, Certifications, SkillsPage, AvailabilityPage, WhereICanWorkPage, ExperiencePage, Bookmarked, BuyMorePostings } from '../pages';
 import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import EducationForm from '../pages/PersonalInfo/EducationForm';
@@ -20,6 +20,10 @@ import Resume from '../pages/Resume/Resume';
 import Video from '../pages/Video/Video';
 import Link from '../pages/Link/Link';
 import ProfilePreview from '../pages/ProfilePreview/ProfilePreview';
+import BusinessDetails from '../pages/Profile/BusinessDetails';
+import BusinessPage from '../pages/Profile/BusinessPage';
+import CurrentPlan from '../pages/Profile/CurrentPlan';
+import NotificationSettings from '../pages/Profile/NotificationSettings';
 const Stack = createNativeStackNavigator();
 const Routes = () => {
   const { isAuth, user } = useAppSelector(state => state.userStore);
@@ -160,6 +164,7 @@ const Routes = () => {
         <Stack.Screen name={routes.DETAILS} component={Details} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.BOOKMARKED} component={Bookmarked} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.RECRUITERHOME} component={RecruiterHome} options={{ headerShown: false, animation: 'none' }} />
+        <Stack.Screen name={routes.BUYMOREPOSTINGS} component={BuyMorePostings} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.ACTIVECANDIDATE} component={Candidate} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.ADDJOB} component={AddJob} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.MESSAGE} component={Messages} options={{ headerShown: false, animation: 'none' }} />
@@ -202,12 +207,12 @@ const Routes = () => {
         <Stack.Screen name={routes.VIDEO} component={Video} options={{ headerShown: false }} />
         <Stack.Screen name={routes.LINK} component={Link} options={{ headerShown: false }} />
         <Stack.Screen name={routes.PROFILEPREVIEW} component={ProfilePreview} options={{ headerShown: false }} />
-        <Stack.Screen name={routes.CERTIFICATIONS} component={Certifications} options={{ headerShown: false, animation: 'none' }} />
-        <Stack.Screen name={routes.SKILLS} component={SkillsPage} options={{ headerShown: false, animation: 'none' }} />
-        <Stack.Screen name={routes.AVAILABILITY} component={AvailabilityPage} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.WHEREICANWORK} component={WhereICanWorkPage} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.EXPERIENCEPAGE} component={ExperiencePage} options={{ headerShown: false, animation: 'none' }} />
-
+        <Stack.Screen name={routes.BUSINESSPAGE} component={BusinessPage} options={{ headerShown: false, animation: 'none' }} />
+        <Stack.Screen name={routes.BUSINESSDETAILS} component={BusinessDetails} options={{ headerShown: false, animation: 'none' }} />
+        <Stack.Screen name={routes.CURRENTPLAN} component={CurrentPlan} options={{ headerShown: false, animation: 'none' }} />
+        <Stack.Screen name={routes.NOTIFICATIONSETTINGS} component={NotificationSettings} options={{ headerShown: false, animation: 'none' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

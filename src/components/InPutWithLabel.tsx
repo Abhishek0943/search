@@ -26,6 +26,7 @@ interface TextInputCompProps {
   mainColor: string
   secondaryColor: string
   inputContainerStyle?: ViewStyle
+  full?: boolean
 }
 const InputWithLabel: React.FC<TextInputCompProps> = ({
   value,
@@ -43,7 +44,8 @@ const InputWithLabel: React.FC<TextInputCompProps> = ({
   mainColor,
   secondaryColor,
   isRequired = true,
-  inputContainerStyle
+  inputContainerStyle,
+  full = true
 }) => {
   const { colors } = useContext(ThemeContext);
   const [activeColor, setActiveColor] = useState(colors.surfaces);
@@ -52,7 +54,7 @@ const InputWithLabel: React.FC<TextInputCompProps> = ({
       case "text":
         return (
           <>
-            <View style={[styles.inputContainer, { marginBottom: responsiveHeight(2), borderColor: activeColor || colors.surfaces }, inputContainerStyle]}>
+            <View style={[styles.inputContainer, { ...(full && { aspectRatio: 350 / 52 }), marginBottom: responsiveHeight(2), borderColor: activeColor || colors.surfaces }, inputContainerStyle]}>
               <CustomTextInput
                 style={[styles.input, { color: colors.textPrimary }]}
                 value={value}
@@ -95,7 +97,7 @@ const InputWithLabel: React.FC<TextInputCompProps> = ({
       case "number":
         return (
           <>
-            <View style={[styles.inputContainer, { marginBottom: responsiveHeight(2), borderColor: colors.mediumGray }]}>
+            <View style={[styles.inputContainer, { ...(full && { aspectRatio: 350 / 52 }), marginBottom: responsiveHeight(2), borderColor: colors.mediumGray }]}>
               <CustomTextInput
                 style={[styles.input, { color: colors.textPrimary }]}
                 value={value}
@@ -122,7 +124,10 @@ const InputWithLabel: React.FC<TextInputCompProps> = ({
         <View style={{ flexDirection: "row", alignItems: "center", flex: 1, justifyContent: "space-between" }}>
 
           <View style={{ flexDirection: "row", alignItems: "baseline", flex: 1, gap: responsiveWidth(1), marginTop: responsiveHeight(1), marginBottom: responsiveHeight(.3) }}>
-            <Text style={[styles.label, { color: secondaryColor || colors.textPrimary, }]}>
+            <Text style={{
+              fontSize: responsiveFontSize(1.8),
+              fontWeight: '700', color: secondaryColor || colors.textPrimary,
+            }}>
               {label}
             </Text>
             {typeof (isRequired) == "function" ? isRequired() : !isRequired && <Text style={{
@@ -143,8 +148,7 @@ const InputWithLabel: React.FC<TextInputCompProps> = ({
 
 const styles = StyleSheet.create({
   label: {
-    fontSize: responsiveFontSize(1.8),
-    fontWeight: '700',
+
   },
   requiredAsterisk: {
     fontSize: responsiveFontSize(1.8),
@@ -156,7 +160,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderRadius: 15,
     width: responsiveWidth(90),
-    aspectRatio: 350 / 52,
+
     paddingHorizontal: responsiveWidth(4),
   },
   input: {

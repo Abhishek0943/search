@@ -74,10 +74,50 @@ export const RecruiterCompleteSteps = createAsyncThunk<{ success: true, recruite
 export const RecruiterProfile = createAsyncThunk<{ success: true; message: string; data: CompanyProfile; } | ErrorResponse>(
   'RecruiterProfile', () => getApiCall<{ success: true; message: string; data: CompanyProfile; }>('/auth/companies/me'),
 );
-export const RecruiterPlans = createAsyncThunk<{ success: true, topic: TopicItem[], } | ErrorResponse>(
+export type RecruiterPlanType = {
+  id: string | number,
+  apple_package_id?: string,
+  display: {
+    days: number,
+    label: string
+  },
+  is_featured: boolean,
+  listings: {
+    count: number,
+    label: string,
+  },
+  package_title: string,
+  remaining_quota: number,
+  end_date: string,
+  price: {
+    amount: number,
+    currency: string,
+    formatted: string,
+    is_free: boolean
+  },
+  sections: Array<{
+    items: Array<string>,
+    key: string,
+    title: string,
+  }>,
+  slug: string,
+  stripe_price_id: string | null,
+  tagline: string,
+  views: {
+    label: string,
+    multiplier: number
+  },
+};
+
+export const RecruiterPlans = createAsyncThunk<{
+  success: true, data: {
+    plans: RecruiterPlanType[]
+  }
+} | ErrorResponse>(
   'RecruiterPlans',
-  () => getApiCall<{ success: true, topic: TopicItem[], token: string }>('/company/plans'),
+  () => getApiCall<{ success: true, data: any, token: string }>('/company/plans'),
 );
+export const CompanyActivePackages = createAsyncThunk<{ success: boolean; data: { packages: RecruiterPlanType[] }; message?: string } | ErrorResponse>('CompanyActivePackages', () => getApiCall<{ success: boolean; data: { packages: RecruiterPlanType[] }; message?: string }>('/company/active-packages'));
 export const Tokien = createAsyncThunk<{ success: true, topic: TopicItem[], } | ErrorResponse>(
   'Tokien',
   (body) => postApiCall<{ success: true, topic: TopicItem[], token: string }>('/apple/token', body),
@@ -109,13 +149,13 @@ export const ComResetPassword = createAsyncThunk<{ success: true, recruiter: Rec
 export const UpdateRegistrationDetails = createAsyncThunk<
   { success: true; message?: string; data?: any } | ErrorResponse,
   {
-    abn: number;
-    acn: number;
-    name: string;
-    location: string;
-    no_of_employees: string;
-    industry_id: number;
-    description: string;
+    abn?: number;
+    acn?: number;
+    name?: string;
+    location?: string;
+    no_of_employees?: string;
+    industry_id?: string;
+    description?: string;
   }
 >(
   'UpdateRegistrationDetails',
@@ -204,7 +244,9 @@ const initialState: RecruiterInitialState = {
   welcomeScreen: [],
   countries: [],
   topic: [],
-  plan: []
+  plan: {
+    plans: []
+  }
 };
 export const recruiterSlice = createSlice({
   name: 'recruiter',

@@ -54,7 +54,32 @@ interface GetMyBlogsResponse {
         }
     }
 }
+type Option = { id: string; name: string };
+type QuestionType = 'short_text' | 'long_text' | 'number' | 'single_select' | 'multi_select' | 'yes_no';
 
+type QuestionItem = {
+    id?: string;
+    question: string;
+    answer_type: QuestionType;
+    is_required: boolean;
+    options: { label: string, scoring_role: string | null }[];
+};
+interface Question {
+    question_id: number,
+    expected_boolean: boolean | null,
+    ideal_value: string,
+    lane: "must_have" | "screening",
+    min_value: string,
+    scored: boolean,
+    source_checksum: string,
+    weight: string,
+    roles: { [key: string]: "ideal" | "acceptable" | "not_preferred" },
+    content: {
+        type: "short_text" | "long_text" | "number" | "single_select" | "multi_select" | "yes_no",
+        text: string,
+        options: { id: string, label: string }[]
+    }
+}
 interface User {
     id: number;
     email: string;
@@ -77,7 +102,11 @@ interface User {
     certificates: any[],
     logo: string,
     images: any[],
-    is_active: boolean
+    is_active: boolean;
+    industry_id: number;
+    description: string;
+
+
 }
 interface Recruiter {
     _id: string;
@@ -100,7 +129,9 @@ interface RecruiterInitialState {
     welcomeScreen: WelcomeScreenItem[] | [];
     countries: CountryItem[] | [];
     topic: TopicItem[] | [];
-    plan: any[]
+    plan: {
+        plans: RecruiterPlanType[]
+    }
 }
 interface StoryInitialState {
 

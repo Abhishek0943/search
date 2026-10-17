@@ -291,5 +291,3 @@ export function useBlockBack() {
 }
 export default Home;
 
-
-const styles = StyleSheet.create({});

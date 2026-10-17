@@ -1263,15 +1263,26 @@ export const CustomDropdown = ({
   data = [],
   placeholder = 'Select',
   selectedValue = 0,
-  onSelect = (e: number) => { },
+  onSelect = () => { },
   labelKey = 'name',
   valueKey = 'id',
+  style = {},
+  fontSize
+}: {
+  data?: any[];
+  placeholder?: string;
+  selectedValue?: any;
+  onSelect?: (e: any) => void;
+  labelKey?: string;
+  valueKey?: string;
+  style?: any;
+  fontSize?: number
 }) => {
   const [visible, setVisible] = useState(false);
   const { colors } = useContext(ThemeContext);
 
   const selectedLabel = useMemo(() => {
-    const found = data?.find(item => item[valueKey] === selectedValue);
+    const found = data?.find((item: any) => item && item[valueKey] === selectedValue);
     return found ? found[labelKey] : '';
   }, [data, selectedValue, labelKey, valueKey]);
 
@@ -1279,21 +1290,25 @@ export const CustomDropdown = ({
     <>
       <TouchableOpacity
         onPress={() => setVisible(true)}
-        style={{
-          borderWidth: 1,
-          borderRadius: 6,
-          borderColor: colors.mediumGray,
-          paddingVertical: responsiveScreenHeight(1.3),
-          marginTop: responsiveScreenHeight(1),
-          flexDirection: 'row',
-          gap: responsiveScreenWidth(2),
-
-        }}
+        style={[
+          {
+            borderWidth: 1,
+            borderRadius: 14,
+            borderColor: colors.gray,
+            paddingVertical: responsiveScreenHeight(1.3),
+            marginTop: responsiveScreenHeight(1),
+            flexDirection: 'row',
+            gap: responsiveScreenWidth(2),
+            alignItems: 'center',
+          },
+          style,
+        ]}
       >
         <View style={{ flex: 1, marginLeft: responsiveScreenWidth(2) }}>
-          <Text numberOfLines={1}
+          <Text
+            numberOfLines={1}
             style={{
-              fontSize: responsiveScreenFontSize(1.8),
+              fontSize: fontSize || responsiveScreenFontSize(1.8),
               color: selectedLabel ? colors.textPrimary : colors.gray,
             }}
           >
@@ -1301,31 +1316,39 @@ export const CustomDropdown = ({
           </Text>
         </View>
         <View style={{ height: responsiveScreenHeight(2), marginRight: responsiveScreenWidth(2), minWidth: responsiveScreenWidth(4) }}>
-          <Image source={imagePath.angle} style={{ width: "100%", }} />
+          <Image source={imagePath.angle} style={{ width: '100%', resizeMode: 'contain' }} />
         </View>
       </TouchableOpacity>
-      <Modal visible={visible} transparent animationType="fade">
-        <TouchableOpacity
-          activeOpacity={1}
-          onPress={() => setVisible(false)}
+
+      <Modal visible={visible} transparent animationType="fade" onRequestClose={() => setVisible(false)}>
+        <View
           style={{
             flex: 1,
-            backgroundColor: 'rgba(0,0,0,0.3)',
+            backgroundColor: 'rgba(0,0,0,0.4)',
             justifyContent: 'center',
             paddingHorizontal: 20,
           }}
         >
+          <Pressable
+            style={StyleSheet.absoluteFill}
+            onPress={() => setVisible(false)}
+          />
           <View
             style={{
-              backgroundColor: 'white',
-              borderRadius: 8,
-              padding: 10,
+              backgroundColor: colors.white || 'white',
+              borderRadius: 12,
+              paddingVertical: 8,
               maxHeight: '50%',
+              elevation: 5,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.25,
+              shadowRadius: 4,
             }}
           >
             <FlatList
               data={data}
-              keyExtractor={item => String(item[valueKey])}
+              keyExtractor={(item, index) => (item && item[valueKey] !== undefined ? String(item[valueKey]) : String(index))}
               renderItem={({ item }) => (
                 <TouchableOpacity
                   onPress={() => {
@@ -1334,17 +1357,17 @@ export const CustomDropdown = ({
                   }}
                   style={{
                     paddingVertical: 12,
-                    paddingHorizontal: 10,
+                    paddingHorizontal: 16,
                   }}
                 >
-                  <Text style={{ fontSize: responsiveScreenFontSize(1.8) }}>
-                    {item[labelKey]}
+                  <Text style={{ fontSize: responsiveScreenFontSize(1.8), color: colors.textPrimary }}>
+                    {item[labelKey] ?? item.name ?? ''}
                   </Text>
                 </TouchableOpacity>
               )}
             />
           </View>
-        </TouchableOpacity>
+        </View>
       </Modal>
     </>
   );

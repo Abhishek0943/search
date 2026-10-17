@@ -34,7 +34,6 @@ type CommonProps = {
     options: DropdownOption[];
     placeholder?: string;
     maxDropdownHeight?: number;
-
     secondaryColor?: string;
 };
 
@@ -43,11 +42,16 @@ type Props = CommonProps & (SingleProps | MultiProps);
 const SearchSelectDropdown: React.FC<Props> = (props) => {
     const { colors } = useContext(ThemeContext);
     const { label, options, placeholder = 'Search...', maxDropdownHeight = 22 } = props;
-    console.log(props, "hii")
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState('');
     const [singleSelectedName, setSingleSelectedName] = useState(!props.multiSelect ? options.find(o => o.id === props.selectedId)?.name : '')
-    const filtered = options.filter((i) => i.name.toLowerCase().includes(query.toLowerCase() || (singleSelectedName || "").toLowerCase()))
+    React.useEffect(() => {
+        if (!props.multiSelect) {
+            setSingleSelectedName(options.find(o => o.id === props.selectedId)?.name)
+        }
+    }, [props]);
+
+    const filtered = options.filter((i) => (i.name?.toLowerCase() || "").includes(query?.toLowerCase() || (singleSelectedName || "").toLowerCase()))
     const isSelected = (id: string) => {
         if (props.multiSelect) {
             return props.selectedIds.includes(id);
@@ -55,7 +59,6 @@ const SearchSelectDropdown: React.FC<Props> = (props) => {
         const a = filtered.find((i) => i.name === singleSelectedName)
         return a ? a.id === id : false
     };
-
     const handleSelect = (option: DropdownOption) => {
         if (props.multiSelect) {
             props.onToggle(option.id);
@@ -64,11 +67,6 @@ const SearchSelectDropdown: React.FC<Props> = (props) => {
             setSingleSelectedName(option.name)
         }
     };
-
-    // const singleSelectedName = !props.multiSelect
-    //     ? options.find(o => o._id === props.selectedId)?.name
-    //     : undefined;
-
     const selectedChips = props.multiSelect
         ? props.selectedIds
             .map(id => options.find(o => o.id === id))
@@ -78,10 +76,8 @@ const SearchSelectDropdown: React.FC<Props> = (props) => {
         <View style={{ marginBottom: responsiveHeight(1) }}>
             <Text style={{
                 fontSize: responsiveFontSize(1.8),
-                fontWeight: '700',
-                color: props.secondaryColor || colors.textPrimary,
+                fontWeight: '700', color: colors.primary2,
                 marginBottom: responsiveHeight(.5),
-                marginTop: responsiveHeight(1),
             }}>
                 {label}
             </Text>
@@ -227,11 +223,10 @@ const SearchSelectDropdown: React.FC<Props> = (props) => {
             {props.multiSelect && selectedChips.length > 0 && (
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: responsiveWidth(2), marginTop: responsiveHeight(1) }}>
                     <Text style={{
+                        fontSize: responsiveFontSize(1.8),
+                        fontWeight: '700', color: colors.primary2,
+                        marginTop: responsiveHeight(1),
                         width: '100%',
-                        fontSize: responsiveFontSize(1.5),
-                        fontWeight: '700',
-                        color: colors.textSecondary,
-                        letterSpacing: 0.5,
                     }}>
                         Selected chips
                     </Text>

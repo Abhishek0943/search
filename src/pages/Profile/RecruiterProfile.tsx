@@ -167,15 +167,15 @@ const RecruiterProfile = () => {
                                 <ProfileRow
                                     title="Business page"
                                     subtitle="Photos, about, industry"
-                                    containerStyle={{ borderBottomColor: colors.gray, borderBottomWidth: 1, }}
+                                    containerStyle={{ borderBottomColor: colors.gray, borderBottomWidth: 1 }}
                                     rightIcon={imagePath.DownAngle}
-                                    onPress={() => navigation.navigate(routes.WHEREICANWORK)}
+                                    onPress={() => navigation.navigate(routes.BUSINESSPAGE)}
                                 />
                                 <ProfileRow
                                     title="Business details"
                                     subtitle="ABN, trading name, address"
                                     rightIcon={imagePath.DownAngle}
-                                    onPress={() => { }}
+                                    onPress={() => navigation.navigate(routes.BUSINESSDETAILS)}
                                 />
 
                             </View>
@@ -190,21 +190,22 @@ const RecruiterProfile = () => {
                                 <ProfileRow
                                     title="Current plan"
                                     subtitle="Gold · 1 posting left · expires 15 Sep"
-                                    containerStyle={{ borderBottomColor: colors.gray, borderBottomWidth: 1, }}
+                                    containerStyle={{ borderBottomColor: colors.gray, borderBottomWidth: 1 }}
                                     rightIcon={imagePath.DownAngle}
-                                    onPress={() => navigation.navigate(routes.WHEREICANWORK)}
+                                    onPress={() => navigation.navigate(routes.CURRENTPLAN)}
                                 />
                                 <ProfileRow
                                     title="Buy more postings"
                                     subtitle="Free, Basic, Gold, Diamond, Platinum"
+                                    containerStyle={{ borderBottomColor: colors.gray, borderBottomWidth: 1 }}
                                     rightIcon={imagePath.DownAngle}
-                                    onPress={() => { }}
+                                    onPress={() => navigation.navigate(routes.BUYMOREPOSTINGS)}
                                 />
                                 <ProfileRow
                                     title="Payment history"
                                     subtitle="Invoices and receipts"
                                     rightIcon={imagePath.DownAngle}
-                                    onPress={() => { }}
+                                    onPress={() => navigation.navigate(routes.PAYMENTHISTORY)}
                                 />
 
                             </View>
@@ -219,21 +220,21 @@ const RecruiterProfile = () => {
                                 <ProfileRow
                                     title="Notifications"
                                     subtitle="Email and push"
-                                    containerStyle={{ borderBottomColor: colors.gray, borderBottomWidth: 1, }}
+                                    containerStyle={{ borderBottomColor: colors.gray, borderBottomWidth: 1 }}
                                     rightIcon={imagePath.DownAngle}
-                                    onPress={() => { }}
+                                    onPress={() => navigation.navigate(routes.NOTIFICATIONSETTINGS)}
                                 />
                                 <ProfileRow
                                     title="Help and support"
                                     containerStyle={{ borderBottomColor: colors.gray, borderBottomWidth: 1, paddingVertical: responsiveHeight(2.5) }}
                                     rightIcon={imagePath.DownAngle}
-                                    onPress={() => { }}
+                                    onPress={() => navigation.navigate(routes.CONTACT)}
                                 />
 
                                 <ProfileRow
                                     title="Logout"
                                     containerStyle={{ borderBottomColor: colors.gray, borderBottomWidth: 1, paddingVertical: responsiveHeight(2.5) }}
-                                    onPress={() => { }}
+                                    onPress={() => logoutAndRestart()}
                                 />
                                 <ProfileRow
                                     title="Delete Account"
