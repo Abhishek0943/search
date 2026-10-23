@@ -171,31 +171,53 @@ const ApplyJob = () => {
                 width: "100%",
               }}>
                 {
-                  value.type === "yes_no" && <View style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: responsiveWidth(2),
-                    borderWidth: 1,
-                    borderRadius: 10,
-                    paddingHorizontal: responsiveScreenWidth(2),
-                    paddingVertical: responsiveScreenHeight(1),
-                  }}>
-                    <TouchableOpacity style={{
-                      width: responsiveWidth(12),
-                      aspectRatio: 1,
-                    }}>
-                      <Text>Yes</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={{
-                      width: responsiveWidth(12),
-                      aspectRatio: 1,
-                    }}>
-                      <Text>No</Text>
-                    </TouchableOpacity>
-                  </View>
+                  value.type === "yes_no" &&
+                  <>
+                    <View style={{ flexDirection: 'row', alignItems: "baseline", gap: responsiveWidth(1), marginBottom: responsiveHeight(0.5), }}>
+                      <Text style={{
+                        fontSize: responsiveFontSize(1.8),
+                        fontWeight: '700', color: colors.primary2
+                      }}>
+                        {value.text}
+                      </Text>
+                    </View>
+
+                    <View
+                      style={{ flexDirection: 'row', gap: responsiveWidth(2.5), marginTop: responsiveWidth(.5), paddingVertical: 4, flexWrap: "wrap" }}
+                    >
+                      {["yes", "no"].map((key2) => {
+                        const isSelected = value.answer === key2
+                        return (
+                          <Pressable
+                            key={key2}
+                            onPress={() => setCvs({ ...cvs, [key]: { ...value, answer: key2 } })}
+                            style={{
+                              backgroundColor: isSelected ? colors.primary : colors.white,
+                              borderWidth: isSelected ? 0 : 1.5,
+                              borderColor: isSelected ? colors.primary : colors.gray,
+                              borderRadius: 24,
+                              paddingHorizontal: responsiveWidth(5),
+                              paddingVertical: responsiveHeight(1),
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <Text style={{
+                              color: isSelected ? colors.white : colors.textPrimary,
+                              fontSize: responsiveFontSize(1.8),
+                              fontWeight: '600',
+                            }}>
+                              {key2.toUpperCase()}
+                            </Text>
+                          </Pressable>
+                        );
+                      })}
+                    </View>
+                  </>
+
                 }
                 {
-                  (value.type === "short_text" || value.type === "number")&&
+                  (value.type === "short_text" || value.type === "number") &&
                   <InPutWithLabel
                     inputContainerStyle={{
                       marginBottom: responsiveHeight(0.5),

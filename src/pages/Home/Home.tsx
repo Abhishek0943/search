@@ -73,8 +73,18 @@ function Home() {
     }, [user?.id])
   )
   useEffect(() => {
-    fetchJobs(1, true);
+    fetchJobs(1);
   }, [user?.id]);
+
+  // Debounced search effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setPage(1);
+      fetchJobs(1);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [search]);
   useBlockBack()
   return (
     <>
@@ -96,17 +106,19 @@ function Home() {
           <View style={{ paddingHorizontal: responsiveScreenWidth(5), paddingTop: responsiveScreenHeight(1), paddingBottom: responsiveScreenHeight(1) }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <Text style={{ fontSize: responsiveFontSize(3), fontWeight: '800', color: colors.textPrimary }}>Jobs for you</Text>
-              <TouchableOpacity onPress={() => navigation.navigate(routes.SEARCH, { filter: true })} style={{ width: responsiveScreenWidth(7), aspectRatio: 1 }}>
+              <TouchableOpacity style={{ width: responsiveScreenWidth(7), aspectRatio: 1 }}>
                 <Image source={imagePath.Filter} style={{ width: "100%", height: "100%", resizeMode: 'contain' }} />
               </TouchableOpacity>
             </View>
           </View>
 
           <View style={{ paddingHorizontal: responsiveScreenWidth(5), marginTop: responsiveHeight(.5), marginBottom: responsiveScreenHeight(1.5) }}>
-            <TouchableOpacity onPress={() => navigation.navigate(routes.SEARCH, { search: true })} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.white, borderRadius: 12, paddingHorizontal: responsiveScreenWidth(4), paddingVertical: responsiveScreenHeight(1.5), borderWidth: 1, borderColor: '#E5E7EB' }}>
+            <View style={{ flexDirection: 'row', overflow: 'hidden', alignItems: 'center', backgroundColor: colors.white, borderRadius: 12, paddingHorizontal: responsiveScreenWidth(4), borderWidth: 1, borderColor: '#E5E7EB' }}>
               <Image source={imagePath.SearchIcon} style={{ width: responsiveScreenWidth(5), height: responsiveScreenWidth(5), resizeMode: 'contain', tintColor: '#9CA3AF', marginRight: responsiveScreenWidth(2) }} />
-              <Text style={{ fontSize: responsiveFontSize(1.9), color: colors.textSecondary, fontWeight: "600" }}>Search bar, kitchen, retail...</Text>
-            </TouchableOpacity>
+              {/* <Text style={{ fontSize: responsiveFontSize(1.9), color: colors.textSecondary, fontWeight: "600" }}>Search bar, kitchen, retail...</Text> */}
+              <TextInput style={{ flex: 1, fontSize: responsiveFontSize(1.9), color: colors.textSecondary, fontWeight: "600" }} onChangeText={setSearch} value={search} placeholderTextColor={colors.textSecondary} placeholder="Search bar, kitchen, retail..." />
+            </View>
+
           </View>
 
           {/* <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: responsiveScreenWidth(5), gap: responsiveScreenWidth(2), marginBottom: responsiveScreenHeight(1.5) }}>

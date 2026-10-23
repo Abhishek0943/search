@@ -19,7 +19,6 @@ const Splash = () => {
     const login = async () => {
       // 500 ms delay
       await new Promise((resolve: any) => setTimeout(resolve, 500));
-
       const token = await AsyncStorage.getItem("token");
       const role = (await AsyncStorage.getItem("role")) as "seeker" | "recruiter";
 
@@ -32,20 +31,18 @@ const Splash = () => {
         dispatch(RecruiterProfile()).unwrap().then((res) => {
           if (res.success) {
 
-            // if (res.data.onboarding_step === 1) {
-            //   navigation.reset({
-            //     index: 0,
-            //     routes: [{ name: routes.DETAILS }]
-            //   })
+            if (res.data.onboarding_step === 1) {
+              navigation.reset({
+                index: 0,
+                routes: [{ name: routes.DETAILS }]
+              })
 
-            // } else {
-            navigation.reset({
-              index: 0,
-              routes: [{ name: routes.RECRUITERHOME }]
-            });
-            // }
-            console.log("res", res);
-
+            } else {
+              navigation.reset({
+                index: 0,
+                routes: [{ name: routes.RECRUITERHOME }]
+              });
+            }
           } else {
             navigation.navigate(routes.WELCOME);
           }

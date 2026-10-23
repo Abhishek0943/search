@@ -25,25 +25,25 @@ const NavigationBar = ({ onPress, bottomPadding = false, children, statusbar = t
         {
             name: "Home",
             path: routes.HOME,
-            icon: <Image source={name === routes.HOME ? require("./ActiveSearch.png") : imagePath.home} />
+            icon: <Image source={name === routes.HOME ? require("./ActiveSearch.png") : require("./home.png")} />
         },
         {
             name: "Bookmarked",
             path: routes.BOOKMARKED,
-            icon: <Image source={name === routes.BOOKMARKED ? imagePath.activeBlog : require("./Bookmark.png")} />
+            icon: <Image source={name === routes.BOOKMARKED ? require("./ActiveSave.png") : require("./Bookmark.png")} />
         },
         {
             name: "Applications",
             path: routes.APPLYJOB,
-            icon: <Image source={name === routes.APPLYJOB ? imagePath.activeApplication : require("./Applied.png")} />
+            icon: <Image source={name === routes.APPLYJOB ? require("./ActiveApply.png") : require("./Applied.png")} />
         }, {
             name: "Chat",
             path: routes.CHAT,
-            icon: <Image source={name === routes.CHAT ? imagePath.chat : require("./Inbox.png")} />
+            icon: <Image source={name === routes.CHAT ? require("./ActiveInbox.png") : require("./Inbox.png")} />
         }, {
             name: "Profile",
             path: routes.PROFILE,
-            icon: <Image source={name === routes.PROFILE ? imagePath.activeProfile : require("./Profile.png")} />
+            icon: <Image source={name === routes.PROFILE ? require("./ActiveProfile.png") : require("./Profile.png")} />
         },
     ]
     return (

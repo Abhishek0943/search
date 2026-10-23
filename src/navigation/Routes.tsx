@@ -24,6 +24,7 @@ import BusinessDetails from '../pages/Profile/BusinessDetails';
 import BusinessPage from '../pages/Profile/BusinessPage';
 import CurrentPlan from '../pages/Profile/CurrentPlan';
 import NotificationSettings from '../pages/Profile/NotificationSettings';
+import AssessmentScreen from '../reducer/JobId';
 const Stack = createNativeStackNavigator();
 const Routes = () => {
   const { isAuth, user } = useAppSelector(state => state.userStore);
@@ -165,6 +166,8 @@ const Routes = () => {
         <Stack.Screen name={routes.BOOKMARKED} component={Bookmarked} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.RECRUITERHOME} component={RecruiterHome} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.BUYMOREPOSTINGS} component={BuyMorePostings} options={{ headerShown: false, animation: 'none' }} />
+        <Stack.Screen name={routes.AVAILABILITY} component={AvailabilityPage} options={{ headerShown: false, animation: 'none' }} />
+        <Stack.Screen name={routes.SKILLS} component={SkillsPage} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.ACTIVECANDIDATE} component={Candidate} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.ADDJOB} component={AddJob} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.MESSAGE} component={Messages} options={{ headerShown: false, animation: 'none' }} />
@@ -175,6 +178,7 @@ const Routes = () => {
         <Stack.Screen name={routes.OPENJOBS} component={OpenJobs} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.ACCOUNT} component={RecruiterProfile} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.CANDIDATEPROFILE} component={CandidateProfile} options={{ headerShown: false, animation: 'none' }} />
+        <Stack.Screen name={routes.CERTIFICATIONS} component={Certifications} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.HOME} component={Home} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.BLOGPAGE} component={BlogPage} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.CHAT} component={Chat} options={{ headerShown: false, animation: 'none' }} />
@@ -182,6 +186,7 @@ const Routes = () => {
         <Stack.Screen name={routes.JOBDETAIL} component={Jobdetail} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.COMPANY} component={Company} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.COMPANYDETAILS} component={CompanyDetails} options={{ headerShown: false, animation: 'none' }} />
+        <Stack.Screen name={"asjdfhajsdf"} component={AssessmentScreen} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.SUGGESTEDJOB} component={SuggestedJob} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.PAYMENTHISTORY} component={PaymentHistory} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.PERSONALINFO} component={PersonalInfo} options={{ headerShown: false, animation: 'none' }} />

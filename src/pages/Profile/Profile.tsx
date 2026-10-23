@@ -20,6 +20,7 @@ import { openBrowser } from '../Resume/Resume';
 import { pick, types } from '@react-native-documents/picker';
 import { setUser } from '../../reducer/userReducer';
 import { formatDateToMonthYear } from '../Auth/ProfileCompelete';
+import { postApiCall } from '../../api';
 const logoutUser = async () => {
     try {
         await messaging().deleteToken();
@@ -70,8 +71,12 @@ export const ProfileRow = ({ rightIcon, containerStyle, icon, title, subtitle, o
         >
             {icon && (
                 <View style={{
-                    width: responsiveWidth(11), aspectRatio: 1,
+                    width: responsiveWidth(8), aspectRatio: 1,
                     marginRight: responsiveWidth(3),
+                    borderWidth: 1,
+                    borderColor: colors.gray,
+                    borderRadius: responsiveWidth(10),
+
                 }}>
                     <Image source={icon} style={{ width: "100%", height: "100%", resizeMode: "contain" }} />
                 </View>
@@ -82,7 +87,7 @@ export const ProfileRow = ({ rightIcon, containerStyle, icon, title, subtitle, o
             </View>
             {actionText && (
                 <TouchableOpacity onPress={onPress}>
-                    <Text style={{ fontSize: responsiveFontSize(1.6), fontWeight: '600', color: colors.primary }}>{actionText}</Text>
+                    <Text style={{ fontSize: responsiveFontSize(1.6), fontWeight: '800', color: colors.primary }}>{actionText}</Text>
                 </TouchableOpacity>
             )}
             {
@@ -222,6 +227,40 @@ const RecruiterProfile = () => {
             setLoadingCV(false)
         })
     };
+    const uploadMediaToApi = async (key: string, file: { uri: string; name: string; type: string }, extraFields?: Record<string, string>) => {
+        try {
+            const fd = new FormData();
+            fd.append(key, {
+                uri: file.uri,
+                name: file.name,
+                type: file.type,
+            } as any);
+            if (extraFields) {
+                Object.entries(extraFields).forEach(([k, v]) => fd.append(k, v));
+            }
+            const res: any = await postApiCall('/jobseeker/update-user-media', fd, { as: 'form' });
+            if (!res.success) {
+                Alert.alert('Upload Failed', res?.message || 'Something went wrong');
+            }
+
+        } catch (e) {
+            Alert.alert('Upload Failed', 'Network error. Please try again.');
+        }
+    };
+    const pickProfilePhoto = async () => {
+        try {
+            const [doc] = await pick({
+                type: [types.images],
+                allowMultiSelection: false,
+                mode: 'import',
+            });
+            if (!doc) return;
+            const uri = normalizeFileUri((doc as any).fileCopyUri || doc.uri);
+            const fileName = `profile_${Date.now()}.${doc.type || 'image/jpeg'}`;
+            const file = { uri, name: fileName, type: doc.type || 'image/jpeg' };
+            uploadMediaToApi('image', file);
+        } catch (e) { }
+    };
     return (
         <>
             <NavigationBar name={routes.PROFILE}>
@@ -268,7 +307,7 @@ const RecruiterProfile = () => {
                                     paddingHorizontal: responsiveWidth(4),
                                     paddingVertical: responsiveHeight(1.5)
                                 }}>
-                                    <TouchableOpacity onPress={() => pickImage('image')} style={{
+                                    <TouchableOpacity onPress={pickProfilePhoto} style={{
                                         width: responsiveWidth(15), aspectRatio: 1,
                                         borderRadius: 20,
                                         backgroundColor: colors.primary + '18',
@@ -445,12 +484,12 @@ const RecruiterProfile = () => {
                             )}
 
                             <SectionHeader titleColor={colors.textSecondary} title="AVAILABILITY" actionText="Edit" actionColor={colors.primary} onAction={() => navigation.navigate(routes.AVAILABILITY)} />
-
                             <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                                <TagChip label="Evenings" />
-                                <TagChip label="Weekends" />
-                                <TagChip label="Overnight" />
-
+                                {user?.availabilities && user.availabilities.length > 0 &&
+                                    user.availabilities.map((item: any, i: number) => (
+                                        <TagChip key={i} label={item.availability} />
+                                    ))
+                                }
                             </View>
 
                             <SectionHeader titleColor={colors.textSecondary} title="SKILLS" actionText="Edit" actionColor={colors.primary} onAction={() => navigation.navigate(routes.SKILLS)} />
@@ -463,77 +502,50 @@ const RecruiterProfile = () => {
                                 }
                             </View>
                             <SectionHeader titleColor={colors.textSecondary} title="EXPERIENCE" actionText="Edit" actionColor={colors.primary} onAction={() => navigation.navigate(routes.EXPERIENCEPAGE)} />
-                            <View
-                                style={{
-                                    borderRadius: 15,
-                                    borderWidth: 1,
-                                    borderColor: colors.gray,
-                                }}
-                            >
-                                {roles.length > 0 ? (
-                                    roles.map((item: RoleItem, i: number) => (
-                                        <View key={i} style={{
-                                            paddingVertical: responsiveHeight(1.5),
-                                            paddingHorizontal: responsiveWidth(4),
-                                            borderBottomWidth: i == roles.length - 1 ? 0 : 1,
-                                            borderBottomColor: colors.gray,
-                                        }}>
-                                            <Text style={{ fontSize: responsiveFontSize(2), fontWeight: '700', color: colors.textPrimary }}>{item.jobTitle}</Text>
-                                            <Text style={{ fontSize: responsiveFontSize(1.6), color: colors.textSecondary, fontWeight: "600", marginTop: responsiveHeight(0.4) }}>
-                                                {item.startDate} – {item.endDate} · {item.businessName}
-                                            </Text>
-                                        </View>
-                                    ))
-                                ) : (
-                                    <>
-                                        <View style={{
-                                            borderBottomWidth: 0.5,
-                                            paddingVertical: responsiveHeight(1.5),
-                                            paddingHorizontal: responsiveWidth(4),
-                                        }}>
-                                            <Text style={{ fontSize: responsiveFontSize(1.7), fontWeight: '700', color: '#1A1A2E' }}>Bartender · The Alley</Text>
-                                            <Text style={{ fontSize: responsiveFontSize(1.3), color: '#9CA3AF', marginTop: responsiveHeight(0.2) }}>2023 – now · Brunswick</Text>
-                                        </View>
-                                        <View style={{ paddingVertical: responsiveHeight(1), borderBottomWidth: 0.5, borderBottomColor: '#F3F4F6' }}>
-                                            <Text style={{ fontSize: responsiveFontSize(1.7), fontWeight: '700', color: '#1A1A2E' }}>Floor staff · Nonna's</Text>
-                                            <Text style={{ fontSize: responsiveFontSize(1.3), color: '#9CA3AF', marginTop: responsiveHeight(0.2) }}>2021 – 2023 · Coburg</Text>
-                                        </View>
-                                    </>
-                                )}
-                            </View>
-                            <SectionHeader titleColor={colors.textSecondary} title="PROMPTS AND PHOTO" actionColor={colors.primary} />
+
+                            {roles.length > 0 && (
+                                <View
+                                    style={{
+                                        borderRadius: 15,
+                                        borderWidth: 1,
+                                        borderColor: colors.gray,
+                                    }}
+                                >
+                                    {
+                                        roles.map((item: RoleItem, i: number) => (
+                                            <View key={i} style={{
+                                                paddingVertical: responsiveHeight(1.5),
+                                                paddingHorizontal: responsiveWidth(4),
+                                                borderBottomWidth: i == roles.length - 1 ? 0 : 1,
+                                                borderBottomColor: colors.gray,
+                                            }}>
+                                                <Text style={{ fontSize: responsiveFontSize(2), fontWeight: '700', color: colors.textPrimary }}>{item.jobTitle}</Text>
+                                                <Text style={{ fontSize: responsiveFontSize(1.6), color: colors.textSecondary, fontWeight: "600", marginTop: responsiveHeight(0.4) }}>
+                                                    {item.startDate} – {item.endDate} · {item.businessName}
+                                                </Text>
+                                            </View>
+                                        ))
+                                    }
+
+                                </View>
+
+                            )}
+                            {/* <SectionHeader titleColor={colors.textSecondary} title="PROMPTS AND PHOTO" actionColor={colors.primary} />
+
                             <ProfileRow
-                                icon="📸"
-                                title="Profile photo"
-                                subtitle="Added recently"
-                                actionText="Change"
-                                actionColor={colors.primary}
-                                onAction={() => pickImage('image')}
-                            />
-                            <ProfileRow
-                                icon="✓"
-                                iconColor="#2E7D32"
+                                icon={require("./Add.png")}
                                 title="Prompt 1"
                                 subtitle="Reliable, on time, happy on a busy bar."
                                 actionText="Change"
-                                actionColor={colors.primary}
+                                containerStyle={{ paddingHorizontal: 0 }}
                             />
                             <ProfileRow
-                                icon="+"
-                                iconColor={colors.primary}
-                                title="Right to work expiry"
-                                subtitle="Not added yet"
-                                actionText="Add"
-                                actionColor={colors.primary}
-                            />
-                            <ProfileRow
-                                icon="+"
-                                iconColor={colors.primary}
+                                icon={require("./Add.png")}
                                 title="Prompt 2"
                                 subtitle="Not added yet"
                                 actionText="Add"
-                                actionColor={colors.primary}
-                            />
+                                containerStyle={{ paddingHorizontal: 0 }}
+                            /> */}
 
                             <SectionHeader titleColor={colors.textSecondary} title="ACCOUNT" />
                             <View
@@ -543,31 +555,46 @@ const RecruiterProfile = () => {
                                     borderColor: colors.gray,
                                 }}
                             >
-                                <ProfileRow
+                                {/* <ProfileRow
                                     title="Where I can work"
                                     subtitle="Brunswick +3 areas"
                                     containerStyle={{ borderBottomColor: colors.gray, borderBottomWidth: 1, }}
                                     rightIcon={imagePath.DownAngle}
                                     onPress={() => navigation.navigate(routes.WHEREICANWORK)}
-                                />
+                                /> */}
                                 <ProfileRow
                                     title="Notifications"
                                     subtitle="Email and push"
                                     containerStyle={{ borderBottomColor: colors.gray, borderBottomWidth: 1, }}
                                     rightIcon={imagePath.DownAngle}
-                                    onPress={() => { }}
+                                    onPress={() => { navigation.navigate(routes.NOTIFICATIONSETTINGS) }}
                                 />
                                 <ProfileRow
                                     title="Help and support"
                                     containerStyle={{ borderBottomColor: colors.gray, borderBottomWidth: 1, paddingVertical: responsiveHeight(2.5) }}
                                     rightIcon={imagePath.DownAngle}
-                                    onPress={() => { }}
+                                    onPress={() => {
+                                        openBrowser("https://dev.searchtalents.co/contact", colors.primary, false)
+                                    }}
                                 />
 
                                 <ProfileRow
                                     title="Logout"
                                     containerStyle={{ borderBottomColor: colors.gray, borderBottomWidth: 1, paddingVertical: responsiveHeight(2.5) }}
-                                    onPress={() => { }}
+                                    onPress={() => {
+                                        showConfirm({
+                                            title: 'Logout',
+                                            message: 'Are you sure you want to logout?',
+                                            okText: 'Logout',
+                                            cancelText: 'Cancel',
+                                            waitForOk: true,
+                                            onOkPress: async () => {
+                                                logoutAndRestart()
+                                                return true;
+                                            },
+                                        })
+
+                                    }}
                                 />
                                 <ProfileRow
                                     title="Delete Account"
@@ -589,6 +616,7 @@ const RecruiterProfile = () => {
                                                         })
                                                         logoutAndRestart()
                                                     }
+                                                    console.log(res)
                                                 })
                                                 return true;
                                             },
@@ -603,7 +631,7 @@ const RecruiterProfile = () => {
                         </View>
                     )}
                 </ScrollView>
-            </NavigationBar>
+            </NavigationBar >
         </>
     )
 }

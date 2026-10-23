@@ -191,11 +191,12 @@ export const PaymentHistoryApi = createAsyncThunk<
   }
 );
 export const JobCandidates = createAsyncThunk<
-  { success: true, data: User } | ErrorResponse, { job_id: string, status?: string, pages: string }
+  { success: true, data: User } | ErrorResponse, { job_id: number, }
 >(
   'JobCandidates',
-  ({ pages, ...body }) => {
-    return postApiCall<{ success: true, data: User }>('/company/job-candidates?page=' + pages, body);
+  ({ ...body }) => {
+    console.log("job_id", body);
+    return postApiCall<{ success: true, data: User }>('/company/job-candidates', body);
   }
 );
 export const CandidateProfileData = createAsyncThunk<

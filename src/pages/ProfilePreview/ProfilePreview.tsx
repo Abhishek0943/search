@@ -131,12 +131,10 @@ const ProfilePreview = () => {
                         <Image style={{ height: '100%', width: '100%' }} source={imagePath.leftAngle} />
                     </Pressable>
 
-                    {/* Profile Card */}
                     <View style={{
                         borderWidth: 1, borderColor: colors.gray, borderRadius: 16,
                         overflow: 'hidden', marginTop: responsiveHeight(1),
                     }}>
-                        {/* Top: Avatar + Name */}
                         <View style={{
                             flexDirection: 'row', alignItems: 'center',
                             paddingHorizontal: responsiveWidth(4), paddingVertical: responsiveHeight(2),

@@ -144,12 +144,6 @@ const CompLogin = () => {
                 RecruiterProfile()
             ).unwrap();
 
-            console.log(
-                "Company Profile:",
-                JSON.stringify(profileRes, null, 2)
-            );
-
-            // First check success
             if (!profileRes.success) {
                 navigation.reset({
                     index: 0,
@@ -157,12 +151,7 @@ const CompLogin = () => {
                 });
                 return;
             }
-
-            // Now TypeScript knows this is the successful response
             const onboardingStep = profileRes.data.onboarding_step;
-
-            console.log("Onboarding Step:", onboardingStep);
-
             if (onboardingStep === 1) {
                 navigation.reset({
                     index: 0,

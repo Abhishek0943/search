@@ -1,770 +1,569 @@
-import { CustomTextInput } from '../../../components';
-import React, { useCallback, useContext, useEffect, useState } from 'react'
-import { ActivityIndicator, Alert, BackHandler, Image, ImageBackground, KeyboardAvoidingView, Linking, PermissionsAndroid, Platform, Pressable, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
-import { NavigationBar } from '../../../components'
-import { routes } from '../../../constants/values'
-import { responsiveScreenFontSize, responsiveScreenHeight, responsiveScreenWidth } from 'react-native-responsive-dimensions'
-import Text from '../../../components/Text'
-import { ThemeContext } from '../../../context/ThemeProvider'
-import imagePath from '../../../assets/imagePath'
+import React, { useCallback, useContext, useState } from 'react'
+import {
+  ActivityIndicator, Alert, BackHandler, Image, KeyboardAvoidingView, Linking,
+  Platform, Pressable, ScrollView, StyleSheet, TouchableOpacity, View,
+} from 'react-native'
 import { NavigationProp, ParamListBase, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native'
+import RNFS from 'react-native-fs'
+import { responsiveScreenFontSize as fs, responsiveScreenHeight as hp, responsiveFontSize, responsiveHeight, responsiveWidth, responsiveScreenWidth as wp } from 'react-native-responsive-dimensions'
+import { CustomTextInput, NavigationBar } from '../../../components'
+import Text from '../../../components/Text'
+import imagePath from '../../../assets/imagePath'
+import { routes } from '../../../constants/values'
 import { useAppDispatch } from '../../../store'
-import { CandidateProf, CandidateProfileData, SendMessage, UpdateStatus } from '../../../reducer/recruiterReducer'
-import RNFS from "react-native-fs";
+import { CandidateProf, SendMessage, UpdateStatus } from '../../../reducer/recruiterReducer'
 import { useAlert } from '../../../context/AlertContext'
-function CandidateProfile() {
+import { ThemeContext, ThemeProvider } from '../../../context/ThemeProvider'
+const C = {
+  bg: '#F4F7FD',
+  card: '#FFFFFF',
+  border: '#E1E8F5',
+  navy: '#0F1B3D',
+  muted: '#7A869A',
+  primary: '#1A73E8',
+  primarySoft: '#E8F0FD',
+  green: '#1E7D4F',
+  greenSoft: '#E3F4EA',
+  red: '#D93025',
+  chip: '#EEF1F6',
+}
+
+/* ---------- helpers ---------- */
+const arr = (v: any) => (Array.isArray(v) ? v : [])
+
+const formatApplied = (iso?: string) => {
+  if (!iso) return '-'
+  const d = new Date(iso)
+  const now = new Date()
+  const sameDay = d.toDateString() === now.toDateString()
+  const time = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+  return sameDay ? time + ' today' : d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' })
+}
+
+export async function downloadCV(url: string) {
+  try {
+    const fileName = `candidate_cv_${Date.now()}.pdf`
+    const toFile = Platform.OS === 'android'
+      ? `${RNFS.DownloadDirectoryPath}/${fileName}`
+      : `${RNFS.DocumentDirectoryPath}/${fileName}`
+    const { statusCode } = await RNFS.downloadFile({ fromUrl: url, toFile }).promise
+    Alert.alert(
+      statusCode === 200 ? 'Download complete' : 'Download failed',
+      statusCode === 200
+        ? (Platform.OS === 'android' ? 'Saved in Downloads folder' : 'Saved in app documents')
+        : undefined,
+    )
+  } catch {
+    Alert.alert('Error downloading file')
+  }
+}
+
+/* ---------- small building blocks ---------- */
+const SectionTitle = ({ children, right }: { children: string; right?: string }) => (
+  <View style={s.sectionRow}>
+    <Text style={s.sectionTitle}>{children}</Text>
+    {!!right && <Text style={s.sectionRight}>{right}</Text>}
+  </View>
+)
+
+const Card = ({ children, style }: any) => <View style={[s.card, style]}>{children}</View>
+
+const PillButton = ({ label, onPress }: { label: string; onPress: () => void }) => {
   const { colors } = useContext(ThemeContext);
-  const navigation: NavigationProp<ParamListBase> = useNavigation();
-  const route = useRoute();
-  const id = route.params?.candidateId;
-  const application = route.params?.application_id;
-  const dispatch = useAppDispatch()
-  const [cvs, setCvs] = useState([])
-  const [data, setData] = useState("")
-  const [loading, setLoading] = useState(true)
-  const [isMsgModalVisible, setIsMsgModalVisible] = useState(false);
-  const [messageText, setMessageText] = useState("");
-  const [sendMsgLoading, setSendMsgLoading] = useState(false);
-  const [isDownloadingCV, setIsDownloadingCV] = useState(false);
-  const { showAlert } = useAlert()
-  useFocusEffect(useCallback(
-    () => {
-      const onBackPress = () => {
-        if (!navigation.canGoBack()) {
-          (navigation as any).replace(routes.RECRUITERHOME);
-          return true;
-        }
-        return false;
-      };
-
-      const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
-
-      if (id) {
-        setLoading(true)
-        dispatch(CandidateProfileData({ id: id })).unwrap().then(res => {
-          if (res.success !== false) {
-            setCvs(res.data)
-          }
-          setLoading(false)
-        })
-      }
-      else if (application) {
-        setLoading(true)
-
-        dispatch(CandidateProf({ id: application })).unwrap().then(res => {
-          if (res.success !== false) {
-            setCvs(res.data.user)
-            setData(res.data.status)
-          }
-          setLoading(false)
-
-        })
-      }
-
-      return () => {
-        subscription.remove();
-      }
-    },
-    [id, application, navigation],
-  )
-  )
   return (
-    <NavigationBar navigationBar={false} >
-      <>
-        <ScrollView style={{ flex: 1, }} contentContainerStyle={{}}>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              position: 'relative',
-              alignItems: 'center',
-              borderBottomColor: colors.textDisabled,
-              borderBottomWidth: 0.5,
-              paddingBottom: responsiveScreenHeight(2),
-              width: responsiveScreenWidth(100),
-              paddingHorizontal: responsiveScreenWidth(5),
-              gap: responsiveScreenWidth(2),
-            }}
-          >
-            <TouchableOpacity onPress={() => {
-              if (navigation.canGoBack()) {
-                navigation.goBack();
-              } else {
-                (navigation as any).replace(routes.RECRUITERHOME);
-              }
-            }}>
-              <Image source={imagePath.backIcon} style={{ resizeMode: 'contain', transform: [{ scale: 1.1 }] }} />
-            </TouchableOpacity>
-            <Text
-              style={{
-                flex: 1,
-                textAlign: 'left',
-                fontSize: responsiveScreenFontSize(2),
-                color: colors.textPrimary,
-                fontWeight: '800',
-              }}
-            >
-              {cvs?.name ? cvs.name : "Candidates"}
-            </Text>
+    <TouchableOpacity onPress={onPress} style={{ backgroundColor: colors.primary50, borderRadius: 8, paddingHorizontal: responsiveWidth(3), paddingVertical: responsiveHeight(.6) }}>
+      <Text style={{ color: colors.primary, fontSize: responsiveFontSize(1.8), fontWeight: "700" }}>{label}</Text>
+    </TouchableOpacity>
+  )
+}
 
-          </View>
-          {
-            loading ?
-              <View style={{ flex: 1, marginTop: responsiveScreenHeight(40) }}>
-                <ActivityIndicator size={responsiveScreenFontSize(3)} style={{}} />
-              </View>
-              :
-              <>
-                <ImageBackground source={{ uri: cvs?.cover_image }} style={{ width: responsiveScreenWidth(100), height: responsiveScreenHeight(20), justifyContent: 'flex-end', alignItems: 'flex-start' }}>
-                  <View style={{ width: responsiveScreenWidth(30), height: responsiveScreenWidth(30), borderRadius: responsiveScreenWidth(15), borderWidth: 3, borderColor: "white", elevation: 2, marginHorizontal: responsiveScreenWidth(5), marginBottom: -responsiveScreenWidth(15), overflow: 'hidden' }}>
-                    <Image source={{ uri: cvs?.image }} style={{ width: '100%', height: '100%' }} />
-                  </View>
-                </ImageBackground>
-                <Text style={{ marginTop: responsiveScreenWidth(18), fontSize: responsiveScreenFontSize(2.5), fontWeight: '700', color: colors.textPrimary, textAlign: 'left', marginHorizontal: responsiveScreenWidth(5) }}>{cvs?.name}</Text>
-                {
-                  cvs?.location &&
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(2), marginTop: responsiveScreenHeight(.5), marginHorizontal: responsiveScreenWidth(5) }}>
-                    <Image source={imagePath.location} style={{ width: responsiveScreenWidth(4), height: responsiveScreenWidth(4), }} />
-                    <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: '500', color: colors.darkGray, textAlign: 'left', }}>{cvs.location}</Text>
-                  </View>
-                }
-                {
-                  cvs?.member_since &&
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(2), marginTop: responsiveScreenHeight(.5), marginHorizontal: responsiveScreenWidth(5) }}>
-                    <Image source={imagePath.time} style={{ width: responsiveScreenWidth(4), height: responsiveScreenWidth(4), }} />
-                    <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: '500', color: colors.darkGray, textAlign: 'left', }}>{formatMemberSince(cvs.member_since)}</Text>
-                  </View>
-                }
-                {
-                  cvs?.phone &&
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(2), marginTop: responsiveScreenHeight(.5), marginHorizontal: responsiveScreenWidth(5) }}>
-                    <Image source={imagePath.phone} style={{ width: responsiveScreenWidth(4), height: responsiveScreenWidth(4), }} />
-                    <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: '500', color: colors.darkGray, textAlign: 'left', }}>{cvs.phone}</Text>
-                  </View>
-                }
-                {
-                  cvs?.email &&
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: responsiveScreenWidth(2), marginTop: responsiveScreenHeight(.5), marginHorizontal: responsiveScreenWidth(5) }}>
-                    <Image source={imagePath.email} style={{ width: responsiveScreenWidth(4), height: responsiveScreenWidth(4), }} />
-                    <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: '500', color: colors.darkGray, textAlign: 'left', }}>{cvs.email}</Text>
-                  </View>
-                }
+const Stat = ({ value, label, divider }: { value: string; label: string; divider?: boolean }) => {
+  const { colors } = useContext(ThemeContext);
+  return (
+    <View style={[s.stat, divider && s.statDivider]}>
+      <Text style={s.statValue}>{label}</Text>
+      <Text style={[s.statLabel, { color: colors.textSecondary }]}>{value}</Text>
+    </View>
+  )
+}
 
-                {
-                  application &&
-                  <Selection data={data} application_id={application} />
-                }
-                {/* <AboutMeCard /> */}
-                {
-                  cvs?.skills?.length > 0 &&
-                  <SkillCard data={cvs.skills} />
-                }
-                {
-                  cvs?.languages?.length > 0 &&
-                  <LanguageCard data={cvs.languages} />
-                }
-                {
-                  cvs?.profile_education?.length > 0 &&
-                  <EducationCard data={cvs.profile_education} />
-                }
+/* ---------- screen ---------- */
+function CandidateProfile() {
+  const navigation: NavigationProp<ParamListBase> = useNavigation()
+  const route: any = useRoute()
+  const applicationId = route.params?.application_id
+  const dispatch = useAppDispatch()
+  const { showAlert } = useAlert()
 
-                <Text style={{ paddingHorizontal: responsiveScreenWidth(5), fontWeight: "600", color: colors.textPrimary, fontSize: responsiveScreenFontSize(2.6), marginTop: responsiveScreenHeight(2), marginBottom: 0 }}>Company details</Text>
+  const [app, setApp] = useState<any>(null)
+  const [status, setStatus] = useState<string>('')
+  const [loading, setLoading] = useState(true)
+  const [msgOpen, setMsgOpen] = useState(false)
+  const [msgText, setMsgText] = useState('')
+  const [sending, setSending] = useState(false)
+  const [downloading, setDownloading] = useState(false)
 
-                <View style={{ flexDirection: "row", rowGap: responsiveScreenHeight(3), marginTop: responsiveScreenHeight(2), marginHorizontal: responsiveScreenWidth(5), flexWrap: "wrap", justifyContent: "space-between", }}>
-                  {
-                    cvs?.is_verified &&
-                    <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
-                      <Image source={imagePath.verify} style={{ transform: [{ scale: 1.3 }], }} />
-                      <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Verified</Text>
-                      <Text style={{ color: colors.textSecondary, fontSize: responsiveScreenFontSize(2), }}>Yes</Text>
-                    </View>
-                  }
 
-                  <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
-                    <Image source={imagePath.hand} style={{ transform: [{ scale: 1.3 }], }} />
-                    <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Ready for hire</Text>
-                    <Text style={{ color: colors.textSecondary, fontSize: responsiveScreenFontSize(2), }}>Yes</Text>
-                  </View>
-                  {
-                    cvs?.date_of_birth &&
-                    <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
-                      <Image source={imagePath.cake} style={{ transform: [{ scale: 1.3 }], }} />
-                      <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Date of Birth</Text>
-                      <Text style={{ color: colors.textSecondary, fontSize: responsiveScreenFontSize(2), }}>{cvs.date_of_birth}</Text>
-                    </View>
-                  }
 
-                  {
-                    cvs?.gender?.gender &&
-                    <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
-                      <Image source={imagePath.gender} style={{ transform: [{ scale: 1.3 }], }} />
-                      <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Gender</Text>
-                      <Text style={{ color: colors.textSecondary, fontSize: responsiveScreenFontSize(2), }}>{cvs.gender.gender}</Text>
-                    </View>
-                  }
-
-                  {
-                    cvs?.job_experience &&
-                    <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
-                      <Image source={imagePath.bag} tintColor={colors.primary} style={{ transform: [{ scale: 1.3 }], }} />
-                      <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Experience</Text>
-                      <Text style={{ color: colors.textSecondary, fontSize: responsiveScreenFontSize(2), }}>{cvs.job_experience.job_experience}</Text>
-                    </View>
-                  }
-                  {
-                    cvs?.career_level &&
-                    <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
-                      <Image source={imagePath.careerlevel} style={{ transform: [{ scale: 1.3 }], }} />
-                      <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Career level</Text>
-                      <Text style={{ color: colors.textSecondary, fontSize: responsiveScreenFontSize(2), }}>{cvs.career_level.career_level}</Text>
-                    </View>
-                  }
-                  {
-                    cvs?.location &&
-                    <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
-                      <Image source={imagePath.location4} style={{ transform: [{ scale: 1.3 }], }} />
-                      <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Location</Text>
-                      <Text numberOfLines={1} style={{ color: colors.textSecondary, fontSize: responsiveScreenFontSize(2), }}>{cvs.location}</Text>
-                    </View>
-                  }
-                  {
-                    cvs?.current_salary &&
-                    <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
-                      <Image source={imagePath.coin} style={{ transform: [{ scale: 1.3 }], }} />
-                      <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Current Salary</Text>
-                      <Text numberOfLines={1} style={{ color: colors.textSecondary, fontSize: responsiveScreenFontSize(2), }}>{cvs.salary_currency} {cvs.current_salary}</Text>
-                    </View>
-                  }
-                  {
-                    cvs?.expected_salary &&
-                    <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
-                      <Image source={imagePath.coin} style={{ transform: [{ scale: 1.3 }], }} />
-                      <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Expected salary</Text>
-                      <Text numberOfLines={1} style={{ color: colors.textSecondary, fontSize: responsiveScreenFontSize(2), }}>{cvs.salary_currency} {cvs.expected_salary}</Text>
-                    </View>
-                  }
-                  {
-                    cvs?.organizationType &&
-                    <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
-                      <Image source={imagePath.company2} style={{ transform: [{ scale: 1.3 }], }} />
-                      <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Organization
-                        Type</Text>
-                      <Text style={{ color: colors.textSecondary, fontSize: responsiveScreenFontSize(2), }}>{job.organizationType}</Text>
-                    </View>
-                  }
-                  {
-                    cvs?.no_of_offices &&
-                    <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
-                      <Image source={imagePath.company2} style={{ transform: [{ scale: 1.3 }], }} />
-                      <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Total Offices</Text>
-                      <Text style={{ color: colors.textSecondary, fontSize: responsiveScreenFontSize(2), }}>{job.no_of_offices}</Text>
-                    </View>
-                  }
-                  {
-                    cvs?.openJobs &&
-                    <View style={{ gap: responsiveScreenHeight(.5), width: "33%" }}>
-                      <Image source={imagePath.bag2} style={{ transform: [{ scale: 1.3 }], }} />
-                      <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: "700" }}>Opened Jobs</Text>
-                      <Text style={{ color: colors.textSecondary, fontSize: responsiveScreenFontSize(2), }}>{job.openJobs}</Text>
-                    </View>
-                  }
-                </View>
-                <View style={{ gap: responsiveScreenWidth(2), marginHorizontal: responsiveScreenWidth(5), flexDirection: "row", justifyContent: "center" }}>
-                  {
-                    cvs?.cv &&
-                    <TouchableOpacity
-                      disabled={isDownloadingCV}
-                      onPress={async () => {
-                        setIsDownloadingCV(true);
-                        await downloadCV(cvs.cv);
-                        setIsDownloadingCV(false);
-                      }}
-                      style={{ width: "90%", marginVertical: responsiveScreenHeight(2), marginHorizontal: "auto", backgroundColor: "#E2ECFF", borderWidth: 1, borderColor: colors.primary, paddingVertical: responsiveScreenHeight(1), flex: 1, paddingHorizontal: responsiveScreenWidth(4), borderRadius: 15, justifyContent: "center", alignItems: "center", opacity: isDownloadingCV ? 0.6 : 1 }}
-                    >
-                      {isDownloadingCV ? (
-                        <ActivityIndicator color={colors.primary} size="small" />
-                      ) : (
-                        <Text style={{ color: colors.primary, textAlign: "center", fontSize: responsiveScreenFontSize(1.8) }}>Download CV</Text>
-                      )}
-                    </TouchableOpacity>
-                  }
-                  <Text onPress={() => setIsMsgModalVisible(true)} style={{ color: colors.primary, width: "90%", marginVertical: responsiveScreenHeight(2), marginHorizontal: "auto", backgroundColor: "#E2ECFF", borderWidth: 1, borderColor: colors.primary, paddingVertical: responsiveScreenHeight(1), flex: 1, textAlign: "center", paddingHorizontal: responsiveScreenWidth(4), borderRadius: 15, fontSize: responsiveScreenFontSize(1.8) }}>Send Message</Text>
-                </View>
-              </>
+  useFocusEffect(useCallback(() => {
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (!navigation.canGoBack()) {
+        (navigation as any).replace(routes.RECRUITERHOME)
+        return true
+      }
+      return false
+    })
+    if (applicationId) {
+      setLoading(true)
+      dispatch(CandidateProf({ id: applicationId })).unwrap()
+        .then((res: any) => {
+          if (res.success !== false) {
+            setApp(res.data)            // whole payload: user, answers, submitted_resume...
+            setStatus(res.data?.status || '')
           }
+        })
+        .finally(() => setLoading(false))
+    }
+    return () => sub.remove()
+  }, [applicationId, navigation]))
 
-        </ScrollView>
-        {isMsgModalVisible && (
+  /* status change now happens on press only (no request on mount) */
+  const changeStatus = async (next: string) => {
+    if (next === status) return
+    const prev = status
+    setStatus(next)
+    try {
+      await dispatch(UpdateStatus({ status: next, application_id: applicationId })).unwrap()
+    } catch {
+      setStatus(prev)
+      showAlert({ title: 'Failed', message: 'Could not update status. Please try again.' })
+    }
+  }
 
-          <View
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: "rgba(0,0,0,0.45)",
-              alignItems: "center",
-              paddingHorizontal: responsiveScreenWidth(5),
-              zIndex: 999,
-            }}
-          >
-            <KeyboardAvoidingView
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: "rgba(0,0,0,0.45)",
-                alignItems: "center",
-                paddingHorizontal: responsiveScreenWidth(5),
-                zIndex: 999,
-              }}
-              behavior={Platform.OS === "ios" ? "padding" : "height"}
-              keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+  const sendMessage = async () => {
+    const text = msgText.trim()
+    if (text.length < 2 || !app?.user?.id) return
+    try {
+      setSending(true)
+      await dispatch(SendMessage({ seeker_id: app.user.id, message: text })).unwrap()
+      setMsgText('')
+      setMsgOpen(false)
+      showAlert({ title: 'Success', message: 'Message sent successfully.' })
+    } catch {
+      showAlert({ title: 'Failed', message: 'Could not send message. Please try again.' })
+    } finally {
+      setSending(false)
+    }
+  }
+
+  /* ---------- derive view data ---------- */
+  const user = app?.user || {}
+  const details = app?.submitted_details || {}
+  const profile = details.profile || {}
+
+  const name = user.name || details.name || 'Candidate'
+  const initials = user.avatar?.initials || name.slice(0, 2).toUpperCase()
+  const photo = user.avatar?.has_image ? user.avatar.url : null
+  const location = user.location || profile.location || user.street_address || ''
+  const jobTitle = details.job_title || 'Candidate'
+  const matchPct = app?.match_percentage ?? app?.match ?? null          // only if backend sends it
+  const experienceLabel = user.job_experience?.job_experience || user.job_experience || null
+  const answers = arr(app?.answers)
+  const mustHave = answers.filter((a: any) => a.is_must_have || a.must_have)
+  const screening = answers.filter((a: any) => !(a.is_must_have || a.must_have))
+  const passedCount = mustHave.filter((a: any) => a.passed ?? a.is_passed).length
+
+  const availabilities = arr(user.availabilities).filter((a: any) => a.is_active)
+  const skills = arr(user.skills).length ? arr(user.skills).map((x: any) => x.skill_name) : arr(profile.skills)
+  const experience = arr(app?.profile_experience)
+  const education = arr(app?.profile_education)
+  const summary = user.profile_summary
+  const portfolio = user.portfolio_link
+  const videoUrl = typeof user.video === 'string' ? user.video : user.video?.url
+  const resume = app?.submitted_resume?.available ? app.submitted_resume : null
+  const resumeUrl = resume?.download_url || user.cv?.cv_url
+  const resumeName = resume?.title || user.cv?.cv_file || 'Resume.pdf'
+  const { colors } = useContext(ThemeContext);
+  console.log(experience, "jdhfahsdfjh")
+
+  /* ---------- render ---------- */
+  return (
+    <NavigationBar navigationBar={false}>
+      <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{ paddingHorizontal: responsiveWidth(5), paddingBottom: responsiveHeight(12) }}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={{ flexDirection: "row", alignItems: "center", marginBottom: responsiveHeight(2) }}>
+            <Pressable
+              onPress={() => navigation.goBack()}
+              style={{ width: responsiveWidth(2.8), aspectRatio: 1 / 2, }}
             >
-              <Pressable
-                onPress={() => {
-                  if (!sendMsgLoading) setIsMsgModalVisible(false);
-                }}
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                }}
-              />
+              <Image style={{ height: '100%', width: '100%' }} source={imagePath.leftAngle} />
+            </Pressable>
+            <Text style={{ flex: 1, textAlign: "center", textTransform: "uppercase", fontSize: responsiveFontSize(2), fontWeight: "700" }} numberOfLines={1}>{jobTitle}</Text>
+            <Pressable
+              onPress={() => navigation.goBack()}
+              style={{ width: responsiveWidth(5), aspectRatio: 1, }}
+            >
+              <Image source={imagePath.Shear} />
+            </Pressable>
 
-              <View
-                style={{
-                  width: "100%",
-                  backgroundColor: "white",
-                  borderRadius: 18,
-                  marginVertical: "auto",
-                  padding: responsiveScreenWidth(5),
-                  zIndex: 1000,
-                }}
-              >
-                <Text style={{ fontSize: responsiveScreenFontSize(2.2), fontWeight: "700" }}>
-                  Send Message
-                </Text>
-
-                <Text
-                  style={{
-                    marginTop: responsiveScreenHeight(0.8),
-                    color: colors.gray,
-                    fontSize: responsiveScreenFontSize(1.6),
-                  }}
-                >
-                  Write your message below and submit.
-                </Text>
-
-                <CustomTextInput
-                  value={messageText}
-                  onChangeText={setMessageText}
-                  placeholder="Type your message..."
-                  placeholderTextColor="#999"
-                  multiline
-                  textAlignVertical="top"
-                  editable={!sendMsgLoading}
-                  style={{
-                    marginTop: responsiveScreenHeight(1.5),
-                    borderWidth: 1,
-                    borderColor: "#D9D9D9",
-                    borderRadius: 14,
-                    padding: responsiveScreenWidth(4),
-                    height: responsiveScreenHeight(18),
-                    fontSize: responsiveScreenFontSize(1.7),
-                    color: "#111",
-                    backgroundColor: "#FAFAFA",
-                  }}
-                />
-
-                {/* Buttons */}
-                <View
-                  style={{
-                    flexDirection: "row",
-                    gap: responsiveScreenWidth(3),
-                    marginTop: responsiveScreenHeight(2),
-                  }}
-                >
-                  <Pressable
-                    disabled={sendMsgLoading}
-                    onPress={() => setIsMsgModalVisible(false)}
-                    style={{
-                      flex: 1,
-                      borderWidth: 1,
-                      borderColor: "#D9D9D9",
-                      paddingVertical: responsiveScreenHeight(1.2),
-                      borderRadius: 14,
-                      alignItems: "center",
-                      backgroundColor: "#FFF",
-                    }}
-                  >
-                    <Text style={{ color: "#111", fontSize: responsiveScreenFontSize(1.8) }}>
-                      Cancel
-                    </Text>
-                  </Pressable>
-
-                  <Pressable
-                    disabled={sendMsgLoading || messageText.trim().length < 2}
-                    onPress={async () => {
-                      const msg = messageText.trim();
-                      if (msg.length < 2) return;
-
-                      try {
-                        setSendMsgLoading(true);
-                        dispatch(SendMessage({ seeker_id: cvs.id, message: messageText })).unwrap().then((res) => { })
-                        setMessageText("");
-                        setIsMsgModalVisible(false);
-                        showAlert({
-                          title: "Success",
-                          message: "Message sent successfully.",
-                        });
-                      } catch (e) {
-                        showAlert({
-                          title: "Failed",
-                          message: "Could not send message. Please try again.",
-                        });
-                      } finally {
-                        setSendMsgLoading(false);
-                      }
-                    }}
-                    style={{
-                      flex: 1,
-                      paddingVertical: responsiveScreenHeight(1.2),
-                      borderRadius: 14,
-                      alignItems: "center",
-                      backgroundColor:
-                        sendMsgLoading || messageText.trim().length < 2
-                          ? "#B7C7FF"
-                          : colors.primary,
-                    }}
-                  >
-                    {sendMsgLoading ? (
-                      <ActivityIndicator color="#fff" />
-                    ) : (
-                      <Text style={{ color: "#fff", fontSize: responsiveScreenFontSize(1.8) }}>
-                        Submit
-                      </Text>
-                    )}
-                  </Pressable>
-                </View>
-              </View>
-            </KeyboardAvoidingView>
           </View>
+
+          {loading ? (
+            <ActivityIndicator style={{ marginTop: hp(30) }} size="large" color={C.primary} />
+          ) : (
+            <>
+              <Card style={{ padding: 0, borderColor: colors.gray }}>
+                <View style={{ padding: responsiveWidth(3), flexDirection: 'row', gap: responsiveWidth(3), alignItems: "center" }}>
+                  <View style={s.avatar}>
+                    {photo
+                      ? <Image source={{ uri: photo }} style={{ width: '100%', height: '100%' }} />
+                      : <Text style={s.avatarText}>{initials}</Text>}
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: responsiveFontSize(3), fontWeight: '800', }} numberOfLines={1}>{name}</Text>
+                    {!!location && <Text style={{ fontSize: responsiveFontSize(1.8), fontWeight: "500", color: colors.textSecondary, marginTop: 2 }} numberOfLines={1}>{location}</Text>}
+                  </View>
+                  {/* {matchPct != null && Number(matchPct) >= 80 && (
+                    <View style={s.badge}>
+                      <View style={s.badgeDot} />
+                      <Text style={s.badgeText}>Strong match</Text>
+                    </View>
+                  )} */}
+                </View>
+                <View style={{ flexDirection: 'row', borderTopWidth: 1, borderTopColor: colors.gray, paddingVertical: responsiveHeight(1.6) }}>
+                  {matchPct != null && <Stat value={`${matchPct}%`} label="Match" divider />}
+                  {!!experienceLabel && <Stat value={String(experienceLabel)} label="Experience" divider />}
+                  <Stat value={formatApplied(app?.created_at)} label="Applied" />
+                </View>
+              </Card>
+
+              {/* must-have questions */}
+              {mustHave.length > 0 && (
+                <>
+                  <SectionTitle right={`${passedCount} of ${mustHave.length} passed`}>Must-have questions</SectionTitle>
+                  <Card style={{ padding: 0 }}>
+                    {mustHave.map((a: any, i: number) => {
+                      const ok = a.passed ?? a.is_passed ?? true
+                      return (
+                        <View key={i} style={[s.qaRow, i > 0 && s.rowDivider]}>
+                          <View style={[s.checkCircle, !ok && { backgroundColor: '#FDE8E7' }]}>
+                            <Text style={{ color: ok ? C.primary : C.red, fontWeight: '700' }}>{ok ? '✓' : '✕'}</Text>
+                          </View>
+                          <View style={{ flex: 1 }}>
+                            <Text style={s.question}>{a.question}</Text>
+                            <Text style={s.answer}>{String(a.answer)}</Text>
+                          </View>
+                        </View>
+                      )
+                    })}
+                  </Card>
+                </>
+              )}
+
+              {/* screening answers */}
+              {screening.length > 0 && (
+                <>
+                  <SectionTitle>Screening answers</SectionTitle>
+                  <Card style={{ padding: 0 }}>
+                    {screening.map((a: any, i: number) => (
+                      <View key={i} style={[s.qaRow, i > 0 && s.rowDivider]}>
+                        <View style={{ flex: 1 }}>
+                          <Text style={s.question}>{a.question}</Text>
+                          <Text style={s.answer}>{String(a.answer)}</Text>
+                        </View>
+                        {typeof a.rating === 'number' && (
+                          <View style={{ flexDirection: 'row', gap: 4 }}>
+                            {[1, 2, 3].map(n => (
+                              <View key={n} style={[s.dot, n > a.rating && { backgroundColor: C.border }]} />
+                            ))}
+                          </View>
+                        )}
+                      </View>
+                    ))}
+                  </Card>
+                </>
+              )}
+
+              {availabilities.length > 0 && (
+                <>
+                  <SectionTitle>Availability</SectionTitle>
+                  <Card style={[s.chipWrap, { borderColor: colors.gray, }]}>
+                    {availabilities.map((a: any) => (
+                      <View key={a.id} style={[s.chip, { flexDirection: "row", gap: responsiveWidth(1), alignItems: 'center', backgroundColor: colors.primary50 }]}>
+                        <View style={{ width: responsiveWidth(5), aspectRatio: 1, }}>
+                          <Image source={imagePath.check} tintColor={colors.primary} style={{ height: "100%", width: "100%", resizeMode: 'contain' }} />
+                        </View>
+                        <Text style={[s.chipText, { color: colors.primary }]}>
+                          {a.availability}</Text>
+                      </View>
+                    ))}
+                  </Card>
+                </>
+              )}
+
+              {/* video intro */}
+              {!!videoUrl && (
+                <>
+                  <SectionTitle>Video intro</SectionTitle>
+                  <Card style={s.mediaRow}>
+                    <View style={s.videoThumb}>
+                      <View style={s.playCircle}><Text style={{ color: C.navy, fontSize: 14 }}>▶</Text></View>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={s.mediaTitle}>Video intro</Text>
+                    </View>
+                    <PillButton label="Play" onPress={() => Linking.openURL(videoUrl)} />
+                  </Card>
+                </>
+              )}
+
+              {/* portfolio */}
+              {!!portfolio && (
+                <>
+                  <SectionTitle>Portfolio</SectionTitle>
+                  <Card style={[s.mediaRow, { borderColor: colors.gray }]}>
+                    <View style={s.iconBox}><Text style={{ color: C.primary, fontSize: 18 }}>🔗</Text></View>
+                    <Text style={[s.mediaTitle, { flex: 1, fontWeight: '500' }]} numberOfLines={1}>
+                      {portfolio.replace(/^https?:\/\//, '')}
+                    </Text>
+                    <PillButton
+                      label="Open"
+                      onPress={() => Linking.openURL(/^https?:\/\//.test(portfolio) ? portfolio : `https://${portfolio}`)}
+                    />
+                  </Card>
+                </>
+              )}
+
+              {/* about */}
+              {!!summary?.summary && (
+                <>
+                  <SectionTitle>{`About ${name.split(' ')[0]}`}</SectionTitle>
+                  <Card style={{ borderColor: colors.gray }}><Text style={s.body}>{summary?.summary}</Text></Card>
+                </>
+              )}
+
+              {skills.length > 0 && (
+                <>
+                  <SectionTitle>Skills</SectionTitle>
+                  <View style={s.skillWrap}>
+                    {skills.map((sk: string, i: number) => (
+                      <View key={i} style={{ borderWidth: 1, borderColor: colors.gray, borderRadius: 8, paddingHorizontal: responsiveWidth(2), paddingVertical: responsiveHeight(.6) }}><Text style={{ fontSize: responsiveFontSize(1.8), color: colors.textSecondary }}>{sk}</Text></View>
+                    ))}
+                  </View>
+                </>
+              )}
+
+              {/* experience */}
+              {experience.length > 0 && (
+                <>
+                  <SectionTitle>Experience</SectionTitle>
+                  <Card style={{ padding: 0, borderColor: colors.gray }}>
+                    {experience.map((e: any, i: number) => (
+                      <View key={i} style={[s.expRow, i > 0 && s.rowDivider]}>
+                        <Text style={{ fontSize: responsiveFontSize(2), fontWeight: '700', textTransform: "capitalize" }}>
+                          {(e.job_title || e.title || e.position)}{(e.company || e.company_name) ? ` · ${e.company || e.company_name}` : ''}
+                        </Text>
+                        <Text style={{ fontSize: responsiveFontSize(1.8), textTransform: "capitalize", fontWeight: "500", color: colors.textSecondary }}>
+                          {[new Date(e.date_start).toLocaleDateString(), !e.date_end ? 'now' : new Date(e.date_end).toLocaleDateString()].filter(Boolean).join(' – ')}
+                        </Text>
+                      </View>
+                    ))}
+                  </Card>
+                </>
+              )}
+
+              {/* education */}
+              {education.length > 0 && (
+                <>
+                  <SectionTitle>Education</SectionTitle>
+                  <Card style={{ padding: 0 }}>
+                    {education.map((e: any, i: number) => (
+                      <View key={i} style={[s.expRow, i > 0 && s.rowDivider]}>
+                        <Text style={s.expTitle}>{e.degree_title}</Text>
+                        <Text style={{ fontSize: responsiveFontSize(1.8), fontWeight: "500", color: colors.textSecondary }}>
+                          {[e.institution, e.date_completion].filter(Boolean).join(' · ')}
+                        </Text>
+                      </View>
+                    ))}
+                  </Card>
+                </>
+              )}
+
+              {/* resume */}
+              {!!resumeUrl && (
+                <>
+                  <SectionTitle>Resume</SectionTitle>
+                  <Card style={[s.mediaRow, { borderColor: colors.gray }]}>
+                    <View style={{ width: responsiveWidth(10), aspectRatio: 1, }}>
+                      <Image source={require("./Document.png")} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: responsiveFontSize(2), fontWeight: '700', }} numberOfLines={1}>{resumeName}</Text>
+                      <Text style={{ color: colors.textSecondary, fontWeight: "500" }}>PDF</Text>
+                    </View>
+                    {downloading
+                      ? <ActivityIndicator color={colors.primary} />
+                      : <PillButton
+                        label="Open"
+                        onPress={async () => {
+                          setDownloading(true)
+                          await downloadCV(resumeUrl)
+                          setDownloading(false)
+                        }}
+                      />}
+                  </Card>
+                </>
+              )}
+
+              <View style={s.actionBar}>
+                <View style={s.actionRow}>
+                  <ActionBtn
+                    label="Not a fit" icon="✕" color={C.red}
+                    bg={C.card} border={status === 'rejected' ? C.red : C.border}
+                    onPress={() => changeStatus('rejected')}
+                  />
+                  <ActionBtn
+                    label="Shortlist" icon="⚑" color={C.green}
+                    bg={C.greenSoft} border={status === 'shortlist' ? C.green : 'transparent'}
+                    onPress={() => changeStatus('shortlist')}
+                  />
+                  <ActionBtn
+                    label="Message" icon="✉" color={C.primary}
+                    bg={C.primarySoft} border="transparent"
+                    onPress={() => setMsgOpen(true)}
+                  />
+                </View>
+                <TouchableOpacity
+                  style={[s.hireBtn, { backgroundColor: colors.primary }]}
+                  onPress={() => changeStatus('hired')}
+                >
+                  <Text style={s.hireText}>
+                    {status === 'hired' ? 'Hired' : `Hire ${name.split(' ')[0]}`}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
+        </ScrollView>
+        {/* message modal */}
+        {msgOpen && (
+          <KeyboardAvoidingView
+            style={s.overlay}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          >
+            <Pressable style={StyleSheet.absoluteFill} onPress={() => !sending && setMsgOpen(false)} />
+            <View style={s.modal}>
+              <Text style={{ fontSize: fs(2.2), fontWeight: '700', color: C.navy }}>Send message</Text>
+              <Text style={[{ marginTop: responsiveHeight(2) }]}>Write your message to {name.split(' ')[0]}.</Text>
+              <CustomTextInput
+                value={msgText}
+                onChangeText={setMsgText}
+                placeholder="Type your message..."
+                placeholderTextColor="#999"
+                multiline
+                textAlignVertical="top"
+                editable={!sending}
+                style={s.input}
+              />
+              <View style={{ flexDirection: 'row', gap: wp(3), marginTop: hp(2) }}>
+                <Pressable disabled={sending} onPress={() => setMsgOpen(false)} style={[s.modalBtn, { borderWidth: 1, borderColor: C.border }]}>
+                  <Text style={{ color: C.navy }}>Cancel</Text>
+                </Pressable>
+                <Pressable
+                  disabled={sending || msgText.trim().length < 2}
+                  onPress={sendMessage}
+                  style={[s.modalBtn, { backgroundColor: sending || msgText.trim().length < 2 ? '#B7C7FF' : C.primary }]}
+                >
+                  {sending ? <ActivityIndicator color="#fff" /> : <Text style={{ color: '#fff' }}>Send</Text>}
+                </Pressable>
+              </View>
+            </View>
+          </KeyboardAvoidingView>
         )}
 
-      </>
-
-    </NavigationBar>
+      </View>
+    </NavigationBar >
   )
 }
-async function requestStoragePermission() {
-  if (Platform.OS !== "android") return true;
 
-  const permission = PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
+const ActionBtn = ({ label, icon, color, bg, border, onPress }: any) => (
+  <TouchableOpacity onPress={onPress} style={[s.actionBtn, { backgroundColor: bg, borderColor: border }]}>
+    <Text style={{ color, fontSize: 20 }}>{icon}</Text>
+    <Text style={{ color, fontSize: fs(1.5), fontWeight: '600', marginTop: 2 }}>{label}</Text>
+  </TouchableOpacity>
+)
 
-  const result = await PermissionsAndroid.request(permission);
+const s = StyleSheet.create({
 
-  if (result === PermissionsAndroid.RESULTS.GRANTED) {
-    return true;
-  }
+  scroll: { paddingHorizontal: wp(5), paddingBottom: hp(4) },
 
-  if (result === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
-    Alert.alert(
-      "Permission required",
-      "Storage permission is permanently denied. Please enable it from app settings.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Open Settings",
-          onPress: () => Linking.openSettings(),
-        },
-      ]
-    );
-    return false;
-  }
-
-  Alert.alert("Permission denied");
-  return false;
-}
-
-
-export async function downloadCV(cv: string) {
-  try {
-    // if (Platform.OS === "android") {
-    //   const hasPermission = await requestStoragePermission();
-    //   if (!hasPermission) {
-    //     Alert.alert("Permission denied");
-    //     return;
-    //   }
-    // }
-
-    // 2️⃣ Build file path
-    const fileName = `candidate_cv_${Date.now()}.pdf`;
-
-    const downloadPath =
-      Platform.OS === "android"
-        ? `${RNFS.DownloadDirectoryPath}/${fileName}`
-        : `${RNFS.DocumentDirectoryPath}/${fileName}`;
-
-
-    const { statusCode } = await RNFS.downloadFile({
-      fromUrl: cv,
-      toFile: downloadPath,
-    }).promise;
-    if (statusCode === 200) {
-      Alert.alert(
-        "Download complete",
-        Platform.OS === "android"
-          ? "Saved in Downloads folder"
-          : "Saved in app documents"
-      );
-    } else {
-      Alert.alert("Download failed");
-    }
-  } catch (err) {
-    Alert.alert("Error downloading file");
-  }
-}
-function AboutMeCard({ }) {
-  const { colors } = useContext(ThemeContext);
-
-  return (
-    <View style={[styles.card, { backgroundColor: colors.lightGrayNatural }]}>
-      <View style={styles.headerRow}>
-        <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: '800' }}>About Me</Text>
-        <Pressable
-          onPress={() => { }}
-          style={({ pressed }) => [
-            styles.iconButton,
-            pressed && { opacity: 0.85, transform: [{ scale: 0.98 }] },
-          ]}
-          hitSlop={10}
-        >
-          <Text style={styles.chevron}>⌃</Text>
-        </Pressable>
-      </View>
-
-      <View style={{ borderBottomColor: colors.mediumGrayNatural, borderBottomWidth: 1, borderStyle: "dashed", marginVertical: responsiveScreenHeight(1) }} />
-      <Text style={{ fontSize: responsiveScreenFontSize(1.8), fontWeight: '600' }}>
-        Highly qualified residential care officer with a background in community
-        health and service management. experienced in aged care supervision,
-        health promotion, and client advocacy. committed to ensuring the safety
-        and wellbeing of residents through evidence-based practices.
-      </Text>
-    </View>
-  );
-}
-function SkillCard({ data }) {
-  const { colors } = useContext(ThemeContext);
-  return (
-    <View style={[styles.card, { backgroundColor: colors.lightGrayNatural, marginTop: responsiveScreenHeight(2) }]}>
-      <View style={styles.headerRow}>
-        <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: '800' }}>Skills</Text>
-
-      </View>
-
-      <View style={{ borderBottomColor: colors.mediumGrayNatural, borderBottomWidth: 1, borderStyle: "dashed", marginVertical: responsiveScreenHeight(1) }} />
-      {
-        data.map((item, index) => (
-          <View key={index} style={{ backgroundColor: colors.lightGray, borderRadius: 10, paddingVertical: responsiveScreenHeight(2), paddingHorizontal: responsiveScreenWidth(4), marginBottom: responsiveScreenHeight(1) }}>
-            <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: '700', }}>{item.skill_name}</Text>
-            <Text style={{ fontSize: responsiveScreenFontSize(1.6), fontWeight: '600', color: colors.darkGray, marginTop: responsiveScreenHeight(1) }}>{item.experience_label}</Text>
-          </View>
-        ))
-      }
-      {/* <View style={{ backgroundColor: colors.lightGray, borderRadius: 10, paddingVertical: responsiveScreenHeight(2), paddingHorizontal: responsiveScreenWidth(4) }}>
-        <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: '700', }}>Patient Care</Text>
-        <Text style={{ fontSize: responsiveScreenFontSize(1.6), fontWeight: '600', color: colors.darkGray, marginTop: responsiveScreenHeight(1) }}>Fresher</Text>
-      </View> */}
-    </View>
-  );
-}
-function LanguageCard({ data }) {
-  const { colors } = useContext(ThemeContext);
-  return (
-    <View style={[styles.card, { backgroundColor: colors.lightGrayNatural, marginTop: responsiveScreenHeight(2) }]}>
-      <View style={styles.headerRow}>
-        <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: '800' }}>Languages</Text>
-
-      </View>
-
-      <View style={{ borderBottomColor: colors.mediumGrayNatural, borderBottomWidth: 1, borderStyle: "dashed", marginVertical: responsiveScreenHeight(1) }} />
-      {
-        data.map((item, index) => (
-          <View key={index} style={{ backgroundColor: colors.lightGray, borderRadius: 10, paddingVertical: responsiveScreenHeight(2), paddingHorizontal: responsiveScreenWidth(4), marginBottom: responsiveScreenHeight(1) }}>
-            <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: '700', }}>{item.language}</Text>
-            <Text style={{ fontSize: responsiveScreenFontSize(1.6), fontWeight: '600', color: colors.darkGray, marginTop: responsiveScreenHeight(1) }}>{item.language_level}</Text>
-          </View>
-        ))
-      }
-    </View>
-  );
-}
-function EducationCard({ data }) {
-  const { colors } = useContext(ThemeContext);
-  return (
-    <View style={[styles.card, { backgroundColor: colors.lightGrayNatural, marginTop: responsiveScreenHeight(2) }]}>
-      <View style={styles.headerRow}>
-        <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: '800' }}>Education</Text>
-
-      </View>
-
-      <View style={{ borderBottomColor: colors.mediumGrayNatural, borderBottomWidth: 1, borderStyle: "dashed", marginTop: responsiveScreenHeight(1) }} />
-      {
-        data.map((item, index) => (
-          <View style={[{
-            width: "100%",
-            borderRadius: 14,
-            marginTop: responsiveScreenHeight(2)
-          }]}>
-            <View style={styles.topRow}>
-              <Text style={[styles.title, { fontSize: responsiveScreenFontSize(2.5), fontWeight: "600", color: colors.textPrimary }]} numberOfLines={1}>
-                {item.degree_title}
-              </Text>
-            </View>
-            <Text style={{ marginTop: responsiveScreenHeight(1) }}>{item.date_completion} - {item.country.country} - {item.state.state}</Text>
-            <View style={[styles.metaRow, { gap: responsiveScreenWidth(2), marginTop: responsiveScreenHeight(1) }]}>
-              <Image source={imagePath.education} />
-              <Text style={[styles.metaText, { fontSize: responsiveScreenFontSize(1.8), color: colors.textSecondary, fontWeight: "600", }]}>{item.majorSubjects.map((e) => `${e.name},`)}</Text>
-
-            </View>
-            <View style={[styles.metaRow, { gap: responsiveScreenWidth(2), marginTop: responsiveScreenHeight(.8) }]}>
-              <Image source={imagePath.location2} />
-              <Text style={[styles.metaText, { fontSize: responsiveScreenFontSize(1.8), color: colors.textSecondary, fontWeight: "600", }]}>{item.country.country} - {item.state.state}</Text>
-            </View>
-            <View style={[styles.metaRow, { gap: responsiveScreenWidth(2), marginTop: responsiveScreenHeight(.8) }]}>
-              <Image source={imagePath.company3} />
-              <Text style={[styles.metaText, { fontSize: responsiveScreenFontSize(1.8), color: colors.textSecondary, fontWeight: "600", }]}>{item.institution}</Text>
-            </View>
-          </View>
-        ))
-      }
-
-    </View>
-  );
-}
-function Selection({ data, application_id }) {
-
-  const { colors } = useContext(ThemeContext);
-  const [status, setStatus] = useState(data)
-  const dispatch = useAppDispatch()
-  useEffect(() => {
-    setStatus(data)
-  }, [data])
-
-  useEffect(() => {
-    dispatch(UpdateStatus({ status: status, application_id: application_id })).unwrap().then((res) => { })
-  }, [status])
-  return (
-    <View style={[styles.card, { backgroundColor: colors.lightGrayNatural, marginTop: responsiveScreenHeight(2) }]}>
-      <View style={styles.headerRow}>
-        <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: '800' }}>Select Option</Text>
-
-      </View>
-
-      <View style={{ borderBottomColor: colors.mediumGrayNatural, borderBottomWidth: 1, borderStyle: "dashed", marginVertical: responsiveScreenHeight(1) }} />
-      <Pressable onPress={() => setStatus("shortlist")} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: responsiveScreenHeight(1) }}>
-        <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: '800' }}>Short List</Text>
-        {
-          status === "shortlist" ? <Image source={imagePath.checkActive} /> :
-            <Image source={imagePath.checkInactive} />
-        }
-      </Pressable>
-      <Pressable onPress={() => setStatus("hired")} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: responsiveScreenHeight(1.5) }}>
-        <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: '800' }}>Hired this Candidate</Text>
-        {
-          status === "hired" ? <Image source={imagePath.checkActive} /> :
-            <Image source={imagePath.checkInactive} />
-        }
-      </Pressable>
-      <Pressable onPress={() => setStatus("rejected")} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: responsiveScreenHeight(1.5) }}>
-        <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: '800' }}>Rejected</Text>
-        {
-          status === "rejected" ? <Image source={imagePath.checkActive} /> :
-            <Image source={imagePath.checkInactive} />
-        }
-
-      </Pressable>
-
-    </View>
-  );
-}
-const styles = StyleSheet.create({
   card: {
-
-    borderRadius: 14,
-    marginHorizontal: responsiveScreenWidth(5),
-    paddingHorizontal: responsiveScreenWidth(4),
-    paddingVertical: responsiveScreenHeight(2),
-    elevation: 3,
-  },
-  metaRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: responsiveScreenHeight(.8),
-  },
-  metaIcon: {
-    marginRight: 10,
-    color: "#111",
-    opacity: 0.9,
-  },
-  metaText: {
-    fontSize: 13,
-    color: "#111",
-    opacity: 0.75,
-    fontWeight: "500",
-  },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#1F2937",
-  },
-  iconButton: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#FFFFFF",
+    padding: responsiveWidth(4),
+    overflow: 'hidden',
   },
-  chevron: {
-    fontSize: 16,
-    color: "#9CA3AF",
-    lineHeight: 16,
-    marginTop: -1, // tiny visual nudge
-  },
-  dashedDivider: {
-    marginTop: 10,
-    marginBottom: 12,
-    borderTopWidth: 1,
-    borderStyle: "dashed",
-    borderColor: "#E5E7EB",
-  },
-  body: {
-    fontSize: 13,
-    lineHeight: 18,
-    color: "#4B5563",
-  },
-});
-export default CandidateProfile
-const formatMemberSince = (isoDate) => {
-  const date = new Date(isoDate);
+  sectionRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: responsiveHeight(1) },
+  sectionTitle: { fontSize: responsiveFontSize(2), fontWeight: '700', },
+  sectionRight: { fontSize: fs(1.5), fontWeight: '700', color: C.primary },
 
-  return `Member Since, ${date.toLocaleDateString("en-US", {
-    month: "long",
-    day: "2-digit",
-    year: "numeric",
-  })}`;
-};
+  avatar: {
+    width: wp(15), height: wp(15), borderRadius: 16, backgroundColor: C.primarySoft,
+    alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
+  },
+  avatarText: { color: C.primary, fontWeight: '700', fontSize: fs(2) },
+  badge: {
+    flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: C.primarySoft,
+    paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, alignSelf: 'flex-start',
+  },
+  badgeDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: C.primary },
+  badgeText: { color: C.primary, fontSize: fs(1.4), fontWeight: '700' },
+
+  statsRow: {},
+  stat: { flex: 1, alignItems: 'center' },
+  statDivider: { borderRightWidth: 1, borderRightColor: C.border },
+  statValue: { fontSize: responsiveFontSize(2.2), fontWeight: '800', },
+  statLabel: { fontSize: responsiveFontSize(1.8), fontWeight: "600", marginTop: responsiveHeight(0.6) },
+
+  qaRow: { flexDirection: 'row', alignItems: 'center', gap: wp(3), paddingHorizontal: wp(4), paddingVertical: hp(1.6) },
+  rowDivider: { borderTopWidth: 1, borderTopColor: C.border },
+  checkCircle: { width: 26, height: 26, borderRadius: 13, backgroundColor: C.primarySoft, alignItems: 'center', justifyContent: 'center' },
+  question: { fontSize: fs(1.7), color: C.navy },
+  answer: { fontSize: fs(1.6), fontWeight: '700', color: C.primary, marginTop: 3 },
+  dot: { width: 10, height: 10, borderRadius: 5, backgroundColor: C.primary },
+
+  chipWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  chip: { paddingHorizontal: responsiveWidth(2), paddingVertical: responsiveHeight(.4), borderRadius: 8 },
+  chipText: { fontSize: responsiveFontSize(1.8), textTransform: "capitalize", fontWeight: '700' },
+
+  mediaRow: { flexDirection: 'row', alignItems: 'center', gap: wp(3) },
+  videoThumb: { width: wp(24), height: wp(15), borderRadius: 8, backgroundColor: C.navy, alignItems: 'center', justifyContent: 'center' },
+  playCircle: { width: 30, height: 30, borderRadius: 15, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' },
+
+  body: { fontSize: fs(1.7), lineHeight: fs(2.6), color: C.navy },
+  skillWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+
+  expRow: { paddingHorizontal: wp(4), paddingVertical: hp(1.6) },
+
+  actionBar: {
+    paddingTop: responsiveHeight(3), paddingBottom: responsiveHeight(3), gap: responsiveHeight(1.2),
+  },
+  actionRow: { flexDirection: 'row', gap: wp(2.5) },
+  actionBtn: { flex: 1, alignItems: 'center', paddingVertical: responsiveHeight(1.2), borderRadius: 12, borderWidth: 1.5 },
+  hireBtn: { borderRadius: 12, paddingVertical: responsiveHeight(1.7), alignItems: 'center' },
+  hireText: { color: '#fff', fontSize: fs(2), fontWeight: '700' },
+
+  overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'center', paddingHorizontal: wp(5), zIndex: 999 },
+  modal: { backgroundColor: '#fff', borderRadius: 18, padding: wp(5) },
+  input: {
+    marginTop: hp(1.5), borderWidth: 1, borderColor: C.border, borderRadius: 14, padding: wp(4),
+    height: hp(18), fontSize: fs(1.7), color: C.navy, backgroundColor: '#FAFBFE',
+  },
+  modalBtn: { flex: 1, paddingVertical: hp(1.2), borderRadius: 14, alignItems: 'center' },
+})
+
+export default CandidateProfile

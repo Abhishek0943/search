@@ -265,6 +265,8 @@ export const ComponentSingUp = ({ mainColor, secondaryColor, }: { mainColor: str
                                 secondaryColor={secondaryColor}
                                 label="ABN"
                                 value={user.abn}
+                                keyboardType='number-pad'
+                                maxLength={11}
                                 onChangeText={text =>
                                     handleInputChange({
                                         name: 'abn',
@@ -280,6 +282,8 @@ export const ComponentSingUp = ({ mainColor, secondaryColor, }: { mainColor: str
                                 mainColor={mainColor}
                                 secondaryColor={secondaryColor}
                                 label="ACN"
+                                keyboardType='number-pad'
+                                maxLength={9}
                                 value={user.acn}
                                 onChangeText={text =>
                                     handleInputChange({
@@ -713,10 +717,8 @@ export const ComponentSingUp = ({ mainColor, secondaryColor, }: { mainColor: str
                                     {
                                         industry_id: Number(user.industryIds[0]),
                                         description: user.aboutCompany.trim(),
-                                        // abn: user.abn.trim(),
-                                        // acn: user.acn.trim(),
-                                        abn: "11111111111",
-                                        acn: "111111111",
+                                        abn: user.abn.trim(),
+                                        acn: user.acn.trim(),
                                         name: user.trendingname.trim(),
                                         location: user.businessaddress.trim(),
                                         no_of_employees: user.no_of_employees,
@@ -733,7 +735,7 @@ export const ComponentSingUp = ({ mainColor, secondaryColor, }: { mainColor: str
                                             index: 0,
                                             routes: [
                                                 {
-                                                    name: routes.HOME,
+                                                    name: routes.RECRUITERHOME,
                                                 },
                                             ],
                                         });

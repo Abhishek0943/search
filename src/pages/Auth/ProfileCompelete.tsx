@@ -34,7 +34,7 @@ export const formatDateToMonthYear = (dateStr?: string | null) => {
 };
 function ProfileCompelete(): ReactElement {
     const { colors } = useContext(ThemeContext);
-    const { showConfirm } = useAlert();
+    const { showAlert, showConfirm } = useAlert();
     const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
     const dispatch = useAppDispatch();
     const [availabilityOptions, setAvailabilityOptions] = useState<{ id: string; name: string }[]>([]);
@@ -214,33 +214,32 @@ function ProfileCompelete(): ReactElement {
 
     const pickProfilePhoto = async () => {
         try {
-            const image = await ImagePicker.openPicker({
-                cropperCircleOverlay: true,
-                compressImageQuality: 0.9,
-                mediaType: 'photo',
+            const [doc] = await pick({
+                type: [types.images],
+                allowMultiSelection: false,
+                mode: 'import',
             });
-            if (!image?.path) return;
-            const fileName = `profile_${Date.now()}.${image.mime?.includes('png') ? 'png' : 'jpg'}`;
-            const file = { uri: image.path, name: fileName, type: image.mime || 'image/jpeg' };
+            if (!doc) return;
+            const uri = normalizeFileUri((doc as any).fileCopyUri || doc.uri);
+            const fileName = `profile_${Date.now()}.${doc.type || 'image/jpeg'}`;
+            const file = { uri, name: fileName, type: doc.type || 'image/jpeg' };
             setProfilePhoto(file);
             uploadMediaToApi('image', file);
         } catch (e) { }
     };
 
     const pickVideoIntro = async () => {
-        // try {
-        //     const res = await launchImageLibrary({
-        //         mediaType: 'video',
-        //         selectionLimit: 1,
-        //     });
-        //     if (res.didCancel) return;
-        //     const asset = res.assets?.[0];
-        //     if (!asset?.uri) return;
-        //     const fileName = asset.fileName || `video_${Date.now()}.mp4`;
-        //     const file = { uri: asset.uri, name: fileName, type: asset.type || 'video/mp4' };
-        //     setVideoIntro(file);
-        //     uploadMediaToApi('video', file);
-        // } catch (e) { }
+        const [doc] = await pick({
+            type: [types.video],
+            allowMultiSelection: false,
+            mode: 'import',
+        });
+        if (!doc) return;
+        const uri = normalizeFileUri((doc as any).fileCopyUri || doc.uri);
+        const fileName = `profile_${Date.now()}.${doc.type || 'video/mp4'}`;
+        const file = { uri, name: fileName, type: doc.type || 'video/mp4' };
+        setVideoIntro(file);
+        uploadMediaToApi('video', file);
     };
 
     const pickCertImage = async () => {
@@ -249,14 +248,15 @@ function ProfileCompelete(): ReactElement {
             return;
         }
         try {
-            const image = await ImagePicker.openPicker({
-                cropperCircleOverlay: false,
-                compressImageQuality: 0.9,
-                mediaType: 'photo',
+            const [doc] = await pick({
+                type: [types.images],
+                allowMultiSelection: false,
+                mode: 'import',
             });
-            if (!image?.path) return;
-            const fileName = `cert_${Date.now()}.${image.mime?.includes('png') ? 'png' : 'jpg'}`;
-            const file = { uri: image.path, name: fileName, type: image.mime || 'image/jpeg' };
+            if (!doc) return;
+            const uri = normalizeFileUri((doc as any).fileCopyUri || doc.uri);
+            const fileName = `certificate_${Date.now()}.${doc.type || 'image/jpeg'}`;
+            const file = { uri, name: fileName, type: doc.type || 'image/jpeg' };
             setCertImage(file);
             await uploadMediaToApi('certificate', file, { certificate_title: certTitle.trim() });
             setCertTitle('');
@@ -370,7 +370,6 @@ function ProfileCompelete(): ReactElement {
                         <ScrollView showsVerticalScrollIndicator={false}>
                             <InPutWithLabel inputContainerStyle={{ marginBottom: responsiveHeight(.5) }} mainColor={colors.primary} secondaryColor={colors.primary2} label={'First Name'} value={user.name} onChangeText={(text) => handleInputChange({ name: "name", value: text })} placeholder="Enter your first name" />
                             <InPutWithLabel inputContainerStyle={{ marginBottom: responsiveHeight(.5) }} mainColor={colors.primary} secondaryColor={colors.primary2} label={'Address'} value={user.address} onChangeText={(text) => handleInputChange({ name: "address", value: text })} placeholder="Enter your address" />
-
                             <SearchSelectDropdown
                                 label="Availability"
                                 options={availabilityOptions}
@@ -406,6 +405,41 @@ function ProfileCompelete(): ReactElement {
                             label="Continue"
                             backgroundColor={colors.primary}
                             onPress={async () => {
+                                if (!user.name || !user.address || !user.availabilityIds.length || !user.workRightsId) {
+                                    showAlert({
+                                        title: "Error",
+                                        message: "Please fill all the required fields",
+                                    })
+                                    return;
+                                }
+                                if (user.name.length < 3 || user.name.length > 15) {
+                                    showAlert({
+                                        title: "Error",
+                                        message: "Please enter valid name (length between 3 and 15)",
+                                    })
+                                    return;
+                                }
+                                if (user.address.length < 3 || user.address.length > 20) {
+                                    showAlert({
+                                        title: "Error",
+                                        message: "Please enter valid address (length between 3 and 20)",
+                                    })
+                                    return;
+                                }
+                                if (user.address.length < 3 || user.address.length > 20) {
+                                    showAlert({
+                                        title: "Error",
+                                        message: "Please enter valid address (length between 3 and 20)",
+                                    })
+                                    return;
+                                }
+                                if (!user.workRightsId) {
+                                    showAlert({
+                                        title: "Error",
+                                        message: "Please select your work rights",
+                                    })
+                                    return;
+                                }
                                 setStep(2)
                                 await AsyncStorage.setItem("user", JSON.stringify({ ...user, step: 2 }));
                             }}
@@ -479,6 +513,27 @@ function ProfileCompelete(): ReactElement {
                             label="Continue"
                             backgroundColor={colors.primary}
                             onPress={async () => {
+                                if (!user.industryId || !user.skillIds.length) {
+                                    showAlert({
+                                        title: "Error",
+                                        message: "Please fill all the required fields",
+                                    })
+                                    return;
+                                }
+                                if (!user.industryId) {
+                                    showAlert({
+                                        title: "Error",
+                                        message: "Please select your industry",
+                                    })
+                                    return;
+                                }
+                                if (user.skillIds.length > 15 || user.skillIds.length < 3) {
+                                    showAlert({
+                                        title: "Error",
+                                        message: "Please enter valid skills (length between 3 and 15)",
+                                    })
+                                    return;
+                                }
                                 setStep(3)
                                 await AsyncStorage.setItem("user", JSON.stringify({ ...user, step: 3 }));
                             }}

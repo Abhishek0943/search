@@ -44,7 +44,6 @@ const Login = () => {
     try {
       const result = await googleLogin();
       if ('code' in result) {
-        // User cancelled or error
         return;
       }
       const userInfo = result as any;
@@ -68,9 +67,16 @@ const Login = () => {
         dispatch(ProfileData()).unwrap().then((profileRes) => {
           if (profileRes.success) {
             if (profileRes.data.login_step === 1) {
-              navigation.reset({ index: 0, routes: [{ name: routes.USERSTEPS }] });
-            } else {
-              navigation.reset({ index: 0, routes: [{ name: routes.HOME }] });
+              navigation.reset({
+                index: 0,
+                routes: [{ name: routes.USERSTEPS }]
+              })
+            }
+            else {
+              navigation.reset({
+                index: 0,
+                routes: [{ name: routes.HOME }]
+              });
             }
           }
         });

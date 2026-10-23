@@ -1,17 +1,14 @@
-import { View, ScrollView, Image, Pressable, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { View, ScrollView, Image, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native'
 import React, { useCallback, useContext, useMemo, useState } from 'react'
 import { NavigationBar } from '../../components'
 import { routes } from '../../constants/values'
 import { responsiveScreenFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
-import imagePath from '../../assets/imagePath'
 import { ThemeContext } from '../../context/ThemeProvider'
 import { NavigationProp, ParamListBase, useFocusEffect, useNavigation } from '@react-navigation/native'
 import { useAppDispatch, useAppSelector } from '../../store'
 import { GetJobApplication } from '../../reducer/jobsReducer'
 import Text from '../../components/Text'
 import Button from '../../components/Button'
-
-// --- Status badge config ---
 const STATUS_CONFIG: Record<string, { label: string; bg: string; color: string; borderColor?: string }> = {
   applied: { label: 'SENT', bg: '#E8F5E9', color: '#2E7D32', borderColor: '#2E7D32' },
   shortlist: { label: 'SHORTLISTED', bg: '#E8F5E9', color: '#2E7D32', borderColor: '#2E7D32' },
@@ -83,6 +80,7 @@ const ApplyJob = () => {
     dispatch(GetJobApplication({ search: '', page }))
       .unwrap()
       .then(res => {
+        console.log(res, "skfjsdf")
         setLoading(false)
         if (res.success !== false) {
           if (page === 1) {
@@ -175,7 +173,7 @@ const ApplyJob = () => {
     return (
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={() => navigation.navigate(routes.JOBDETAIL, { id: item.id })}
+        onPress={() => navigation.navigate("asjdfhajsdf", { id: item.id })}
         style={{
           backgroundColor: '#FFFFFF',
           borderRadius: 16,

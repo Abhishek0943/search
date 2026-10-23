@@ -200,10 +200,11 @@ export default function OpenJobs() {
 
                                 return (
                                     <Pressable
-                                        onPress={() => navigation.navigate(routes.ADDJOB, { ...item })}
+                                        // onPress={() => navigation.navigate(routes.ADDJOB, { ...item })}
                                         style={({ pressed }) => [
                                             styles.card,
                                             pressed && { opacity: 0.95 },
+                                            { backgroundColor: '#FFFFFF', borderColor: '#E5E7EB', borderWidth: 1 },
                                         ]}
                                     >
                                         <View style={styles.cardTopRow}>
@@ -212,69 +213,35 @@ export default function OpenJobs() {
                                                     {item.title}
                                                 </Text>
                                                 <Text style={styles.cardSubtitle} numberOfLines={1}>
-                                                    sdfads {subtitle}
+                                                    {subtitle}
                                                 </Text>
                                             </View>
                                             <View style={styles.statusBadge}>
                                                 <View style={[styles.statusDot, { backgroundColor: statusCfg.color }]} />
                                                 <Text style={[styles.statusLabel, { color: statusCfg.color }]}>
-                                                    dfasfdasfdasdf {statusCfg.label}
+                                                    {statusCfg.label}
                                                 </Text>
                                             </View>
                                         </View>
-
-                                        {/* {item.candidates_count > 0 && ( */}
-                                        <View style={styles.candidateSection}>
-                                            <View style={styles.candidateTopRow}>
-                                                <Text style={styles.candidateCount}>
-                                                    {item.candidates_count} application{item.candidates_count !== 1 ? 's' : ''}
-                                                </Text>
-                                                <Pressable
-                                                    onPress={() => navigation.navigate(routes.ACTIVECANDIDATE, { jobId: item?.id })}
-                                                    hitSlop={8}
-                                                >
-                                                    <Image source={imagePath.rightAngle} style={styles.chevronIcon} />
-                                                </Pressable>
-                                            </View>
-                                            <ApplicationProgressBar count={item.candidates_count} />
-                                            <TouchableOpacity
-                                                onPress={() => navigation.navigate(routes.ACTIVECANDIDATE, { jobId: item?.id })}
-                                                activeOpacity={0.7}
-                                            >
-                                                <Text style={[styles.viewCandidates, { color: colors.primary }]}>
-                                                    View candidates
-                                                </Text>
-                                            </TouchableOpacity>
-                                        </View>
-                                        {/* )} */}
-                                        {/*  */}
-                                        {/* No candidates — show chevron for navigation */}
-                                        {(!item.candidates_count || item.candidates_count === 0) && (
-                                            <View style={styles.noAppRow}>
-                                                <Text style={styles.cardSubtitle}>
-                                                    {item?.status === 'draft' ? 'Not published yet' : ''}
-                                                </Text>
-                                                <Image source={imagePath.rightAngle} style={styles.chevronIcon} />
-                                            </View>
-                                        )}
-
-                                        {/* Swipe actions (hidden — long press to show) */}
-                                        <View style={styles.cardActions}>
-                                            <Pressable
-                                                onPress={() => navigation.navigate(routes.ADDJOB, { ...item })}
-                                                hitSlop={8}
-                                                style={styles.actionBtn}
-                                            >
-                                                <Image source={imagePath.edit} style={styles.actionIcon} />
-                                            </Pressable>
-                                            <Pressable
-                                                onPress={() => handleDelete(item)}
-                                                hitSlop={8}
-                                                style={styles.actionBtn}
-                                            >
-                                                <Image source={imagePath.delete} style={styles.actionIcon} />
-                                            </Pressable>
-                                        </View>
+                                        {
+                                            item.applications > 0 && (
+                                                <View style={styles.candidateSection}>
+                                                    <View style={styles.candidateTopRow}>
+                                                        <Text style={styles.candidateCount}>
+                                                            {item.applications} application{item.applications !== 1 ? 's' : ''}
+                                                        </Text>
+                                                    </View>
+                                                    <TouchableOpacity
+                                                        onPress={() => navigation.navigate(routes.ACTIVECANDIDATE, { jobId: item?.job_id, jobTitle: item.title })}
+                                                        activeOpacity={0.7}
+                                                    >
+                                                        <Text style={[styles.viewCandidates, { color: colors.primary }]}>
+                                                            View candidates
+                                                        </Text>
+                                                    </TouchableOpacity>
+                                                </View>
+                                            )
+                                        }
                                     </Pressable>
                                 )
                             }}
@@ -282,7 +249,7 @@ export default function OpenJobs() {
                     )}
                 </ScrollView>
             </View>
-        </NavigationBar>
+        </NavigationBar >
     )
 }
 
@@ -402,15 +369,9 @@ const styles = StyleSheet.create({
 
     // Card
     card: {
-        backgroundColor: '#FFFFFF',
         borderRadius: 16,
         paddingHorizontal: responsiveScreenWidth(4.5),
         paddingVertical: responsiveScreenHeight(2),
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.06,
-        shadowRadius: 8,
-        elevation: 3,
     },
     cardTopRow: {
         flexDirection: 'row',
@@ -422,13 +383,14 @@ const styles = StyleSheet.create({
         marginRight: responsiveScreenWidth(3),
     },
     cardTitle: {
-        fontSize: responsiveScreenFontSize(2),
+        fontSize: responsiveScreenFontSize(2.3),
         fontWeight: '700',
         marginBottom: responsiveScreenHeight(0.4),
     },
     cardSubtitle: {
-        fontSize: responsiveScreenFontSize(1.6),
+        fontSize: responsiveScreenFontSize(1.8),
         color: '#9CA3AF',
+
         fontWeight: '500',
     },
 
@@ -438,6 +400,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: responsiveScreenWidth(1.2),
         marginTop: responsiveScreenHeight(0.3),
+        backgroundColor: "#E4F3EC",
+        paddingVertical: responsiveScreenHeight(0.2),
+        paddingHorizontal: responsiveScreenWidth(3),
+        borderRadius: responsiveScreenWidth(1),
     },
     statusDot: {
         width: 8,
@@ -471,7 +437,6 @@ const styles = StyleSheet.create({
     viewCandidates: {
         fontSize: responsiveScreenFontSize(1.6),
         fontWeight: '600',
-        marginTop: responsiveScreenHeight(1),
     },
 
     // Progress bar

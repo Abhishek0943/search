@@ -227,7 +227,6 @@ const WhereICanWork = () => {
                         </View>
                     </View>
 
-                    {/* Footer Note */}
                     <Text style={{
                         fontSize: responsiveFontSize(1.5),
                         color: colors.textSecondary,

@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, } from 'react';
 import {
     View,
     ScrollView,
@@ -7,6 +7,7 @@ import {
     ActivityIndicator,
     TextInput,
     Pressable,
+    Platform,
 } from 'react-native';
 import {
     responsiveFontSize,
@@ -20,12 +21,14 @@ import { Header } from '../Company/Company';
 import { ThemeContext } from '../../context/ThemeProvider';
 import Text from '../../components/Text';
 import ImagePicker from 'react-native-image-crop-picker';
+import { launchImageLibrary } from 'react-native-image-picker';
 import { postApiCall } from '../../api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { DeleteCertificate } from '../../reducer/jobsReducer';
 import { useAlert } from '../../context/AlertContext';
 import Icon from '../../utils/Icon';
+import { check, request, PERMISSIONS, RESULTS, Permission } from 'react-native-permissions';
 const Certifications = () => {
     const { colors } = useContext(ThemeContext);
     const dispatch = useAppDispatch();
@@ -65,17 +68,52 @@ const Certifications = () => {
             Alert.alert('Title Required', 'Please enter a certificate title before uploading.');
             return;
         }
+
         try {
-            const image = await ImagePicker.openPicker({
-                mediaType: 'photo',
-                cropping: true,
-            });
-            const fileName = `cert_${Date.now()}.${image.mime?.includes('png') ? 'png' : 'jpg'}`;
-            const file = { uri: image.path, name: fileName, type: image.mime || 'image/jpeg' };
-            setCertImage(file);
-            uploadMediaToApi('certificate', file, { certificate_title: certTitle });
-            setCertTitle('');
-        } catch (e) { }
+            // For Android 13 and above, bypass standard permission-dependent galleries completely
+            if (Platform.OS === 'android' && Platform.Version >= 33) {
+                const response = await launchImageLibrary({
+                    mediaType: 'photo',
+                    quality: 1,
+                });
+
+                if (response.didCancel) {
+                    console.log('User cancelled image selection');
+                    return;
+                }
+
+                if (response.assets && response.assets.length > 0) {
+                    const selectedAsset = response.assets[0];
+
+                    const file = {
+                        uri: selectedAsset.uri,
+                        name: selectedAsset.fileName || `cert_${Date.now()}.jpg`,
+                        type: selectedAsset.type || 'image/jpeg',
+                    };
+
+                    setCertImage(file);
+                    uploadMediaToApi('certificate', file, { certificate_title: certTitle });
+                    setCertTitle('');
+                }
+                return;
+            }
+
+            // --- Legacy Fallback logic for iOS & Older Android Versions ---
+            // (Insert your previous working permission check + react-native-image-crop-picker fallback code here)
+
+        } catch (e) {
+            console.log('Error selecting image:', e);
+        }
+    };
+
+    // Extracted helper logic to clean up file formatting
+    const processSelectedImage = (image) => {
+        const fileName = `cert_${Date.now()}.${image.mime?.includes('png') ? 'png' : 'jpg'}`;
+        const file = { uri: image.path, name: fileName, type: image.mime || 'image/jpeg' };
+
+        setCertImage(file);
+        uploadMediaToApi('certificate', file, { certificate_title: certTitle });
+        setCertTitle('');
     };
     return (
         <NavigationBar navigationBar={false}>

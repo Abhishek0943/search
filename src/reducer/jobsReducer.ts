@@ -8,7 +8,7 @@ export const GetJobByStatus = createAsyncThunk<{ success: true, data: RoleItem[]
 export const deleteJob = createAsyncThunk<{ success: true, data: RoleItem[] } | ErrorResponse, { status: string }>('GetSuggestedJobs', (body) => postApiCall<{ success: true, data: RoleItem[] }>('/company/delete-RoleItem', body));
 export const UploadCV = createAsyncThunk<{ success: true, data: UploadCVRess } | ErrorResponse, {}>('UploadCV', (body) => postApiCall<{ success: true, data: RoleItem[] }>('/jobseekers/cv-save', body, { as: "form" }));
 export const UploadDocument = createAsyncThunk<{ success: true, data: RoleItem[] } | ErrorResponse, {}>('UploadDocument', (body) => postApiCall<{ success: true, data: RoleItem[] }>('/company/messages/upload-file', body, { as: "form" }));
-export const GetJobApplication = createAsyncThunk<{ success: true, data: RoleItem[] } | ErrorResponse, { search: string, page: number }>('GetJobApplication', ({ search, page }) => getApiCall<{ success: true, data: RoleItem[] }>('/jobseekers/my-RoleItem-applications?search=' + search + '&page=' + page));
+export const GetJobApplication = createAsyncThunk<{ success: true, data: RoleItem[] } | ErrorResponse, { search: string, page: number }>('GetJobApplication', ({ search, page }) => getApiCall<{ success: true, data: RoleItem[] }>('/jobseekers/my-job-applications?search=' + search + '&page=' + page));
 export const GetCv = createAsyncThunk<{ success: true, data: RoleItem[] } | ErrorResponse, { id: number }>('GetCv', ({ id }) => getApiCall<{ success: true, data: RoleItem[] }>('/jobseekers/get-cvs?user_id=' + id));
 export const GetNotification = createAsyncThunk<{ success: true, data: RoleItem[] } | ErrorResponse>('GetNotification', () => getApiCall<{ success: true, data: RoleItem[] }>('/jobseekers/get-notifications'));
 export const DeleteNotification = createAsyncThunk<{ success: true, data: RoleItem[] } | ErrorResponse>('DeleteNotification', ({ id }) => deleteApiCall<{ success: true, data: RoleItem[] }>('/jobseekers/delete-notificatoin/' + id,));
@@ -177,7 +177,7 @@ export const GetMessage = createAsyncThunk<
 >(
   'GetFilter',
   ({ id, pages }) => {
-    return getApiCall<{ success: true, data: { filter: { filter: string, option: string[] | { id: number, name: string }[] }[] } }>('/company/messages?seekerid=' + id + '&page=' + pages);
+    return getApiCall<{ success: true, data: { filter: { filter: string, option: string[] | { id: number, name: string }[] }[] } }>('/company/messages?seeker_id=' + id + '&page=' + pages);
   }
 );
 export const GetMessageSeeker = createAsyncThunk<

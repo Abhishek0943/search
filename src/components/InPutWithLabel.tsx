@@ -27,10 +27,12 @@ interface TextInputCompProps {
   secondaryColor: string
   inputContainerStyle?: ViewStyle
   full?: boolean
+  maxLength?: number
 }
 const InputWithLabel: React.FC<TextInputCompProps> = ({
   value,
   onChangeText,
+  maxLength,
   placeholder = '',
   label,
   secureText = false,
@@ -62,6 +64,7 @@ const InputWithLabel: React.FC<TextInputCompProps> = ({
                 placeholder={placeholder}
                 placeholderTextColor={colors.placeholder}
                 secureTextEntry={secureText}
+                maxLength={maxLength}
                 keyboardType={keyboardType}
                 onFocus={() => setActiveColor(mainColor)}
                 onBlur={() => setActiveColor(colors.surfaces)}

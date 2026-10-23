@@ -75,8 +75,9 @@ const PaymentHistory = () => {
 
   useEffect(() => {
     dispatch(PaymentHistoryApi()).unwrap().then(res => {
+      console.log('payment history', res)
       if (res.success !== false) {
-        setCvs(res.data || [])
+        setCvs(res.data)
       }
       setLoading(false)
     }).catch(() => {
@@ -132,7 +133,6 @@ const PaymentHistory = () => {
           Every invoice, receipt and refund.
         </Text>
 
-        {/* Financial Year Summary */}
         <View style={{
           backgroundColor: '#FFFFFF',
           borderRadius: 16,
@@ -149,19 +149,16 @@ const PaymentHistory = () => {
               <Text style={{ fontSize: responsiveFontSize(3), fontWeight: '800', color: '#0F172A' }}>
                 {cvs.total?.currency} {cvs.total?.amount}
               </Text>
-              {/* <Text style={{ fontSize: responsiveFontSize(1.4), color: '#94A3B8', fontWeight: '500', marginTop: 4 }}>
-                Includes AUD 22.45 GST
-              </Text> */}
+
             </View>
             <View style={{ backgroundColor: '#EDF4FC', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 }}>
               <Text style={{ color: colors.primary, fontWeight: '700', fontSize: responsiveFontSize(1.6) }}>
-                {cvs.total.count}  paid
+                {cvs?.total?.count}  paid
               </Text>
             </View>
           </View>
         </View>
 
-        {/* Filters Row */}
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: responsiveHeight(2) }}>
           <View style={{ flexDirection: 'row' }}>
             {renderFilterPill('All')}
@@ -194,7 +191,6 @@ const PaymentHistory = () => {
                   marginBottom: responsiveHeight(2),
                   overflow: 'hidden'
                 }}>
-                  {/* Top half */}
                   <View style={{ padding: responsiveWidth(4), flexDirection: 'row', alignItems: 'flex-start' }}>
                     <View style={{
                       width: 48,
@@ -234,10 +230,8 @@ const PaymentHistory = () => {
                     </View>
                   </View>
 
-                  {/* Divider line */}
                   <View style={{ height: 1, backgroundColor: '#E2E8F0', width: '100%' }} />
 
-                  {/* Bottom half */}
                   <View style={{ padding: responsiveWidth(4), flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Text style={{ fontSize: responsiveFontSize(1.4), color: '#64748B', fontWeight: '500' }}>
                       {item.payment_method || 'Visa 4242'} · {item.job_quota || '0'} postings
@@ -296,7 +290,6 @@ const PaymentHistory = () => {
           />
         )}
 
-        {/* Payment Method Section */}
         <View style={{ marginBottom: responsiveHeight(3) }}>
           <Text style={{ fontSize: responsiveFontSize(2), fontWeight: '700', color: '#0F172A', marginBottom: responsiveHeight(1.5) }}>
             Payment method
@@ -335,7 +328,6 @@ const PaymentHistory = () => {
           </View>
         </View>
 
-        {/* Footer info */}
         <Text style={{ fontSize: responsiveFontSize(1.4), color: '#94A3B8', fontWeight: '500', lineHeight: 20 }}>
           Invoices are emailed to accounts@rozamexicano.com.au{'\n'}Change this in Business details.
         </Text>

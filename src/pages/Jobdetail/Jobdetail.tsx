@@ -47,6 +47,7 @@ const Jobdetail = () => {
     const [loading, setLoading] = useState(true)
     const dispatch = useAppDispatch()
     const [job, setJob] = useState<Job>()
+    console.log(job, "jobfasdfadsfadsfadsfasdfasdfadsf")
     const [role, setRole] = useState<string | null>(null)
     const [detailsExpanded, setDetailsExpanded] = useState(true)
     const rotateAnim = useRef(new Animated.Value(1)).current // 1 = expanded (arrow up)
@@ -321,20 +322,21 @@ const Jobdetail = () => {
             paddingHorizontal: responsiveScreenWidth(4),
             borderTopWidth: 1,
             borderColor: colors.gray,
-            paddingBottom: responsiveScreenHeight(2),
+            paddingBottom: responsiveScreenHeight(.5),
         },
         detailGridItem: {
             width: '50%',
-            marginBottom: responsiveScreenHeight(1.5),
+            marginVertical: responsiveScreenHeight(1),
         },
         detailLabel: {
-            fontSize: responsiveScreenFontSize(1.4),
+            fontSize: responsiveScreenFontSize(1.8),
             color: colors.textSecondary,
+            fontWeight: "600",
             marginBottom: 3,
         },
         detailValue: {
-            fontSize: responsiveScreenFontSize(1.7),
-            fontWeight: '700',
+            fontSize: responsiveScreenFontSize(2),
+            fontWeight: '800',
             color: colors.textPrimary,
             textTransform: 'capitalize',
         },
@@ -552,12 +554,37 @@ const Jobdetail = () => {
 
                     {detailsExpanded && (
                         <View style={dynamicStyles.detailsGrid}>
-                            {/* {detailGridItems.map((item, idx) => (
-                                    <View key={idx} style={dynamicStyles.detailGridItem}>
-                                        <Text style={dynamicStyles.detailLabel}>{item.label}</Text>
-                                        <Text style={dynamicStyles.detailValue}>{item.value}</Text>
-                                    </View>
-                                ))} */}
+                            {[
+                                {
+                                    label: "Pay",
+                                    value: salaryDisplay?.split("·")[0]
+                                }, {
+                                    label: "Job type",
+                                    value: job?.jobType
+                                },
+                                {
+                                    label: "Hours",
+                                    value: job?.hours_min && job?.hours_max ? job?.hours_min + "-" + job?.hours_max : job?.hours_min ? job?.hours_min : job?.hours_max ? job?.hours_max : "NA"
+                                },
+                                {
+                                    label: "Education",
+                                    value: job?.education || "NA"
+                                },
+                                {
+                                    label: "Experience",
+                                    value: job?.experience || "NA"
+                                },
+                                {
+                                    label: "Work rights",
+                                    value: job?.work_rights || "NA"
+                                },
+
+                            ].map((item, idx) => (
+                                <View key={idx} style={dynamicStyles.detailGridItem}>
+                                    <Text style={dynamicStyles.detailLabel}>{item.label}</Text>
+                                    <Text style={dynamicStyles.detailValue}>{item.value}</Text>
+                                </View>
+                            ))}
                         </View>
                     )}
                 </View>
