@@ -10,6 +10,7 @@ import {
 import { NavigationBar } from '../../components';
 import {
     responsiveFontSize,
+    responsiveHeight,
     responsiveScreenHeight,
     responsiveScreenWidth,
     responsiveWidth,
@@ -22,6 +23,7 @@ import Text from '../../components/Text';
 import imagePath from '../../assets/imagePath';
 import { formatSalaryRange } from '../../utils';
 import { routes } from '../../constants/values';
+import { LogInModel } from '../Chat/Chat';
 
 const AVATAR_COLORS = ['#2563EB', '#059669', '#7C3AED', '#DC2626', '#D97706', '#0891B2'];
 
@@ -48,6 +50,8 @@ const Bookmarked = () => {
     const navigation: NavigationProp<ParamListBase> = useNavigation();
     const dispatch = useAppDispatch();
     const { bookmarkedJobIds } = useAppSelector(state => state.jobsReducer);
+    const { user } = useAppSelector(state => state.userStore)
+
     const [jobs, setJobs] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const loadBookmarks = async () => {
@@ -104,151 +108,165 @@ const Bookmarked = () => {
                     }}>
                         Saved jobs
                     </Text>
-                    {!loading && (
-                        <Text style={{
-                            fontSize: responsiveFontSize(1.7),
-                            color: colors.textSecondary,
-                            marginTop: 4,
-                            fontWeight: '500',
-                        }}>
-                            {jobs.length} saved{closingSoonCount > 0 ? ` · ${closingSoonCount} closing soon` : ''}
-                        </Text>
-                    )}
+                    {!user?.id ? (
+                        <View style={{ flex: 1, marginTop: responsiveHeight(10) }}>
+                            <LogInModel />
+                        </View>
+
+                    ) :
+                        <>
+
+
+
+                            {!loading && (
+                                <Text style={{
+                                    fontSize: responsiveFontSize(1.7),
+                                    color: colors.textSecondary,
+                                    marginTop: 4,
+                                    fontWeight: '500',
+                                }}>
+                                    {jobs.length} saved{closingSoonCount > 0 ? ` · ${closingSoonCount} closing soon` : ''}
+                                </Text>
+                            )}
+
+                            {loading ? (
+                                <View style={{ marginTop: responsiveScreenHeight(20), alignItems: 'center' }}>
+                                    <ActivityIndicator size="large" color={colors.primary} />
+                                </View>
+                            ) : jobs.length === 0 ? (
+                                <View style={{ alignItems: 'center', marginTop: responsiveScreenHeight(15) }}>
+                                    <Image
+                                        source={imagePath.Bookmark}
+                                        style={{ width: responsiveWidth(16), height: responsiveWidth(16), resizeMode: 'contain', opacity: 0.3, marginBottom: responsiveScreenHeight(2) }}
+                                    />
+                                    <Text style={{ fontSize: responsiveFontSize(2), fontWeight: '700', color: colors.textPrimary }}>No saved jobs yet</Text>
+                                    <Text style={{ fontSize: responsiveFontSize(1.7), color: colors.textSecondary, marginTop: 6, textAlign: 'center' }}>
+                                        Tap the bookmark on any job to save it here.
+                                    </Text>
+                                    <Pressable
+                                        onPress={() => navigation.navigate(routes.HOME)}
+                                        style={{
+                                            marginTop: responsiveScreenHeight(3),
+                                            backgroundColor: colors.primary,
+                                            borderRadius: 14,
+                                            paddingVertical: responsiveScreenHeight(1.5),
+                                            paddingHorizontal: responsiveScreenWidth(8),
+                                        }}
+                                    >
+                                        <Text style={{ color: '#fff', fontWeight: '700', fontSize: responsiveFontSize(1.8) }}>Browse jobs</Text>
+                                    </Pressable>
+                                </View>
+                            ) : (
+                                <>
+                                    {jobs.map((job: any, index: number) => {
+                                        const companyName = job?.company_info?.name || '';
+                                        const initials = getInitials(companyName);
+                                        const avatarBg = AVATAR_COLORS[index % AVATAR_COLORS.length];
+                                        const isBookmarked = bookmarkedJobIds[job.id] ?? job.is_favorited;
+                                        const closing = getClosingText(job?.expiredAt);
+
+                                        return (
+                                            <Pressable
+                                                key={job.id || index}
+                                                onPress={() => navigation.navigate(routes.JOBDETAIL, { id: job.id })}
+                                                style={{
+                                                    backgroundColor: colors.white,
+                                                    borderRadius: 20,
+                                                    padding: responsiveScreenWidth(4),
+                                                    marginBottom: responsiveScreenHeight(1.2),
+                                                    borderWidth: 1,
+                                                    borderColor: colors.gray,
+                                                }}
+                                            >
+                                                {/* Company row */}
+                                                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: responsiveScreenHeight(1) }}>
+                                                    {job?.company_info?.image ? (
+                                                        <View style={{ width: 44, height: 44, borderRadius: 10, overflow: 'hidden', backgroundColor: colors.gray, marginRight: responsiveScreenWidth(3) }}>
+                                                            <Image source={{ uri: job.company_info.image }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+                                                        </View>
+                                                    ) : (
+                                                        <View style={{ width: 44, height: 44, borderRadius: 10, backgroundColor: avatarBg, alignItems: 'center', justifyContent: 'center', marginRight: responsiveScreenWidth(3) }}>
+                                                            <Text style={{ color: '#fff', fontSize: responsiveFontSize(1.6), fontWeight: '700' }}>{initials}</Text>
+                                                        </View>
+                                                    )}
+                                                    <View style={{ flex: 1 }}>
+                                                        <Text numberOfLines={1} style={{ fontSize: responsiveFontSize(1.7), fontWeight: '700', color: colors.primary2 }}>{companyName}</Text>
+                                                        {job?.jobLocation && (
+                                                            <Text numberOfLines={1} style={{ fontSize: responsiveFontSize(1.5), color: colors.textSecondary, marginTop: 2 }}>{job.jobLocation}</Text>
+                                                        )}
+                                                    </View>
+                                                    {/* Bookmark toggle */}
+                                                    <TouchableOpacity
+                                                        onPress={() => handleToggleBookmark(job)}
+                                                        style={{ width: responsiveWidth(5.5), aspectRatio: 1 }}
+                                                    >
+                                                        <Image
+                                                            source={isBookmarked ? imagePath.Bookmarked : imagePath.Bookmark}
+                                                            style={{ width: '100%', height: '100%', resizeMode: 'contain' }}
+                                                        />
+                                                    </TouchableOpacity>
+                                                </View>
+
+                                                {/* Job title */}
+                                                <Text numberOfLines={1} style={{
+                                                    fontSize: responsiveFontSize(2.2),
+                                                    fontWeight: '800',
+                                                    color: colors.textPrimary,
+                                                    marginBottom: responsiveScreenHeight(0.6),
+                                                }}>
+                                                    {job?.title}
+                                                </Text>
+
+                                                {/* Salary + closing */}
+                                                <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap' }}>
+                                                    {!job?.is_hide_salary && job?.salary && job?.salary_period && (
+                                                        <Text style={{ fontSize: responsiveFontSize(1.9), fontWeight: '700', color: colors.primary }}>
+                                                            {job.salary_currency}{formatSalaryRange(job.salary)} / {job.salary_period}
+                                                            {job?.jobType ? ' · ' + job.jobType : ''}
+                                                        </Text>
+                                                    )}
+                                                    {closing && (
+                                                        <Text style={{
+                                                            fontSize: responsiveFontSize(1.9),
+                                                            fontWeight: '700',
+                                                            color: closing.color,
+                                                            marginLeft: 'auto',
+                                                        }}>
+                                                            {closing.text}
+                                                        </Text>
+                                                    )}
+                                                </View>
+                                            </Pressable>
+                                        );
+                                    })}
+
+                                    {/* Info banner */}
+                                    <View style={{
+                                        flexDirection: 'row',
+                                        alignItems: 'flex-start',
+                                        backgroundColor: '#FEF3C7',
+                                        borderRadius: 16,
+                                        padding: responsiveScreenWidth(4),
+                                        gap: responsiveScreenWidth(3),
+                                        marginTop: responsiveScreenHeight(1),
+                                    }}>
+                                        <Text style={{ fontSize: responsiveFontSize(2.2) }}>⚠️</Text>
+                                        <View style={{ flex: 1 }}>
+                                            <Text style={{ fontSize: responsiveFontSize(1.7), fontWeight: '700', color: '#92400E' }}>
+                                                Saved jobs still close
+                                            </Text>
+                                            <Text style={{ fontSize: responsiveFontSize(1.5), color: '#92400E', marginTop: 3, fontWeight: '500' }}>
+                                                We will remind you the day before each one ends.
+                                            </Text>
+                                        </View>
+                                    </View>
+                                </>
+                            )}
+                        </>
+                    }
+
                 </View>
 
-                {loading ? (
-                    <View style={{ marginTop: responsiveScreenHeight(20), alignItems: 'center' }}>
-                        <ActivityIndicator size="large" color={colors.primary} />
-                    </View>
-                ) : jobs.length === 0 ? (
-                    <View style={{ alignItems: 'center', marginTop: responsiveScreenHeight(15) }}>
-                        <Image
-                            source={imagePath.Bookmark}
-                            style={{ width: responsiveWidth(16), height: responsiveWidth(16), resizeMode: 'contain', opacity: 0.3, marginBottom: responsiveScreenHeight(2) }}
-                        />
-                        <Text style={{ fontSize: responsiveFontSize(2), fontWeight: '700', color: colors.textPrimary }}>No saved jobs yet</Text>
-                        <Text style={{ fontSize: responsiveFontSize(1.7), color: colors.textSecondary, marginTop: 6, textAlign: 'center' }}>
-                            Tap the bookmark on any job to save it here.
-                        </Text>
-                        <Pressable
-                            onPress={() => navigation.navigate(routes.HOME)}
-                            style={{
-                                marginTop: responsiveScreenHeight(3),
-                                backgroundColor: colors.primary,
-                                borderRadius: 14,
-                                paddingVertical: responsiveScreenHeight(1.5),
-                                paddingHorizontal: responsiveScreenWidth(8),
-                            }}
-                        >
-                            <Text style={{ color: '#fff', fontWeight: '700', fontSize: responsiveFontSize(1.8) }}>Browse jobs</Text>
-                        </Pressable>
-                    </View>
-                ) : (
-                    <>
-                        {jobs.map((job: any, index: number) => {
-                            const companyName = job?.company_info?.name || '';
-                            const initials = getInitials(companyName);
-                            const avatarBg = AVATAR_COLORS[index % AVATAR_COLORS.length];
-                            const isBookmarked = bookmarkedJobIds[job.id] ?? job.is_favorited;
-                            const closing = getClosingText(job?.expiredAt);
-
-                            return (
-                                <Pressable
-                                    key={job.id || index}
-                                    onPress={() => navigation.navigate(routes.JOBDETAIL, { id: job.id })}
-                                    style={{
-                                        backgroundColor: colors.white,
-                                        borderRadius: 20,
-                                        padding: responsiveScreenWidth(4),
-                                        marginBottom: responsiveScreenHeight(1.2),
-                                        borderWidth: 1,
-                                        borderColor: colors.gray,
-                                    }}
-                                >
-                                    {/* Company row */}
-                                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: responsiveScreenHeight(1) }}>
-                                        {job?.company_info?.image ? (
-                                            <View style={{ width: 44, height: 44, borderRadius: 10, overflow: 'hidden', backgroundColor: colors.gray, marginRight: responsiveScreenWidth(3) }}>
-                                                <Image source={{ uri: job.company_info.image }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
-                                            </View>
-                                        ) : (
-                                            <View style={{ width: 44, height: 44, borderRadius: 10, backgroundColor: avatarBg, alignItems: 'center', justifyContent: 'center', marginRight: responsiveScreenWidth(3) }}>
-                                                <Text style={{ color: '#fff', fontSize: responsiveFontSize(1.6), fontWeight: '700' }}>{initials}</Text>
-                                            </View>
-                                        )}
-                                        <View style={{ flex: 1 }}>
-                                            <Text numberOfLines={1} style={{ fontSize: responsiveFontSize(1.7), fontWeight: '700', color: colors.primary2 }}>{companyName}</Text>
-                                            {job?.jobLocation && (
-                                                <Text numberOfLines={1} style={{ fontSize: responsiveFontSize(1.5), color: colors.textSecondary, marginTop: 2 }}>{job.jobLocation}</Text>
-                                            )}
-                                        </View>
-                                        {/* Bookmark toggle */}
-                                        <TouchableOpacity
-                                            onPress={() => handleToggleBookmark(job)}
-                                            style={{ width: responsiveWidth(5.5), aspectRatio: 1 }}
-                                        >
-                                            <Image
-                                                source={isBookmarked ? imagePath.Bookmarked : imagePath.Bookmark}
-                                                style={{ width: '100%', height: '100%', resizeMode: 'contain' }}
-                                            />
-                                        </TouchableOpacity>
-                                    </View>
-
-                                    {/* Job title */}
-                                    <Text numberOfLines={1} style={{
-                                        fontSize: responsiveFontSize(2.2),
-                                        fontWeight: '800',
-                                        color: colors.textPrimary,
-                                        marginBottom: responsiveScreenHeight(0.6),
-                                    }}>
-                                        {job?.title}
-                                    </Text>
-
-                                    {/* Salary + closing */}
-                                    <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap' }}>
-                                        {!job?.is_hide_salary && job?.salary && job?.salary_period && (
-                                            <Text style={{ fontSize: responsiveFontSize(1.9), fontWeight: '700', color: colors.primary }}>
-                                                {job.salary_currency}{formatSalaryRange(job.salary)} / {job.salary_period}
-                                                {job?.jobType ? ' · ' + job.jobType : ''}
-                                            </Text>
-                                        )}
-                                        {closing && (
-                                            <Text style={{
-                                                fontSize: responsiveFontSize(1.9),
-                                                fontWeight: '700',
-                                                color: closing.color,
-                                                marginLeft: 'auto',
-                                            }}>
-                                                {closing.text}
-                                            </Text>
-                                        )}
-                                    </View>
-                                </Pressable>
-                            );
-                        })}
-
-                        {/* Info banner */}
-                        <View style={{
-                            flexDirection: 'row',
-                            alignItems: 'flex-start',
-                            backgroundColor: '#FEF3C7',
-                            borderRadius: 16,
-                            padding: responsiveScreenWidth(4),
-                            gap: responsiveScreenWidth(3),
-                            marginTop: responsiveScreenHeight(1),
-                        }}>
-                            <Text style={{ fontSize: responsiveFontSize(2.2) }}>⚠️</Text>
-                            <View style={{ flex: 1 }}>
-                                <Text style={{ fontSize: responsiveFontSize(1.7), fontWeight: '700', color: '#92400E' }}>
-                                    Saved jobs still close
-                                </Text>
-                                <Text style={{ fontSize: responsiveFontSize(1.5), color: '#92400E', marginTop: 3, fontWeight: '500' }}>
-                                    We will remind you the day before each one ends.
-                                </Text>
-                            </View>
-                        </View>
-                    </>
-                )}
             </ScrollView>
         </NavigationBar>
     );

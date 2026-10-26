@@ -122,6 +122,13 @@ export const Tokien = createAsyncThunk<{ success: true, topic: TopicItem[], } | 
   'Tokien',
   (body) => postApiCall<{ success: true, topic: TopicItem[], token: string }>('/apple/token', body),
 );
+export type JobDetails = {
+
+}
+export const GetJobDetaild = createAsyncThunk<{ success: true, job: JobDetails[], } | ErrorResponse, { id: string }>(
+  'GetJobDetaild',
+  ({ id }) => getApiCall<{ success: true, job: JobDetails[], token: string }>('/jobseekers/my-job-applications/' + id,),
+);
 export const RecruiterLoginByPassword = createAsyncThunk<{ success: true, recruiter: Recruiter, token: string } | ErrorResponse, { email: string, password: string }>(
   'RecruiterLoginByPassword',
   (body) => postApiCall<{ success: true, recruiter: Recruiter, token: string }>('/auth/companies/login', body),

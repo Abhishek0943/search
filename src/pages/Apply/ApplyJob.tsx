@@ -14,6 +14,7 @@ import ResumeCard from '../../components/ResumeCard'
 import { SectionHeader } from '../Profile/Profile'
 import { openBrowser } from '../Resume/Resume'
 import { pick, types } from '@react-native-documents/picker'
+import authStyles from '../Auth/styles'
 
 const ApplyJob = () => {
   const { user } = useAppSelector(state => state.userStore);
@@ -78,6 +79,7 @@ const ApplyJob = () => {
     if (u.startsWith('/')) return `file://${u}`;
     return u;
   };
+  console.log(cvs, "cvs")
   const pickResume = async () => {
     const [doc] = await pick({
       type: [types.pdf],
@@ -95,15 +97,8 @@ const ApplyJob = () => {
       type: file.type,
     } as any);
     setLoadingCV(true)
-    dispatch(UploadCV(fd)).unwrap().then(res => {
-      if (res.success) {
-        // dispatch(setUser({ user: { ...user, cv: res.data } }))
-      }
-    }).finally(() => {
-      setLoadingCV(false)
-    })
+    dispatch(UploadCV(fd))
   };
-  const [step, setStep] = useState(1)
   return (
     <NavigationBar navigationBar={false}>
       <TouchableWithoutFeedback>
@@ -118,7 +113,6 @@ const ApplyJob = () => {
             }}
           >
             <Pressable
-              onPress={() => setStep(1)}
               style={{
                 width: responsiveWidth(2.8),
                 aspectRatio: 1 / 2,
@@ -132,7 +126,6 @@ const ApplyJob = () => {
                 source={imagePath.leftAngle}
               />
             </Pressable>
-
             <View>
               <Text
                 style={{
@@ -141,7 +134,7 @@ const ApplyJob = () => {
                   fontWeight: '800',
                 }}
               >
-                Step 1 of 2
+                Step 1 of 1
               </Text>
 
               <Text
@@ -152,17 +145,25 @@ const ApplyJob = () => {
                   fontWeight: '800',
                 }}
               >
-                Your venue
+                Your answers
               </Text>
             </View>
           </View>
+          <Pressable style={[{
+            width: responsiveWidth(100),
+            marginTop: responsiveHeight(2.5),
+            position: 'relative',
+            aspectRatio: 350 / 1,
+            marginBottom: responsiveHeight(2)
+          }]}>
+            <Image style={authStyles.bgImage} source={require("../Auth/images/Devider2.png")} />
+          </Pressable>
           <ScrollView
-            style={{ flex: 1 }}
+            style={{}}
             contentContainerStyle={{
               width: responsiveScreenWidth(90),
               alignSelf: 'center',
               alignItems: 'center',
-              flex: 1,
               paddingBottom: responsiveScreenHeight(3),
             }}
           >
@@ -178,7 +179,7 @@ const ApplyJob = () => {
                         fontSize: responsiveFontSize(1.8),
                         fontWeight: '700', color: colors.primary2
                       }}>
-                        {value.text}
+                        {value.text} <Text style={{ color: colors.textSecondary, fontSize: responsiveFontSize(1.6), }}>{!value.required && '(optional)'}</Text>
                       </Text>
                     </View>
 
@@ -222,6 +223,7 @@ const ApplyJob = () => {
                     inputContainerStyle={{
                       marginBottom: responsiveHeight(0.5),
                     }}
+                    isRequired={value.required}
                     mainColor={colors.primary}
                     secondaryColor={colors.primary2}
                     label={value.text}
@@ -238,14 +240,8 @@ const ApplyJob = () => {
                         fontWeight: '700', color: colors.primary2
                       }}>
                         {value.text}
+                        <Text style={{ color: colors.textSecondary, fontSize: responsiveFontSize(1.6), }}>{!value.required && '(optional)'}</Text>
                       </Text>
-                      <Text style={{
-                        fontSize: responsiveFontSize(1.2),
-                        fontWeight: "400",
-                        lineHeight: responsiveFontSize(1.9),
-                        color: colors.textSecondary,
-                        flexWrap: "wrap",
-                      }}>(Optional)</Text>
                     </View>
                     <View style={{
                       borderWidth: 1.5,
@@ -279,6 +275,7 @@ const ApplyJob = () => {
                         fontWeight: '700', color: colors.primary2,
                       }}>
                         {value.text}
+                        <Text style={{ color: colors.textSecondary, fontSize: responsiveFontSize(1.6), }}>{!value.required && '(optional)'}</Text>
                       </Text>
 
                       <View
@@ -324,6 +321,7 @@ const ApplyJob = () => {
                         fontWeight: '700', color: colors.primary2,
                       }}>
                         {value.text}
+                        <Text style={{ color: colors.textSecondary, fontSize: responsiveFontSize(1.6), }}>{!value.required && '(optional)'}</Text>
                       </Text>
 
                       <View
@@ -396,252 +394,45 @@ const ApplyJob = () => {
                   </Pressable>
               }
             </View>
-            <TouchableOpacity
-              onPress={() => {
-                const answers = Object.fromEntries(
-                  Object.entries(cvs).map(([key, value]) => [key, value.answer])
-                );
-                console.log({ cv_id: cv.id, job_id: id, answers })
-                dispatch(ApplyJobs({ cv_id: cv.id, job_id: id, answers })).unwrap().then((data) => {
-                  if (data.success) {
-                    showAlert({ title: "Success", message: "You have successfully applied for this job", })
-                    navigation.goBack()
-                  }
-                })
-              }}
-              style={{
-                width: '100%',
-                justifyContent: 'center',
-                marginTop: responsiveScreenHeight(2),
-                borderRadius: 15,
-                gap: responsiveScreenWidth(1),
-                flexDirection: 'row',
-                alignItems: 'center',
-                backgroundColor: colors.primary,
-                paddingHorizontal: responsiveScreenWidth(3),
-                paddingVertical: responsiveScreenHeight(1.5),
-              }}
-            >
-              <Text
-                style={{
-                  color: colors.white,
-                  fontSize: responsiveScreenFontSize(1.8),
-                }}
-              >
-                Apply
-              </Text>
-            </TouchableOpacity>
-            {/* {
-              success ? <>
-                <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-                  <Image source={imagePath.success} />
-                  <Text style={{ fontSize: responsiveScreenFontSize(3), marginTop: responsiveScreenHeight(3), textAlign: "center", fontWeight: "600" }}>You’ve Applied</Text>
-                  <Text style={{ fontSize: responsiveScreenFontSize(2), textTransform: "capitalize", color: colors.textSecondary, marginTop: responsiveScreenHeight(.2), textAlign: "center", fontWeight: "600" }}>You have successfully applied to this job vacancy.</Text>
-                </View>
-                <TouchableOpacity
-                  onPress={() => navigation.navigate(routes.HOME)}
-                  style={{
-                    width: '100%',
-                    justifyContent: 'center',
-                    marginTop: responsiveScreenHeight(2),
-                    borderRadius: 15,
-                    gap: responsiveScreenWidth(1),
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    backgroundColor: colors.primary,
-                    paddingHorizontal: responsiveScreenWidth(3),
-                    paddingVertical: responsiveScreenHeight(1.5),
-                  }}
-                >
-                  <Text
-                    style={{
-                      color: colors.white,
-                      fontSize: responsiveScreenFontSize(1.8),
-                    }}
-                  >
-                    Back Home
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => navigation.replace(routes.APPLYJOB)}
-                  style={{
-                    width: '100%',
-                    justifyContent: 'center',
-                    marginTop: responsiveScreenHeight(2),
-                    borderRadius: 15,
-                    gap: responsiveScreenWidth(1),
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    backgroundColor: "#BBD4FF8C",
-                    paddingHorizontal: responsiveScreenWidth(3),
-                    paddingVertical: responsiveScreenHeight(1.5),
-                  }}
-                >
-                  <Text
-                    style={{
-                      color: colors.primary,
-                      fontSize: responsiveScreenFontSize(1.8),
-                    }}
-                  >
-                    See Applied Job
-                  </Text>
-                </TouchableOpacity>
-
-
-              </> :
-                <>
-                  {
-                    loadIngForCV ?
-                      <ActivityIndicator style={{ marginTop: responsiveScreenHeight(40), }} size={responsiveScreenFontSize(3)} /> : <>
-
-                        <>
-                          <View
-                            style={{
-                              width: '100%',
-                              marginTop: responsiveScreenHeight(2),
-                            }}
-                          >
-                            <Text
-                              style={{
-                                fontSize: responsiveScreenFontSize(2),
-                                fontWeight: '600',
-                                color: colors.textPrimary,
-                                marginBottom: responsiveScreenHeight(1),
-                              }}
-                            >
-                              Select a Resume
-                            </Text>
-                          </View>
-
-                          <View
-                            style={{
-                              width: '100%',
-                              gap: responsiveScreenHeight(1.5),
-                              flex: 1
-                            }}
-                          >
-
-                            {cvs && cvs.length > 0 ? (
-                              cvs.map(cv => (
-                                <TouchableOpacity
-                                  key={cv.id}
-                                  onPress={() => setSelectedCvId(cv.id)}
-                                  style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    paddingVertical: responsiveScreenHeight(1.5),
-                                    paddingHorizontal: responsiveScreenWidth(3),
-                                    borderRadius: 8,
-                                    borderWidth: 1,
-                                    borderColor:
-                                      selectedCvId === cv.id
-                                        ? colors.primary
-                                        : colors.textDisabled,
-                                  }}
-                                >
-            <View
-              style={{
-                height: 20,
-                width: 20,
-                borderRadius: 10,
-                borderWidth: 2,
-                borderColor:
-                  selectedCvId === cv.id
-                    ? colors.primary
-                    : colors.textDisabled,
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginRight: responsiveScreenWidth(3),
-              }}
-            >
-              {selectedCvId === cv.id && (
-                <View
-                  style={{
-                    height: 10,
-                    width: 10,
-                    borderRadius: 5,
-                    backgroundColor: colors.primary,
-                  }}
-                />
-              )}
-            </View>
-
-            <View style={{ flex: 1 }}>
-              <Text
-                style={{
-                  fontSize: responsiveScreenFontSize(1.8),
-                  fontWeight: '500',
-                  color: colors.textPrimary,
-                }}
-                numberOfLines={1}
-              >
-                {cv.title || cv.name || 'My Resume'}
-              </Text>
-              {cv.updatedAt && (
-                <Text
-                  style={{
-                    fontSize: responsiveScreenFontSize(1.4),
-                    color: colors.textSecondary,
-                    marginTop: 2,
-                  }}
-                  numberOfLines={1}
-                >
-                  Last updated: {cv.updatedAt}
-                </Text>
-              )}
-            </View>
-          </TouchableOpacity>
-          ))
-          ) : (
-
-                            )}
-        </View>
-        <View style={{ flex: 1 }}></View>
-        {
-          cvs.length > 0 ? <TouchableOpacity
-            onPress={handleApply}
-            disabled={!selectedCvId}
+          </ScrollView >
+          <TouchableOpacity
+            onPress={() => {
+              const answers = Object.fromEntries(
+                Object.entries(cvs).map(([key, value]) => [key, value.answer])
+              );
+              if (!cv?.id) {
+                showAlert({ title: "Error", message: "Please upload your CV", })
+                return
+              }
+              dispatch(ApplyJobs({ cv_id: cv.id, job_id: id, answers })).unwrap().then((data) => {
+                if (data.success) {
+                  showAlert({ title: "Success", message: "You have successfully applied for this job", })
+                  navigation.reset({ index: 0, routes: [{ name: routes.HOME }] })
+                }
+              })
+            }}
             style={{
-              marginTop: responsiveScreenHeight(3),
-              width: '100%',
-              alignSelf: 'center',
-              paddingVertical: responsiveScreenHeight(1.8),
-              borderRadius: 15,
-              backgroundColor: selectedCvId
-                ? colors.primary
-                : colors.textDisabled,
-              alignItems: 'center',
+              width: '90%',
               justifyContent: 'center',
+              margin: "auto",
+              borderRadius: 15,
+              gap: responsiveScreenWidth(1),
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: colors.primary,
+              paddingHorizontal: responsiveScreenWidth(3),
+              paddingVertical: responsiveScreenHeight(2),
             }}
           >
-            {
-              loading ? <ActivityIndicator color={colors.white} /> : <Text
-                style={{
-                  color: '#fff',
-                  fontSize: responsiveScreenFontSize(1.8),
-                  fontWeight: '600',
-                }}
-              >
-                Apply with resume
-              </Text>
-            }
-          </TouchableOpacity> :
-            
-        }
-
-
-      </>
-
-    </>
-
-                  }
-                </>
-
-            }
- */}
-
-          </ScrollView >
-
+            <Text
+              style={{
+                color: colors.white,
+                fontSize: responsiveScreenFontSize(1.8),
+              }}
+            >
+              Apply
+            </Text>
+          </TouchableOpacity>
         </>
 
       </TouchableWithoutFeedback >

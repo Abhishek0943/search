@@ -25,15 +25,17 @@ function Home() {
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
-  const [meta, setMeta] = useState<any>(null)
+  const [hasMore, setHasMore] = useState(true)
   const scrollViewRef = useRef<ScrollView>(null)
   const [sortBy, setSortBy] = useState('Newest')
+  const PAGE_SIZE = 10;
+  const [meta, setMeta] = useState<any>(null)
 
   const fetchJobs = async (pageNum: number = 1, append: boolean = false) => {
     if (pageNum === 1) setLoading(true);
     else setLoadingMore(true);
     try {
-      const res = await dispatch(GetJobs({ page: pageNum, search })).unwrap()
+      const res = await dispatch(GetJobs({ page: pageNum, search } as any)).unwrap()
       if (res?.success) {
         const jobsList = res.data?.jobs || res.data || [];
         if (append) {
@@ -42,6 +44,7 @@ function Home() {
           setJobs(jobsList);
         }
         setMeta(res.data?.meta || null);
+        setHasMore(jobsList.length >= PAGE_SIZE);
       }
     } catch (err) {
       console.error('Failed to fetch jobs:', err);
@@ -52,7 +55,7 @@ function Home() {
   };
 
   const onLoadMore = () => {
-    if (loadingMore || !meta || meta.current_page >= meta.last_page) return;
+    if (loadingMore || !hasMore) return;
     const nextPage = page + 1;
     setPage(nextPage);
     fetchJobs(nextPage, true);
@@ -80,22 +83,22 @@ function Home() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setPage(1);
+      setHasMore(true);
       fetchJobs(1);
     }, 500);
-
     return () => clearTimeout(timer);
   }, [search]);
   useBlockBack()
   return (
     <>
-      <NavigationBar statusbar={user?.id ? true : false} name={routes.HOME} onPress={() => {
+      <NavigationBar statusbar={true} name={routes.HOME} onPress={() => {
         scrollViewRef.current?.scrollTo({ y: 0, animated: true })
       }}>
         <ScrollView
           ref={scrollViewRef}
-          style={{ flex: 1, }}
+          style={{ flex: 1 }}
           onScroll={({ nativeEvent }) => {
-            const paddingToBottom = 1000;
+            const paddingToBottom = 800;
             const isCloseToBottom = nativeEvent.layoutMeasurement.height + nativeEvent.contentOffset.y >= nativeEvent.contentSize.height - paddingToBottom;
             if (isCloseToBottom) {
               onLoadMore();
@@ -217,15 +220,18 @@ function Home() {
                           <Text numberOfLines={1} style={{ fontSize: responsiveFontSize(1.7), color: colors.textSecondary, marginTop: 2 }}>{job.jobLocation}</Text>
                         )}
                       </View>
-                      <TouchableOpacity onPress={() => {
-                        dispatch(toggleBookmark({ id: job.id, is_favorited: isBookmarked }))
-                        dispatch(Bookmark({ id: job.id })).unwrap().then((res) => {
-                          console.log(res)
+                      {
+                        user?.id && <TouchableOpacity onPress={() => {
+                          dispatch(toggleBookmark({ id: job.id, is_favorited: isBookmarked }))
+                          dispatch(Bookmark({ id: job.id })).unwrap().then((res) => {
+                            console.log(res)
 
-                        })
-                      }} style={{ width: responsiveWidth(5), aspectRatio: 1 }}>
-                        <Image source={isBookmarked ? imagePath.Bookmarked : imagePath.Bookmark} style={{ resizeMode: "contain", width: "100%", height: "100%" }} />
-                      </TouchableOpacity>
+                          })
+                        }} style={{ width: responsiveWidth(5), aspectRatio: 1 }}>
+                          <Image source={isBookmarked ? imagePath.Bookmarked : imagePath.Bookmark} style={{ resizeMode: "contain", width: "100%", height: "100%" }} />
+                        </TouchableOpacity>
+                      }
+
                     </View>
 
                     <Text numberOfLines={1} style={{ fontSize: responsiveFontSize(2.1), fontWeight: '700', color: colors.textPrimary, marginBottom: responsiveScreenHeight(0.5) }}>{job?.title}</Text>

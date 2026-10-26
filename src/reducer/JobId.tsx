@@ -1,5 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, ScrollView, TouchableOpacity, SafeAreaView } from "react-native";
+import { NavigationBar } from "../components";
+import { responsiveFontSize } from "react-native-responsive-dimensions";
+import { useAppDispatch } from "../store";
+import { GetJobDetaild, Tokien } from "./recruiterReducer";
+import { useRoute } from "@react-navigation/native";
 
 const C = {
     bg: "#EEF4FF",
@@ -53,7 +58,7 @@ const Stepper = () => (
                     >
                         <Text
                             style={{
-                                fontSize: 12,
+                                fontSize: responsiveFontSize(1.5),
                                 fontWeight: "700",
                                 color: s.state === "todo" ? C.navy : "#fff",
                             }}
@@ -64,7 +69,7 @@ const Stepper = () => (
                     <Text
                         style={{
                             marginTop: 4,
-                            fontSize: 10,
+                            fontSize: responsiveFontSize(1.4),
                             fontWeight: s.state === "todo" ? "400" : "600",
                             color: s.state === "todo" ? C.navy : C.primary,
                         }}
@@ -144,16 +149,25 @@ export default function AssessmentScreen({
     onRestart = () => { },
     onLater = () => { },
 }) {
-    return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
-            <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40 }}>
-                {/* Header */}
-                <Text style={{ fontSize: 24, fontWeight: "800", color: C.navy }}>Assessment for {company}</Text>
-                <Text style={{ fontSize: 12, fontWeight: "600", color: C.navy, marginTop: 6 }}>{user}</Text>
+    const route = useRoute()
+    const id = route?.params?.id
+    const dispatch = useAppDispatch()
+    useEffect(() => {
+        dispatch(GetJobDetaild({ id: id })).unwrap().then((res) => {
+            console.log(res, "kjasdfghjkasdfhjkadfhkuasdfhikua")
+        }).catch((err) => {
+            console.log(err)
+        })
 
+    }, [id])
+
+    return (
+        <NavigationBar>
+            <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40 }}>
+                <Text style={{ fontSize: responsiveFontSize(3), fontWeight: "800", color: C.navy }}>Assessment for {company}</Text>
+                <Text style={{ fontSize: responsiveFontSize(1.8), fontWeight: "600", color: C.navy, marginTop: 6 }}>{user}</Text>
                 <Stepper />
 
-                {/* Status banner */}
                 <Card style={{ flexDirection: "row", alignItems: "flex-start", marginBottom: 14 }}>
                     <View
                         style={{
@@ -300,6 +314,7 @@ export default function AssessmentScreen({
                     ))}
                 </Card>
             </ScrollView>
-        </SafeAreaView>
+        </NavigationBar>
+
     );
 }

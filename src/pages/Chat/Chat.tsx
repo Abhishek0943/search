@@ -181,230 +181,220 @@ const Chat = () => {
 
         {/* Content */}
         {
-            !user || !user?.id ? <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                <Image source={imagePath.image1} />
-                <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "600", textAlign: "center", width: responsiveScreenWidth(80) }}>You're not logged in. Please log in to access this feature</Text>
-                <View style={{ marginHorizontal: responsiveScreenWidth(5), flexDirection: "row", gap: responsiveScreenHeight(2), marginTop: responsiveScreenHeight(2) }}>
-                    <TouchableOpacity onPress={() => navigation.navigate(routes.SIGNUP)} style={{ flex: 1, justifyContent: "center", borderRadius: 6, gap: responsiveScreenWidth(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.primary, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(.7) }}>
-                        <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8) }}>Register</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate(routes.LOGIN)} style={{ flex: 1, justifyContent: "center", borderWidth: 1, borderColor: colors.primary, borderRadius: 6, gap: responsiveScreenWidth(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.white, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(1.2) }}>
-                        <Text style={{ color: colors.primary, fontSize: responsiveScreenFontSize(1.8) }}>Log In</Text>
-                    </TouchableOpacity>
-                </View>
-            </View> : <View style={{ flex: 1, backgroundColor: colors.background }}>
-                {loading ? (
-                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                        <ActivityIndicator size={responsiveScreenFontSize(3)} color={colors.primary} />
-                    </View>
-                ) : (
-                    <FlatList
-                        onEndReachedThreshold={0.5}
-                        style={{ flex: 1 }}
-                        contentContainerStyle={{
-                            paddingHorizontal: responsiveScreenWidth(4),
-                            paddingBottom: responsiveScreenHeight(2),
-                            gap: responsiveScreenHeight(1),
-                        }}
-                        data={filteredData}
-                        ListEmptyComponent={() => <EmptyComp heading="No messages yet" text="Your conversations will appear here" />}
-                        keyExtractor={(item, index) => `${item}-${index}`}
-                        ListFooterComponent={() => (
-                            filteredData.length > 0 ? (
-                                <View style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    backgroundColor: colors.secondary,
-                                    borderRadius: 14,
-                                    padding: responsiveScreenWidth(4),
-                                    marginTop: responsiveScreenHeight(1),
-                                    gap: responsiveScreenWidth(3),
-                                }}>
+            !user || !user?.id ? <LogInModel /> :
+                <View style={{ flex: 1, backgroundColor: colors.background }}>
+                    {loading ? (
+                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                            <ActivityIndicator size={responsiveScreenFontSize(3)} color={colors.primary} />
+                        </View>
+                    ) : (
+                        <FlatList
+                            onEndReachedThreshold={0.5}
+                            style={{ flex: 1 }}
+                            contentContainerStyle={{
+                                paddingHorizontal: responsiveScreenWidth(4),
+                                paddingBottom: responsiveScreenHeight(2),
+                                gap: responsiveScreenHeight(1),
+                            }}
+                            data={filteredData}
+                            ListEmptyComponent={() => <EmptyComp heading="No messages yet" text="Your conversations will appear here" />}
+                            keyExtractor={(item, index) => `${item}-${index}`}
+                            ListFooterComponent={() => (
+                                filteredData.length > 0 ? (
                                     <View style={{
-                                        width: responsiveScreenWidth(10),
-                                        aspectRatio: 1,
-                                        borderRadius: 100,
-                                        backgroundColor: colors.lightBlue,
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                    }}>
-                                        <Icon
-                                            icon={{ type: 'Ionicons', name: 'information-circle-outline' }}
-                                            size={responsiveScreenFontSize(2.2)}
-                                            color={colors.primary}
-                                        />
-                                    </View>
-                                    <View style={{ flex: 1 }}>
-                                        <Text style={{
-                                            fontSize: responsiveScreenFontSize(1.6),
-                                            fontWeight: '700',
-                                            color: colors.textPrimary,
-                                            marginBottom: 2,
-                                        }}>Employers message you here</Text>
-                                        <Text style={{
-                                            fontSize: responsiveScreenFontSize(1.4),
-                                            color: colors.textSecondary,
-                                            fontWeight: '500',
-                                        }}>You cannot start a chat until they reply first.</Text>
-                                    </View>
-                                </View>
-                            ) : null
-                        )}
-                        renderItem={({ item, index }) => {
-                            const hasUnread = item?.unread_count > 0;
-                            return (
-                                <Pressable
-                                    onPress={() => {
-                                        dispatch(clearUnreadCount(item.id));
-                                        dispatch(setMessageCount({ messages_count: user?.messages_count - item?.unread_count }))
-                                        navigation.navigate(routes.MESSAGE, { ...item })
-                                    }}
-                                    style={{
-                                        backgroundColor: '#FFFFFF',
-                                        borderRadius: 16,
-                                        paddingHorizontal: responsiveScreenWidth(4),
-                                        paddingVertical: responsiveScreenHeight(1.8),
                                         flexDirection: 'row',
                                         alignItems: 'center',
+                                        backgroundColor: colors.secondary,
+                                        borderRadius: 14,
+                                        padding: responsiveScreenWidth(4),
+                                        marginTop: responsiveScreenHeight(1),
                                         gap: responsiveScreenWidth(3),
-                                        shadowColor: '#000',
-                                        shadowOffset: { width: 0, height: 1 },
-                                        shadowOpacity: 0.06,
-                                        shadowRadius: 6,
-                                        elevation: 2,
-                                    }}
-                                >
-                                    {/* Avatar */}
-                                    {item.logo ? (
+                                    }}>
                                         <View style={{
-                                            width: responsiveScreenWidth(13),
+                                            width: responsiveScreenWidth(10),
                                             aspectRatio: 1,
                                             borderRadius: 100,
-                                            borderWidth: 2,
-                                            borderColor: colors.primary + '20',
-                                            overflow: 'hidden',
-                                            backgroundColor: colors.secondary,
-                                        }}>
-                                            <Image
-                                                source={{ uri: item.logo }}
-                                                style={{ height: '100%', width: '100%', resizeMode: 'contain' }}
-                                            />
-                                        </View>
-                                    ) : (
-                                        <View style={{
-                                            width: responsiveScreenWidth(13),
-                                            aspectRatio: 1,
-                                            borderRadius: 100,
-                                            backgroundColor: colors.primary + '15',
+                                            backgroundColor: colors.lightBlue,
                                             justifyContent: 'center',
                                             alignItems: 'center',
                                         }}>
-                                            <Text style={{
-                                                fontSize: responsiveScreenFontSize(1.8),
-                                                fontWeight: '800',
-                                                color: colors.primary,
-                                            }}>{getInitials(item.name)}</Text>
+                                            <Icon
+                                                icon={{ type: 'Ionicons', name: 'information-circle-outline' }}
+                                                size={responsiveScreenFontSize(2.2)}
+                                                color={colors.primary}
+                                            />
                                         </View>
-                                    )}
-
-                                    {/* Content */}
-                                    <View style={{ flex: 1 }}>
-                                        <View style={{
-                                            flexDirection: 'row',
-                                            alignItems: 'center',
-                                            justifyContent: 'space-between',
-                                            marginBottom: 3,
-                                        }}>
-                                            <Text
-                                                numberOfLines={1}
-                                                style={{
-                                                    maxWidth: responsiveScreenWidth(48),
-                                                    fontSize: responsiveScreenFontSize(1.85),
-                                                    color: colors.textPrimary,
-                                                    fontWeight: '700',
-                                                }}
-                                            >{item.name}</Text>
+                                        <View style={{ flex: 1 }}>
                                             <Text style={{
-                                                fontSize: responsiveScreenFontSize(1.35),
+                                                fontSize: responsiveScreenFontSize(1.6),
+                                                fontWeight: '700',
+                                                color: colors.textPrimary,
+                                                marginBottom: 2,
+                                            }}>Employers message you here</Text>
+                                            <Text style={{
+                                                fontSize: responsiveScreenFontSize(1.4),
                                                 color: colors.textSecondary,
                                                 fontWeight: '500',
-                                            }}>{formatConversationTime(item.last_message_at)}</Text>
+                                            }}>You cannot start a chat until they reply first.</Text>
                                         </View>
-
-                                        {/* Job role badge */}
-                                        {item.job_title && (
+                                    </View>
+                                ) : null
+                            )}
+                            renderItem={({ item, index }) => {
+                                const hasUnread = item?.unread_count > 0;
+                                return (
+                                    <Pressable
+                                        onPress={() => {
+                                            dispatch(clearUnreadCount(item.id));
+                                            dispatch(setMessageCount({ messages_count: user?.messages_count - item?.unread_count }))
+                                            navigation.navigate(routes.MESSAGE, { ...item })
+                                        }}
+                                        style={{
+                                            backgroundColor: '#FFFFFF',
+                                            borderRadius: 16,
+                                            paddingHorizontal: responsiveScreenWidth(4),
+                                            paddingVertical: responsiveScreenHeight(1.8),
+                                            flexDirection: 'row',
+                                            alignItems: 'center',
+                                            gap: responsiveScreenWidth(3),
+                                            shadowColor: '#000',
+                                            shadowOffset: { width: 0, height: 1 },
+                                            shadowOpacity: 0.06,
+                                            shadowRadius: 6,
+                                            elevation: 2,
+                                        }}
+                                    >
+                                        {/* Avatar */}
+                                        {item.logo ? (
                                             <View style={{
-                                                alignSelf: 'flex-start',
-                                                backgroundColor: colors.lightBlue,
-                                                borderRadius: 8,
-                                                paddingHorizontal: responsiveScreenWidth(2.5),
-                                                paddingVertical: 3,
-                                                marginBottom: 5,
+                                                width: responsiveScreenWidth(13),
+                                                aspectRatio: 1,
+                                                borderRadius: 100,
+                                                borderWidth: 2,
+                                                borderColor: colors.primary + '20',
+                                                overflow: 'hidden',
+                                                backgroundColor: colors.secondary,
+                                            }}>
+                                                <Image
+                                                    source={{ uri: item.logo }}
+                                                    style={{ height: '100%', width: '100%', resizeMode: 'contain' }}
+                                                />
+                                            </View>
+                                        ) : (
+                                            <View style={{
+                                                width: responsiveScreenWidth(13),
+                                                aspectRatio: 1,
+                                                borderRadius: 100,
+                                                backgroundColor: colors.primary + '15',
+                                                justifyContent: 'center',
+                                                alignItems: 'center',
                                             }}>
                                                 <Text style={{
-                                                    fontSize: responsiveScreenFontSize(1.3),
-                                                    fontWeight: '700',
+                                                    fontSize: responsiveScreenFontSize(1.8),
+                                                    fontWeight: '800',
                                                     color: colors.primary,
-                                                }}>{item.job_title}</Text>
+                                                }}>{getInitials(item.name)}</Text>
                                             </View>
                                         )}
 
-                                        {/* Last message + unread indicator */}
-                                        <View style={{
-                                            flexDirection: 'row',
-                                            alignItems: 'center',
-                                        }}>
-                                            {
-                                                item.last_message
-                                                    ? <Text
-                                                        numberOfLines={1}
-                                                        style={{
-                                                            flex: 1,
-                                                            fontSize: responsiveScreenFontSize(1.55),
-                                                            color: hasUnread ? colors.textPrimary : colors.textSecondary,
-                                                            fontWeight: hasUnread ? '600' : '500',
-                                                        }}
-                                                    >{item.last_message}</Text>
-                                                    : item.attachment_type === "file"
+                                        {/* Content */}
+                                        <View style={{ flex: 1 }}>
+                                            <View style={{
+                                                flexDirection: 'row',
+                                                alignItems: 'center',
+                                                justifyContent: 'space-between',
+                                                marginBottom: 3,
+                                            }}>
+                                                <Text
+                                                    numberOfLines={1}
+                                                    style={{
+                                                        maxWidth: responsiveScreenWidth(48),
+                                                        fontSize: responsiveScreenFontSize(1.85),
+                                                        color: colors.textPrimary,
+                                                        fontWeight: '700',
+                                                    }}
+                                                >{item.name}</Text>
+                                                <Text style={{
+                                                    fontSize: responsiveScreenFontSize(1.35),
+                                                    color: colors.textSecondary,
+                                                    fontWeight: '500',
+                                                }}>{formatConversationTime(item.last_message_at)}</Text>
+                                            </View>
+
+                                            {/* Job role badge */}
+                                            {item.job_title && (
+                                                <View style={{
+                                                    alignSelf: 'flex-start',
+                                                    backgroundColor: colors.lightBlue,
+                                                    borderRadius: 8,
+                                                    paddingHorizontal: responsiveScreenWidth(2.5),
+                                                    paddingVertical: 3,
+                                                    marginBottom: 5,
+                                                }}>
+                                                    <Text style={{
+                                                        fontSize: responsiveScreenFontSize(1.3),
+                                                        fontWeight: '700',
+                                                        color: colors.primary,
+                                                    }}>{item.job_title}</Text>
+                                                </View>
+                                            )}
+
+                                            {/* Last message + unread indicator */}
+                                            <View style={{
+                                                flexDirection: 'row',
+                                                alignItems: 'center',
+                                            }}>
+                                                {
+                                                    item.last_message
                                                         ? <Text
                                                             numberOfLines={1}
                                                             style={{
                                                                 flex: 1,
                                                                 fontSize: responsiveScreenFontSize(1.55),
-                                                                color: colors.textSecondary,
-                                                                fontWeight: '500',
+                                                                color: hasUnread ? colors.textPrimary : colors.textSecondary,
+                                                                fontWeight: hasUnread ? '600' : '500',
                                                             }}
-                                                        >Sent a PDF</Text>
-                                                        : <Text
-                                                            numberOfLines={1}
-                                                            style={{
-                                                                flex: 1,
-                                                                fontSize: responsiveScreenFontSize(1.55),
-                                                                color: colors.textSecondary,
-                                                                fontWeight: '500',
-                                                            }}
-                                                        >Sent an Image</Text>
-                                            }
-                                            {hasUnread ? (
-                                                <View style={{
-                                                    width: responsiveScreenWidth(2.8),
-                                                    aspectRatio: 1,
-                                                    borderRadius: 100,
-                                                    backgroundColor: '#EAA31E',
-                                                    marginLeft: responsiveScreenWidth(2),
-                                                }} />
-                                            ) : (
-                                                item?.last_message_status === "viewed"
-                                                    ? <Image source={require("./sent2.png")} style={{ marginLeft: responsiveScreenWidth(2) }} />
-                                                    : <Image source={require("./sent3.png")} style={{ marginLeft: responsiveScreenWidth(2) }} />
-                                            )}
+                                                        >{item.last_message}</Text>
+                                                        : item.attachment_type === "file"
+                                                            ? <Text
+                                                                numberOfLines={1}
+                                                                style={{
+                                                                    flex: 1,
+                                                                    fontSize: responsiveScreenFontSize(1.55),
+                                                                    color: colors.textSecondary,
+                                                                    fontWeight: '500',
+                                                                }}
+                                                            >Sent a PDF</Text>
+                                                            : <Text
+                                                                numberOfLines={1}
+                                                                style={{
+                                                                    flex: 1,
+                                                                    fontSize: responsiveScreenFontSize(1.55),
+                                                                    color: colors.textSecondary,
+                                                                    fontWeight: '500',
+                                                                }}
+                                                            >Sent an Image</Text>
+                                                }
+                                                {hasUnread ? (
+                                                    <View style={{
+                                                        width: responsiveScreenWidth(2.8),
+                                                        aspectRatio: 1,
+                                                        borderRadius: 100,
+                                                        backgroundColor: '#EAA31E',
+                                                        marginLeft: responsiveScreenWidth(2),
+                                                    }} />
+                                                ) : (
+                                                    item?.last_message_status === "viewed"
+                                                        ? <Image source={require("./sent2.png")} style={{ marginLeft: responsiveScreenWidth(2) }} />
+                                                        : <Image source={require("./sent3.png")} style={{ marginLeft: responsiveScreenWidth(2) }} />
+                                                )}
+                                            </View>
                                         </View>
-                                    </View>
-                                </Pressable>
-                            )
-                        }} />
-                )}
-            </View>
+                                    </Pressable>
+                                )
+                            }} />
+                    )}
+                </View>
         }
     </View>
 
@@ -436,7 +426,24 @@ const Chat = () => {
 
 export default Chat
 
-const styles = StyleSheet.create({})
+export const LogInModel = () => {
+    const { colors } = useContext(ThemeContext)
+    const navigation: NavigationProp<ParamListBase> = useNavigation()
+    return (
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+            <Image source={imagePath.image1} />
+            <Text style={{ fontSize: responsiveScreenFontSize(2), fontWeight: "600", textAlign: "center", width: responsiveScreenWidth(80) }}>You're not logged in. Please log in to access this feature</Text>
+            <View style={{ marginHorizontal: responsiveScreenWidth(5), flexDirection: "row", gap: responsiveScreenHeight(2), marginTop: responsiveScreenHeight(2) }}>
+                <TouchableOpacity onPress={() => navigation.navigate(routes.SIGNUP)} style={{ flex: 1, justifyContent: "center", borderRadius: 6, gap: responsiveScreenWidth(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.primary, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(.7) }}>
+                    <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8) }}>Register</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate(routes.LOGIN)} style={{ flex: 1, justifyContent: "center", borderWidth: 1, borderColor: colors.primary, borderRadius: 6, gap: responsiveScreenWidth(1), flexDirection: "row", alignItems: "center", backgroundColor: colors.white, paddingHorizontal: responsiveScreenWidth(3), paddingVertical: responsiveScreenHeight(1.2) }}>
+                    <Text style={{ color: colors.primary, fontSize: responsiveScreenFontSize(1.8) }}>Log In</Text>
+                </TouchableOpacity>
+            </View>
+        </View>
+    )
+}
 
 
 

@@ -33,7 +33,7 @@ const Welcome = () => {
     <View style={{ height: responsiveHeight(100), width: responsiveWidth(100), flex: 1, }}>
       <Image style={{ height: "100%", width: "100%", }} source={require("./welcome.png")} />
       <View style={{ width: responsiveWidth(100), gap: responsiveHeight(2), maxHeight: responsiveHeight(35), position: "absolute", bottom: insets.bottom }}>
-        <Pressable style={{ aspectRatio: 4.375, margin: "auto", width: responsiveWidth(90), }}
+        <Pressable onPress={() => navigation.navigate(routes.HOME)} style={{ aspectRatio: 4.375, margin: "auto", width: responsiveWidth(90), }}
         >
           <Image style={{ height: "100%", width: "100%", }} source={require("./ExploreOption.png")} />
         </Pressable>

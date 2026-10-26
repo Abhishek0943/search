@@ -181,7 +181,7 @@ const Login = () => {
                 )}
               </Pressable>
               <Pressable style={authStyles.socialButton}>
-                <Image style={authStyles.bgImage} source={require("./images/GoogleButton.png")} />
+                <Image style={authStyles.bgImage} source={require("./images/apple.png")} />
               </Pressable>
             </View>
             <Pressable onPress={() => { navigation.replace(routes.COMPLOGIN) }} style={authStyles.switchLink}>

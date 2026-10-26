@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from '../../store'
 import { GetJobApplication } from '../../reducer/jobsReducer'
 import Text from '../../components/Text'
 import Button from '../../components/Button'
+import { LogInModel } from '../Chat/Chat'
 const STATUS_CONFIG: Record<string, { label: string; bg: string; color: string; borderColor?: string }> = {
   applied: { label: 'SENT', bg: '#E8F5E9', color: '#2E7D32', borderColor: '#2E7D32' },
   shortlist: { label: 'SHORTLISTED', bg: '#E8F5E9', color: '#2E7D32', borderColor: '#2E7D32' },
@@ -80,7 +81,6 @@ const ApplyJob = () => {
     dispatch(GetJobApplication({ search: '', page }))
       .unwrap()
       .then(res => {
-        console.log(res, "skfjsdf")
         setLoading(false)
         if (res.success !== false) {
           if (page === 1) {
@@ -169,11 +169,10 @@ const ApplyJob = () => {
     const statusStyle = getStatusStyle(item.status)
     const relativeTime = getRelativeTime(item.created_at || item.applied_date)
     const note = getStatusNote(item)
-
     return (
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={() => navigation.navigate("asjdfhajsdf", { id: item.id })}
+        onPress={() => navigation.navigate("asjdfhajsdf", { id: item.application_id })}
         style={{
           backgroundColor: '#FFFFFF',
           borderRadius: 16,
@@ -190,9 +189,7 @@ const ApplyJob = () => {
           borderColor: '#F0F0F0',
         }}
       >
-        {/* Top row: avatar, info, date + badge */}
         <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-          {/* Avatar */}
           <View style={{
             width: responsiveWidth(11),
             height: responsiveWidth(11),
@@ -285,6 +282,7 @@ const ApplyJob = () => {
     </>
 
   )
+
   return (
     <NavigationBar name={routes.APPLYJOB}>
       <ScrollView
@@ -329,28 +327,36 @@ const ApplyJob = () => {
             onPress={() => setActiveFilter('closed')}
           />
         </View>
-        {loading ? (
-          <ActivityIndicator
-            style={{ marginTop: responsiveHeight(25) }}
-            size={responsiveScreenFontSize(4)}
-            color={colors.primary}
-          />
-        ) : (
-          <>
-            <FlatList
-              ListEmptyComponent={() => <EmptyState />}
-              scrollEnabled={false}
-              contentContainerStyle={{
-                paddingHorizontal: responsiveWidth(5),
-              }}
-              data={filteredJobs}
-              keyExtractor={(item, index) => item.id?.toString() || index.toString()}
-              onEndReached={loadMore}
-              onEndReachedThreshold={0.5}
-              renderItem={({ item }) => <ApplicationCard item={item} />}
-            />
-          </>
-        )}
+
+        {
+          !user?.id ? (
+            <View style={{ flex: 1, marginTop: responsiveHeight(10) }}>
+              <LogInModel />
+            </View>
+
+          )
+            : loading ? (
+              <ActivityIndicator
+                style={{ marginTop: responsiveHeight(25) }}
+                size={responsiveScreenFontSize(4)}
+                color={colors.primary}
+              />
+            ) : (
+              <>
+                <FlatList
+                  ListEmptyComponent={() => <EmptyState />}
+                  scrollEnabled={false}
+                  contentContainerStyle={{
+                    paddingHorizontal: responsiveWidth(5),
+                  }}
+                  data={filteredJobs}
+                  keyExtractor={(item, index) => item.id?.toString() || index.toString()}
+                  onEndReached={loadMore}
+                  onEndReachedThreshold={0.5}
+                  renderItem={({ item }) => <ApplicationCard item={item} />}
+                />
+              </>
+            )}
       </ScrollView>
     </NavigationBar>
   )
