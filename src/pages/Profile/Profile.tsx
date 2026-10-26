@@ -581,15 +581,15 @@ const RecruiterProfile = () => {
                                 <ProfileRow
                                     title="Logout"
                                     containerStyle={{ borderBottomColor: colors.gray, borderBottomWidth: 1, paddingVertical: responsiveHeight(2.5) }}
-                                    onPress={() => {
-                                        showConfirm({
+                                    onPress={async () => {
+                                        await showConfirm({
                                             title: 'Logout',
                                             message: 'Are you sure you want to logout?',
                                             okText: 'Logout',
                                             cancelText: 'Cancel',
                                             waitForOk: true,
                                             onOkPress: async () => {
-                                                logoutAndRestart()
+                                                await logoutAndRestart()
                                                 return true;
                                             },
                                         })

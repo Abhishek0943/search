@@ -73,7 +73,7 @@ export const AlertProvider: React.FC<React.PropsWithChildren> = ({ children }) =
     onOkPress: null,
     loading: false,
   });
-
+  console.log("state", state)
   const confirmResolverRef = useRef<((value: boolean) => void) | null>(null);
 
   const hideAlert = useCallback(() => {
@@ -96,6 +96,7 @@ export const AlertProvider: React.FC<React.PropsWithChildren> = ({ children }) =
   }, []);
 
   const showConfirm = useCallback((payload: ShowConfirmPayload) => {
+    console.log("showConfirm", payload)
     return new Promise<boolean>((resolve) => {
       confirmResolverRef.current = resolve;
       setState({
