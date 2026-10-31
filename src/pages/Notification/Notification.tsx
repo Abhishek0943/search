@@ -28,6 +28,7 @@ const Notification = () => {
     dispatch(GetNotification())
       .unwrap()
       .then(res => {
+        console.log(res, "notification")
         if (res.success !== false) {
           setCvs(res.data.notifications);
         }
@@ -53,6 +54,7 @@ const Notification = () => {
         });
     }, []),
   );
+  // https://dev.searchtalents.co/jobs/nxjxjxn-293
   const openURL = (url: any) => {
     if (!url) return;
     if (url === "https://dev.searchtalents.co/creator-dashboard") {
@@ -99,21 +101,22 @@ const Notification = () => {
                           if (item.type === "blog_rejected" || item.type === "creator_request_status" || item.type === "blog_published" || item.type === "blog_approved") {
                             openURL(item.redirect)
                           }
-                          else if (item.job?.id || item.application_id) {
-                            if (role === "seeker") {
-                              item?.job?.id && navigation.navigate(routes.JOBDETAIL, { id: item.job.id })
-                            } else {
-                              navigation.navigate(routes.CANDIDATEPROFILE, { application_id: item.application_id, })
-                            }
-                          } else if (item.type === "chat" || item.type === "message" || item.chat_id) {
-                            const partnerId = item.sender_id || item.seeker_id || item.company_id || item.chat_id || item.from?.id;
-                            const partnerName = item.sender_name || item.from?.name || "Chat";
-                            if (partnerId) {
-                              navigation.navigate(routes.MESSAGE, { id: Number(partnerId), name: partnerName })
-                            } else {
-                              navigation.navigate(routes.CHAT)
-                            }
-                          } else {
+                          // else if (item.job?.id || item.application_id) {
+                          //   if (role === "seeker") {
+                          //     item?.job?.id && navigation.navigate(routes.JOBDETAIL, { id: item.job.id })
+                          //   }
+                          // else {
+                          //   navigation.navigate(routes.CANDIDATEPROFILE, { application_id: item.application_id, })
+                          // }
+                          // } else if (item.type === "chat" || item.type === "message" || item.chat_id) {
+                          //   const partnerId = item.sender_id || item.seeker_id || item.company_id || item.chat_id || item.from?.id;
+                          //   const partnerName = item.sender_name || item.from?.name || "Chat";
+                          //   if (partnerId) {
+                          //     navigation.navigate(routes.MESSAGE, { id: Number(partnerId), name: partnerName })
+                          //   } else {
+                          //     navigation.navigate(routes.CHAT)
+                          //   }
+                          else {
                             navigation.goBack()
                           }
                         }} style={{ flex: 1, }}>

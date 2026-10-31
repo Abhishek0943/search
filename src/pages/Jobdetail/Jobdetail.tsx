@@ -82,6 +82,8 @@ const Jobdetail = () => {
 
     useEffect(() => {
         dispatch(GetJob({ id })).unwrap().then((res) => {
+            console.log(res, "jobfasdfadsfadsfadsfasdfasdfadsf")
+
             if (res.success) {
                 setJob(res.data.jobDetail)
             }

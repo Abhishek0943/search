@@ -25,9 +25,9 @@ const Welcome2 = () => {
                 <Pressable onPress={() => navigation.navigate(routes.COMPLOGIN)} style={{ width: "100%", marginTop: responsiveHeight(3), aspectRatio: 175 / 102 }}>
                     <Image style={{ height: "100%", width: "100%", }} source={require("./CompanyCard.png")} />
                 </Pressable>
-                <View style={{ width: "100%", marginTop: responsiveHeight(3), aspectRatio: 175 / 29 }}>
+                <Pressable onPress={() => navigation.navigate(routes.HOME)} style={{ width: "100%", marginTop: responsiveHeight(3), aspectRatio: 175 / 29 }}>
                     <Image style={{ height: "100%", width: "100%", }} source={require("./ExploreCard.png")} />
-                </View>
+                </Pressable>
             </View>
         </View>
     )

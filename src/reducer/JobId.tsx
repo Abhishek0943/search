@@ -1,10 +1,13 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity, SafeAreaView } from "react-native";
 import { NavigationBar } from "../components";
 import { responsiveFontSize } from "react-native-responsive-dimensions";
 import { useAppDispatch } from "../store";
 import { GetJobDetaild, Tokien } from "./recruiterReducer";
 import { useRoute } from "@react-navigation/native";
+import { openBrowser } from "../pages/Resume/Resume";
+import { ThemeContext } from "../context/ThemeProvider";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const C = {
     bg: "#EEF4FF",
@@ -152,11 +155,18 @@ export default function AssessmentScreen({
     const route = useRoute()
     const id = route?.params?.id
     const dispatch = useAppDispatch()
+    const { colors } = useContext(ThemeContext)
+    const [data, setData] = useState<any>(null)
+    const [loading, setLoading] = useState(false)
     useEffect(() => {
+        setLoading(true)
         dispatch(GetJobDetaild({ id: id })).unwrap().then((res) => {
-            console.log(res, "kjasdfghjkasdfhjkadfhkuasdfhikua")
+            console.log(res.data, "kjasdfghjkasdfhjkadfhkuasdfhikua")
+            setData(res.data)
+            setLoading(false)
         }).catch((err) => {
             console.log(err)
+            setLoading(false)
         })
 
     }, [id])
@@ -238,7 +248,11 @@ export default function AssessmentScreen({
 
                     {/* Actions */}
                     <TouchableOpacity
-                        onPress={onResume}
+                        onPress={async () => {
+                            const token = await AsyncStorage.getItem("token")
+                            console.log(data.assignment.url + `?token=${token}`, "asdfghjk")
+                            openBrowser(data.assignment.url + `?token=${token}`, colors.primary, false)
+                        }}
                         activeOpacity={0.85}
                         style={{
                             backgroundColor: C.primary,

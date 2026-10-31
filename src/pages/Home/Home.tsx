@@ -108,8 +108,11 @@ function Home() {
         >
           <View style={{ paddingHorizontal: responsiveScreenWidth(5), paddingTop: responsiveScreenHeight(1), paddingBottom: responsiveScreenHeight(1) }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Text style={{ fontSize: responsiveFontSize(3), fontWeight: '800', color: colors.textPrimary }}>Jobs for you</Text>
-              <TouchableOpacity style={{ width: responsiveScreenWidth(7), aspectRatio: 1 }}>
+              <Text style={{ fontSize: responsiveFontSize(3), fontWeight: '800', color: colors.textPrimary, flex: 1 }}>Jobs for you</Text>
+              <TouchableOpacity onPress={() => navigation.navigate(routes.NOTIFICATION, { company: true })} style={{ width: responsiveScreenWidth(5), aspectRatio: 1, marginLeft: responsiveScreenWidth(2) }}>
+                <Image source={imagePath.NotificationIcon} style={{ width: "100%", height: "100%", resizeMode: 'contain' }} />
+              </TouchableOpacity>
+              <TouchableOpacity style={{ width: responsiveScreenWidth(7), aspectRatio: 1, marginLeft: responsiveScreenWidth(2) }}>
                 <Image source={imagePath.Filter} style={{ width: "100%", height: "100%", resizeMode: 'contain' }} />
               </TouchableOpacity>
             </View>

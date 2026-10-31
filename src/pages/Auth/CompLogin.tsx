@@ -42,7 +42,6 @@ const CompLogin = () => {
         try {
             const result = await googleLogin();
             if ('code' in result) {
-                // User cancelled or error
                 return;
             }
             const userInfo = result as any;
@@ -51,6 +50,8 @@ const CompLogin = () => {
                 showAlert({ title: 'Error', message: 'Could not get email from Google account' });
                 return;
             }
+            console.log(userData, "Google login  userData");
+
             const FCM = await getFCMToken();
             const res: any = await postApiCall('/auth/companies/social-login', {
                 device_token: FCM,
@@ -60,7 +61,9 @@ const CompLogin = () => {
                 name: userData.givenName || userData.name || '',
                 email: userData.email,
             });
-            if (res?.success || res?.data?.token) {
+            console.log(res, "Google login res");
+
+            if (res?.success && res?.data?.token) {
                 await AsyncStorage.setItem('token', res.data.token);
                 await AsyncStorage.setItem("role", "recruiter");
                 await checkCompanyRegistration();
@@ -163,7 +166,7 @@ const CompLogin = () => {
             if (onboardingStep === 2) {
                 navigation.reset({
                     index: 0,
-                    routes: [{ name: routes.HOME }],
+                    routes: [{ name: routes.RECRUITERHOME }],
                 });
                 return;
             }

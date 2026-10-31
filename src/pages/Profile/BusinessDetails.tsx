@@ -9,7 +9,7 @@ import { InPutWithLabel } from '../../components';
 import Button from '../../components/Button';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { useAlert } from '../../context/AlertContext';
-import { GetNumberOfEmployees } from '../../reducer/jobsReducer';
+import { GetCity, GetCountry, GetNumberOfEmployees, GetOwnership, GetState } from '../../reducer/jobsReducer';
 import { UpdateRegistrationDetails } from '../../reducer/recruiterReducer';
 import { CustomDropdown } from '../PersonalInfo/PersonalInfo';
 
@@ -24,39 +24,35 @@ const BusinessDetails = () => {
     const [loading, setLoading] = useState(false);
 
     // Mock data for dropdowns
-    const [businessTypes] = useState([{ id: 'Company - Pty Ltd', name: 'Company - Pty Ltd' }, { id: 'Sole Trader', name: 'Sole Trader' }]);
+    const [businessTypes, setBusinessTypes] = useState([]);
     const [establishedYears] = useState(
         Array.from({ length: 50 }, (_, i) => ({ id: (2024 - i).toString(), name: (2024 - i).toString() }))
     );
-    const [countries] = useState([{ id: 'Australia', name: 'Australia' }]);
-    const [states] = useState([{ id: 'South Australia', name: 'South Australia' }, { id: 'Victoria', name: 'Victoria' }]);
-
+    const [countries, setCountries] = useState([]);
+    const [states, setStates] = useState([]);
+    const [cities, setCities] = useState([]);
     const [formData, setFormData] = useState({
-        legalbusinessname: user?.legalbusinessname || 'Roza Mexicano Pty Ltd',
         trendingname: user?.name,
-        abn: user?.abn,
-        acn: user?.acn,
-        businesstype: user?.businesstype || 'Company - Pty Ltd',
+        abn: user?.abn_number,
+        acn: user?.acn_number,
+        businesstype: user?.ownership_type_id,
         no_of_employees: String(user?.no_of_employees),
-        established: user?.established || '2018',
-        country: user?.country || 'Australia',
-        state: user?.state || 'South Australia',
-        city: user?.city || 'Norwood',
-        postcode: user?.postcode || '5067',
-        businessaddress: user?.businessaddress || '142 The Parade\nNorwood SA 5067',
-        invoiceemail: user?.invoiceemail || 'accounts@rozamexicano.com.au',
+        established: user?.established_in,
+        country: user?.country,
+        state: user?.state,
+        city: user?.city,
+        postcode: user?.postcode,
+        businessaddress: user?.company_address,
+        invoiceemail: user?.email,
     });
 
     useEffect(() => {
-        dispatch(GetNumberOfEmployees())
-            .unwrap()
-            .then(res => {
-                if (res?.success && res?.data) {
-                    setStaffSizes(res.data);
-                }
-            })
-            .catch(() => { });
-    }, [dispatch]);
+        dispatch(GetNumberOfEmployees()).unwrap().then(res => res?.success && res?.data && setStaffSizes(res.data))
+        dispatch(GetCountry()).unwrap().then(res => res?.success && res?.data && setCountries(res.data))
+        dispatch(GetOwnership()).unwrap().then(res => res?.success && res?.data && setBusinessTypes(res.data))
+        if (user?.country) dispatch(GetState({ id: user?.country })).unwrap().then(res => res?.success && res?.data && setStates(res.data))
+        if (user?.state) dispatch(GetCity({ id: user?.state })).unwrap().then(res => res?.success && res?.data && setCities(res.data))
+    }, [dispatch, user]);
 
     const handleSave = () => {
         if (!formData.trendingname?.trim()) {
@@ -65,7 +61,21 @@ const BusinessDetails = () => {
         }
 
         setLoading(true);
-        dispatch(UpdateRegistrationDetails(formData))
+        const data = {
+            name: formData.trendingname,
+            abn: formData.abn,
+            acn: formData.acn,
+            ownership_type_id: formData.businesstype,
+            no_of_employees: formData.no_of_employees,
+            established_in: formData.established,
+            country_id: formData.country,
+            state_id: formData.state,
+            city_id: formData.city,
+            postcode: formData.postcode,
+            location: formData.businessaddress,
+            email: formData.invoiceemail,
+        }
+        dispatch(UpdateRegistrationDetails(data))
             .unwrap()
             .then(res => {
                 setLoading(false);
@@ -150,7 +160,10 @@ const BusinessDetails = () => {
                             data={businessTypes}
                             placeholder="Select business type"
                             selectedValue={formData.businesstype}
-                            onSelect={val => setFormData(prev => ({ ...prev, businesstype: String(val) }))}
+                            onSelect={val => {
+                                console.log(val, "valvalval")
+                                setFormData({ ...formData, businesstype: val })
+                            }}
                             labelKey="name"
                             valueKey="id"
                             fontSize={responsiveFontSize(2)}
@@ -169,9 +182,9 @@ const BusinessDetails = () => {
                             Number of Employees
                         </Text>
                         <CustomDropdown
-                            data={staffSizes.map(item => ({ id: Number(item.id), name: item.name }))}
+                            data={staffSizes}
                             placeholder="Select staff size"
-                            selectedValue={Number(formData.no_of_employees) || 0}
+                            selectedValue={formData.no_of_employees}
                             onSelect={val => setFormData(prev => ({ ...prev, no_of_employees: String(val) }))}
                             labelKey="name"
                             valueKey="id"
@@ -219,7 +232,10 @@ const BusinessDetails = () => {
                             data={countries}
                             placeholder="Select country"
                             selectedValue={formData.country}
-                            onSelect={val => setFormData(prev => ({ ...prev, country: String(val) }))}
+                            onSelect={val => {
+                                dispatch(GetState({ id: val })).unwrap().then(res => res?.success && res?.data && setStates(res.data))
+                                setFormData({ ...formData, country: val })
+                            }}
                             labelKey="name"
                             valueKey="id"
                             fontSize={responsiveFontSize(2)}
@@ -242,7 +258,10 @@ const BusinessDetails = () => {
                             data={states}
                             placeholder="Select state"
                             selectedValue={formData.state}
-                            onSelect={val => setFormData(prev => ({ ...prev, state: String(val) }))}
+                            onSelect={val => {
+                                dispatch(GetCity({ id: val })).unwrap().then(res => res?.success && res?.data && setCities(res.data))
+                                setFormData({ ...formData, state: val })
+                            }}
                             labelKey="name"
                             valueKey="id"
                             fontSize={responsiveFontSize(2)}
@@ -250,13 +269,29 @@ const BusinessDetails = () => {
                             style={[styles.dropdownStyle, { borderColor: colors.surfaces }]}
                         />
                     </View>
-                    <InPutWithLabel
-                        label="CITY OR SUBURB"
-                        value={formData.city}
-                        onChangeText={text => setFormData(prev => ({ ...prev, city: text }))}
-                        mainColor={colors.primary}
-                        secondaryColor={colors.primary2}
-                    />
+                    <View style={{ marginBottom: responsiveHeight(1.5) }}>
+                        <Text
+                            style={{
+                                color: colors.primary2,
+                                fontSize: responsiveFontSize(1.8),
+                                fontWeight: '700',
+                            }}
+                        >
+                            CITY
+                        </Text>
+                        <CustomDropdown
+                            data={cities}
+                            placeholder="Select City"
+                            selectedValue={formData.city}
+                            onSelect={val => {
+                                setFormData(prev => ({ ...prev, city: val }))
+                            }}
+                            labelKey="name"
+                            valueKey="id"
+                            fontSize={responsiveFontSize(2)}
+                            style={[styles.dropdownStyle, { borderColor: colors.surfaces }]}
+                        />
+                    </View>
                     <InPutWithLabel
                         label="POSTCODE"
                         value={formData.postcode}

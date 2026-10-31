@@ -10,7 +10,6 @@ export async function postApiCall<T>(
 ): Promise<ApiResponse<T>> {
   const { as = 'json', } = opts;
   console.log(`${API_URL}${url}`, JSON.stringify(body), "resssssssssssss")
-
   const token = await AsyncStorage.getItem("token")
   const isForm = as === 'form';
   // const controller = new AbortController();
@@ -29,8 +28,8 @@ export async function postApiCall<T>(
       body: isForm ? (body as FormData) : JSON.stringify(body),
       // signal: controller.signal,
     });
-    console.log(`${API_URL}${url}`, JSON.stringify(body), headers, "resssssssssssss")
     const text = await res.text(); // <-- better than res.json() first
+    console.log(`${API_URL}${url}`, text, "resssssssssssss")
     let data: any = null;
     try { data = text ? JSON.parse(text) : null; } catch { data = text; }
 

@@ -12,7 +12,7 @@ import React, {
     useRef,
     useState,
 } from 'react';
-import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, TouchableOpacity, View } from 'react-native';
+import { Image, KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, TouchableOpacity, View } from 'react-native';
 import {
     responsiveFontSize,
     responsiveHeight,
@@ -401,6 +401,7 @@ export const ComponentSingUp = ({
                                 } else {
                                     dispatch(RecruiterRegister({ email: user.email, password: user.password, password_confirmation: user.confirmPassword, terms_of_use: true })).unwrap().then((res) => {
                                         setLoading(false);
+                                        console.log(res, "Company Registeration response");
                                         if (res.success) {
                                             startTimer();
                                             setStep(2)
@@ -508,7 +509,7 @@ export const ComponentSingUp = ({
                                 <Text style={{ color: colors.textSecondary, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '600', }}>Didn't get the code?</Text>
                                 {
                                     remainingSeconds === 0 ?
-                                        <Text                                        onPress={() => {
+                                        <Text onPress={() => {
                                             if (resendLoading) return;
                                             setResendLoading(true);
                                             if (type === "jobSeeker") {
@@ -542,7 +543,7 @@ export const ComponentSingUp = ({
                                 }
                             </View>
                             <Text style={{ color: colors.textSecondary, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '600', }}>Check your spam or junk folder before resending.</Text>
-                            <Pressable style={{ width: responsiveWidth(90), marginTop: responsiveHeight(1.5), aspectRatio: 350 / 57.2, }}>
+                            <Pressable onPress={() => Linking.openURL('mailto:')} style={{ width: responsiveWidth(90), marginTop: responsiveHeight(1.5), aspectRatio: 350 / 57.2, }}>
                                 <Image style={authStyles.bgImageCover} source={require("./images/OpenEmailApp.png")} />
                             </Pressable>
                             <Pressable style={{ width: responsiveWidth(90), marginTop: responsiveHeight(1.5), aspectRatio: 350 / 62, }}>

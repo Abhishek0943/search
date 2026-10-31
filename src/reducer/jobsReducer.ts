@@ -1,10 +1,13 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { deleteApiCall, getApiCall, patchApiCall, postApiCall, } from '../api';
-
 export const GetAllAvailabilities = createAsyncThunk<{ success: true; data: { id: string; name: string }[] } | ErrorResponse>('GetAllAvailabilities', () => getApiCall<{ success: true; data: { id: string; name: string }[] }>('/get-all-availabilities'));
 export const GetAllWorkRights = createAsyncThunk<{ success: true; data: { id: string; name: string }[] } | ErrorResponse>('GetAllWorkRights', () => getApiCall<{ success: true; data: { id: string; name: string }[] }>('/get-all-work-rights'));
 export const GetBookmarkJobs = createAsyncThunk<{ success: true, data: RoleItem[] } | ErrorResponse>('GetBookmarkJobs', () => getApiCall<{ success: true, data: RoleItem[] }>('/jobseekers/my-favourite-jobs'));
-export const GetJobByStatus = createAsyncThunk<{ success: true, data: RoleItem[] } | ErrorResponse>('GetJobByStatus', () => getApiCall<{ success: true, data: RoleItem[] }>('/company/jobs'));
+export const GetJobByStatus = createAsyncThunk<{ success: true, data: RoleItem[] } | ErrorResponse, { status?: string } | void>('GetJobByStatus', (params) => {
+  const status = params?.status;
+  const url = status ? `/company/jobs?status=${status}` : '/company/jobs';
+  return getApiCall<{ success: true, data: RoleItem[] }>(url);
+});
 export const deleteJob = createAsyncThunk<{ success: true, data: RoleItem[] } | ErrorResponse, { status: string }>('GetSuggestedJobs', (body) => postApiCall<{ success: true, data: RoleItem[] }>('/company/delete-RoleItem', body));
 export const UploadCV = createAsyncThunk<{ success: true, data: UploadCVRess } | ErrorResponse, {}>('UploadCV', (body) => postApiCall<{ success: true, data: RoleItem[] }>('/jobseekers/cv-save', body, { as: "form" }));
 export const UploadDocument = createAsyncThunk<{ success: true, data: RoleItem[] } | ErrorResponse, {}>('UploadDocument', (body) => postApiCall<{ success: true, data: RoleItem[] }>('/company/messages/upload-file', body, { as: "form" }));
@@ -282,11 +285,11 @@ export const UpdateProfile3 = createAsyncThunk<
   }
 );
 export const GetOwnership = createAsyncThunk<
-  { success: true, data: User } | ErrorResponse, {}
+  { success: true, data: Option[] } | ErrorResponse
 >(
   'GetOwnership',
   () => {
-    return getApiCall<{ success: true, data: User }>('/get-ownerships',);
+    return getApiCall<{ success: true, data: Option[] }>('/get-ownerships',);
   }
 );
 export const GetNumberOfOffices = createAsyncThunk<

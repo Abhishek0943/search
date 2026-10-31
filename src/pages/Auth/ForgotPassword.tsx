@@ -11,7 +11,7 @@ import React, {
     useRef,
     useState,
 } from 'react';
-import { Image, Pressable, TouchableOpacity, View } from 'react-native';
+import { Image, Linking, Pressable, TouchableOpacity, View } from 'react-native';
 import {
     responsiveFontSize,
     responsiveHeight,
@@ -302,7 +302,7 @@ const ForgotPassword = () => {
                                     : require("./images/SignedUpGoogleApple.png")
                             }
                         />
-                        <Text style={{ color: secondaryColor, textAlign: 'center', borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '900', marginTop: responsiveHeight(1), marginBottom: responsiveHeight(1.5) }}>Back to Log in</Text>
+                        <Pressable onPress={() => navigation.goBack()}><Text style={{ color: secondaryColor, textAlign: 'center', borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '900', marginTop: responsiveHeight(1), marginBottom: responsiveHeight(1.5) }}>Back to Log in</Text></Pressable>
                     </>
                 )
             case (2):
@@ -408,7 +408,7 @@ const ForgotPassword = () => {
                             }
                         </View>
                         <Text style={{ color: colors.textSecondary, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '600', }}>Check your spam or junk folder before resending.</Text>
-                        <Pressable style={{ width: responsiveWidth(90), marginTop: responsiveHeight(1.5), aspectRatio: 350 / 57.2, }}>
+                        <Pressable onPress={() => Linking.openURL('mailto:')} style={{ width: responsiveWidth(90), marginTop: responsiveHeight(1.5), aspectRatio: 350 / 57.2, }}>
                             <Image style={{ height: "100%", width: "100%", resizeMode: "cover" }} source={require("./images/OpenEmailApp.png")} />
                         </Pressable>
                         <Pressable style={{ width: responsiveWidth(90), marginTop: responsiveHeight(1.5), aspectRatio: 350 / 62, }}>

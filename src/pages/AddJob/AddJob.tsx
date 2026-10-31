@@ -54,7 +54,7 @@ const AddJob = () => {
     const [activePackages, setActivePackages] = useState<RecruiterPlanType[]>([]);
     const [industries, setIndustries] = useState<Option[]>([]);
     const [questionDetails, setQuestionDetails] = useState<{ screening: Question[] }>({ screening: [] });
-    const [step, setStep] = useState(5)
+    const [step, setStep] = useState(1)
     const editorRef = useRef<RichEditor | null>(null);
     const [isVisible, setIsVisible] = useState(false)
     const [isLoading, setIsLoading] = useState(false)

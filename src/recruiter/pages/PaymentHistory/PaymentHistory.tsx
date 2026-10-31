@@ -122,9 +122,9 @@ const PaymentHistory = () => {
         }}
         showsVerticalScrollIndicator={false}
       >
-        <TouchableOpacity style={{ marginBottom: responsiveHeight(2) }} onPress={() => navigation.goBack()}>
+        {/* <TouchableOpacity style={{ marginBottom: responsiveHeight(2) }} onPress={() => navigation.goBack()}>
           <Image source={imagePath.backIcon} style={{ width: 24, height: 24, tintColor: '#0F172A' }} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <Text style={{ fontSize: responsiveFontSize(3.5), fontWeight: '800', color: '#0F172A', marginBottom: 4 }}>
           Payment history
@@ -289,8 +289,7 @@ const PaymentHistory = () => {
             }}
           />
         )}
-
-        <View style={{ marginBottom: responsiveHeight(3) }}>
+        {/* <View style={{ marginBottom: responsiveHeight(3) }}>
           <Text style={{ fontSize: responsiveFontSize(2), fontWeight: '700', color: '#0F172A', marginBottom: responsiveHeight(1.5) }}>
             Payment method
           </Text>
@@ -326,8 +325,7 @@ const PaymentHistory = () => {
               </Text>
             </TouchableOpacity>
           </View>
-        </View>
-
+        </View> */}
         <Text style={{ fontSize: responsiveFontSize(1.4), color: '#94A3B8', fontWeight: '500', lineHeight: 20 }}>
           Invoices are emailed to accounts@rozamexicano.com.au{'\n'}Change this in Business details.
         </Text>

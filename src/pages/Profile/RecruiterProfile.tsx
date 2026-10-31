@@ -130,7 +130,7 @@ const RecruiterProfile = () => {
                                 paddingHorizontal: responsiveWidth(4),
                                 paddingVertical: responsiveHeight(1.5)
                             }}>
-                                <TouchableOpacity onPress={() => pickImage('image')} style={{
+                                <TouchableOpacity disabled style={{
                                     width: responsiveWidth(15), aspectRatio: 1,
                                     borderRadius: 20,
                                     backgroundColor: colors.primary + '18',

@@ -85,6 +85,7 @@ function RecruiterHome() {
             const json = await postApiCall(`/company/packages/${id}/intent`, {
                 currency,
             });
+            console.log(json)
             const clientSecret = json?.data?.client_secret;
             if (!clientSecret) {
                 return;
@@ -263,7 +264,12 @@ function RecruiterHome() {
                                 <View style={styles.headerRow}>
                                     <View style={styles.companyInfoRow}>
                                         <View style={styles.avatarWrap}>
-                                            <Text style={[styles.avatarText,]}>{companyInitial}</Text>
+                                            {
+                                                user?.avatar?.url ? <Image style={{ height: "100%", width: "100%", borderRadius: responsiveScreenHeight(10) }} source={{ uri: user.avatar.url }} /> :
+                                                    <Text style={[styles.avatarText,]}>{companyInitial}</Text>
+                                            }
+
+
                                         </View>
                                         <View style={styles.companyTextWrap}>
                                             <Text style={[styles.companyNameText, { color: colors.textPrimary }]}>{companyName}</Text>
@@ -424,7 +430,7 @@ export default RecruiterHome;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FAFAFC', // Very light background to match screenshot
+        backgroundColor: '#fff', // Very light background to match screenshot
     },
     listContent: {
         paddingHorizontal: responsiveScreenWidth(5),

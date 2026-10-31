@@ -48,7 +48,6 @@ const ApplicationProgressBar = ({ count }: { count: number }) => {
 const TABS = [
     { key: 'all', label: 'All' },
     { key: 'active', label: 'Live' },
-    { key: 'draft', label: 'Draft' },
     { key: 'expired', label: 'Closed' },
 ]
 
@@ -65,7 +64,7 @@ export default function OpenJobs() {
         useCallback(() => {
             setJob({ ...job, jobs: [] })
             setLoading(true)
-            dispatch(GetJobByStatus())
+            dispatch(GetJobByStatus(page === 'all' ? undefined : { status: page }))
                 .unwrap()
                 .then((res) => {
                     console.log(res, 'dfjsdfjshdkf')
@@ -80,7 +79,6 @@ export default function OpenJobs() {
     const getTabCount = (key: string) => {
         if (key === 'all') return job?.all_jobs_count || job?.active_jobs_count || 0
         if (key === 'active') return job?.active_jobs_count || 0
-        if (key === 'draft') return job?.draft_jobs_count || 0
         if (key === 'expired') return job?.expired_jobs_count || 0
         return 0
     }
@@ -92,37 +90,10 @@ export default function OpenJobs() {
 
     const getSubtitle = (item: any) => {
         const parts: string[] = []
-        if (item?.jobType) parts.push(item.jobType)
-        if (item?.salary) parts.push(`${item.salary_currency || ''}${formatSalaryRange(item.salary)}/${item?.salary_period?.salary_period || 'hr'}`)
-        if (item?.posted_at) parts.push(getTimeAgo(item.posted_at))
-        else if (item?.jobLocation) parts.push(item.jobLocation)
+        if (item?.pay?.show_salary) parts.push(`${item?.pay?.currency || ''}${formatSalaryRange(item?.pay?.salary_from)}-${formatSalaryRange(item?.pay?.salary_to)}/${item?.pay?.salary_period?.salary_period || 'hr'}`)
+        if (item?.closing_label) parts.push(item.closing_label)
         return parts.join(' · ')
     }
-
-    const handleDelete = async (item: any) => {
-        const ok = await showConfirm({
-            title: 'Delete',
-            message: 'Are you sure you want to delete this Job?',
-            okText: 'Delete',
-            cancelText: 'Cancel',
-        })
-        if (ok) {
-            dispatch(deleteJob({ id: item.id }))
-                .unwrap()
-                .then((res) => {
-                    res.success &&
-                        dispatch(GetJobByStatus({ status: page }))
-                            .unwrap()
-                            .then((res) => {
-                                if (res.success && 'data' in res) {
-                                    setJob(res?.data)
-                                }
-                                dispatch(RecruiterProfile())
-                            })
-                })
-        }
-    }
-
     return (
         <NavigationBar navigationBar={false}>
             <View style={styles.pageContainer}>
@@ -131,7 +102,6 @@ export default function OpenJobs() {
                     contentContainerStyle={{ paddingBottom: responsiveScreenHeight(4) }}
                     showsVerticalScrollIndicator={false}
                 >
-                    {/* ─── Header ─────────────────────────────── */}
                     <View style={styles.headerRow}>
                         <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
                             <Image style={{ height: '100%', width: '100%' }} source={imagePath.leftAngle} />
@@ -149,7 +119,6 @@ export default function OpenJobs() {
                         </TouchableOpacity>
                     </View>
 
-                    {/* ─── Tabs ───────────────────────────────── */}
                     <View style={styles.tabsContainer}>
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsScroll}>
                             {TABS.map((tab) => {

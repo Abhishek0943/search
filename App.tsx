@@ -112,7 +112,7 @@ const App: React.FC = () => (
     <Provider store={store}>
         <StripeProvider
             merchantIdentifier="merchant.com.searchtalent.app"
-            publishableKey="pk_live_51RYRHEKzQ210P9pldkRm88H5hzMQQuTDgU0Q2gON2YuTb5bVZkkoX0G9Mvizl2uYMxXmNTgIXALn8rRx2bOcQtZh002vm5EeQV">
+            publishableKey="pk_test_51RVQyZHHafdVN8eXBHV52epv6mRZA1RiQ51vwf9ayxPqfkzrRq5xi5VZjaQGJAAc9Gu3wgPOWiGjBmO7ypblVvFZ002X8Qa5HJ">
             <ThemeProvider key={1}>
                 <SocketProvider>
                     <AlertProvider>

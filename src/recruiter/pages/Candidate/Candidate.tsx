@@ -12,6 +12,7 @@ import { useAppDispatch } from "../../../store";
 import { JobCandidates } from "../../../reducer/recruiterReducer";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { routes } from "../../../constants/values";
+import NavigationBar from "../../components/NavigationBar";
 
 // ---- CONFIG -------------------------------------------------------------
 const VISIBLE_COUNT = 3; // candidates shown before "Show N more"
@@ -107,7 +108,7 @@ const SkillTag = ({ label }) => (
 );
 
 const CandidateCard = ({ item, onPress }) => {
-  const { user, match_percentage, application_id } = item;
+  const { user, match_percentage, application_id, created_at } = item;
   const navigation = useNavigation();
   return (
     <TouchableOpacity
@@ -130,8 +131,8 @@ const CandidateCard = ({ item, onPress }) => {
           {user.name}
         </Text>
         {
-          user?.location && <Text style={{ fontSize: 12, color: C.text, marginTop: 3 }} numberOfLines={1}>
-            {user.location}
+          created_at && <Text style={{ fontSize: 12, color: C.text, marginTop: 3 }} numberOfLines={1}>
+            Applied on {created_at}
           </Text>
         }
 
@@ -289,7 +290,8 @@ export default function CandidatesScreen({
   }, [jobId]);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
+    <NavigationBar navigationBar={false} >
+
       <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 12, paddingBottom: 24 }}>
         <Text style={{ fontSize: 30, fontWeight: "800", color: C.navy, marginBottom: 14 }}>Candidates</Text>
 
@@ -386,10 +388,9 @@ export default function CandidatesScreen({
             />
           ))}
       </ScrollView>
+    </NavigationBar>
 
-      <TabBar active="candidates" onChange={() => {
 
-      }} />
-    </SafeAreaView>
+
   );
 }

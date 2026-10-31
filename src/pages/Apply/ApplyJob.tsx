@@ -186,12 +186,12 @@ const ApplyJob = () => {
                     <View
                       style={{ flexDirection: 'row', gap: responsiveWidth(2.5), marginTop: responsiveWidth(.5), paddingVertical: 4, flexWrap: "wrap" }}
                     >
-                      {["yes", "no"].map((key2) => {
-                        const isSelected = value.answer === key2
+                      {[{ key: "yes", value: 1 }, { key: "no", value: 0 }].map((key2) => {
+                        const isSelected = value.answer == key2.value
                         return (
                           <Pressable
-                            key={key2}
-                            onPress={() => setCvs({ ...cvs, [key]: { ...value, answer: key2 } })}
+                            key={key2.key}
+                            onPress={() => setCvs({ ...cvs, [key]: { ...value, answer: key2.value } })}
                             style={{
                               backgroundColor: isSelected ? colors.primary : colors.white,
                               borderWidth: isSelected ? 0 : 1.5,
@@ -208,7 +208,7 @@ const ApplyJob = () => {
                               fontSize: responsiveFontSize(1.8),
                               fontWeight: '600',
                             }}>
-                              {key2.toUpperCase()}
+                              {key2.key.toUpperCase()}
                             </Text>
                           </Pressable>
                         );
