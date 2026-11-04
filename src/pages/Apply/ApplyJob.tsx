@@ -396,7 +396,9 @@ const ApplyJob = () => {
             </View>
           </ScrollView >
           <TouchableOpacity
+            disabled={loading}
             onPress={() => {
+              if (loading) return;
               const answers = Object.fromEntries(
                 Object.entries(cvs).map(([key, value]) => [key, value.answer])
               );
@@ -404,12 +406,23 @@ const ApplyJob = () => {
                 showAlert({ title: "Error", message: "Please upload your CV", })
                 return
               }
-              dispatch(ApplyJobs({ cv_id: cv.id, job_id: id, answers })).unwrap().then((data) => {
-                if (data.success) {
-                  showAlert({ title: "Success", message: "You have successfully applied for this job", })
-                  navigation.reset({ index: 0, routes: [{ name: routes.HOME }] })
-                }
-              })
+              setLoading(true);
+              dispatch(ApplyJobs({ cv_id: cv.id, job_id: id, answers }))
+                .unwrap()
+                .then((data) => {
+                  if (data.success) {
+                    showAlert({ title: "Success", message: data?.message || "You have successfully applied for this job", })
+                    navigation.reset({ index: 0, routes: [{ name: routes.HOME }] })
+                  } else {
+                    showAlert({ title: "Error", message: data?.message || "Failed to apply" });
+                  }
+                })
+                .catch((err) => {
+                  showAlert({ title: "Error", message: err?.message || "Failed to apply" });
+                })
+                .finally(() => {
+                  setLoading(false);
+                });
             }}
             style={{
               width: '90%',
@@ -422,16 +435,22 @@ const ApplyJob = () => {
               backgroundColor: colors.primary,
               paddingHorizontal: responsiveScreenWidth(3),
               paddingVertical: responsiveScreenHeight(2),
+              opacity: loading ? 0.7 : 1,
             }}
           >
-            <Text
-              style={{
-                color: colors.white,
-                fontSize: responsiveScreenFontSize(1.8),
-              }}
-            >
-              Apply
-            </Text>
+            {loading ? (
+              <ActivityIndicator color={colors.white} />
+            ) : (
+              <Text
+                style={{
+                  color: colors.white,
+                  fontSize: responsiveScreenFontSize(1.8),
+                  fontWeight: '700',
+                }}
+              >
+                Apply
+              </Text>
+            )}
           </TouchableOpacity>
         </>
 

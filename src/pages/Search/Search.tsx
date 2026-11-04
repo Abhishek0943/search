@@ -19,9 +19,12 @@ import {
   View,
 } from 'react-native';
 import {
+  responsiveFontSize,
+  responsiveHeight,
   responsiveScreenFontSize,
   responsiveScreenHeight,
   responsiveScreenWidth,
+  responsiveWidth,
 } from 'react-native-responsive-dimensions';
 import { routes } from '../../constants/values';
 import { useAppDispatch, useAppSelector } from '../../store';
@@ -450,6 +453,7 @@ export const CustomMultiDropdown = ({
   onSelect = (arr: any[]) => { },
   labelKey = "name",
   valueKey = "id",
+  label
 }) => {
   const [visible, setVisible] = useState(false);
   const [query, setQuery] = useState("");
@@ -485,19 +489,27 @@ export const CustomMultiDropdown = ({
 
   return (
     <>
+      <Text style={{
+        fontSize: responsiveFontSize(1.8),
+        fontWeight: '700', color: colors.primary2,
+        marginTop: responsiveHeight(1),
+      }}>
+        {label}
+      </Text>
       <TouchableOpacity
         onPress={() => {
           setQuery("");
           setVisible(true);
         }}
         style={{
-          borderWidth: 1,
-          width: "100%",
-          borderRadius: 6,
-          borderColor: colors.mediumGray,
-          paddingHorizontal: responsiveScreenWidth(3),
-          paddingVertical: responsiveScreenHeight(1.3),
-          marginTop: responsiveScreenHeight(1),
+          flexDirection: 'row',
+          alignItems: 'center',
+          borderWidth: 1.5,
+          borderRadius: 15,
+          width: responsiveWidth(90),
+          aspectRatio: 350 / 52,
+          paddingHorizontal: responsiveWidth(4),
+          borderColor: colors.surfaces,
         }}
       >
         <Text
@@ -512,7 +524,6 @@ export const CustomMultiDropdown = ({
       </TouchableOpacity>
 
       <Modal visible={visible} transparent animationType="fade">
-        {/* overlay */}
         <Pressable
           onPress={() => setVisible(false)}
           style={{
@@ -522,7 +533,6 @@ export const CustomMultiDropdown = ({
             paddingHorizontal: 20,
           }}
         >
-          {/* modal card - stop overlay close */}
           <Pressable
             onPress={() => { }}
             style={{
@@ -532,7 +542,6 @@ export const CustomMultiDropdown = ({
               maxHeight: "60%",
             }}
           >
-            {/* search input */}
             <View
               style={{
                 borderWidth: 1,

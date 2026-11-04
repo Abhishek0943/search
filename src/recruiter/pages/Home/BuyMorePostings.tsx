@@ -80,22 +80,18 @@ function BuyMorePostings() {
     }
 
     async function onSelectPlan(item: any) {
-        if (!item) return;
         if (isSelecting) return;
         if (item.price.amount === 0) return free(item.id)
-
         if (Platform.OS === 'ios') {
             return buyIosWithRevenueCat(item)
         }
-
         return pay(item.price.currency, item.id)
     }
-
-    async function pay(currency: string, id: string | number) {
+    async function pay(currency, id) {
         try {
             if (!id) return
             setIsSelecting(true);
-            const json = await postApiCall<any>(`/company/packages/${id}/intent`, {
+            const json = await postApiCall(`/company/packages/${id}/intent`, {
                 currency,
             });
             const clientSecret = json?.data?.client_secret;
@@ -115,15 +111,15 @@ function BuyMorePostings() {
                 style: 'alwaysLight',
                 appearance: {
                     colors: {
-                        primary: colors.primary,
-                        background: colors.white,
-                        componentBackground: colors.gray,
-                        componentBorder: colors.gray,
-                        componentDivider: colors.gray,
-                        primaryText: colors.textPrimary,
-                        secondaryText: colors.textSecondary,
-                        placeholderText: colors.textSecondary,
-                        icon: colors.textPrimary,
+                        primary: colors.primary,        // main button
+                        background: '#FFFFFF',     // sheet bg
+                        componentBackground: '#F2F2F7',
+                        componentBorder: '#D1D1D6',
+                        componentDivider: '#E5E5EA',
+                        primaryText: '#111111',
+                        secondaryText: '#6B7280',
+                        placeholderText: '#9CA3AF',
+                        icon: '#111111',
                         error: '#FF3B30',
                     },
                     shapes: {
@@ -152,8 +148,8 @@ function BuyMorePostings() {
         } finally {
             setIsSelecting(false);
         }
-    }
 
+    }
     useFocusEffect(useCallback(
         () => {
             setIsLoadingProfile(true);
@@ -161,7 +157,6 @@ function BuyMorePostings() {
         },
         [],
     ))
-
     async function free(id: string | number) {
         if (!id) return
         setIsSelecting(true);
@@ -211,7 +206,6 @@ function BuyMorePostings() {
                                     plan?.plans?.map((item, index) => {
                                         const isExpanded = expandedPlanId === item.id;
                                         const isPopular = item.name?.toLowerCase().includes('gold') || item.name?.toLowerCase().includes('popular');
-
                                         return (
                                             <TouchableOpacity
                                                 key={index + "BuyMorePostings"}

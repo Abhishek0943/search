@@ -326,7 +326,6 @@ const ForgotPassword = () => {
                         <Text style={{ color: secondaryColor, borderWidth: 1, lineHeight: responsiveFontSize(3.6), fontSize: responsiveFontSize(3.5), fontWeight: '700', marginTop: responsiveHeight(3) }}>Check your email</Text>
                         <Text style={{ color: colors.textSecondary, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '600', marginTop: responsiveHeight(1.5) }}>We sent a 6-digit code by email.</Text>
                         <Text style={{ color: colors.textSecondary, borderWidth: 1, lineHeight: responsiveFontSize(2.6), fontSize: responsiveFontSize(1.9), fontWeight: '600', }}>It expires in 10 minutes.</Text>
-
                         <View
                             style={{
                                 flexDirection: 'row',

@@ -126,6 +126,7 @@ const BusinessDetails = () => {
                         inputContainerStyle={{
                             marginBottom: responsiveHeight(0.5),
                         }}
+                        editable={false}
                         onChangeText={text => setFormData(prev => ({ ...prev, abn: text }))}
                         placeholder="e.g. 51 824 753 556"
                         keyboardType="numeric"
@@ -139,6 +140,7 @@ const BusinessDetails = () => {
                         inputContainerStyle={{
                             marginBottom: responsiveHeight(0.5),
                         }}
+                        editable={false}
                         onChangeText={text => setFormData(prev => ({ ...prev, acn: text }))}
                         placeholder="e.g. 004 085 616"
                         keyboardType="numeric"
@@ -297,6 +299,7 @@ const BusinessDetails = () => {
                         value={formData.postcode}
                         onChangeText={text => setFormData(prev => ({ ...prev, postcode: text }))}
                         keyboardType="numeric"
+                        maxLength={6}
                         mainColor={colors.primary}
                         secondaryColor={colors.primary2}
                     />
@@ -312,8 +315,8 @@ const BusinessDetails = () => {
                     <InPutWithLabel
                         label="INVOICE EMAIL"
                         value={formData.invoiceemail}
+                        editable={false}
                         inputContainerStyle={{ marginBottom: responsiveHeight(0.2) }}
-                        onChangeText={text => setFormData(prev => ({ ...prev, invoiceemail: text }))}
                         keyboardType="email-address"
                         mainColor={colors.primary}
                         secondaryColor={colors.primary2}

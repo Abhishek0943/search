@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react';
 import { TextInput, TextInputProps } from 'react-native';
 
-const CustomTextInput = forwardRef<TextInput, TextInputProps>((props, ref) => {
+const CustomTextInput = forwardRef<TextInput, TextInputProps>((props: TextInputProps, ref) => {
   const { onChangeText, ...rest } = props;
   const handleChangeText = (text: string) => {
     // Regex to remove emojis
@@ -19,6 +19,7 @@ const CustomTextInput = forwardRef<TextInput, TextInputProps>((props, ref) => {
       ref={ref}
       contextMenuHidden={true} // Disables copy/paste
       {...rest}
+
       onChangeText={handleChangeText}
     />
   );

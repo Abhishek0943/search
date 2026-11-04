@@ -37,6 +37,8 @@ const Login = () => {
   const { showAlert } = useAlert();
   const insets = useSafeAreaInsets();
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [keepLoggedIn, setKeepLoggedIn] = useState(false);
 
   const handleGoogleLogin = async () => {
     if (googleLoading) return;
@@ -120,8 +122,8 @@ const Login = () => {
               )
             }} value={user.password} onChangeText={(text) => handleInputChange({ name: "password", value: text })} placeholder="Password" mainColor={''} secondaryColor={''} />
             <View style={authStyles.checkboxRow}>
-              <Pressable style={authStyles.checkboxIcon}>
-                <Image style={authStyles.bgImage} source={imagePath.Check} />
+              <Pressable onPress={() => setKeepLoggedIn(!keepLoggedIn)} style={[authStyles.checkboxIcon, { backgroundColor: keepLoggedIn ? 'transparent' : '#E5E7EB', borderRadius: 4, justifyContent: 'center', alignItems: 'center' }]}>
+                {keepLoggedIn && <Image style={authStyles.bgImage} source={imagePath.Check} />}
               </Pressable>
               <Text style={{ color: colors.primary2, fontSize: responsiveFontSize(1.8), fontWeight: '600' }}>
                 Keep me logged in on this phone
@@ -130,8 +132,10 @@ const Login = () => {
 
             <Button
               label="Log in"
+              loading={loginLoading}
               backgroundColor={colors.primary}
               onPress={() => {
+                setLoginLoading(true);
                 dispatch(LoginByPassword({ email: user.email, password: user.password })).unwrap().then(async (res) => {
                   if (res.success) {
                     showAlert({
@@ -163,7 +167,7 @@ const Login = () => {
                   }
                 }).catch((error) => {
                   console.log("login failed", error)
-                })
+                }).finally(() => setLoginLoading(false))
               }}
             />
             <Pressable style={authStyles.loginDivider}>

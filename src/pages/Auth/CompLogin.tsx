@@ -88,7 +88,6 @@ const CompLogin = () => {
             });
             return;
         }
-
         if (!user.password) {
             showAlert({
                 title: "Validation",
@@ -96,7 +95,6 @@ const CompLogin = () => {
             });
             return;
         }
-
         if (loading) return;
         try {
             setLoading(true);
@@ -139,6 +137,7 @@ const CompLogin = () => {
             setLoading(false);
         }
     };
+    const [keepLoggedIn, setKeepLoggedIn] = useState(false);
 
 
     const checkCompanyRegistration = async () => {
@@ -223,8 +222,8 @@ const CompLogin = () => {
                             )
                         }} value={user.password} onChangeText={(text) => handleInputChange({ name: "password", value: text })} placeholder="Password" mainColor={''} secondaryColor={''} />
                         <View style={authStyles.checkboxRow}>
-                            <Pressable style={authStyles.checkboxIcon}>
-                                <Image style={authStyles.bgImage} source={imagePath.CompCheck} />
+                            <Pressable onPress={() => setKeepLoggedIn(!keepLoggedIn)} style={[authStyles.checkboxIcon, { backgroundColor: keepLoggedIn ? 'transparent' : '#E5E7EB', borderRadius: 4, justifyContent: 'center', alignItems: 'center' }]}>
+                                {keepLoggedIn && <Image style={authStyles.bgImage} source={imagePath.Check} />}
                             </Pressable>
                             <Text style={{ color: colors.primary2, fontSize: responsiveFontSize(1.8), fontWeight: '600' }}>
                                 Keep me logged in on this phone

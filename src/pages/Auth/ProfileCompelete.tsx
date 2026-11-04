@@ -25,6 +25,8 @@ import RNFS from 'react-native-fs';
 import PdfThumbnail from 'react-native-pdf-thumbnail';
 import { routes } from '../../constants/values';
 import authStyles from './styles';
+import { CustomMultiDropdown } from '../Search/Search';
+import { CustomDropdown } from '../PersonalInfo/PersonalInfo';
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 export const formatDateToMonthYear = (dateStr?: string | null) => {
     if (!dateStr) return 'Still here';
@@ -368,32 +370,34 @@ function ProfileCompelete(): ReactElement {
                         </Pressable>
 
                         <ScrollView showsVerticalScrollIndicator={false}>
-                            <InPutWithLabel inputContainerStyle={{ marginBottom: responsiveHeight(.5) }} mainColor={colors.primary} secondaryColor={colors.primary2} label={'First Name'} value={user.name} onChangeText={(text) => handleInputChange({ name: "name", value: text })} placeholder="Enter your first name" />
+                            <InPutWithLabel inputContainerStyle={{ marginBottom: responsiveHeight(.5) }} mainColor={colors.primary} secondaryColor={colors.primary2} label={'Full Name'} value={user.name} onChangeText={(text) => handleInputChange({ name: "name", value: text })} placeholder="Enter your first name" />
                             <InPutWithLabel inputContainerStyle={{ marginBottom: responsiveHeight(.5) }} mainColor={colors.primary} secondaryColor={colors.primary2} label={'Address'} value={user.address} onChangeText={(text) => handleInputChange({ name: "address", value: text })} placeholder="Enter your address" />
-                            <SearchSelectDropdown
+                            <CustomMultiDropdown
+                                data={availabilityOptions}
+                                placeholder="Select Subjects"
                                 label="Availability"
-                                options={availabilityOptions}
-                                placeholder="Search availability..."
-                                multiSelect={true}
-                                selectedIds={user.availabilityIds}
-                                onToggle={(id) => {
+                                selectedValues={user.availabilityIds}
+                                onSelect={(arr: number[]) => {
                                     setUser(prev => {
-                                        const already = prev.availabilityIds.includes(id);
-                                        return { ...prev, availabilityIds: already ? prev.availabilityIds.filter(i => i !== id) : [...prev.availabilityIds, id], };
+                                        return { ...prev, availabilityIds: arr };
                                     })
                                 }}
+                                labelKey="name"
+                                valueKey="id"
                             />
-                            <SearchSelectDropdown
+                            <CustomDropdown
+                                data={workRightsOptions}
+                                placeholder="Select"
                                 label="Work rights"
-                                options={workRightsOptions}
-                                placeholder="Search work rights..."
-                                multiSelect={false}
-                                selectedId={user.workRightsId}
+                                selectedValue={user.workRightsId}
                                 onSelect={(id) => {
                                     setUser(prev => {
                                         return { ...prev, workRightsId: id };
                                     })
+
                                 }}
+                                labelKey="name"
+                                valueKey="id"
                             />
                         </ScrollView>
                         <View style={{ flex: 1 }}>
@@ -479,36 +483,34 @@ function ProfileCompelete(): ReactElement {
                         <Pressable style={{ width: responsiveWidth(100), marginTop: responsiveHeight(2), aspectRatio: 350 / 1, position: "relative", right: responsiveWidth(5), }}>
                             <Image style={authStyles.bgImageContain} source={require("./images/Devider2.png")} />
                         </Pressable>
-                        <SearchSelectDropdown
+                        <CustomDropdown
+                            data={industryOptions}
+                            placeholder="Select"
                             label="Industries"
-                            options={industryOptions}
-                            placeholder="Search industries..."
-                            multiSelect={false}
-                            selectedId={user.industryId}
+                            selectedValue={user.industryId}
                             onSelect={(id) => setUser(prev => ({ ...prev, industryId: id }))}
+                            labelKey="name"
+                            valueKey="id"
                         />
-                        <SearchSelectDropdown
+                        <CustomMultiDropdown
+                            data={skillOptions}
+                            placeholder="Select Skills"
                             label="Skills"
-                            options={skillOptions}
-                            placeholder="Search skills..."
-                            multiSelect={true}
-                            selectedIds={user.skillIds}
-                            onToggle={(id) => setUser(prev => {
-                                const already = prev.skillIds.includes(id);
-                                return {
-                                    ...prev,
-                                    skillIds: already
-                                        ? prev.skillIds.filter(i => i !== id)
-                                        : [...prev.skillIds, id],
-                                };
-                            })}
+                            selectedValues={user.skillIds}
+                            onSelect={(arr: number[]) => {
+                                setUser(prev => {
+                                    return { ...prev, skillIds: arr };
+                                })
+                            }}
+                            labelKey="name"
+                            valueKey="id"
                         />
+
                         <View style={{ flex: 1 }}>
                         </View>
                         <Pressable style={{ width: responsiveWidth(100), marginBottom: responsiveHeight(2.5), aspectRatio: 350 / 1, position: "relative", right: responsiveWidth(5), }}>
                             <Image style={authStyles.bgImageContain} source={require("./images/Devider2.png")} />
                         </Pressable>
-
                         <Button
                             label="Continue"
                             backgroundColor={colors.primary}
@@ -630,7 +632,7 @@ function ProfileCompelete(): ReactElement {
                                 </View>
                             </View>
 
-                            <View style={{ flexDirection: 'row', alignItems: "baseline", gap: responsiveWidth(1), marginBottom: responsiveHeight(0.5), marginTop: responsiveHeight(1) }}>
+                            {/* <View style={{ flexDirection: 'row', alignItems: "baseline", gap: responsiveWidth(1), marginBottom: responsiveHeight(0.5), marginTop: responsiveHeight(1) }}>
 
                                 <Text style={{ color: colors.textPrimary, fontSize: responsiveFontSize(1.6), fontWeight: '700', letterSpacing: 0.5 }}>
                                     VIDEO INTRO
@@ -642,9 +644,9 @@ function ProfileCompelete(): ReactElement {
                                     color: colors.textSecondary,
                                     flexWrap: "wrap",
                                 }}>(Optional)</Text>
-                            </View>
+                            </View> */}
 
-                            <View style={{
+                            {/* <View style={{
                                 borderWidth: 1.5,
                                 borderRadius: 12,
                                 borderColor: colors.surfaces,
@@ -728,9 +730,9 @@ function ProfileCompelete(): ReactElement {
                                         {user.profileVideoUrl ? 'Change video' : 'Upload a file'}
                                     </Text>
                                 </Pressable>
-                            </View>
+                            </View> */}
 
-                            <View style={{ flexDirection: 'row', alignItems: "baseline", gap: responsiveWidth(1), marginBottom: responsiveHeight(0.5), }}>
+                            {/* <View style={{ flexDirection: 'row', alignItems: "baseline", gap: responsiveWidth(1), marginBottom: responsiveHeight(0.5), }}>
                                 <Text style={{ color: colors.textPrimary, fontSize: responsiveFontSize(1.6), fontWeight: '700', letterSpacing: 0.5 }}>
                                     PROMPT 1 OF 2
                                 </Text>
@@ -801,7 +803,7 @@ function ProfileCompelete(): ReactElement {
                                 <Text style={{ alignSelf: 'flex-end', marginBottom: responsiveHeight(1), color: colors.textSecondary, fontSize: responsiveFontSize(1.4), marginTop: responsiveHeight(0.5) }}>
                                     {(user.prompt2 || '').length} / 200
                                 </Text>
-                            </View>
+                            </View> */}
 
                             <View style={{
                                 marginBottom: responsiveHeight(2),
@@ -1221,10 +1223,9 @@ function ProfileCompelete(): ReactElement {
                                         availability_ids: parsed.availabilityIds || [],
                                     };
                                     const res: any = await postApiCall('/jobseekers/user/profile/update', payload);
-                                    console.log(res)
                                     if (res.success) {
                                         await AsyncStorage.removeItem("user");
-                                        navigation.reset({ index: 0, routes: [{ name: routes.HOME }] });
+                                        navigation.reset({ index: 0, routes: [{ name: routes.SPLASH }] });
                                     } else {
                                         Alert.alert('Error', res.message || 'Profile update failed');
                                     }
@@ -1306,6 +1307,7 @@ function ProfileCompelete(): ReactElement {
                                                 value={currentRole.jobTitle}
                                                 onChangeText={(t) => setCurrentRole(prev => ({ ...prev, jobTitle: t }))}
                                                 placeholder="e.g. Barista"
+                                                maxLength={20}
                                                 placeholderTextColor={colors.placeholder}
                                                 style={{ fontSize: responsiveFontSize(1.9), color: colors.textPrimary }}
                                             />

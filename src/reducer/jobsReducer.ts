@@ -152,11 +152,11 @@ export const DeleteBlog = createAsyncThunk<
   }
 );
 export const GetFilter = createAsyncThunk<
-  { success: true, data: { filter: { filter: string, option: string[] | { id: number, name: string }[] }[] } } | ErrorResponse, { search?: string }
+  { success: true, data: { filter: { filter: string, option: string[] | { id: number, name: string }[] }[] } } | ErrorResponse
 >(
   'GetFilter',
-  ({ search }) => {
-    return getApiCall<{ success: true, data: { filter: { filter: string, option: string[] | { id: number, name: string }[] }[] } }>('/jobseekers/Job-filters');
+  () => {
+    return getApiCall<{ success: true, data: { filter: { filter: string, option: string[] | { id: number, name: string }[] }[] } }>('/jobseekers/job-filters');
   }
 );
 export const GetChatsSeeker = createAsyncThunk<

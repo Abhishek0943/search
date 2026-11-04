@@ -383,6 +383,37 @@ export const ComponentSingUp = ({
                             label={loading ? "Sending..." : "Send Verification Code"}
                             backgroundColor={mainColor}
                             onPress={() => {
+                                // Validation
+                                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                                if (!user.email.trim()) {
+                                    showAlert({ title: "Validation", message: "Email is required" });
+                                    return;
+                                }
+                                if (!emailRegex.test(user.email.trim())) {
+                                    showAlert({ title: "Validation", message: "Please enter a valid email address" });
+                                    return;
+                                }
+                                if (!user.password) {
+                                    showAlert({ title: "Validation", message: "Password is required" });
+                                    return;
+                                }
+                                if (user.password.length < 8) {
+                                    showAlert({ title: "Validation", message: "Password must be at least 8 characters" });
+                                    return;
+                                }
+                                if (!user.confirmPassword) {
+                                    showAlert({ title: "Validation", message: "Confirm password is required" });
+                                    return;
+                                }
+                                if (user.password !== user.confirmPassword) {
+                                    showAlert({ title: "Validation", message: "Passwords do not match" });
+                                    return;
+                                }
+                                if (user.mobile && !/^\d{10}$/.test(user.mobile.trim())) {
+                                    showAlert({ title: "Validation", message: "Mobile number must be exactly 10 digits" });
+                                    return;
+                                }
+
                                 setLoading(true);
                                 if (type === "jobSeeker") {
                                     dispatch(UserRegister({ email: user.email, password: user.password, password_confirmation: user.confirmPassword, terms_of_use: true })).unwrap().then((res) => {

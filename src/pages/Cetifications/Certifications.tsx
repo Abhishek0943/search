@@ -20,17 +20,16 @@ import { NavigationBar } from '../../components';
 import { Header } from '../Company/Company';
 import { ThemeContext } from '../../context/ThemeProvider';
 import Text from '../../components/Text';
-import ImagePicker from 'react-native-image-crop-picker';
-import { launchImageLibrary } from 'react-native-image-picker';
+import { pick, types } from '@react-native-documents/picker';
 import { postApiCall } from '../../api';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAppDispatch, useAppSelector } from '../../store';
-import { DeleteCertificate } from '../../reducer/jobsReducer';
+import { DeleteCertificate, ProfileData } from '../../reducer/jobsReducer';
 import { useAlert } from '../../context/AlertContext';
 import Icon from '../../utils/Icon';
-import { check, request, PERMISSIONS, RESULTS, Permission } from 'react-native-permissions';
+import { useNavigation } from '@react-navigation/native';
 const Certifications = () => {
     const { colors } = useContext(ThemeContext);
+    const navigation = useNavigation()
     const dispatch = useAppDispatch();
     const { showConfirm } = useAlert();
     const [certTitle, setCertTitle] = useState('');
@@ -54,13 +53,19 @@ const Certifications = () => {
                 Alert.alert('Upload Failed', res?.message || 'Something went wrong');
             }
             if (res.success) {
-
+                dispatch(ProfileData());
             }
         } catch (e) {
             Alert.alert('Upload Failed', 'Network error. Please try again.');
         } finally {
             setUploadingMedia(null);
         }
+    };
+
+    const normalizeFileUri = (u?: string) => {
+        if (!u) return '';
+        if (u.startsWith('/')) return `file://${u}`;
+        return u;
     };
 
     const pickCertImage = async () => {
@@ -70,51 +75,40 @@ const Certifications = () => {
         }
 
         try {
-            // For Android 13 and above, bypass standard permission-dependent galleries completely
-            if (Platform.OS === 'android' && Platform.Version >= 33) {
-                const response = await launchImageLibrary({
-                    mediaType: 'photo',
-                    quality: 1,
-                });
+            const [doc] = await pick({
+                type: [types.images],
+                allowMultiSelection: false,
+                mode: 'import',
+            });
 
-                if (response.didCancel) {
-                    console.log('User cancelled image selection');
-                    return;
-                }
+            if (!doc) return;
 
-                if (response.assets && response.assets.length > 0) {
-                    const selectedAsset = response.assets[0];
+            const uri = normalizeFileUri((doc as any).fileCopyUri || doc.uri);
+            const fileName = doc.name || `cert_${Date.now()}.${doc.type || 'image/jpeg'}`;
+            const file = {
+                uri,
+                name: fileName,
+                type: doc.type || 'image/jpeg',
+            };
 
-                    const file = {
-                        uri: selectedAsset.uri,
-                        name: selectedAsset.fileName || `cert_${Date.now()}.jpg`,
-                        type: selectedAsset.type || 'image/jpeg',
-                    };
-
-                    setCertImage(file);
-                    uploadMediaToApi('certificate', file, { certificate_title: certTitle });
-                    setCertTitle('');
-                }
-                return;
-            }
-
-            // --- Legacy Fallback logic for iOS & Older Android Versions ---
-            // (Insert your previous working permission check + react-native-image-crop-picker fallback code here)
-
+            setCertImage(file);
+            await uploadMediaToApi('certificate', file, { certificate_title: certTitle });
+            setCertTitle('');
+            navigation.goBack();
         } catch (e) {
             console.log('Error selecting image:', e);
         }
     };
 
     // Extracted helper logic to clean up file formatting
-    const processSelectedImage = (image) => {
-        const fileName = `cert_${Date.now()}.${image.mime?.includes('png') ? 'png' : 'jpg'}`;
-        const file = { uri: image.path, name: fileName, type: image.mime || 'image/jpeg' };
+    // const processSelectedImage = (image) => {
+    //     const fileName = `cert_${Date.now()}.${image.mime?.includes('png') ? 'png' : 'jpg'}`;
+    //     const file = { uri: image.path, name: fileName, type: image.mime || 'image/jpeg' };
 
-        setCertImage(file);
-        uploadMediaToApi('certificate', file, { certificate_title: certTitle });
-        setCertTitle('');
-    };
+    //     setCertImage(file);
+    //     uploadMediaToApi('certificate', file, { certificate_title: certTitle });
+    //     setCertTitle('');
+    // };
     return (
         <NavigationBar navigationBar={false}>
             <ScrollView
@@ -209,13 +203,7 @@ const Certifications = () => {
                                 cancelText: "Cancel",
                                 onOkPress: () => {
                                     const value = dispatch(DeleteCertificate({ id: String(cert.id) })).unwrap().then(async (res) => {
-                                        // const updatedCertificates = user?.certificates.filter((c: any) => c.id !== cert.id);
-
-                                        // const userData = await AsyncStorage.getItem("user");
-                                        // const parsed = userData ? JSON.parse(userData) : {};
-                                        // await AsyncStorage.setItem("user", JSON.stringify({ ...parsed, certificates: updatedCertificates }));
-
-                                        // setCertificates(updatedCertificates);
+                                        dispatch(ProfileData())
                                         return true
                                     }).catch(err => {
                                         console.error(err)

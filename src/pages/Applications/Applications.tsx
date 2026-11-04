@@ -10,6 +10,8 @@ import { GetJobApplication } from '../../reducer/jobsReducer'
 import Text from '../../components/Text'
 import Button from '../../components/Button'
 import { LogInModel } from '../Chat/Chat'
+import { openBrowser } from '../Resume/Resume'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 const STATUS_CONFIG: Record<string, { label: string; bg: string; color: string; borderColor?: string }> = {
   applied: { label: 'SENT', bg: '#E8F5E9', color: '#2E7D32', borderColor: '#2E7D32' },
   shortlist: { label: 'SHORTLISTED', bg: '#E8F5E9', color: '#2E7D32', borderColor: '#2E7D32' },
@@ -172,7 +174,10 @@ const ApplyJob = () => {
     return (
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={() => navigation.navigate("asjdfhajsdf", { id: item.application_id })}
+        onPress={async () => {
+          const token = await AsyncStorage.getItem('token')
+          openBrowser(item.assignment + `?token=${token}`, colors.primary, false)
+        }}
         style={{
           backgroundColor: '#FFFFFF',
           borderRadius: 16,
@@ -278,7 +283,7 @@ const ApplyJob = () => {
       <View style={{ width: responsiveWidth(100), aspectRatio: 390 / 440, position: "relative", right: responsiveWidth(5), marginVertical: responsiveHeight(2) }}>
         <Image source={require("./ApplicationsNotFound.png")} style={{ width: "100%", height: "100%", }} />
       </View>
-      <Button backgroundColor={colors.primary} label='Find a job to apply for' />
+      <Button backgroundColor={colors.primary} onPress={() => navigation.reset({ index: 0, routes: [{ name: routes.HOME }] })} label='Find a job to apply for' />
     </>
 
   )

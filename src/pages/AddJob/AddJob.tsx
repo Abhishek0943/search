@@ -122,14 +122,8 @@ const AddJob = () => {
 
     const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
     useEffect(() => {
-        console.log("questionDetails 1",)
-
         if (saveTimer.current) clearTimeout(saveTimer.current);
-        console.log("questionDetails 2",)
-
         saveTimer.current = setTimeout(() => {
-            console.log("questionDetails 3",)
-
             AsyncStorage.setItem(DRAFT_KEY, JSON.stringify({ formData, dis, questionDetails }));
         }, 500);
         return () => { if (saveTimer.current) clearTimeout(saveTimer.current); };
@@ -169,6 +163,9 @@ const AddJob = () => {
             num_of_positions: formData.num_of_positions,
             screening: questionDetails.screening.map((item: any) => ({
                 ...item,
+                ...(item?.content?.type === "yes_no" && {
+                    expected_boolean: item?.expected_boolean ? 1 : 0
+                })
             })),
             versions: formData.versions
         };
@@ -193,6 +190,7 @@ const AddJob = () => {
         //         .catch(() => { setIsLoading(false); });
         // }
         // else {
+        console.log('payloa', payload.screening)
         dispatch(AddNewJob(payload)).unwrap()
             .then(res => {
                 if (res?.success) {
@@ -732,6 +730,15 @@ const AddJob = () => {
                                 });
                                 return;
                             }
+                            if (formData.salary && formData.salaryTo) {
+                                if (formData.salary > formData.salaryTo) {
+                                    showAlert({
+                                        title: "Validation",
+                                        message: "Salary From should be less than or equal to Salary To.",
+                                    });
+                                    return;
+                                }
+                            }
                             setStep(4);
                         }} style={{
                             marginBottom: responsiveHeight(2.5),
@@ -1112,16 +1119,42 @@ const AddJob = () => {
                                                             </Text>
 
                                                             <View style={{ flexDirection: 'row', gap: responsiveScreenWidth(6) }}>
-                                                                <Pressable onPress={() => handleChange('isFreelance', true)} style={styles.radioRow}>
+                                                                <Pressable
+                                                                    onPress={() => {
+                                                                        setQuestionDetails(prev => ({
+                                                                            ...prev,
+                                                                            screening: prev.screening.map(q =>
+                                                                                q.question_id === item.question_id
+                                                                                    ? { ...q, expected_boolean: true }
+                                                                                    : q
+                                                                            )
+                                                                        }));
+                                                                    }}
+                                                                    style={styles.radioRow}
+                                                                >
                                                                     <View style={[styles.radioOuter, { borderColor: colors.primary }]}>
                                                                         {item?.expected_boolean === true && <View style={[styles.radioInner, { backgroundColor: colors.primary }]} />}
                                                                     </View>
                                                                     <Text style={{ color: colors.textPrimary }}>Yes</Text>
                                                                 </Pressable>
 
-                                                                <Pressable onPress={() => handleChange('isFreelance', false)} style={styles.radioRow}>
+                                                                <Pressable
+                                                                    onPress={() => {
+                                                                        setQuestionDetails(prev => ({
+                                                                            ...prev,
+                                                                            screening: prev.screening.map(q =>
+                                                                                q.question_id === item.question_id
+                                                                                    ? { ...q, expected_boolean: false }
+                                                                                    : q
+                                                                            )
+                                                                        }));
+                                                                    }}
+                                                                    style={styles.radioRow}
+                                                                >
                                                                     <View style={[styles.radioOuter, { borderColor: colors.primary }]}>
-                                                                        {item?.expected_boolean === false && <View style={[styles.radioInner, { backgroundColor: colors.primary }]} />}
+                                                                        {(item?.expected_boolean === false || item?.expected_boolean === undefined || item?.expected_boolean === null) && (
+                                                                            <View style={[styles.radioInner, { backgroundColor: colors.primary }]} />
+                                                                        )}
                                                                     </View>
                                                                     <Text style={{ color: colors.textPrimary }}>No</Text>
                                                                 </Pressable>
@@ -1345,6 +1378,7 @@ const AddJob = () => {
                             </View>
                         </ScrollView>
                         <Pressable
+                            disabled={isLoading}
                             onPress={onSubmit}
                             style={{
                                 width: "100%",
@@ -1359,12 +1393,16 @@ const AddJob = () => {
                                 backgroundColor: colors.primary,
                                 paddingHorizontal: responsiveScreenWidth(3),
                                 paddingVertical: responsiveScreenHeight(1.5),
+                                opacity: isLoading ? 0.7 : 1,
                             }}
                         >
-
-                            <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8), fontWeight: '700' }}>
-                                {jobData?.id ? 'Update Job' : 'Post Job'}
-                            </Text>
+                            {isLoading ? (
+                                <ActivityIndicator color={colors.white} />
+                            ) : (
+                                <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8), fontWeight: '700' }}>
+                                    {jobData?.id ? 'Update Job' : 'Post Job'}
+                                </Text>
+                            )}
                         </Pressable>
                     </>)
         }
@@ -1646,33 +1684,6 @@ const QuestionModel = ({ isVisible, onClose, id }: { isVisible: boolean; onClose
                                 valueKey="id"
                                 style={{ marginTop: 0 }}
                             />
-                        </View>
-                        <View style={{ flex: 1 }}>
-                            <Text style={{ fontSize: responsiveFontSize(1.7), fontWeight: '700', color: colors.primary2, marginBottom: responsiveHeight(0.5) }}>
-                                Is Required?
-                            </Text>
-
-                            <View style={{ flexDirection: 'row', gap: responsiveWidth(4), marginTop: responsiveHeight(0.8) }}>
-                                <Pressable
-                                    onPress={() => { }}
-                                    style={{ flexDirection: 'row', alignItems: 'center' }}
-                                >
-                                    <View style={[styles.radioOuter, { borderColor: colors.primary }]}>
-                                        {true && <View style={[styles.radioInner, { backgroundColor: colors.primary }]} />}
-                                    </View>
-                                    <Text style={{ color: colors.textPrimary }}>Yes</Text>
-                                </Pressable>
-
-                                <Pressable
-                                    onPress={() => { }}
-                                    style={{ flexDirection: 'row', alignItems: 'center' }}
-                                >
-                                    <View style={[styles.radioOuter, { borderColor: colors.primary }]}>
-                                        {!true && <View style={[styles.radioInner, { backgroundColor: colors.primary }]} />}
-                                    </View>
-                                    <Text style={{ color: colors.textPrimary }}>No</Text>
-                                </Pressable>
-                            </View>
                         </View>
                     </View>
                     {(question.answer_type == "multi_select" || question.answer_type == "single_select") && (

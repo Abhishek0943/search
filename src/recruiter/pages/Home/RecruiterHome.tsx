@@ -85,7 +85,6 @@ function RecruiterHome() {
             const json = await postApiCall(`/company/packages/${id}/intent`, {
                 currency,
             });
-            console.log(json)
             const clientSecret = json?.data?.client_secret;
             if (!clientSecret) {
                 return;
@@ -326,9 +325,7 @@ function RecruiterHome() {
                                     <View >
                                         <View style={styles.planHeaderRow}>
                                             <Text style={[styles.planHeaderTitle, { color: colors.textPrimary }]}>Choose a plan</Text>
-                                            <TouchableOpacity>
-                                                <Text style={[styles.compareAllText, { color: colors.primary }]}>Compare all</Text>
-                                            </TouchableOpacity>
+
                                         </View>
                                         <Text style={[styles.planHeaderSubtitle, { color: colors.textSecondary }]}>You need a plan before a job goes live.</Text>
                                     </View>

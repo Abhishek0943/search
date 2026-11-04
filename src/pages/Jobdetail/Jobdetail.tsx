@@ -40,7 +40,7 @@ function getInitial(name?: string): string {
 const Jobdetail = () => {
     const { colors } = useContext(ThemeContext)
     const route = useRoute()
-    const { id } = route.params as { id: number }
+    const { id, isCompany = false } = route.params as { id: number, isCompany?: boolean }
     const navigation: NavigationProp<ParamListBase> = useNavigation()
     const { user } = useAppSelector(state => state.userStore)
     const { bookmarkedJobIds } = useAppSelector(state => state.jobsReducer)
@@ -559,7 +559,7 @@ const Jobdetail = () => {
                             {[
                                 {
                                     label: "Pay",
-                                    value: salaryDisplay?.split("·")[0]
+                                    value: salaryDisplay?.split("·")[0] || "NA"
                                 }, {
                                     label: "Job type",
                                     value: job?.jobType
@@ -655,7 +655,7 @@ const Jobdetail = () => {
                     {renderContent()}
                 </ScrollView>
 
-                {job && !loading && (
+                {!isCompany && job && !loading && (
                     <View style={dynamicStyles.bottomBar}>
                         {user?.id && (
                             <TouchableOpacity

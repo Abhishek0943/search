@@ -14,6 +14,7 @@ import Text from '../../components/Text';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getFCMToken } from '../../utils/notificationService';
 import { Tokien } from '../../reducer/recruiterReducer';
+import FilterModal from './FilterModal';
 function Home() {
   const { colors } = useContext(ThemeContext)
   const navigation: NavigationProp<ParamListBase> = useNavigation()
@@ -30,12 +31,14 @@ function Home() {
   const [sortBy, setSortBy] = useState('Newest')
   const PAGE_SIZE = 10;
   const [meta, setMeta] = useState<any>(null)
+  const [filterVisible, setFilterVisible] = useState(false)
+  const [activeFilters, setActiveFilters] = useState<Record<string, any>>({})
 
   const fetchJobs = async (pageNum: number = 1, append: boolean = false) => {
     if (pageNum === 1) setLoading(true);
     else setLoadingMore(true);
     try {
-      const res = await dispatch(GetJobs({ page: pageNum, search } as any)).unwrap()
+      const res = await dispatch(GetJobs({ page: pageNum, search, ...activeFilters } as any)).unwrap()
       if (res?.success) {
         const jobsList = res.data?.jobs || res.data || [];
         if (append) {
@@ -112,7 +115,7 @@ function Home() {
               <TouchableOpacity onPress={() => navigation.navigate(routes.NOTIFICATION, { company: true })} style={{ width: responsiveScreenWidth(5), aspectRatio: 1, marginLeft: responsiveScreenWidth(2) }}>
                 <Image source={imagePath.NotificationIcon} style={{ width: "100%", height: "100%", resizeMode: 'contain' }} />
               </TouchableOpacity>
-              <TouchableOpacity style={{ width: responsiveScreenWidth(7), aspectRatio: 1, marginLeft: responsiveScreenWidth(2) }}>
+              <TouchableOpacity onPress={() => setFilterVisible(true)} style={{ width: responsiveScreenWidth(7), aspectRatio: 1, marginLeft: responsiveScreenWidth(2) }}>
                 <Image source={imagePath.Filter} style={{ width: "100%", height: "100%", resizeMode: 'contain' }} />
               </TouchableOpacity>
             </View>
@@ -287,6 +290,30 @@ function Home() {
           <View style={{ height: responsiveScreenHeight(3) }} />
         </ScrollView>
       </NavigationBar >
+      <FilterModal
+        visible={filterVisible}
+        onClose={() => setFilterVisible(false)}
+        onApply={(filters) => {
+          setActiveFilters(filters);
+          setFilterVisible(false);
+          setPage(1);
+          setHasMore(true);
+          // Fetch with new filters immediately
+          setLoading(true);
+          dispatch(GetJobs({ page: 1, search, ...filters } as any))
+            .unwrap()
+            .then((res) => {
+              if (res?.success) {
+                const jobsList = res.data?.jobs || res.data || [];
+                setJobs(jobsList);
+                setMeta(res.data?.meta || null);
+                setHasMore(jobsList.length >= PAGE_SIZE);
+              }
+            })
+            .catch(() => {})
+            .finally(() => setLoading(false));
+        }}
+      />
     </>
   );
 }

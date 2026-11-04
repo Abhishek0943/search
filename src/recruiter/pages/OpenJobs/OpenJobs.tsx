@@ -1,4 +1,4 @@
-import { ActivityIndicator, FlatList, Image, Pressable, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Alert, FlatList, Image, Pressable, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
 import React, { useCallback, useContext, useState } from 'react'
 import NavigationBar from '../../components/NavigationBar'
 import { ThemeContext } from '../../../context/ThemeProvider'
@@ -23,26 +23,7 @@ const STATUS_CONFIG: Record<string, { color: string; label: string }> = {
 }
 
 // ─── Application progress bar component ──────────────────────
-const ApplicationProgressBar = ({ count }: { count: number }) => {
-    const barColors = ['#3B82F6', '#2563EB', '#F59E0B', '#D4D4D4']
-    const segments = Math.min(count, 4)
-    return (
-        <View style={styles.progressContainer}>
-            {barColors.map((color, i) => (
-                <View
-                    key={i}
-                    style={[
-                        styles.progressSegment,
-                        {
-                            backgroundColor: i < segments ? color : '#E5E7EB',
-                            flex: i < segments ? (i === 2 ? 2 : 1) : 0.5,
-                        },
-                    ]}
-                />
-            ))}
-        </View>
-    )
-}
+
 
 // ─── Tab definitions ─────────────────────────────────────────
 const TABS = [
@@ -169,7 +150,9 @@ export default function OpenJobs() {
 
                                 return (
                                     <Pressable
-                                        // onPress={() => navigation.navigate(routes.ADDJOB, { ...item })}
+                                        onPress={() => {
+                                            navigation.navigate(routes.JOBDETAIL, { id: item?.job_id, isCompany: true })
+                                        }}
                                         style={({ pressed }) => [
                                             styles.card,
                                             pressed && { opacity: 0.95 },

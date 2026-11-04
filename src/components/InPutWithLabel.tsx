@@ -47,6 +47,7 @@ const InputWithLabel: React.FC<TextInputCompProps> = ({
   secondaryColor,
   isRequired = true,
   inputContainerStyle,
+  editable = true,
   full = true
 }) => {
   const { colors } = useContext(ThemeContext);
@@ -62,6 +63,7 @@ const InputWithLabel: React.FC<TextInputCompProps> = ({
                 value={value}
                 onChangeText={onChangeText}
                 placeholder={placeholder}
+                editable={editable}
                 placeholderTextColor={colors.placeholder}
                 secureTextEntry={secureText}
                 maxLength={maxLength}

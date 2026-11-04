@@ -15,9 +15,12 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { NavigationBar } from '../../components';
 import imagePath from '../../assets/imagePath';
 import {
+  responsiveFontSize,
+  responsiveHeight,
   responsiveScreenFontSize,
   responsiveScreenHeight,
   responsiveScreenWidth,
+  responsiveWidth,
 } from 'react-native-responsive-dimensions';
 import { ThemeContext } from '../../context/ThemeProvider';
 import { useAppDispatch } from '../../store';
@@ -1267,7 +1270,8 @@ export const CustomDropdown = ({
   labelKey = 'name',
   valueKey = 'id',
   style = {},
-  fontSize
+  fontSize,
+  label
 }: {
   data?: any[];
   placeholder?: string;
@@ -1276,7 +1280,8 @@ export const CustomDropdown = ({
   labelKey?: string;
   valueKey?: string;
   style?: any;
-  fontSize?: number
+  fontSize?: number;
+  label?: string
 }) => {
   const [visible, setVisible] = useState(false);
   const { colors } = useContext(ThemeContext);
@@ -1288,18 +1293,25 @@ export const CustomDropdown = ({
 
   return (
     <>
+      <Text style={{
+        fontSize: responsiveFontSize(1.8),
+        fontWeight: '700', color: colors.primary2,
+        marginTop: responsiveHeight(1),
+      }}>
+        {label}
+      </Text>
       <TouchableOpacity
         onPress={() => setVisible(true)}
         style={[
           {
-            borderWidth: 1,
-            borderRadius: 14,
-            borderColor: colors.gray,
-            paddingVertical: responsiveScreenHeight(1.3),
-            marginTop: responsiveScreenHeight(1),
             flexDirection: 'row',
-            gap: responsiveScreenWidth(2),
             alignItems: 'center',
+            borderWidth: 1.5,
+            borderRadius: 15,
+            width: responsiveWidth(90),
+            aspectRatio: 350 / 52,
+            paddingHorizontal: responsiveWidth(4),
+            borderColor: colors.surfaces,
           },
           style,
         ]}

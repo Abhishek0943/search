@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { TouchableOpacity, ViewStyle } from 'react-native';
+import { ActivityIndicator, TouchableOpacity, ViewStyle } from 'react-native';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 import { ThemeContext } from '../context/ThemeProvider';
 import Text from './Text';
@@ -10,13 +10,14 @@ type ButtonProps = {
   onPress?: () => void;
   style?: ViewStyle;
   disabled?: boolean;
+  loading?: boolean;
 };
 
-const Button = ({ style = {}, label, backgroundColor, disabled, onPress = () => { } }: ButtonProps) => {
+const Button = ({ style = {}, label, backgroundColor, disabled, loading, onPress = () => { } }: ButtonProps) => {
   const { colors } = useContext(ThemeContext);
   return (
     <TouchableOpacity
-      disabled={disabled}
+      disabled={disabled || loading}
       onPress={onPress}
       activeOpacity={0.7}
       style={{
@@ -27,20 +28,24 @@ const Button = ({ style = {}, label, backgroundColor, disabled, onPress = () => 
         borderRadius: 15,
         justifyContent: 'center',
         alignItems: 'center',
-        opacity: disabled ? 0.8 : 1,
+        opacity: (disabled || loading) ? 0.8 : 1,
         ...style
       }}
     >
-      <Text
-        style={{
-          color: colors.white,
-          fontSize: responsiveFontSize(2),
-          fontWeight: 'bold',
-          textAlign: 'center',
-        }}
-      >
-        {label}
-      </Text>
+      {loading ? (
+        <ActivityIndicator size="small" color={colors.white} />
+      ) : (
+        <Text
+          style={{
+            color: colors.white,
+            fontSize: responsiveFontSize(2),
+            fontWeight: 'bold',
+            textAlign: 'center',
+          }}
+        >
+          {label}
+        </Text>
+      )}
     </TouchableOpacity>
   );
 };

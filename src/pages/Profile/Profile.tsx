@@ -292,9 +292,9 @@ const RecruiterProfile = () => {
                                 <Text style={{ fontSize: responsiveFontSize(3.2), fontWeight: '800', color: colors.textPrimary }}>
                                     Profile
                                 </Text>
-                                <TouchableOpacity style={{ width: responsiveWidth(7), aspectRatio: 1 }} onPress={() => navigation.navigate(routes.NOTIFICATION)}>
+                                {/* <TouchableOpacity style={{ width: responsiveWidth(7), aspectRatio: 1 }} onPress={() => navigation.navigate(routes.NOTIFICATION)}>
                                     <Image source={imagePath.UserIcon} style={{ width: "100%", height: "100%", resizeMode: 'contain', }} />
-                                </TouchableOpacity>
+                                </TouchableOpacity> */}
                             </View>
                             <View style={{
                                 borderWidth: 1,
@@ -333,7 +333,7 @@ const RecruiterProfile = () => {
                                         </Text>
                                     </View>
 
-                                    <TouchableOpacity
+                                    {/* <TouchableOpacity
                                         onPress={() => navigation.navigate(routes.PROFILEPREVIEW)}
                                         style={{
                                             backgroundColor: colors.primary50, borderRadius: 8,
@@ -341,7 +341,7 @@ const RecruiterProfile = () => {
                                         }}
                                     >
                                         <Text style={{ fontSize: responsiveFontSize(1.6), fontWeight: '800', color: colors.primary }}>Preview</Text>
-                                    </TouchableOpacity>
+                                    </TouchableOpacity> */}
                                 </View>
 
                                 <View style={{
@@ -356,9 +356,9 @@ const RecruiterProfile = () => {
                                             <Text style={{ fontSize: responsiveFontSize(1.6), fontWeight: '700', color: colors.textPrimary }}>
                                                 Profile {user?.percentage?.percentage}% complete
                                             </Text>
-                                            <Text style={{ fontSize: responsiveFontSize(1.6), fontWeight: '700', color: colors.primary, marginLeft: responsiveWidth(3) }}>
+                                            {/* <Text style={{ fontSize: responsiveFontSize(1.6), fontWeight: '700', color: colors.primary, marginLeft: responsiveWidth(3) }}>
                                                 Add a photo
-                                            </Text>
+                                            </Text> */}
                                         </View>
 
                                         <View style={{ flex: 1, height: responsiveHeight(.7), backgroundColor: colors.gray, borderRadius: 20, }}>
@@ -370,7 +370,7 @@ const RecruiterProfile = () => {
                                 </View>
                             </View>
 
-                            <SectionHeader titleColor={colors.textSecondary} title="RESUME" onAction={() => navigation.navigate(routes.RESUME)} actionText="Optional" actionColor={colors.primary} />
+                            <SectionHeader titleColor={colors.textSecondary} title="RESUME" />
                             {
                                 user.cv?.cv_url ? (
                                     <ResumeCard
@@ -406,19 +406,19 @@ const RecruiterProfile = () => {
                                     borderColor: colors.gray,
                                 }}
                             >
-                                <ProfileRow
+                                {/* <ProfileRow
                                     icon={require("./VideoIcon.png")}
                                     title="Video intro"
                                     subtitle="30 seconds"
                                     containerStyle={{ borderBottomColor: colors.gray, borderBottomWidth: 1, }}
                                     actionText={user.video ? "Edit" : "Add"}
                                     onPress={() => navigation.navigate(routes.VIDEO, { link: user.video ? user.video?.video_url : null, uploaded_at: user.video ? user.video?.uploaded_at : null, file: user.video ? user.video?.video_name : null })}
-                                />
+                                /> */}
                                 <ProfileRow
                                     icon={require('./PortfolioLink.png')}
                                     title="Portfolio link"
-                                    subtitle={user.portfolio || 'jordanlee.myportfolio.com'}
-                                    actionText={user.portfolio ? "Edit" : "Add"}
+                                    subtitle={user.portfolio_link || 'jordanlee.myportfolio.com'}
+                                    actionText={user.portfolio_link ? "Edit" : "Add"}
                                     onPress={() => navigation.navigate(routes.LINK)}
                                 />
                             </View>
@@ -482,7 +482,6 @@ const RecruiterProfile = () => {
                                     </TouchableOpacity>
                                 </View>
                             )}
-
                             <SectionHeader titleColor={colors.textSecondary} title="AVAILABILITY" actionText="Edit" actionColor={colors.primary} onAction={() => navigation.navigate(routes.AVAILABILITY)} />
                             <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                                 {user?.availabilities && user.availabilities.length > 0 &&
