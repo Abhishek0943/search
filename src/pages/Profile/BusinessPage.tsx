@@ -13,7 +13,7 @@ import { Industries } from '../../reducer/jobsReducer';
 import { UpdateRegistrationDetails } from '../../reducer/recruiterReducer';
 import { postApiCall, deleteApiCall } from '../../api';
 import imagePath from '../../assets/imagePath';
-import SearchSelectDropdown from '../../components/SearchSelectDropdown';
+import { CustomDropdown } from '../PersonalInfo/PersonalInfo';
 
 const BusinessPage = () => {
     const { colors } = useContext(ThemeContext);
@@ -295,13 +295,14 @@ const BusinessPage = () => {
                     <Text style={[styles.headerSubtitle, { marginBottom: responsiveHeight(.5), color: colors.textSecondary }]}>
                         Real photos of the floor and team beat stock images.
                     </Text>
-                    <SearchSelectDropdown
-                        options={industries}
+                    <CustomDropdown
+                        data={industries}
                         placeholder="Select Industry"
                         onSelect={val => setFormData(prev => ({ ...prev, industry_id: String(val) }))}
-                        label='Industry'
-                        multiSelect={false}
-                        selectedId={formData.industry_id}
+                        label="Industry"
+                        selectedValue={formData.industry_id}
+                        labelKey="name"
+                        valueKey="id"
                     />
                     <View
                         style={{

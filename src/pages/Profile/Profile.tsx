@@ -333,15 +333,15 @@ const RecruiterProfile = () => {
                                         </Text>
                                     </View>
 
-                                    {/* <TouchableOpacity
-                                        onPress={() => navigation.navigate(routes.PROFILEPREVIEW)}
+                                    <TouchableOpacity
+                                        onPress={() => navigation.navigate(routes.EDITPROFILE)}
                                         style={{
                                             backgroundColor: colors.primary50, borderRadius: 8,
                                             paddingHorizontal: responsiveWidth(3.5), paddingVertical: responsiveHeight(0.7),
                                         }}
                                     >
-                                        <Text style={{ fontSize: responsiveFontSize(1.6), fontWeight: '800', color: colors.primary }}>Preview</Text>
-                                    </TouchableOpacity> */}
+                                        <Text style={{ fontSize: responsiveFontSize(1.6), fontWeight: '800', color: colors.primary }}>Edit</Text>
+                                    </TouchableOpacity>
                                 </View>
 
                                 <View style={{
@@ -398,7 +398,7 @@ const RecruiterProfile = () => {
                             <Text style={{ fontSize: responsiveFontSize(1.6), color: colors.textSecondary, marginTop: responsiveHeight(0.8) }}>
                                 Most shift jobs do not need one. Your user is enough.
                             </Text>
-                            <SectionHeader titleColor={colors.textSecondary} title="VIDEO AND PORTFOLIO" actionText="Optional" actionColor={colors.primary} />
+                            <SectionHeader titleColor={colors.textSecondary} title="PORTFOLIO" actionText="Optional" actionColor={colors.primary} />
                             <View
                                 style={{
                                     borderRadius: 15,
@@ -500,6 +500,25 @@ const RecruiterProfile = () => {
                                     ))
                                 }
                             </View>
+                            <SectionHeader titleColor={colors.textSecondary} title="INTERVIEWS" actionText="View all" actionColor={colors.primary} onAction={() => navigation.navigate(routes.INTERVIEWS)} />
+                            <View
+                                style={{
+                                    borderRadius: 15,
+                                    borderWidth: 1,
+                                    borderColor: colors.gray,
+                                    marginBottom: responsiveHeight(1.5),
+                                    overflow: 'hidden',
+                                }}
+                            >
+                                <ProfileRow
+                                    title="My Interviews"
+                                    subtitle="View all scheduled and past interviews"
+                                    containerStyle={{ paddingVertical: responsiveHeight(1.8) }}
+                                    rightIcon={imagePath.DownAngle}
+                                    onPress={() => navigation.navigate(routes.INTERVIEWS)}
+                                />
+                            </View>
+
                             <SectionHeader titleColor={colors.textSecondary} title="EXPERIENCE" actionText="Edit" actionColor={colors.primary} onAction={() => navigation.navigate(routes.EXPERIENCEPAGE)} />
 
                             {roles.length > 0 && (
@@ -567,6 +586,13 @@ const RecruiterProfile = () => {
                                     containerStyle={{ borderBottomColor: colors.gray, borderBottomWidth: 1, }}
                                     rightIcon={imagePath.DownAngle}
                                     onPress={() => { navigation.navigate(routes.NOTIFICATIONSETTINGS) }}
+                                />
+                                <ProfileRow
+                                    title="Change Password"
+                                    subtitle="Update your account password"
+                                    containerStyle={{ borderBottomColor: colors.gray, borderBottomWidth: 1, }}
+                                    rightIcon={imagePath.DownAngle}
+                                    onPress={() => { navigation.navigate(routes.CHANGEPASSWORD, { user_type: "jobSeeker" }) }}
                                 />
                                 <ProfileRow
                                     title="Help and support"

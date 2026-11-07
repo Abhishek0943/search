@@ -454,15 +454,26 @@ export const CustomMultiDropdown = ({
   labelKey = "name",
   valueKey = "id",
   label
+}: {
+  data?: any[];
+  placeholder?: string;
+  selectedValues?: any[];
+  onSelect?: (arr: any[]) => void;
+  labelKey?: string;
+  valueKey?: string;
+  label?: string;
 }) => {
   const [visible, setVisible] = useState(false);
   const [query, setQuery] = useState("");
   const { colors } = useContext(ThemeContext);
 
+  const isValSelected = (val: any) =>
+    (selectedValues || []).some((v: any) => v === val || (v !== undefined && v !== '' && String(v) === String(val)));
+
   const selectedLabel = useMemo(() => {
     if (!selectedValues?.length) return "";
     const labels = data
-      .filter((x: any) => selectedValues.includes(getOptionValue(x, valueKey)))
+      .filter((x: any) => isValSelected(getOptionValue(x, valueKey)))
       .map((x: any) => getOptionLabel(x, labelKey));
 
     if (labels.length > 3) return `${labels.length} selected`;
@@ -480,10 +491,10 @@ export const CustomMultiDropdown = ({
   }, [data, query, labelKey]);
 
   const toggleValue = (val: any) => {
-    const exists = selectedValues.includes(val);
+    const exists = isValSelected(val);
     const updated = exists
-      ? selectedValues.filter((v) => v !== val)
-      : [...selectedValues, val];
+      ? (selectedValues || []).filter((v: any) => v !== val && String(v) !== String(val))
+      : [...(selectedValues || []), val];
     onSelect(updated);
   };
 
@@ -576,7 +587,7 @@ export const CustomMultiDropdown = ({
               renderItem={({ item }) => {
                 const val = getOptionValue(item, valueKey);
                 const label = getOptionLabel(item, labelKey);
-                const isSelected = selectedValues.includes(val);
+                const isSelected = isValSelected(val);
 
                 return (
                   <TouchableOpacity

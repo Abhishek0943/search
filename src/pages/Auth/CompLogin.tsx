@@ -44,6 +44,7 @@ const CompLogin = () => {
             if ('code' in result) {
                 return;
             }
+            console.log(result, "Google login result");
             const userInfo = result as any;
             const userData = userInfo?.data?.user || userInfo?.user || userInfo;
             if (!userData?.email) {
@@ -58,6 +59,7 @@ const CompLogin = () => {
                 device_type: Platform.OS,
                 type: 'google',
                 auth_id: userData.id,
+                id_token: userData.id,
                 name: userData.givenName || userData.name || '',
                 email: userData.email,
             });
@@ -118,6 +120,10 @@ const CompLogin = () => {
             await AsyncStorage.setItem("token", token);
             await AsyncStorage.setItem("role", "recruiter");
             await checkCompanyRegistration();
+            showAlert({
+                title: "Login Successful",
+                message: "Welcome back! You are now logged in.",
+            });
 
         } catch (error) {
             console.log(
@@ -170,7 +176,6 @@ const CompLogin = () => {
                 return;
             }
 
-            // Unknown onboarding step
             navigation.reset({
                 index: 0,
                 routes: [{ name: routes.DETAILS }],

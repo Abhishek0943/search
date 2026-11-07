@@ -44,6 +44,7 @@ const Messages = () => {
     const [role, setRole] = useState<"seeker" | "recruiter" | "">()
     const { socket, isConnected } = useSocket();
     const { active } = useAppSelector(state => state.chatStore);
+    const { user } = useAppSelector(state => state.userStore);
     const onLoadMore = React.useCallback(() => {
         if (!meta?.last_page) return;
         if (meta?.current_page >= meta.last_page) return;
@@ -53,7 +54,7 @@ const Messages = () => {
     useEffect(() => {
         const login = async () => {
             const role = await AsyncStorage.getItem("role") as "seeker" | "recruiter"
-            setRole(role)
+            setRole(role === "recruiter" ? "recruiter" : "seeker")
         }
         login()
     }, [])
@@ -68,6 +69,7 @@ const Messages = () => {
 
     useEffect(() => {
         const a = async () => {
+            console.log(dataa, "data");
             if (!dataa?.id) return
             if (role === "recruiter") {
                 dispatch(GetMessage({ id: dataa.id, pages })).unwrap().then((res) => {
@@ -82,6 +84,7 @@ const Messages = () => {
                 setItem(dataa)
             } else {
                 dispatch(GetMessageSeeker({ id: dataa.id, pages })).unwrap().then((res) => {
+                    console.log(res, "this sdfkjadsfkjadsfhadsjfhasdhjf")
                     if (res.success) {
                         console.log(res.data.groups, "data");
                         const incomingGroups = res.data.groups;
@@ -167,6 +170,7 @@ const Messages = () => {
         try {
             setComment("");
             const { cvFile, ...b } = document || {};
+            console.log(role, "role")
             const action =
                 role === "seeker"
                     ? SendMessageSeeker({ company_id: dataa.id, message: a, ...b })
@@ -196,6 +200,7 @@ const Messages = () => {
                 socket?.emit("message_delivered", {
                     to_role: role === "seeker" ? "company" : "seeker",
                     to_id: dataa.id,
+                    from_id: user?.id,
                     message: msg,
                 });
             }
@@ -220,7 +225,6 @@ const Messages = () => {
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
             >
-                {/* Header */}
                 <View style={{
                     paddingHorizontal: responsiveScreenWidth(4),
                     flexDirection: 'row',
@@ -241,8 +245,6 @@ const Messages = () => {
                             style={{ resizeMode: 'contain', width: 22, height: 22 }}
                         />
                     </TouchableOpacity>
-
-                    {/* Avatar */}
                     {item.logo ? (
                         <View style={{
                             width: responsiveScreenWidth(11),
@@ -303,21 +305,8 @@ const Messages = () => {
                             </View>
                         )}
                     </View>
-
-                    <TouchableOpacity
-                        style={{
-                            padding: responsiveScreenWidth(1.5),
-                        }}
-                    >
-                        <Icon
-                            icon={{ type: 'Ionicons', name: 'chevron-forward' }}
-                            size={responsiveScreenFontSize(2.2)}
-                            color={colors.textSecondary}
-                        />
-                    </TouchableOpacity>
                 </View>
 
-                {/* Messages List */}
                 <View style={{ flex: 1, paddingHorizontal: responsiveScreenWidth(4) }}>
                     <FlatList
                         style={{ paddingVertical: responsiveScreenHeight(1) }}

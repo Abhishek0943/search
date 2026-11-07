@@ -43,8 +43,12 @@ const Chat = () => {
 
         (async () => {
             handler = (e: any) => {
+                console.log(e, "message test 1")
                 if (!isMounted) return;
+
                 const num = Number(e?.from_id);
+                console.log(num, "message test 2")
+
                 if (!Number.isNaN(num)) {
                     dispatch(updateChatMessage({ companyId: num, lastMessage: e?.message?.message, active }));
                 }

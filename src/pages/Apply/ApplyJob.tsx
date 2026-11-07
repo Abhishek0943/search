@@ -113,6 +113,7 @@ const ApplyJob = () => {
             }}
           >
             <Pressable
+              onPress={() => navigation.goBack()}
               style={{
                 width: responsiveWidth(2.8),
                 aspectRatio: 1 / 2,
@@ -328,15 +329,17 @@ const ApplyJob = () => {
                         style={{ flexDirection: 'row', gap: responsiveWidth(2.5), marginTop: responsiveWidth(.5), paddingVertical: 4, flexWrap: "wrap" }}
                       >
                         {Object.entries(value.options).map(([key2, value2]) => {
-                          const isSelected = value.answer.includes(key2)
+                          const isSelected = value.answer?.includes(key2)
                           return (
                             <Pressable
                               key={key2}
                               onPress={() => {
+                                const newAnswer = value.answer?.length === 0 ? [] : value.answer
+                                console.log(newAnswer)
                                 if (isSelected) {
                                   setCvs({ ...cvs, [key]: { ...value, answer: value.answer.filter((item: string) => item !== key2) } })
                                 } else {
-                                  setCvs({ ...cvs, [key]: { ...value, answer: [...value.answer, key2] } })
+                                  setCvs({ ...cvs, [key]: { ...value, answer: [...newAnswer, key2] } })
                                 }
                               }}
                               style={{

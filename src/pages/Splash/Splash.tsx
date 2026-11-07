@@ -76,7 +76,7 @@ const Splash = () => {
   return (
     <>
       <View style={{ backgroundColor: colors.background, flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Image source={require('../../assets/images/logo.png')} style={{ objectFit: "contain", height: "100%", width: responsiveScreenWidth(75), margin: "auto" }} />
+        <Image source={require('./group.png')} style={{ objectFit: "contain", height: "100%", width: responsiveScreenWidth(100), margin: "auto" }} />
       </View>
     </>
 

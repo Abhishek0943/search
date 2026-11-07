@@ -57,6 +57,19 @@ export const MyBlogs = createAsyncThunk<GetMyBlogsResponse | ErrorResponse, { st
     return getApiCall<GetMyBlogsResponse>(`/my-blogs${query}`);
   },
 );
+
+export const ChangePasswordApi = createAsyncThunk<
+  { success: boolean; message: string } | ErrorResponse,
+  {
+    user_type: "jobSeeker" | "company";
+    old_password: string;
+    new_password: string;
+    new_password_confirmation: string;
+  }
+>(
+  'ChangePasswordApi',
+  (body) => postApiCall<{ success: boolean; message: string }>('/change-password', body),
+);
 const initialState: UserInitialState = {
   isAuth: false,
   welcomeScreen: [],

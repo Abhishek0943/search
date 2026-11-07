@@ -140,7 +140,7 @@ const Login = () => {
                   if (res.success) {
                     showAlert({
                       title: "Success",
-                      message: "Your account registered successfully",
+                      message: "Your account logged in successfully",
                     });
                     await AsyncStorage.setItem('token', res.data.token)
                     dispatch(ProfileData()).unwrap().then((res) => {

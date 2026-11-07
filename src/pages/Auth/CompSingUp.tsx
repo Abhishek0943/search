@@ -401,7 +401,7 @@ export const ComponentSingUp = ({
                                     showAlert({ title: "Validation", message: "Password must be at least 8 characters" });
                                     return;
                                 }
-                                if (!user.confirmPassword) {
+                                if (!user.confirmPassword || !user.confirmPassword.trim()) {
                                     showAlert({ title: "Validation", message: "Confirm password is required" });
                                     return;
                                 }
@@ -409,9 +409,12 @@ export const ComponentSingUp = ({
                                     showAlert({ title: "Validation", message: "Passwords do not match" });
                                     return;
                                 }
-                                if (user.mobile && !/^\d{10}$/.test(user.mobile.trim())) {
-                                    showAlert({ title: "Validation", message: "Mobile number must be exactly 10 digits" });
-                                    return;
+                                if (user.mobile && user.mobile.trim()) {
+                                    const cleanMobile = user.mobile.trim().replace(/[\s\-()]/g, '');
+                                    if (cleanMobile.length < 10 || !/^\+?\d+$/.test(cleanMobile)) {
+                                        showAlert({ title: "Validation", message: "Mobile number must be at least 10 digits" });
+                                        return;
+                                    }
                                 }
 
                                 setLoading(true);

@@ -14,6 +14,8 @@ import { useAppDispatch } from '../../../store'
 import { CandidateProf, SendMessage, UpdateStatus } from '../../../reducer/recruiterReducer'
 import { useAlert } from '../../../context/AlertContext'
 import { ThemeContext, ThemeProvider } from '../../../context/ThemeProvider'
+import { openBrowser } from '../../../pages/Resume/Resume'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 const C = {
   bg: '#F4F7FD',
   card: '#FFFFFF',
@@ -145,9 +147,10 @@ function CandidateProfile() {
     if (text.length < 2 || !app?.user?.id) return
     try {
       setSending(true)
-      await dispatch(SendMessage({ seeker_id: app.user.id, message: text })).unwrap()
+      const a = await dispatch(SendMessage({ seeker_id: app.user.id, message: text })).unwrap()
       setMsgText('')
       setMsgOpen(false)
+      console.log(a, "response")
       showAlert({ title: 'Success', message: 'Message sent successfully.' })
     } catch {
       showAlert({ title: 'Failed', message: 'Could not send message. Please try again.' })
@@ -184,7 +187,6 @@ function CandidateProfile() {
   const resumeUrl = resume?.download_url || user.cv?.cv_url
   const resumeName = resume?.title || user.cv?.cv_file || 'Resume.pdf'
   const { colors } = useContext(ThemeContext);
-  console.log(experience, "jdhfahsdfjh")
 
   /* ---------- render ---------- */
   return (
@@ -437,6 +439,21 @@ function CandidateProfile() {
                     onPress={() => setMsgOpen(true)}
                   />
                 </View>
+                {app.interview_url && (
+                  <TouchableOpacity
+                    style={[s.hireBtn, { backgroundColor: colors.primary }]}
+                    onPress={async () => {
+                      const token = await AsyncStorage.getItem("token")
+                      console.log(app.interview_url + "?token=" + token)
+                      openBrowser(app.interview_url + "?token=" + token, colors.primary, false)
+                    }}
+                  >
+                    <Text style={s.hireText}>
+                      Schedule Interview
+                    </Text>
+                  </TouchableOpacity>
+                )}
+
                 <TouchableOpacity
                   style={[s.hireBtn, { backgroundColor: colors.primary }]}
                   onPress={() => changeStatus('hired')}
@@ -449,7 +466,6 @@ function CandidateProfile() {
             </>
           )}
         </ScrollView>
-        {/* message modal */}
         {msgOpen && (
           <KeyboardAvoidingView
             style={s.overlay}

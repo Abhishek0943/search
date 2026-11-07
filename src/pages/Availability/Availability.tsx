@@ -17,7 +17,7 @@ import { ThemeContext } from '../../context/ThemeProvider';
 import Text from '../../components/Text';
 import { Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import SearchSelectDropdown from '../../components/SearchSelectDropdown';
+import { CustomMultiDropdown } from '../Search/Search';
 import { useAppDispatch } from '../../store';
 import { GetAllAvailabilities, Update } from '../../reducer/jobsReducer';
 const Availability = () => {
@@ -66,18 +66,14 @@ const Availability = () => {
                 >
                     <Header title="Availability" subtitle="Employers filter on this more than anything else." />
                     <View style={{ marginTop: responsiveHeight(1), width: '100%' }}>
-                        <SearchSelectDropdown
+                        <CustomMultiDropdown
                             label="Availability"
-                            options={availabilityOptions}
+                            data={availabilityOptions}
                             placeholder="Search availability..."
-                            multiSelect={true}
-                            selectedIds={selectedAvailabilityIds}
-                            onToggle={(id) => {
-                                setSelectedAvailabilityIds(prev => {
-                                    const already = prev.includes(id);
-                                    return already ? prev.filter(i => i !== id) : [...prev, id];
-                                });
-                            }}
+                            selectedValues={selectedAvailabilityIds}
+                            onSelect={(arr: any[]) => setSelectedAvailabilityIds(arr)}
+                            labelKey="name"
+                            valueKey="id"
                         />
                     </View>
                     <Text style={{

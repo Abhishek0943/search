@@ -2,7 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useEffect, useRef, useState } from 'react';
 import { useAppSelector } from '../store';
 import { routes } from '../constants/values';
-import { AddJob, Apply, ApplyJob, Browser, Candidate, CandidateProfile, BlogPage, Chat, Company, CompanyDetails, CV, Education, ForgotPassword, Home, Jobdetail, Language, LanguageForm, Login, Messages, Notification, OpenJobs, PaymentHistory, PersonalInfo, Profile, Project, ProjectForm, RecentJob, RecruiterAccount, RecruiterHome, RecruiterProfile, Search, Signup, Skill, SkillAdd, Splash, SuggestedJob, Welcome, WorkExperience, WorkExperienceForm, Certifications, SkillsPage, AvailabilityPage, WhereICanWorkPage, ExperiencePage, Bookmarked, BuyMorePostings } from '../pages';
+import { AddJob, Apply, ApplyJob, Browser, Candidate, CandidateProfile, BlogPage, Chat, Company, CompanyDetails, CV, Education, ForgotPassword, Home, Jobdetail, Language, LanguageForm, Login, Messages, Notification, OpenJobs, PaymentHistory, PersonalInfo, Profile, Project, ProjectForm, RecentJob, RecruiterAccount, RecruiterHome, RecruiterProfile, Search, Signup, Skill, SkillAdd, Splash, SuggestedJob, Welcome, WorkExperience, WorkExperienceForm, Certifications, SkillsPage, AvailabilityPage, WhereICanWorkPage, ExperiencePage, Bookmarked, BuyMorePostings, ChangePassword, EditProfileScreen, Interviews } from '../pages';
 import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import EducationForm from '../pages/PersonalInfo/EducationForm';
@@ -186,7 +186,6 @@ const Routes = () => {
         <Stack.Screen name={routes.JOBDETAIL} component={Jobdetail} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.COMPANY} component={Company} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.COMPANYDETAILS} component={CompanyDetails} options={{ headerShown: false, animation: 'none' }} />
-        <Stack.Screen name={"asjdfhajsdf"} component={AssessmentScreen} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.SUGGESTEDJOB} component={SuggestedJob} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.PAYMENTHISTORY} component={PaymentHistory} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.PERSONALINFO} component={PersonalInfo} options={{ headerShown: false, animation: 'none' }} />
@@ -218,6 +217,9 @@ const Routes = () => {
         <Stack.Screen name={routes.BUSINESSDETAILS} component={BusinessDetails} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.CURRENTPLAN} component={CurrentPlan} options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name={routes.NOTIFICATIONSETTINGS} component={NotificationSettings} options={{ headerShown: false, animation: 'none' }} />
+        <Stack.Screen name={routes.CHANGEPASSWORD} component={ChangePassword} options={{ headerShown: false, animation: 'none' }} />
+        <Stack.Screen name={routes.EDITPROFILE} component={EditProfileScreen} options={{ headerShown: false, animation: 'none' }} />
+        <Stack.Screen name={routes.INTERVIEWS} component={Interviews} options={{ headerShown: false, animation: 'none' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -1287,19 +1287,22 @@ export const CustomDropdown = ({
   const { colors } = useContext(ThemeContext);
 
   const selectedLabel = useMemo(() => {
-    const found = data?.find((item: any) => item && item[valueKey] === selectedValue);
+    const found = data?.find((item: any) => item && (item[valueKey] === selectedValue || (selectedValue !== undefined && selectedValue !== '' && String(item[valueKey]) === String(selectedValue))));
     return found ? found[labelKey] : '';
   }, [data, selectedValue, labelKey, valueKey]);
 
   return (
     <>
-      <Text style={{
-        fontSize: responsiveFontSize(1.8),
-        fontWeight: '700', color: colors.primary2,
-        marginTop: responsiveHeight(1),
-      }}>
-        {label}
-      </Text>
+
+      {!!label && (
+        <Text style={{
+          fontSize: responsiveFontSize(1.8),
+          fontWeight: '700', color: colors.primary2,
+          marginTop: responsiveHeight(1),
+        }}>
+          {label}
+        </Text>
+      )}
       <TouchableOpacity
         onPress={() => setVisible(true)}
         style={[
@@ -1385,7 +1388,6 @@ export const CustomDropdown = ({
   );
 };
 
-const styles = StyleSheet.create({});
 
 export const formatDate = (date?: string | Date) => {
   if (!date) return '';

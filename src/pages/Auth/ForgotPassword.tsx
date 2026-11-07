@@ -88,7 +88,7 @@ const ForgotPassword = () => {
 
 
     const type: 'comp' | 'jobSeeker' =
-        route.params?.type === 'comp'
+        (route.params as any)?.type === 'comp'
             ? 'comp'
             : 'jobSeeker';
 
@@ -158,12 +158,12 @@ const ForgotPassword = () => {
             });
             return;
         }
-        console.log("type", type)
-        if (type === "jobSeeker") {
-            console.log("hiiii")
-            dispatch(ForgetPassword({ email })).unwrap().then((res) => {
-                setLoading(false);
-
+        if (loading) return;
+        setLoading(true);
+        console.log("type", type);
+        try {
+            if (type === "jobSeeker") {
+                const res = await dispatch(ForgetPassword({ email })).unwrap();
                 if (res.success) {
                     setOtp(["", "", "", "", "", ""]);
                     startTimer();
@@ -174,26 +174,28 @@ const ForgotPassword = () => {
                         message: res.message || "Unable to send OTP.",
                     });
                 }
+            } else {
+                const res = await dispatch(RecruiterForgetPassword({ email })).unwrap();
+                if (res.success) {
+                    setOtp(["", "", "", "", "", ""]);
+                    startTimer();
+                    setStep(2);
+                } else {
+                    showAlert({
+                        title: "Validation",
+                        message: res.message || "Unable to send OTP.",
+                    });
+                }
+            }
+        } catch (error: any) {
+            showAlert({
+                title: "Error",
+                message: error?.message || "Unable to send OTP.",
             });
-
-        } else {
-            console.log("hiiii12121212")
-            dispatch(RecruiterForgetPassword({ email })).unwrap().then((res) => {
-                setLoading(false);
-                if (res.success) {
-                    setOtp(["", "", "", "", "", ""]);
-                    startTimer();
-                    setStep(2);
-                } else {
-                    showAlert({
-                        title: "Validation",
-                        message: res.message || "Unable to send OTP.",
-                    });
-                }
-            })
-
-        };
-    }
+        } finally {
+            setLoading(false);
+        }
+    };
     const handleVerifyOtp = async () => {
         const code = otp.join("");
 
@@ -204,6 +206,8 @@ const ForgotPassword = () => {
             });
             return;
         }
+
+        if (loading) return;
 
         try {
             setLoading(true);
@@ -284,6 +288,7 @@ const ForgotPassword = () => {
 
 
                         <Button
+                            loading={loading}
                             label="Send the code"
                             backgroundColor={mainColor}
                             onPress={handleSendCode}
@@ -420,6 +425,7 @@ const ForgotPassword = () => {
                         </Pressable>
 
                         <Button
+                            loading={loading}
                             label="Verify and Continue"
                             backgroundColor={mainColor}
                             onPress={handleVerifyOtp}
@@ -510,7 +516,8 @@ const ForgotPassword = () => {
                         </View>
 
                         <Button
-                            label={loading ? "Saving..." : "Save and log in"}
+                            loading={loading}
+                            label="Save and log in"
                             backgroundColor={mainColor}
                             onPress={async () => {
                                 const email = user.email.trim();

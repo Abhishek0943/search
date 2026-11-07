@@ -225,6 +225,13 @@ const RecruiterProfile = () => {
                                     onPress={() => navigation.navigate(routes.NOTIFICATIONSETTINGS)}
                                 />
                                 <ProfileRow
+                                    title="Change Password"
+                                    subtitle="Update your account password"
+                                    containerStyle={{ borderBottomColor: colors.gray, borderBottomWidth: 1 }}
+                                    rightIcon={imagePath.DownAngle}
+                                    onPress={() => navigation.navigate(routes.CHANGEPASSWORD, { user_type: "company" })}
+                                />
+                                <ProfileRow
                                     title="Help and support"
                                     containerStyle={{ borderBottomColor: colors.gray, borderBottomWidth: 1, paddingVertical: responsiveHeight(2.5) }}
                                     rightIcon={imagePath.DownAngle}

@@ -176,6 +176,7 @@ const ApplyJob = () => {
         activeOpacity={0.8}
         onPress={async () => {
           const token = await AsyncStorage.getItem('token')
+          console.log(item.assignment + `?token=${token}`, "urlrul")
           openBrowser(item.assignment + `?token=${token}`, colors.primary, false)
         }}
         style={{

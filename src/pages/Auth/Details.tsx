@@ -2,7 +2,7 @@ import { ParamListBase, useNavigation, } from '@react-navigation/native';
 import { NativeStackNavigationProp, } from '@react-navigation/native-stack';
 import React, { useContext, useEffect, useState, } from 'react';
 import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, TouchableOpacity, View, } from 'react-native';
-import ImagePicker from 'react-native-image-crop-picker';
+import { pick, types } from '@react-native-documents/picker';
 import Icon from '../../utils/Icon';
 import { responsiveFontSize, responsiveHeight, responsiveWidth, } from 'react-native-responsive-dimensions';
 import { ThemeContext } from '../../context/ThemeProvider';
@@ -12,7 +12,8 @@ import { useAppDispatch, useAppSelector } from '../../store';
 import Button from '../../components/Button';
 import { Industries, GetNumberOfEmployees } from '../../reducer/jobsReducer';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import SearchSelectDropdown from '../../components/SearchSelectDropdown';
+import { CustomDropdown } from '../PersonalInfo/PersonalInfo';
+import { CustomMultiDropdown } from '../Search/Search';
 import { useAlert } from '../../context/AlertContext';
 import { UpdateRegistrationDetails } from '../../reducer/recruiterReducer';
 import { postApiCall, deleteApiCall } from '../../api';
@@ -63,15 +64,25 @@ export const ComponentSingUp = ({ mainColor, secondaryColor, }: { mainColor: str
     const { user: companyUser } = useAppSelector((state) => state.userStore)
     const [user, setUser] = useState<UserState>({ no_of_employees: '', industry_id: '', acn: '', industryIds: [], aboutCompany: '', availabilityIds: [], abn: '', businessaddress: '', trendingname: '', mobile: '', });
     const [workplacePhotos, setWorkplacePhotos] = useState<any[]>(companyUser ? companyUser.images || [] : []);
+    const normalizeFileUri = (u?: string) => {
+        if (!u) return '';
+        if (u.startsWith('/')) return `file://${u}`;
+        return u;
+    };
+
     const pickLogo = async () => {
         try {
-            const image = await ImagePicker.openPicker({
-                mediaType: 'photo',
+            const [image] = await pick({
+                type: [types.images],
+                allowMultiSelection: false,
+                mode: 'import',
             });
+            if (!image) return;
+            const uri = normalizeFileUri((image as any).fileCopyUri || image.uri);
             const logoImage = {
-                uri: image.path,
-                name: `logo_${Date.now()}.${image.mime?.includes('png') ? 'png' : 'jpg'}`,
-                type: image.mime || 'image/jpeg',
+                uri,
+                name: image.name || `logo_${Date.now()}.${image.type?.includes('png') ? 'png' : 'jpg'}`,
+                type: image.type || 'image/jpeg',
             };
 
             const formData = new FormData();
@@ -93,16 +104,17 @@ export const ComponentSingUp = ({ mainColor, secondaryColor, }: { mainColor: str
             return;
         }
         try {
-            const images = await ImagePicker.openPicker({
-                multiple: true,
-                maxFiles: remaining,
-                compressImageQuality: 0.8,
-                mediaType: 'photo',
+            const images = await pick({
+                type: [types.images],
+                allowMultiSelection: true,
+                mode: 'import',
             });
-            const newPhotos = images.map((img, idx) => ({
-                uri: img.path,
-                name: `workplace_${Date.now()}_${idx}.${img.mime?.includes('png') ? 'png' : 'jpg'}`,
-                type: img.mime || 'image/jpeg',
+            if (!images || images.length === 0) return;
+            const selectedImages = images.slice(0, remaining);
+            const newPhotos = selectedImages.map((img, idx) => ({
+                uri: normalizeFileUri((img as any).fileCopyUri || img.uri),
+                name: img.name || `workplace_${Date.now()}_${idx}.${img.type?.includes('png') ? 'png' : 'jpg'}`,
+                type: img.type || 'image/jpeg',
             }));
 
             const formData = new FormData();
@@ -339,19 +351,19 @@ export const ComponentSingUp = ({ mainColor, secondaryColor, }: { mainColor: str
                                 placeholder="142 The Parade, Norwood SA 5067"
                             />
 
-                            <SearchSelectDropdown
+                            <CustomDropdown
                                 label="Staff Size"
-                                options={staffSizes}
-                                placeholder="Search staff size..."
-                                secondaryColor={secondaryColor}
-                                multiSelect={false}
-                                selectedId={user.no_of_employees}
-                                onSelect={(id: string) => {
+                                data={staffSizes}
+                                placeholder="Select Staff Size"
+                                selectedValue={user.no_of_employees}
+                                onSelect={(id: any) => {
                                     setUser(prev => ({
                                         ...prev,
-                                        no_of_employees: id,
+                                        no_of_employees: String(id),
                                     }));
                                 }}
+                                labelKey="name"
+                                valueKey="id"
                             />
 
                         </ScrollView>
@@ -524,21 +536,19 @@ export const ComponentSingUp = ({ mainColor, secondaryColor, }: { mainColor: str
                                 Only the industry is needed. The rest can wait.
                             </Text>
 
-                            <SearchSelectDropdown
+                            <CustomMultiDropdown
                                 label="Industry"
-                                options={industries}
-                                placeholder="Search or add an industry"
-                                multiSelect={true}
-                                selectedIds={user.industryIds}
-                                onToggle={(id: string) => {
+                                data={industries}
+                                placeholder="Select Industry"
+                                selectedValues={user.industryIds}
+                                onSelect={(arr: any[]) => {
                                     setUser(prev => ({
                                         ...prev,
-                                        industryIds:
-                                            prev.industryIds.includes(id)
-                                                ? []
-                                                : [id],
+                                        industryIds: arr,
                                     }));
                                 }}
+                                labelKey="name"
+                                valueKey="id"
                             />
                             <View
                                 style={{
@@ -715,10 +725,10 @@ export const ComponentSingUp = ({ mainColor, secondaryColor, }: { mainColor: str
                                 }
                                 dispatch(UpdateRegistrationDetails(
                                     {
-                                        industry_id: Number(user.industryIds[0]),
+                                        industry_id: String(user.industryIds[0]),
                                         description: user.aboutCompany.trim(),
-                                        abn: user.abn.trim(),
-                                        acn: user.acn.trim(),
+                                        abn: user.abn.trim() as any,
+                                        acn: user.acn.trim() as any,
                                         name: user.trendingname.trim(),
                                         location: user.businessaddress.trim(),
                                         no_of_employees: user.no_of_employees,

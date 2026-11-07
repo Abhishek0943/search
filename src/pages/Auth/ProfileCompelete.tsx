@@ -12,7 +12,6 @@ import Icon from '../../utils/Icon';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAppDispatch } from '../../store';
 import { GetAllAvailabilities, GetAllWorkRights, GetSkills, Industries, AddWorkExperience, EditWorkExperience, GetExperience, DeleteExperience, DeleteCertificate, UploadCV } from '../../reducer/jobsReducer';
-import SearchSelectDropdown from '../../components/SearchSelectDropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ImagePicker from 'react-native-image-crop-picker';
 import { pick, types } from '@react-native-documents/picker';

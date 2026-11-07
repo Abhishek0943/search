@@ -1,4 +1,4 @@
-import { ActivityIndicator, Image, KeyboardAvoidingView, Modal, NativeSyntheticEvent, Platform, Pressable, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, FlatList, Image, KeyboardAvoidingView, Modal, NativeSyntheticEvent, Platform, Pressable, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import NavigationBar from '../../recruiter/components/NavigationBar'
@@ -9,15 +9,15 @@ import { useNavigation, useRoute } from '@react-navigation/native'
 import { actions, RichEditor, RichToolbar } from 'react-native-pell-rich-editor';
 import { CustomTextInput, InPutWithLabel } from '../../components';
 import { routes } from '../../constants/values'
-import { CustomDropdown, } from '../PersonalInfo/PersonalInfo'
-import { useAppDispatch, } from '../../store'
-import { AddNewJob, AddNewQuestion, AssignmentList, Currencies, Experiences, GetCity, GetCountry, GetSkills, GetState, Industries, JobTypes, NumberOfPositions, QuestionDetails, SalaryPeriods } from '../../reducer/jobsReducer'
+import { CustomDropdown } from '../PersonalInfo/PersonalInfo'
+import { CustomMultiDropdown } from '../Search/Search'
+import { useAppDispatch } from '../../store'
+import { AddNewJob, AddNewQuestion, AssignmentList, Currencies, Experiences, GetAllQuestions, GetCity, GetCountry, GetMyQuestions, GetSkills, GetState, Industries, JobTypes, NumberOfPositions, QuestionDetails, SalaryPeriods } from '../../reducer/jobsReducer'
 import Text from '../../components/Text'
 import { useAlert } from '../../context/AlertContext'
 import { CompanyActivePackages, RecruiterProfile, RecruiterPlanType } from '../../reducer/recruiterReducer'
 import authStyles from '../Auth/styles'
 import Button from '../../components/Button'
-import SearchSelectDropdown from '../../components/SearchSelectDropdown'
 import Icon from '../../utils/Icon'
 const DRAFT_KEY = 'ADD_JOB_DRAFT';
 const QUESTION_TYPES = [
@@ -36,6 +36,12 @@ const roles = [
     { id: "ideal", name: "Ideal (100%)" },
     { id: "acceptable", name: "Acceptable (50%)" },
     { id: "not_preferred", name: "Not Preferred (0%)" },] as const;
+const MULTI_SELECT_SCORING_ROLES = [
+    { id: 'required', name: 'Required' },
+    { id: 'bonus', name: 'Bonus' },
+    { id: 'ignore', name: 'Ignore' },
+    { id: 'avoid', name: 'Avoid' },
+];
 const AddJob = () => {
     const { colors } = useContext(ThemeContext);
     const navigation = useNavigation();
@@ -527,63 +533,65 @@ const AddJob = () => {
                             }}
                         >
                             <View style={{ width: responsiveScreenWidth(90), paddingTop: responsiveHeight(1), flex: 1 }}>
-                                <SearchSelectDropdown
+                                <CustomMultiDropdown
                                     label="Skill"
-                                    options={skills}
+                                    data={skills}
                                     placeholder="Search skills..."
-                                    multiSelect={true}
-                                    selectedIds={formData.skills}
-                                    onToggle={(id) => {
-                                        setFormData(prev => {
-                                            const already = prev.skills.includes(id);
-                                            return { ...prev, skills: already ? prev.skills.filter((i: any) => i !== id) : [...prev.skills, id], };
-                                        })
+                                    selectedValues={formData.skills}
+                                    onSelect={(arr: any[]) => {
+                                        setFormData(prev => ({ ...prev, skills: arr }));
                                     }}
+                                    labelKey="name"
+                                    valueKey="id"
                                 />
 
-                                <SearchSelectDropdown
+                                <CustomDropdown
                                     label="Country"
-                                    options={countries}
+                                    data={countries}
                                     placeholder="Search country..."
-                                    multiSelect={false}
-                                    selectedId={formData.country}
+                                    selectedValue={formData.country}
                                     onSelect={(id) => {
                                         handleChange('country', id);
                                         dispatch(GetState({ id })).unwrap().then(res => res.success && setStates(res.data));
                                     }}
+                                    labelKey="name"
+                                    valueKey="id"
                                 />
 
-                                <SearchSelectDropdown
+                                <CustomDropdown
                                     label="State"
-                                    options={states}
+                                    data={states}
                                     placeholder="Search state..."
-                                    multiSelect={false}
-                                    selectedId={formData.state}
+                                    selectedValue={formData.state}
                                     onSelect={(id) => {
                                         handleChange('state', id);
                                         dispatch(GetCity({ id })).unwrap().then(res => res.success && setCities(res.data));
                                     }}
+                                    labelKey="name"
+                                    valueKey="id"
                                 />
-                                <SearchSelectDropdown
+                                <CustomDropdown
                                     label="City"
-                                    options={cities}
+                                    data={cities}
                                     placeholder="Search city..."
-                                    multiSelect={false}
-                                    selectedId={formData.city}
+                                    selectedValue={formData.city}
                                     onSelect={(id) => {
                                         handleChange('city', id);
                                     }}
+                                    labelKey="name"
+                                    valueKey="id"
                                 />
 
-                                <SearchSelectDropdown
+                                <CustomDropdown
                                     label="Currency"
-                                    options={currencies}
+                                    data={currencies}
                                     placeholder="Search currency..."
-                                    multiSelect={false}
-                                    selectedId={formData.currency || ''}
+                                    selectedValue={formData.currency || ''}
                                     onSelect={(id) => {
                                         handleChange('currency', id);
                                     }}
+                                    labelKey="name"
+                                    valueKey="id"
                                 />
 
                                 <View style={{ flexDirection: 'row', gap: responsiveScreenWidth(3), marginTop: responsiveHeight(1) }}>
@@ -622,15 +630,16 @@ const AddJob = () => {
                                     </View>
                                 </View>
 
-                                <SearchSelectDropdown
+                                <CustomDropdown
                                     label="Salary Period"
-                                    options={salaryPeriods}
+                                    data={salaryPeriods}
                                     placeholder="Search salary period..."
-                                    multiSelect={false}
-                                    selectedId={formData.salaryPeriod || ''}
+                                    selectedValue={formData.salaryPeriod || ''}
                                     onSelect={(id) => {
                                         handleChange('salaryPeriod', id);
                                     }}
+                                    labelKey="name"
+                                    valueKey="id"
                                 />
 
                                 <View style={{ flexDirection: 'row', gap: responsiveScreenWidth(6), marginTop: responsiveHeight(1.5) }}>
@@ -759,39 +768,42 @@ const AddJob = () => {
                             }}
                         >
                             <View style={{ width: responsiveScreenWidth(90), paddingTop: responsiveHeight(1), flex: 1 }}>
-                                <SearchSelectDropdown
+                                <CustomDropdown
                                     label="Job Experience"
-                                    options={experiences}
+                                    data={experiences}
                                     placeholder="Search job experience..."
-                                    multiSelect={false}
-                                    selectedId={formData.jobExperience || ''}
+                                    selectedValue={formData.jobExperience || ''}
                                     onSelect={(id) => {
                                         setFormData(prev => ({ ...prev, jobExperience: id }));
                                     }}
+                                    labelKey="name"
+                                    valueKey="id"
                                 />
 
-                                <SearchSelectDropdown
+                                <CustomDropdown
                                     label="Select Package"
-                                    options={activePackages.map(p => ({
+                                    data={activePackages.map(p => ({
                                         id: String(p.id), name: p.package_title + " (left jobs " + p.remaining_quota + ", expires on " + p.end_date + ")"
                                     }))}
                                     placeholder="Search package..."
-                                    multiSelect={false}
-                                    selectedId={formData.company_package_id || ''}
+                                    selectedValue={formData.company_package_id || ''}
                                     onSelect={(id) => {
                                         handleChange('company_package_id', id);
                                         handleChange("expiry_date", activePackages.find((p) => p.id == id)?.end_date);
                                     }}
+                                    labelKey="name"
+                                    valueKey="id"
                                 />
-                                <SearchSelectDropdown
+                                <CustomDropdown
                                     label="Select Industary"
-                                    options={industries}
+                                    data={industries}
                                     placeholder="Search Industary..."
-                                    multiSelect={false}
-                                    selectedId={formData.industry_id || ''}
+                                    selectedValue={formData.industry_id || ''}
                                     onSelect={(id) => {
                                         handleChange('industry_id', id);
                                     }}
+                                    labelKey="name"
+                                    valueKey="id"
                                 />
                                 <View style={{ width: '100%', marginTop: responsiveHeight(.5) }}>
                                     <Text style={{
@@ -895,7 +907,7 @@ const AddJob = () => {
                             <View style={{ width: responsiveWidth(90), paddingTop: responsiveHeight(1), flex: 1 }}>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: responsiveHeight(1.5) }}>
                                     <Text style={{ fontSize: responsiveFontSize(2), fontWeight: '800', color: colors.textPrimary }}>
-                                        Number of questions : 5
+                                        Number of questions : {questionDetails?.screening?.length || 0}
                                     </Text>
 
                                     <TouchableOpacity
@@ -1314,7 +1326,7 @@ const AddJob = () => {
                                                 <View
                                                     style={{ flexDirection: 'row', gap: responsiveWidth(2.5), marginTop: responsiveWidth(.5), paddingVertical: 4, flexWrap: "wrap" }}
                                                 >
-                                                    {item.activity_types.map((laneData) => {
+                                                    {item.activity_types.map((laneData: any) => {
                                                         return (
                                                             <Pressable
                                                                 key={laneData}
@@ -1422,20 +1434,26 @@ const AddJob = () => {
         <NavigationBar navigationBar={jobData?.id ? false : true} name={routes.ADDJOB}>
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
                 {renderElem()}
-                <QuestionModel isVisible={isVisible} onClose={(event) => {
-
-                    if (event?.typeOfModal === "add") {
-                        console.log("event", event)
+                <QuestionModel
+                    isVisible={isVisible}
+                    selectedQuestions={questionDetails?.screening || []}
+                    onAddQuestion={(newQ) => {
                         setQuestionDetails(prev => {
-                            const newQuestion = { ...prev, screening: [...prev.screening, { ...event }] }
-                            return newQuestion
-                        })
-                    }
-                    else {
-                        console.log("event else", event)
-                    }
-                    setIsVisible(false)
-                }} />
+                            const exists = prev.screening.some(item => item.question_id === newQ.question_id);
+                            if (exists) return prev;
+                            return { ...prev, screening: [...prev.screening, newQ] };
+                        });
+                    }}
+                    onRemoveQuestion={(qId) => {
+                        setQuestionDetails(prev => ({
+                            ...prev,
+                            screening: prev.screening.filter(item => item.question_id !== qId)
+                        }));
+                    }}
+                    onClose={() => {
+                        setIsVisible(false);
+                    }}
+                />
             </KeyboardAvoidingView>
         </NavigationBar>
     );
@@ -1533,245 +1551,917 @@ const RenderHeader = ({ currentStep, title, onBack }: { currentStep: number, tit
         </>
     );
 };
-const QuestionModel = ({ isVisible, onClose, id }: { isVisible: boolean; onClose: (payload?: { typeOfModal: "add" } | { typeOfModal: "edit"; } & QuestionItem | NativeSyntheticEvent<any>) => void; id?: string }) => {
+const QuestionModel = ({
+    isVisible,
+    onClose,
+    id,
+    selectedQuestions = [],
+    onAddQuestion,
+    onRemoveQuestion,
+}: {
+    isVisible: boolean;
+    onClose: (payload?: { typeOfModal: "add" } | { typeOfModal: "edit"; } & QuestionItem | NativeSyntheticEvent<any> | void) => void;
+    id?: string;
+    selectedQuestions?: Question[];
+    onAddQuestion?: (question: Question) => void;
+    onRemoveQuestion?: (questionId: number) => void;
+}) => {
     const { colors } = useContext(ThemeContext);
     const dispatch = useAppDispatch();
     const { showAlert } = useAlert();
-    const [question, setQuestion] = useState<QuestionItem>(
-        {
-            id: id,
-            question: '',
-            answer_type: 'short_text',
-            is_required: true,
-            options: [{ label: "", scoring_role: "acceptable" }, { label: "", scoring_role: "not_preferred" }],
+
+    const [activeTab, setActiveTab] = useState<'admin' | 'my' | 'create'>(id ? 'create' : 'admin');
+    const [adminQuestions, setAdminQuestions] = useState<any[]>([]);
+    const [myQuestions, setMyQuestions] = useState<any[]>([]);
+    const [loadingAdmin, setLoadingAdmin] = useState(false);
+    const [loadingAdminMore, setLoadingAdminMore] = useState(false);
+    const [adminPage, setAdminPage] = useState(1);
+    const [adminHasMore, setAdminHasMore] = useState(true);
+
+    const [loadingMy, setLoadingMy] = useState(false);
+    const [loadingMyMore, setLoadingMyMore] = useState(false);
+    const [myPage, setMyPage] = useState(1);
+    const [myHasMore, setMyHasMore] = useState(true);
+
+    const [searchQuery, setSearchQuery] = useState('');
+    const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const [addingId, setAddingId] = useState<number | null>(null);
+
+    const [question, setQuestion] = useState<QuestionItem>({
+        id: id,
+        question: '',
+        answer_type: 'short_text',
+        is_required: true,
+        options: [{ label: "", scoring_role: "required" }, { label: "", scoring_role: "bonus" }],
+    });
+    const [isLoading, setIsLoading] = useState(false);
+
+    const extractQuestions = (resData: any): any[] => {
+        if (!resData) return [];
+        if (Array.isArray(resData)) return resData;
+        if (Array.isArray(resData.data)) return resData.data;
+        if (Array.isArray(resData.questions)) return resData.questions;
+        if (Array.isArray(resData.screening)) return resData.screening;
+        return [];
+    };
+
+    const extractMeta = (resData: any, fullRes?: any) => {
+        const meta = fullRes?.meta || resData?.meta || (resData && !Array.isArray(resData) ? resData : {});
+        const current = Number(meta?.current_page || 1);
+        const last = Number(meta?.last_page || 1);
+        return {
+            current_page: current,
+            last_page: last,
+        };
+    };
+
+    const appendWithoutDuplicates = (prev: any[], next: any[]) => {
+        const seen = new Set(prev.map(p => Number(p?.question_id || p?.id)));
+        const filteredNext = next.filter(n => !seen.has(Number(n?.question_id || n?.id)));
+        return [...prev, ...filteredNext];
+    };
+
+    const fetchAllQuestions = (pageNumber: number = 1, search: string = searchQuery, isLoadMore: boolean = false) => {
+        if (isLoadMore) {
+            setLoadingAdminMore(true);
+        } else {
+            setLoadingAdmin(true);
         }
-    );
+
+        dispatch(GetAllQuestions({ page: pageNumber, search: search.trim() })).unwrap().then((res: any) => {
+            if (res?.success) {
+                const list = extractQuestions(res.data);
+                const meta = extractMeta(res.data, res);
+                setAdminHasMore(meta.current_page < meta.last_page && list.length > 0);
+                setAdminPage(pageNumber);
+
+                if (pageNumber === 1) {
+                    setAdminQuestions(list);
+                } else {
+                    setAdminQuestions(prev => appendWithoutDuplicates(prev, list));
+                }
+            } else {
+                if (pageNumber === 1) setAdminQuestions([]);
+                setAdminHasMore(false);
+            }
+            setLoadingAdmin(false);
+            setLoadingAdminMore(false);
+        }).catch(() => {
+            setLoadingAdmin(false);
+            setLoadingAdminMore(false);
+        });
+    };
+
+    const fetchMyQuestions = (pageNumber: number = 1, search: string = searchQuery, isLoadMore: boolean = false) => {
+        if (isLoadMore) {
+            setLoadingMyMore(true);
+        } else {
+            setLoadingMy(true);
+        }
+
+        dispatch(GetMyQuestions({ page: pageNumber, search: search.trim() })).unwrap().then((res: any) => {
+            if (res?.success) {
+                const list = extractQuestions(res.data);
+                const meta = extractMeta(res.data, res);
+                setMyHasMore(meta.current_page < meta.last_page && list.length > 0);
+                setMyPage(pageNumber);
+
+                if (pageNumber === 1) {
+                    setMyQuestions(list);
+                } else {
+                    setMyQuestions(prev => appendWithoutDuplicates(prev, list));
+                }
+            } else {
+                if (pageNumber === 1) setMyQuestions([]);
+                setMyHasMore(false);
+            }
+            setLoadingMy(false);
+            setLoadingMyMore(false);
+        }).catch(() => {
+            setLoadingMy(false);
+            setLoadingMyMore(false);
+        });
+    };
+
+    const handleSearchChange = (text: string) => {
+        setSearchQuery(text);
+        if (searchTimerRef.current) {
+            clearTimeout(searchTimerRef.current);
+        }
+        searchTimerRef.current = setTimeout(() => {
+            if (activeTab === 'my') {
+                fetchMyQuestions(1, text);
+            } else if (activeTab === 'admin') {
+                fetchAllQuestions(1, text);
+            }
+        }, 400);
+    };
+
+    const handleTabSwitch = (tab: 'admin' | 'my' | 'create') => {
+        setActiveTab(tab);
+        setSearchQuery('');
+        if (searchTimerRef.current) {
+            clearTimeout(searchTimerRef.current);
+        }
+        if (tab === 'admin') {
+            fetchAllQuestions(1, '');
+        } else if (tab === 'my') {
+            fetchMyQuestions(1, '');
+        }
+    };
+
+    const handleLoadMore = () => {
+        if (activeTab === 'my') {
+            if (!loadingMy && !loadingMyMore && myHasMore) {
+                fetchMyQuestions(myPage + 1, searchQuery, true);
+            }
+        } else if (activeTab === 'admin') {
+            if (!loadingAdmin && !loadingAdminMore && adminHasMore) {
+                fetchAllQuestions(adminPage + 1, searchQuery, true);
+            }
+        }
+    };
+
+    useEffect(() => {
+        if (isVisible) {
+            setSearchQuery('');
+            if (id) {
+                setActiveTab('create');
+            } else {
+                fetchAllQuestions(1, '');
+                fetchMyQuestions(1, '');
+            }
+        }
+        return () => {
+            if (searchTimerRef.current) {
+                clearTimeout(searchTimerRef.current);
+            }
+        };
+    }, [isVisible, id]);
+
+    const toScreeningQuestion = (item: any): Question => {
+        if (item?.content && (item?.question_id || item?.id)) {
+            return {
+                question_id: Number(item.question_id || item.id),
+                expected_boolean: item.expected_boolean !== undefined ? item.expected_boolean : (item.content.type === 'yes_no' ? false : null),
+                ideal_value: item.ideal_value ?? '',
+                lane: item.lane || 'screening',
+                min_value: item.min_value ?? '',
+                scored: !!item.scored,
+                source_checksum: item.source_checksum ?? '',
+                weight: item.weight ? String(item.weight) : '1',
+                roles: item.roles || {},
+                content: {
+                    type: item.content.type || 'short_text',
+                    text: item.content.text || '',
+                    options: Array.isArray(item.content.options) ? item.content.options : []
+                }
+            };
+        }
+
+        const qId = item?.question_id || item?.id || Date.now();
+        const type = item?.content?.type || item?.type || item?.answer_type || 'short_text';
+        const text = item?.content?.text || item?.text || item?.question || '';
+        const rawOptions = item?.content?.options || item?.options || [];
+        const options = Array.isArray(rawOptions) ? rawOptions.map((opt: any, idx: number) => {
+            if (typeof opt === 'string') return { id: String(idx + 1), label: opt };
+            return { id: String(opt.id || idx + 1), label: opt.label || opt.name || opt.text || '' };
+        }) : [];
+
+        const roles: { [key: string]: 'ideal' | 'acceptable' | 'not_preferred' } = {};
+        options.forEach(opt => {
+            roles[opt.id] = 'acceptable';
+        });
+
+        return {
+            question_id: Number(qId),
+            expected_boolean: type === 'yes_no' ? false : null,
+            ideal_value: '',
+            lane: 'screening',
+            min_value: '',
+            scored: false,
+            source_checksum: item?.source_checksum || '',
+            weight: '1',
+            roles,
+            content: {
+                type,
+                text,
+                options,
+            }
+        };
+    };
+
+    const handleToggleQuestion = (item: any) => {
+        const qId = Number(item?.question_id || item?.id);
+        const alreadyAdded = selectedQuestions?.some(q => q.question_id === qId);
+
+        if (alreadyAdded) {
+            onRemoveQuestion?.(qId);
+            return;
+        }
+
+        setAddingId(qId);
+        dispatch(QuestionDetails({ question_ids: [String(qId)] })).unwrap().then((res: any) => {
+            if (res?.success && res.data?.screening && res.data.screening.length > 0) {
+                if (onAddQuestion) {
+                    onAddQuestion(res.data.screening[0]);
+                } else if (onClose) {
+                    onClose({ typeOfModal: "add", ...res.data.screening[0] });
+                }
+            } else {
+                const formatted = toScreeningQuestion(item);
+                if (onAddQuestion) {
+                    onAddQuestion(formatted);
+                } else if (onClose) {
+                    onClose({ typeOfModal: "add", ...formatted });
+                }
+            }
+            setAddingId(null);
+        }).catch(() => {
+            const formatted = toScreeningQuestion(item);
+            if (onAddQuestion) {
+                onAddQuestion(formatted);
+            } else if (onClose) {
+                onClose({ typeOfModal: "add", ...formatted });
+            }
+            setAddingId(null);
+        });
+    };
+
     const onSubmit = () => {
         if (isLoading) return;
-        setIsLoading(true);
-        const fquestions = {
-            text: question.question,
-            type: question.answer_type,
-            ...((question.answer_type === 'single_select' || question.answer_type === 'multi_select') && { options: question.options }),
+        if (!question.question.trim()) {
+            showAlert({ title: "Error", message: "Please enter a question prompt" });
+            return;
         }
-        dispatch(AddNewQuestion({ ...fquestions })).unwrap().then((res) => {
+
+        if (question.answer_type === 'single_select' || question.answer_type === 'multi_select') {
+            const validOptions = (question.options || []).filter(o => o.label && o.label.trim());
+            if (validOptions.length < 2) {
+                showAlert({ title: "Error", message: "Please provide at least 2 options" });
+                return;
+            }
+        }
+
+        setIsLoading(true);
+
+        const fquestions: any = {
+            text: question.question.trim(),
+            type: question.answer_type,
+        };
+
+        if (question.answer_type === 'multi_select') {
+            fquestions.options = question.options
+                .filter(o => o.label && o.label.trim())
+                .map(o => ({
+                    label: o.label.trim(),
+                    scoring_role: o.scoring_role || 'required',
+                }));
+        } else if (question.answer_type === 'single_select') {
+            fquestions.options = question.options
+                .filter(o => o.label && o.label.trim())
+                .map(o => ({
+                    label: o.label.trim(),
+                    scoring_role: o.scoring_role || null,
+                }));
+        }
+
+        dispatch(AddNewQuestion({ ...fquestions })).unwrap().then((res: any) => {
             if (res?.success) {
                 showAlert({
                     title: "Success",
                     message: "Successfully added new question",
-                })
-                console.log("res add", res)
-                if (id) {
-                    onClose({
-                        typeOfModal: "edit",
-                        ...res.data.question
-                    })
+                });
+                const createdQuestion = res.data?.screening?.[0] || toScreeningQuestion(res.data?.question || { ...fquestions, id: res.data?.id });
+                if (onAddQuestion) {
+                    onAddQuestion(createdQuestion);
+                } else if (onClose) {
+                    onClose({ typeOfModal: "add", ...createdQuestion });
                 }
-                else {
-                    onClose({
-                        typeOfModal: "add",
-                        ...res.data.screening[0]
+                setQuestion({
+                    id: undefined,
+                    question: '',
+                    answer_type: 'short_text',
+                    is_required: true,
+                    options: [{ label: "", scoring_role: "required" }, { label: "", scoring_role: "bonus" }],
+                });
 
-                    })
-                }
-            }
-            else {
+                // Refresh My Questions list and switch to My Questions tab
+                fetchMyQuestions();
+                setActiveTab('my');
+            } else {
                 showAlert({
                     title: "Error",
-                    message: res?.message,
-                })
+                    message: res?.message || "Failed to add question",
+                });
             }
             setIsLoading(false);
-        })
-
+        }).catch((err: any) => {
+            setIsLoading(false);
+            showAlert({
+                title: "Error",
+                message: err?.message || "Failed to add question",
+            });
+        });
     };
-    const [isLoading, setIsLoading] = useState(false)
+
+    const getTypeLabel = (type?: string) => {
+        switch (type) {
+            case 'short_text': return 'Text (Short)';
+            case 'long_text': return 'Text (Long)';
+            case 'number': return 'Number';
+            case 'single_select': return 'Single Select';
+            case 'multi_select': return 'Multi Select';
+            case 'yes_no': return 'Yes / No';
+            default: return type || 'Text';
+        }
+    };
+
+    const getTypeColors = (type?: string) => {
+        switch (type) {
+            case 'yes_no': return { bg: '#E6F4EA', text: '#137333' };
+            case 'single_select': return { bg: '#E8F0FE', text: '#1A73E8' };
+            case 'multi_select': return { bg: '#F3E8FD', text: '#8430CE' };
+            case 'number': return { bg: '#FEF7E0', text: '#B06000' };
+            case 'long_text': return { bg: '#FCE8E6', text: '#C5221F' };
+            default: return { bg: '#F1F3F4', text: '#5F6368' };
+        }
+    };
+
+    const currentList = activeTab === 'admin' ? adminQuestions : myQuestions;
+    const isCurrentLoading = activeTab === 'admin' ? loadingAdmin : loadingMy;
+    const isCurrentLoadingMore = activeTab === 'admin' ? loadingAdminMore : loadingMyMore;
 
     return (
         <Modal visible={isVisible} transparent animationType='slide' onRequestClose={onClose}>
-            <ScrollView contentContainerStyle={{ backgroundColor: "rgba(0,0,0,.3)", flexGrow: 1, justifyContent: 'flex-end', alignItems: 'center' }}>
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.45)", justifyContent: 'flex-end' }}
+            >
                 <View
                     style={{
                         backgroundColor: colors.white,
-                        borderTopLeftRadius: 30,
-                        borderTopRightRadius: 30,
+                        borderTopLeftRadius: 26,
+                        borderTopRightRadius: 26,
                         width: "100%",
-                        padding: responsiveWidth(5),
-                        paddingTop: responsiveHeight(2)
+                        maxHeight: responsiveHeight(88),
+                        height: responsiveHeight(85),
+                        paddingHorizontal: responsiveWidth(5),
+                        paddingTop: responsiveHeight(1.5),
+                        paddingBottom: responsiveHeight(2.5),
                     }}
                 >
+                    {/* Drag indicator */}
                     <View
                         style={{
-                            paddingBottom: 12,
-                        }}
-                    >
-                        <View
-                            style={{
-                                width: responsiveWidth(10),
-                                height: 5,
-                                borderRadius: 2,
-                                backgroundColor: colors.gray,
-                                alignSelf: 'center',
-                                marginBottom: responsiveHeight(1),
-                            }}
-                        />
-                        <View
-                            style={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                            }}
-                        >
-                            <View style={{ width: 32 }} />
-                            <Text
-                                style={{
-                                    fontSize: responsiveFontSize(2),
-                                    fontWeight: '700',
-                                    color: colors.textPrimary,
-                                    textAlign: 'center',
-                                    flex: 1,
-                                }}
-                                numberOfLines={1}
-                            >
-                                Add Question
-                            </Text>
-
-                            <TouchableOpacity
-                                onPress={onClose}
-                                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                                style={{
-                                    width: 32,
-                                    height: 32,
-                                    borderRadius: 16,
-                                    backgroundColor: '#f2f2f2',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <Text style={{ fontSize: 16, color: '#555', fontWeight: '600' }}>✕</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                    <Text style={{ fontSize: responsiveFontSize(1.7), fontWeight: '700', color: colors.primary2, marginBottom: responsiveHeight(0.5) }}>
-                        Question Prompt
-                    </Text>
-                    <CustomTextInput
-                        value={question.question}
-                        onChangeText={(t) => { setQuestion({ ...question, question: t }) }}
-                        placeholder="e.g., How much experience do you have?"
-                        placeholderTextColor={colors.gray}
-                        style={{
-                            borderWidth: 1,
-                            borderColor: colors.gray,
-                            borderRadius: 8, fontSize: responsiveFontSize(1.7),
-                            paddingHorizontal: responsiveWidth(3),
-                            color: colors.textPrimary,
-                            marginBottom: responsiveHeight(1.5)
+                            width: responsiveWidth(12),
+                            height: 4,
+                            borderRadius: 2,
+                            backgroundColor: '#CBD5E1',
+                            alignSelf: 'center',
+                            marginBottom: responsiveHeight(1.2),
                         }}
                     />
 
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(3), marginBottom: responsiveHeight(1.5) }}>
-                        <View style={{ flex: 1.3 }}>
+                    {/* Header */}
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            marginBottom: responsiveHeight(1.5),
+                        }}
+                    >
+                        <Text
+                            style={{
+                                fontSize: responsiveFontSize(2),
+                                fontWeight: '800',
+                                color: colors.textPrimary,
+                            }}
+                        >
+                            Screening Questions
+                        </Text>
+
+                        <TouchableOpacity
+                            onPress={onClose}
+                            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                            style={{
+                                width: 32,
+                                height: 32,
+                                borderRadius: 16,
+                                backgroundColor: '#F1F5F9',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            <Text style={{ fontSize: 16, color: '#475569', fontWeight: '700' }}>✕</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            backgroundColor: '#F1F5F9',
+                            borderRadius: 12,
+                            padding: 4,
+                            marginBottom: responsiveHeight(1.5),
+                        }}
+                    >
+                        {[
+                            { key: 'admin', label: 'Admin Questions' },
+                            { key: 'my', label: 'My Questions' },
+                            { key: 'create', label: '+ Add New' },
+                        ].map(tab => {
+                            const isActive = activeTab === tab.key;
+                            return (
+                                <TouchableOpacity
+                                    key={tab.key}
+                                    onPress={() => handleTabSwitch(tab.key as any)}
+                                    style={{
+                                        flex: 1,
+                                        paddingVertical: responsiveHeight(0.9),
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        borderRadius: 9,
+                                        backgroundColor: isActive ? colors.white : 'transparent',
+                                        shadowColor: isActive ? '#000' : 'transparent',
+                                        shadowOpacity: isActive ? 0.06 : 0,
+                                        shadowRadius: 2,
+                                        elevation: isActive ? 2 : 0,
+                                    }}
+                                >
+                                    <Text
+                                        style={{
+                                            fontSize: responsiveFontSize(1.5),
+                                            fontWeight: isActive ? '700' : '500',
+                                            color: isActive ? colors.primary : colors.textPrimary,
+                                        }}
+                                        numberOfLines={1}
+                                    >
+                                        {tab.label}
+                                    </Text>
+                                </TouchableOpacity>
+                            );
+                        })}
+                    </View>
+                    {activeTab === 'create' ? (
+                        <ScrollView
+                            showsVerticalScrollIndicator={false}
+                            contentContainerStyle={{ paddingBottom: responsiveHeight(4) }}
+                        >
                             <Text style={{ fontSize: responsiveFontSize(1.7), fontWeight: '700', color: colors.primary2, marginBottom: responsiveHeight(0.5) }}>
-                                Question Type
+                                Question Prompt
                             </Text>
+                            <CustomTextInput
+                                value={question.question}
+                                onChangeText={(t) => { setQuestion({ ...question, question: t }) }}
+                                placeholder="e.g., How much experience do you have?"
+                                placeholderTextColor={colors.gray}
+                                style={{
+                                    borderWidth: 1,
+                                    borderColor: colors.gray,
+                                    borderRadius: 8,
+                                    fontSize: responsiveFontSize(1.7),
+                                    paddingHorizontal: responsiveWidth(3),
+                                    color: colors.textPrimary,
+                                    marginBottom: responsiveHeight(.5)
+                                }}
+                            />
+
+
                             <CustomDropdown
                                 data={QUESTION_TYPES}
+                                label='Question Type'
                                 placeholder="Select Type"
                                 selectedValue={question.answer_type}
                                 onSelect={(val) => { setQuestion({ ...question, answer_type: val }) }}
                                 labelKey="name"
                                 valueKey="id"
-                                style={{ marginTop: 0 }}
                             />
-                        </View>
-                    </View>
-                    {(question.answer_type == "multi_select" || question.answer_type == "single_select") && (
-                        < View style={{ marginTop: responsiveHeight(1), paddingTop: responsiveHeight(1.5), borderTopWidth: 1, borderTopColor: colors.gray }}>
-                            <Text style={{ fontSize: responsiveFontSize(1.7), fontWeight: '700', color: colors.primary2, marginBottom: responsiveHeight(1) }}>
-                                Option Choices
-                            </Text>
-                            {question.options?.map((optText, optIdx) => (
-                                <View key={optIdx} style={{ flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(2), marginBottom: responsiveHeight(1) }}>
-                                    <TextInput
-                                        onChangeText={(t) => {
-                                            const newOptions = [...question.options];
-                                            newOptions[optIdx].label = t;
-                                            setQuestion({ ...question, options: newOptions });
-                                        }}
-                                        placeholder={`Option ${optIdx + 1}`}
-                                        placeholderTextColor={colors.gray}
-                                        style={{
-                                            flex: 1,
-                                            borderWidth: 1,
-                                            borderColor: colors.gray,
-                                            borderRadius: 8,
-                                            paddingHorizontal: responsiveWidth(3),
-                                            paddingVertical: responsiveHeight(0.8),
-                                            fontSize: responsiveFontSize(1.6),
-                                            color: colors.textPrimary,
-                                            backgroundColor: colors.white,
-                                        }}
-                                    />
 
-                                    {question.options?.length > 2 && (
-                                        <TouchableOpacity
-                                            style={{ padding: responsiveWidth(2) }}
-                                            onPress={() => {
-                                                setQuestion({ ...question, options: question.options.filter((_, i) => i !== optIdx) });
+                            {question.answer_type === "single_select" && (
+                                <View style={{ marginTop: responsiveHeight(1), paddingTop: responsiveHeight(1.5), borderTopWidth: 1, borderTopColor: colors.gray }}>
+                                    <Text style={{ fontSize: responsiveFontSize(1.7), fontWeight: '700', color: colors.primary2, marginBottom: responsiveHeight(1) }}>
+                                        Option Choices
+                                    </Text>
+                                    {question.options?.map((optText, optIdx) => (
+                                        <View key={optIdx} style={{ flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(2), marginBottom: responsiveHeight(1) }}>
+                                            <TextInput
+                                                onChangeText={(t) => {
+                                                    const newOptions = [...question.options];
+                                                    newOptions[optIdx].label = t;
+                                                    setQuestion({ ...question, options: newOptions });
+                                                }}
+                                                placeholder={`Option ${optIdx + 1}`}
+                                                placeholderTextColor={colors.gray}
+                                                value={optText.label}
+                                                style={{
+                                                    flex: 1,
+                                                    borderWidth: 1,
+                                                    borderColor: colors.gray,
+                                                    borderRadius: 8,
+                                                    paddingHorizontal: responsiveWidth(3),
+                                                    paddingVertical: responsiveHeight(0.8),
+                                                    fontSize: responsiveFontSize(1.6),
+                                                    color: colors.textPrimary,
+                                                    backgroundColor: colors.white,
+                                                }}
+                                            />
+
+                                            {question.options?.length > 2 && (
+                                                <TouchableOpacity
+                                                    style={{ padding: responsiveWidth(2) }}
+                                                    onPress={() => {
+                                                        setQuestion({ ...question, options: question.options.filter((_, i) => i !== optIdx) });
+                                                    }}
+                                                >
+                                                    <Text style={{ color: colors.red, fontSize: responsiveFontSize(1.8), fontWeight: '700' }}>
+                                                        ✕
+                                                    </Text>
+                                                </TouchableOpacity>
+                                            )}
+                                        </View>
+                                    ))}
+
+                                    <TouchableOpacity
+                                        style={{ marginTop: responsiveHeight(0.5), alignSelf: 'flex-start' }}
+                                        onPress={() => {
+                                            setQuestion({ ...question, options: [...question.options, { label: "", scoring_role: null }] });
+                                        }}
+                                    >
+                                        <Text style={{ color: colors.primary, fontSize: responsiveFontSize(1.6), fontWeight: '700' }}>
+                                            + Add Option
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
+                            )}
+                            {question.answer_type === "multi_select" && (
+                                <View style={{ marginTop: responsiveHeight(1), paddingTop: responsiveHeight(1.5), borderTopWidth: 1, borderTopColor: colors.gray }}>
+                                    <Text style={{ fontSize: responsiveFontSize(1.7), fontWeight: '700', color: colors.primary2, marginBottom: responsiveHeight(0.5) }}>
+                                        Option Choices & Auto-Score Roles
+                                    </Text>
+                                    <Text style={{ fontSize: responsiveFontSize(1.4), color: colors.gray, marginBottom: responsiveHeight(1.2) }}>
+                                        Add options and select an auto-score role for each (Required, Bonus, Ignore, Avoid).
+                                    </Text>
+                                    {question.options?.map((optText, optIdx) => (
+                                        <View
+                                            key={optIdx}
+                                            style={{
+                                                backgroundColor: '#F8FAFC',
+                                                borderWidth: 1,
+                                                borderColor: '#E2E8F0',
+                                                borderRadius: 12,
+                                                padding: responsiveWidth(3),
+                                                marginBottom: responsiveHeight(1.2),
                                             }}
                                         >
-                                            <Text style={{ color: colors.red, fontSize: responsiveFontSize(1.8), fontWeight: '700' }}>
-                                                ✕
+                                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: responsiveHeight(0.8) }}>
+                                                <Text style={{ fontSize: responsiveFontSize(1.5), fontWeight: '700', color: colors.textPrimary }}>
+                                                    Option {optIdx + 1}
+                                                </Text>
+                                                {question.options?.length > 2 && (
+                                                    <TouchableOpacity
+                                                        onPress={() => {
+                                                            setQuestion({ ...question, options: question.options.filter((_, i) => i !== optIdx) });
+                                                        }}
+                                                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                                                    >
+                                                        <Text style={{ color: colors.red, fontSize: responsiveFontSize(1.5), fontWeight: '700' }}>
+                                                            ✕ Remove
+                                                        </Text>
+                                                    </TouchableOpacity>
+                                                )}
+                                            </View>
+
+                                            <TextInput
+                                                onChangeText={(t) => {
+                                                    const newOptions = [...question.options];
+                                                    newOptions[optIdx].label = t;
+                                                    setQuestion({ ...question, options: newOptions });
+                                                }}
+                                                placeholder={`e.g. ${optIdx === 0 ? 'PHP' : optIdx === 1 ? 'JavaScript' : optIdx === 2 ? 'Python' : 'Java'}`}
+                                                placeholderTextColor={colors.gray}
+                                                value={optText.label}
+                                                style={{
+                                                    borderWidth: 1,
+                                                    borderColor: '#CBD5E1',
+                                                    borderRadius: 8,
+                                                    paddingHorizontal: responsiveWidth(3),
+                                                    paddingVertical: responsiveHeight(0.9),
+                                                    fontSize: responsiveFontSize(1.6),
+                                                    color: colors.textPrimary,
+                                                    backgroundColor: colors.white,
+                                                    marginBottom: responsiveHeight(1),
+                                                }}
+                                            />
+
+                                            <Text style={{ fontSize: responsiveFontSize(1.4), fontWeight: '600', color: colors.primary2, marginBottom: 4 }}>
+                                                Auto-Score Role
+                                            </Text>
+                                            <CustomDropdown
+                                                data={MULTI_SELECT_SCORING_ROLES}
+                                                placeholder="Select Score Role"
+                                                selectedValue={optText.scoring_role || 'required'}
+                                                onSelect={(val) => {
+                                                    const newOptions = [...question.options];
+                                                    newOptions[optIdx].scoring_role = val;
+                                                    setQuestion({ ...question, options: newOptions });
+                                                }}
+                                                labelKey="name"
+                                                valueKey="id"
+                                                style={{
+                                                    width: '100%',
+                                                    aspectRatio: undefined,
+                                                    paddingVertical: responsiveHeight(1),
+                                                    borderRadius: 8,
+                                                    borderWidth: 1,
+                                                    borderColor: '#CBD5E1',
+                                                    backgroundColor: colors.white,
+                                                }}
+                                            />
+                                        </View>
+                                    ))}
+
+                                    <TouchableOpacity
+                                        style={{ marginTop: responsiveHeight(0.5), alignSelf: 'flex-start' }}
+                                        onPress={() => {
+                                            setQuestion({ ...question, options: [...question.options, { label: "", scoring_role: "required" }] });
+                                        }}
+                                    >
+                                        <Text style={{ color: colors.primary, fontSize: responsiveFontSize(1.6), fontWeight: '700' }}>
+                                            + Add Option
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
+                            )}
+
+                            <Pressable
+                                onPress={onSubmit}
+                                disabled={isLoading}
+                                style={{
+                                    width: '100%',
+                                    justifyContent: 'center',
+                                    marginTop: responsiveScreenHeight(2.5),
+                                    marginBottom: responsiveScreenHeight(2),
+                                    borderRadius: 12,
+                                    gap: responsiveScreenWidth(1),
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    backgroundColor: colors.primary,
+                                    paddingHorizontal: responsiveScreenWidth(3),
+                                    paddingVertical: responsiveScreenHeight(1.5),
+                                }}
+                            >
+                                {isLoading ? (
+                                    <ActivityIndicator color={colors.white} />
+                                ) : (
+                                    <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8), fontWeight: '700' }}>
+                                        {id ? "Update Question" : "Add Question"}
+                                    </Text>
+                                )}
+                            </Pressable>
+                        </ScrollView>
+                    ) : (
+                        <View style={{ flex: 1 }}>
+                            <View
+                                style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    backgroundColor: '#F8FAFC',
+                                    borderWidth: 1,
+                                    borderColor: '#E2E8F0',
+                                    borderRadius: 10,
+                                    paddingHorizontal: responsiveWidth(3),
+                                    marginBottom: responsiveHeight(1.2),
+                                }}
+                            >
+                                <Icon icon={{ name: 'search', type: 'Feather' }} size={responsiveWidth(4.5)} style={{ color: '#94A3B8' }} />
+                                <TextInput
+                                    placeholder={activeTab === 'admin' ? "Search admin questions..." : "Search my questions..."}
+                                    placeholderTextColor="#94A3B8"
+                                    value={searchQuery}
+                                    onChangeText={handleSearchChange}
+                                    style={{
+                                        flex: 1,
+                                        paddingVertical: responsiveHeight(0.9),
+                                        paddingHorizontal: responsiveWidth(2),
+                                        fontSize: responsiveFontSize(1.5),
+                                        color: colors.textPrimary,
+                                    }}
+                                />
+                                {searchQuery.length > 0 && (
+                                    <TouchableOpacity onPress={() => handleSearchChange('')}>
+                                        <Text style={{ fontSize: 13, color: '#94A3B8', fontWeight: '600' }}>✕</Text>
+                                    </TouchableOpacity>
+                                )}
+                            </View>
+
+                            {isCurrentLoading ? (
+                                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                                    <ActivityIndicator size="large" color={colors.primary} />
+                                    <Text style={{ marginTop: responsiveHeight(1.5), color: colors.gray, fontSize: responsiveFontSize(1.6) }}>
+                                        Loading questions...
+                                    </Text>
+                                </View>
+                            ) : currentList.length === 0 ? (
+                                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: responsiveWidth(5) }}>
+                                    <Icon icon={{ name: 'help-circle', type: 'Feather' }} size={responsiveWidth(12)} style={{ color: '#CBD5E1' }} />
+                                    <Text style={{ marginTop: responsiveHeight(1), fontSize: responsiveFontSize(1.8), fontWeight: '700', color: colors.textPrimary }}>
+                                        No questions found
+                                    </Text>
+                                    <Text style={{ marginTop: 4, fontSize: responsiveFontSize(1.5), color: colors.gray, textAlign: 'center' }}>
+                                        {activeTab === 'admin'
+                                            ? "No admin questions are available at the moment."
+                                            : "You haven't added any custom questions yet."}
+                                    </Text>
+                                    {activeTab === 'my' && (
+                                        <TouchableOpacity
+                                            onPress={() => handleTabSwitch('create')}
+                                            style={{
+                                                marginTop: responsiveHeight(2),
+                                                backgroundColor: colors.primary,
+                                                paddingHorizontal: responsiveWidth(4.5),
+                                                paddingVertical: responsiveHeight(1),
+                                                borderRadius: 10,
+                                            }}
+                                        >
+                                            <Text style={{ color: colors.white, fontWeight: '700', fontSize: responsiveFontSize(1.6) }}>
+                                                + Create New Question
                                             </Text>
                                         </TouchableOpacity>
                                     )}
                                 </View>
-                            ))}
+                            ) : (
+                                <FlatList
+                                    data={currentList}
+                                    keyExtractor={(item, index) => {
+                                        const qId = item?.question_id || item?.id;
+                                        return qId ? `q-${qId}-${index}` : `idx-${index}`;
+                                    }}
+                                    renderItem={({ item, index }) => {
+                                        const qId = Number(item?.question_id || item?.id);
+                                        const qText = item?.content?.text || item?.text || item?.question || '';
+                                        const qType = item?.content?.type || item?.type || item?.answer_type || 'short_text';
+                                        const rawOptions = item?.content?.options || item?.options || [];
+                                        const options = Array.isArray(rawOptions) ? rawOptions : [];
+                                        const isAdded = selectedQuestions?.some(q => q.question_id === qId);
+                                        const isAdding = addingId === qId;
+                                        const typeColor = getTypeColors(qType);
 
-                            <TouchableOpacity
-                                style={{ marginTop: responsiveHeight(0.5), alignSelf: 'flex-start' }}
-                                onPress={() => {
-                                    setQuestion({ ...question, options: [...question.options, { label: "", scoring_role: null }] });
-                                }}
-                            >
-                                <Text style={{ color: colors.primary, fontSize: responsiveFontSize(1.6), fontWeight: '700' }}>
-                                    + Add Option
-                                </Text>
-                            </TouchableOpacity>
+                                        return (
+                                            <View
+                                                key={qId ? `q-${qId}-${index}` : index}
+                                                style={{
+                                                    borderWidth: 1,
+                                                    borderColor: isAdded ? colors.primary : '#E2E8F0',
+                                                    backgroundColor: isAdded ? '#F0FDF4' : colors.white,
+                                                    borderRadius: 14,
+                                                    padding: responsiveWidth(3.5),
+                                                    marginBottom: responsiveHeight(1.2),
+                                                }}
+                                            >
+                                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: responsiveWidth(2) }}>
+                                                    <Text
+                                                        style={{
+                                                            flex: 1,
+                                                            fontSize: responsiveFontSize(1.7),
+                                                            fontWeight: '700',
+                                                            color: colors.textPrimary,
+                                                            lineHeight: 22,
+                                                        }}
+                                                    >
+                                                        {qText}
+                                                    </Text>
+
+                                                    <TouchableOpacity
+                                                        onPress={() => handleToggleQuestion(item)}
+                                                        disabled={isAdding}
+                                                        style={{
+                                                            backgroundColor: isAdded ? '#DCFCE7' : colors.primary,
+                                                            borderWidth: isAdded ? 1 : 0,
+                                                            borderColor: isAdded ? '#16A34A' : 'transparent',
+                                                            paddingHorizontal: responsiveWidth(3.2),
+                                                            paddingVertical: responsiveHeight(0.6),
+                                                            borderRadius: 8,
+                                                            minWidth: responsiveWidth(18),
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                        }}
+                                                    >
+                                                        {isAdding ? (
+                                                            <ActivityIndicator size="small" color={isAdded ? '#16A34A' : colors.white} />
+                                                        ) : (
+                                                            <Text
+                                                                style={{
+                                                                    color: isAdded ? '#16A34A' : colors.white,
+                                                                    fontSize: responsiveFontSize(1.4),
+                                                                    fontWeight: '700',
+                                                                }}
+                                                            >
+                                                                {isAdded ? '✓ Added' : '+ Add'}
+                                                            </Text>
+                                                        )}
+                                                    </TouchableOpacity>
+                                                </View>
+
+                                                {/* Meta: Type Badge & Options Preview */}
+                                                <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: responsiveHeight(1) }}>
+                                                    <View
+                                                        style={{
+                                                            backgroundColor: typeColor.bg,
+                                                            paddingHorizontal: responsiveWidth(2.5),
+                                                            paddingVertical: responsiveHeight(0.3),
+                                                            borderRadius: 6,
+                                                        }}
+                                                    >
+                                                        <Text style={{ color: typeColor.text, fontSize: responsiveFontSize(1.3), fontWeight: '700' }}>
+                                                            {getTypeLabel(qType)}
+                                                        </Text>
+                                                    </View>
+
+                                                    {options.map((opt: any, oIdx: number) => {
+                                                        const label = typeof opt === 'string' ? opt : (opt?.label || opt?.name || opt?.text || '');
+                                                        if (!label) return null;
+                                                        return (
+                                                            <View
+                                                                key={oIdx}
+                                                                style={{
+                                                                    backgroundColor: '#F1F5F9',
+                                                                    paddingHorizontal: responsiveWidth(2),
+                                                                    paddingVertical: responsiveHeight(0.2),
+                                                                    borderRadius: 5,
+                                                                }}
+                                                            >
+                                                                <Text style={{ color: '#475569', fontSize: responsiveFontSize(1.2) }}>
+                                                                    {label}
+                                                                </Text>
+                                                            </View>
+                                                        );
+                                                    })}
+                                                </View>
+                                            </View>
+                                        );
+                                    }}
+                                    showsVerticalScrollIndicator={false}
+                                    contentContainerStyle={{ paddingBottom: responsiveHeight(4) }}
+                                    onEndReachedThreshold={0.4}
+                                    onEndReached={handleLoadMore}
+                                    ListFooterComponent={() => {
+                                        if (!isCurrentLoadingMore) return null;
+                                        return (
+                                            <View style={{ paddingVertical: responsiveHeight(2), alignItems: 'center' }}>
+                                                <ActivityIndicator size="small" color={colors.primary} />
+                                            </View>
+                                        );
+                                    }}
+                                />
+                            )}
                         </View>
                     )}
-
-                    <Pressable
-                        onPress={onSubmit}
-                        style={{
-                            width: '100%',
-                            justifyContent: 'center',
-                            marginTop: responsiveScreenHeight(2),
-                            marginBottom: responsiveScreenHeight(2),
-                            borderRadius: 12,
-                            gap: responsiveScreenWidth(1),
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            backgroundColor: colors.primary,
-                            paddingHorizontal: responsiveScreenWidth(3),
-                            paddingVertical: responsiveScreenHeight(1.5),
-                        }}
-                    >
-                        {isLoading ? (
-                            <ActivityIndicator color={colors.white} />
-                        ) : (
-                            <Text style={{ color: colors.white, fontSize: responsiveScreenFontSize(1.8), fontWeight: '700' }}>
-                                {id ? "Update Question" : "Add Question"}
-                            </Text>
-                        )}
-                    </Pressable>
                 </View>
-
-            </ScrollView>
-        </Modal >
-    )
-}
+            </KeyboardAvoidingView>
+        </Modal>
+    );
+};
 const styles = StyleSheet.create({
     radioOuter: {
         height: 18,

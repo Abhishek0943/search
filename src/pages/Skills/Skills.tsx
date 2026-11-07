@@ -20,7 +20,7 @@ import { GetSkills, GetUserSkill, Update } from '../../reducer/jobsReducer';
 import { setUser } from '../../reducer/userReducer';
 import Text from '../../components/Text';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import SearchSelectDropdown from '../../components/SearchSelectDropdown';
+import { CustomMultiDropdown } from '../Search/Search';
 
 const Skills = () => {
     const { colors } = useContext(ThemeContext);
@@ -93,18 +93,14 @@ const Skills = () => {
                         </View>
                     ) : (
                         <View style={{ marginTop: responsiveHeight(2), width: '100%' }}>
-                            <SearchSelectDropdown
+                            <CustomMultiDropdown
                                 label="Skills"
-                                options={skillOptions}
+                                data={skillOptions}
                                 placeholder="Search skills..."
-                                multiSelect={true}
-                                selectedIds={selectedSkillIds}
-                                onToggle={(id) => {
-                                    setSelectedSkillIds(prev => {
-                                        const already = prev.includes(id);
-                                        return already ? prev.filter(i => i !== id) : [...prev, id];
-                                    });
-                                }}
+                                selectedValues={selectedSkillIds}
+                                onSelect={(arr: any[]) => setSelectedSkillIds(arr)}
+                                labelKey="name"
+                                valueKey="id"
                             />
                         </View>
                     )}

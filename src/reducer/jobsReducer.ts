@@ -25,6 +25,28 @@ export const DeleteExperience = createAsyncThunk<{ success: true, data: RoleItem
 export const DeleteProject = createAsyncThunk<{ success: true, data: RoleItem[] } | ErrorResponse, { id: number, }>('DeleteProject', ({ id }) => deleteApiCall<{ success: true, data: RoleItem[] }>(`/jobseeker/projects/${id}`));
 export const DeleteEducation = createAsyncThunk<{ success: true, data: RoleItem[] } | ErrorResponse, { id: number, }>('DeleteEducation', ({ id }) => deleteApiCall<{ success: true, data: RoleItem[] }>(`/jobseeker/educations/${id}`));
 export const GetJobs = createAsyncThunk<{ success: true, data: { jobs: RoleItem[] } } | ErrorResponse, { page: number, search?: string, job_typeid: number[], job_skillid: number[], companyid: number[], job_title: string[], job_experienceid: number[], degree_levelid: number[], job_shiftid: number[], genderid: number[], career_levelid: number[], functional_areaid: number[], cityid: number[], salary_from: number, salary_to: number }>('GetJobs', ({ page, ...body }) => postApiCall<{ success: true, data: { jobs: RoleItem[] } }>('/jobseekers/search-jobs?page=' + page, body));
+export const GetAllQuestions = createAsyncThunk<
+  { success: boolean; data: any; message?: string } | ErrorResponse,
+  { page?: number; search?: string } | void
+>(
+  'GetAllQuestions',
+  (params) => {
+    const page = params?.page || 1;
+    const search = params?.search ? `&search=${encodeURIComponent(params.search)}` : '';
+    return getApiCall<{ success: boolean; data: any; message?: string }>(`/company/all-questions?page=${page}${search}`);
+  }
+);
+export const GetMyQuestions = createAsyncThunk<
+  { success: boolean; data: any; message?: string } | ErrorResponse,
+  { page?: number; search?: string } | void
+>(
+  'GetMyQuestions',
+  (params) => {
+    const page = params?.page || 1;
+    const search = params?.search ? `&search=${encodeURIComponent(params.search)}` : '';
+    return getApiCall<{ success: boolean; data: any; message?: string }>(`/company/my-questions?page=${page}${search}`);
+  }
+);
 export const DeleteRecruter = createAsyncThunk<
   { success: true, data: { jobs: RoleItem[] } } | ErrorResponse, { search?: string, job_typeid: number[], job_skillid: number[], companyid: number[], job_title: string[], job_experienceid: number[], degree_levelid: number[], job_shiftid: number[], genderid: number[], career_levelid: number[], functional_areaid: number[], cityid: number[], salary_from: number, salary_to: number }
 >(
@@ -186,9 +208,9 @@ export const GetMessage = createAsyncThunk<
 export const GetMessageSeeker = createAsyncThunk<
   { success: true, data: { filter: { filter: string, option: string[] | { id: number, name: string }[] }[] } } | ErrorResponse, { search?: string }
 >(
-  'GetFilter',
+  'GetMessageSeeker',
   ({ id }) => {
-    return getApiCall<{ success: true, data: { filter: { filter: string, option: string[] | { id: number, name: string }[] }[] } }>('/jobseeker/messages?companyid=' + id);
+    return getApiCall<{ success: true, data: { filter: { filter: string, option: string[] | { id: number, name: string }[] }[] } }>('/jobseeker/messages?company_id=' + id);
   }
 );
 export const ProfileData = createAsyncThunk<{ success: true, data: User } | ErrorResponse>('ProfileData', () => getApiCall<{ success: true, data: User }>('/auth/jobseekers/me'));
@@ -523,6 +545,13 @@ export const DeleteCertificate = createAsyncThunk<
   ({ id }) => {
     return deleteApiCall<{ success: true, data: any }>('/jobseeker/delete-certificate/' + id);
   }
+);
+
+export const GetJobseekerInterviews = createAsyncThunk<
+  { success: boolean; data: any } | ErrorResponse
+>(
+  'GetJobseekerInterviews',
+  () => getApiCall<{ success: boolean; data: any }>('/jobseeker/interviews')
 );
 
 const jobSlice = createSlice({

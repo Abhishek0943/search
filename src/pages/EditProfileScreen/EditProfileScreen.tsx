@@ -1,294 +1,748 @@
+import React, { useContext, useEffect, useState } from 'react';
 import {
-  NavigationProp,
-  ParamListBase,
-  useNavigation,
-} from '@react-navigation/native';
-import React, { useState } from 'react';
-import {
-  Alert,
-  Image,
-  KeyboardAvoidingView,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Image,
+    KeyboardAvoidingView,
+    Platform,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import {
-  responsiveScreenFontSize,
-  responsiveScreenHeight,
-  responsiveScreenWidth,
+    responsiveFontSize,
+    responsiveHeight,
+    responsiveWidth,
 } from 'react-native-responsive-dimensions';
-import { InPutWithLable } from '../../components';
-import WrapperContainer from '../../components/WrapperContainer';
-import imagePath from '../../constants/imagePath';
-import { fonts, lightColors } from '../../constants/values';
-import usePostData from '../../hooks/usePostData';
+import { useNavigation } from '@react-navigation/native';
+import { NavigationBar, InPutWithLabel } from '../../components';
+import { ThemeContext } from '../../context/ThemeProvider';
+import Text from '../../components/Text';
+import Button from '../../components/Button';
+import { Header } from '../Company/Company';
+import { CustomDropdown } from '../PersonalInfo/PersonalInfo';
 import { useAppDispatch, useAppSelector } from '../../store';
-import { requestCameraPermission, showError, showSuccess } from '../../utils/helperFunctions';
-import { GetProfile } from '../../reducer/userReducer';
-import PhoneNumberInput from '../../components/PhoneNumberInput';
-import ImageCropPicker from 'react-native-image-crop-picker';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { moderateScale, verticalScale } from '../../styles/scaling';
-
-const colors = lightColors;
+import { useAlert } from '../../context/AlertContext';
+import {
+    Career,
+    Currencies,
+    Experiences,
+    FunctionalAria,
+    GetCity,
+    GetCountry,
+    GetGender,
+    GetNationalities,
+    GetState,
+    Industries,
+    GetAllWorkRights,
+    ProfileData,
+    Update,
+} from '../../reducer/jobsReducer';
+import { pick, types } from '@react-native-documents/picker';
+import { postApiCall } from '../../api';
+import imagePath from '../../assets/imagePath';
 
 const EditProfileScreen = () => {
-  const dispatch = useAppDispatch();
-  const { user } = useAppSelector(state => state.userStore);
-  const navigation: NavigationProp<ParamListBase> = useNavigation();
+    const { colors } = useContext(ThemeContext);
+    const navigation = useNavigation();
+    const dispatch = useAppDispatch();
+    const { showAlert } = useAlert();
+    const { user } = useAppSelector(state => state.userStore);
 
-  const [loading, setLoading] = useState(false);
-  const [image, setImage] = useState<null | {
-    uri: string;
-    name: string;
-    type: string;
-  }>(null);
+    // Dropdown options from backend
+    const [genderOptions, setGenderOptions] = useState<any[]>([]);
+    const [nationalities, setNationalities] = useState<any[]>([]);
+    const [countries, setCountries] = useState<any[]>([]);
+    const [states, setStates] = useState<any[]>([]);
+    const [cities, setCities] = useState<any[]>([]);
+    const [workRights, setWorkRights] = useState<any[]>([]);
+    const [experiences, setExperiences] = useState<any[]>([]);
+    const [careerLevels, setCareerLevels] = useState<any[]>([]);
+    const [functionalAreas, setFunctionalAreas] = useState<any[]>([]);
+    const [industryOptions, setIndustryOptions] = useState<any[]>([]);
+    const [currencies, setCurrencies] = useState<any[]>([]);
 
-  const [userData, setUserData] = useState({
-    name: user?.name || '',
-    username: user?.user_name || '',
-    email: user?.email || '',
-    phone: user?.phone_number || '',
-    bio: user?.bio || '',
-    website: user?.website || 'https://yourwebsite.com',
-  });
+    // Image state
+    const [imageUri, setImageUri] = useState<string | null>((user as any)?.image || (user as any)?.avatar || null);
+    const [uploadingImage, setUploadingImage] = useState(false);
 
-  const { mutate: postUpload } = usePostData<Error>('/update-profile', 'post', {
-    onSuccess: async res => {
-      setLoading(false);
-      dispatch(GetProfile());
-      showSuccess(res?.message);
-      navigation.goBack();
-    },
-    onError: async (error: any) => {
-      setLoading(false);
-      showError(error?.message);
-    },
-  });
+    // Form data state
+    const [formData, setFormData] = useState({
+        firstName: '',
+        middleName: '',
+        lastName: '',
+        phone: '',
+        email: '',
+        nationalId: '',
+        genderId: 0,
+        nationalityId: 0,
+        countryId: 0,
+        stateId: 0,
+        cityId: 0,
+        streetAddress: '',
+        bio: '',
+        jobExperienceId: 0,
+        careerLevelId: 0,
+        functionalAreaId: 0,
+        currentSalary: '',
+        expectedSalary: '',
+        salaryCurrency: 0,
+        workRightId: 0,
+        industryId: 0,
+    });
 
-  const handleSave = () => {
-    if (
-      !userData.email ||
-      !userData.name ||
-      !userData.username ||
-      !userData.phone
-    ) {
-      return;
-    }
+    const [saving, setSaving] = useState(false);
 
-    const formData = new FormData();
-    formData.append('name', userData.name);
-    formData.append('email', userData.email);
-    formData.append('country_code', state.callingCode);
-    formData.append('user_name', userData.username);
-    formData.append('phone_number', userData.phone);
-    formData.append('country_id', '1');
-    formData.append('bio', userData.bio);
-    formData.append('website', userData.website);
-    if (image) {
-      formData.append('cover_image', {
-        uri: image.uri,
-        name: image.name,
-        type: image.type,
-      } as any);
-    }
-    setLoading(true);
-    postUpload(formData);
-  };
+    // Initialize form from current user
+    useEffect(() => {
+        if (!user) return;
+        const u = user as any;
 
-  const handlePhoneChange = (phoneNumber: string) => {
-    const onlyNumbers = phoneNumber.replace(/[^0-9]/g, '');
-    updateState({ phoneNumber: onlyNumbers });
-    setUserData(prev => ({ ...prev, phone: onlyNumbers }));
-  };
+        const first = u.first_name || (u.name ? u.name.split(' ')[0] : '');
+        const middle = u.middle_name || '';
+        const last = u.last_name || (u.name ? u.name.split(' ').slice(1).join(' ') : '');
+        console.log(u, "national")
+        setFormData({
+            firstName: first,
+            middleName: middle,
+            lastName: last,
+            phone: u.phone || u.phone_number || u.mobile_num || '',
+            email: u.email || '',
+            nationalId: u.national_id_card_number || u.national_id || '',
+            genderId: Number(u.gender_id || u.gender?.id || 0),
+            nationalityId: Number(u.nationality_id || 0),
+            countryId: Number(u.country_id || u.country?.id || 0),
+            stateId: Number(u.state_id || u.state?.id || 0),
+            cityId: Number(u.city_id || u.city?.id || 0),
+            streetAddress: u.street_address || u.address || u.location || '',
+            bio: u.bio || u.profile_summary || u.summary || u.description || '',
+            jobExperienceId: Number(u.job_experience_id || u.job_experience?.id || 0),
+            careerLevelId: Number(u.career_level_id || u.career_level?.id || 0),
+            functionalAreaId: Number(u.functional_area_id || u.functional_area?.id || 0),
+            currentSalary: u.current_salary ? String(u.current_salary) : '',
+            expectedSalary: u.expected_salary ? String(u.expected_salary) : '',
+            salaryCurrency: u.salary_currency,
+            workRightId: Number(u.work_right_id || u.work_rights_id || u.work_right?.id || 0),
+            industryId: Number(u.industry_id || u.industry?.id || 0),
+        });
 
-  const handleLaunchCamera = async () => {
-    const hasPermission = await requestCameraPermission();
-    if (!hasPermission) {
-      return;
-    }
-    try {
-      const result = await ImageCropPicker.openCamera({
-        width: 160 * 4,
-        height: 58 * 4,
-        cropping: true,
-        includeBase64: false,
-      });
+        if (u.image) setImageUri(u.image);
 
-      setImage({
-        uri: result.path,
-        name: result.filename || 'profile.jpg',
-        type: result.mime,
-      });
-    } catch (error) {
-    }
-  };
+        if (u.country_id) {
+            dispatch(GetState({ id: String(u.country_id) }))
+                .unwrap()
+                .then(res => {
+                    if (res?.success) setStates(res.data || []);
+                });
+        }
+        if (u.state_id) {
+            dispatch(GetCity({ id: String(u.state_id) }))
+                .unwrap()
+                .then(res => {
+                    if (res?.success) setCities(res.data || []);
+                });
+        }
+    }, [user, dispatch]);
 
-  const handleLaunchGallery = async () => {
-    try {
-      const result = await ImageCropPicker.openPicker({
-        width: 160 * 4,
-        height: 58 * 4,
-        cropping: true,
-        includeBase64: false,
-      });
+    // Fetch backend dropdown data
+    useEffect(() => {
+        dispatch(GetGender()).unwrap().then(res => {
+            if (res?.success) setGenderOptions(res.data || []);
+        });
 
-      setImage({
-        uri: result.path,
-        name: result.filename || 'profile.jpg',
-        type: result.mime,
-      });
-    } catch (error) {
-    }
-  };
+        dispatch(GetNationalities()).unwrap().then(res => {
+            if (res?.success) setNationalities(res.data || []);
+        });
 
-  const handleImagePicker = () => {
+        dispatch(GetCountry()).unwrap().then(res => {
+            if (res?.success) setCountries(res.data || []);
+        });
 
-  };
+        dispatch(GetAllWorkRights()).unwrap().then(res => {
+            if (res?.success) setWorkRights(res.data || []);
+        });
 
-  const [state, setState] = useState({
-    callingCode: user?.country_code,
-    cca2: 'AU',
-    phoneNumber: '',
-  });
+        dispatch(Experiences()).unwrap().then(res => {
+            if (res?.success) setExperiences(res.data || []);
+        });
 
-  const updateState = (data: any) => setState(prev => ({ ...prev, ...data }));
+        dispatch(Career()).unwrap().then(res => {
+            if (res?.success) setCareerLevels(res.data || []);
+        });
 
-  const _onCountryChange = (data: any) => {
-    updateState({ cca2: data.cca2, callingCode: data.callingCode[0] });
-    setUserData(prev => ({ ...prev, country_code: data.callingCode[0] }));
-  };
+        dispatch(FunctionalAria()).unwrap().then(res => {
+            if (res?.success) setFunctionalAreas(res.data || []);
+        });
 
-  return (
-    <SafeAreaView style={{ flex: 1, }}>
-      <KeyboardAvoidingView
-        behavior="padding"
-        style={{ flex: 1, }}>
-        <View >
+        dispatch(Industries()).unwrap().then(res => {
+            if (res?.success) setIndustryOptions(res.data || []);
+        });
 
-          <ScrollView style={{}} contentContainerStyle={styles.scroll}>
-            <View style={styles.header}>
-              <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Image source={imagePath.cross} style={styles.icon} />
-              </TouchableOpacity>
-              <Text style={styles.title}>Edit Profile</Text>
-              <TouchableOpacity onPress={handleSave}>
-                <Image source={imagePath.tick_black} style={styles.icon} />
-              </TouchableOpacity>
-            </View>
+        dispatch(Currencies()).unwrap().then(res => {
+            if (res?.success) setCurrencies(res.data || []);
+        });
+    }, [dispatch]);
 
-            <Pressable
-              onPress={handleImagePicker}
-              style={styles.profileImageContainer}>
-              <Image
-                source={{ uri: image?.uri || user?.cover_image }}
-                style={styles.profileImage}
-              />
-            </Pressable>
+    const handleChange = (key: string, value: any) => {
+        setFormData(prev => ({ ...prev, [key]: value }));
+    };
 
-            <View style={styles.form}>
-              <InPutWithLable
-                value={userData.name}
-                onChangeText={e => setUserData({ ...userData, name: e })}
-                label="Name"
-              />
-              <InPutWithLable
-                value={userData.username}
-                onChangeText={e => setUserData({ ...userData, username: e })}
-                label="Username"
-                editable={false}
-              />
-              <InPutWithLable
-                value={userData.email}
-                onChangeText={e => setUserData({ ...userData, email: e })}
-                label="Email Address"
-                isRequired
-                editable={false}
-              />
-              <Text style={styles.label}>
-                Phone<Text style={styles.required}>*</Text>
-              </Text>
+    const handleCountryChange = (countryId: any) => {
+        setFormData(prev => ({ ...prev, countryId, stateId: 0, cityId: 0 }));
+        setStates([]);
+        setCities([]);
+        if (countryId) {
+            dispatch(GetState({ id: String(countryId) }))
+                .unwrap()
+                .then(res => {
+                    if (res?.success) setStates(res.data || []);
+                });
+        }
+    };
 
-              <PhoneNumberInput
-                onCountryChange={_onCountryChange}
-                onChangePhone={handlePhoneChange}
-                maxLength={11}
-                cca2={state.cca2}
-                phoneNumber={userData.phone}
-                callingCode={state.callingCode}
-                require={true}
-                keyboardType={'phone-pad'}
-              />
-              <InPutWithLable
-                value={userData.bio}
-                onChangeText={e => setUserData({ ...userData, bio: e })}
-                label="Bio"
-              />
-              <InPutWithLable
-                value={userData.website}
-                onChangeText={e => setUserData({ ...userData, website: e })}
-                label="Website"
-              />
-            </View>
-          </ScrollView>
-        </View>
+    const handleStateChange = (stateId: any) => {
+        setFormData(prev => ({ ...prev, stateId, cityId: 0 }));
+        setCities([]);
+        if (stateId) {
+            dispatch(GetCity({ id: String(stateId) }))
+                .unwrap()
+                .then(res => {
+                    if (res?.success) setCities(res.data || []);
+                });
+        }
+    };
 
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+    const normalizeFileUri = (u?: string) => {
+        if (!u) return '';
+        if (u.startsWith('/')) return `file://${u}`;
+        return u;
+    };
 
-  );
+    const handlePickPhoto = async () => {
+        try {
+            const [doc] = await pick({
+                type: [types.images],
+                allowMultiSelection: false,
+                mode: 'import',
+            });
+            if (!doc) return;
+
+            const uri = normalizeFileUri((doc as any).fileCopyUri || doc.uri);
+            const fileName = doc.name || `profile_${Date.now()}.${doc.type || 'image/jpeg'}`;
+            const file = { uri, name: fileName, type: doc.type || 'image/jpeg' };
+
+            setImageUri(uri);
+            setUploadingImage(true);
+
+            const fd = new FormData();
+            fd.append('image', {
+                uri: file.uri,
+                name: file.name,
+                type: file.type,
+            } as any);
+
+            const res: any = await postApiCall('/jobseeker/update-user-media', fd, { as: 'form' });
+            if (res?.success) {
+                dispatch(ProfileData());
+            } else {
+                showAlert({
+                    title: 'Error',
+                    message: res?.message || 'Failed to upload photo',
+                });
+            }
+        } catch (e) {
+            console.log('Pick photo error:', e);
+        } finally {
+            setUploadingImage(false);
+        }
+    };
+
+    const getInitials = (name?: string) => {
+        if (!name) return 'U';
+        return name
+            .split(' ')
+            .map(w => w[0])
+            .join('')
+            .toUpperCase()
+            .slice(0, 2);
+    };
+
+    const handleSave = async () => {
+        if (!formData.firstName.trim()) {
+            showAlert({ title: 'Validation', message: 'First name is required.' });
+            return;
+        }
+
+        if (!formData.bio.trim()) {
+            showAlert({ title: 'Validation', message: 'Bio is required.' });
+            return;
+        }
+
+        if (saving) return;
+        setSaving(true);
+
+        try {
+            const fullName = `${formData.firstName.trim()}${formData.middleName.trim() ? ' ' + formData.middleName.trim() : ''} ${formData.lastName.trim()}`;
+
+            const payload: any = {
+                first_name: formData.firstName.trim(),
+                middle_name: formData.middleName.trim(),
+                last_name: formData.lastName.trim(),
+                name: fullName,
+                phone: formData.phone.trim(),
+                mobile_num: formData.phone.trim(),
+                email: formData.email.trim(),
+                national_id_card_number: formData.nationalId.trim(),
+                street_address: formData.streetAddress.trim(),
+                bio: formData.bio.trim(),
+                profile_summary: formData.bio.trim(),
+                description: formData.bio.trim(),
+                current_salary: formData.currentSalary.trim(),
+                expected_salary: formData.expectedSalary.trim(),
+            };
+
+            if (formData.genderId) payload.gender_id = formData.genderId;
+            if (formData.nationalityId) payload.nationality_id = formData.nationalityId;
+            if (formData.countryId) payload.country_id = formData.countryId;
+            if (formData.stateId) payload.state_id = formData.stateId;
+            if (formData.cityId) payload.city_id = formData.cityId;
+            if (formData.jobExperienceId) payload.job_experience_id = formData.jobExperienceId;
+            if (formData.careerLevelId) payload.career_level_id = formData.careerLevelId;
+            if (formData.functionalAreaId) payload.functional_area_id = formData.functionalAreaId;
+            if (formData.workRightId) payload.work_right_id = formData.workRightId;
+            if (formData.industryId) payload.industry_id = formData.industryId;
+            if (formData.salaryCurrency) payload.salary_currency = formData.salaryCurrency;
+
+            const res: any = await dispatch(Update(payload)).unwrap();
+            console.log('Profile update response:', res);
+
+            if (res?.success !== false) {
+                showAlert({
+                    title: 'Success',
+                    message: res?.message || 'Profile updated successfully.',
+                });
+                dispatch(ProfileData());
+                navigation.goBack(); .0
+            } else {
+                showAlert({
+                    title: 'Error',
+                    message: res?.message || 'Failed to update profile.',
+                });
+            }
+        } catch (error: any) {
+            showAlert({
+                title: 'Error',
+                message: error?.message || 'Something went wrong. Please try again.',
+            });
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    return (
+        <NavigationBar navigationBar={false}>
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : "height"}
+                style={{ flex: 1 }}
+            >
+                <ScrollView
+                    keyboardShouldPersistTaps="handled"
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={styles.scrollContainer}
+                >
+                    <Header
+                        title="Edit Profile"
+                        subtitle="Update your personal information and preferences."
+                    />
+
+                    {/* Profile Section: Avatar & Change Photo */}
+                    <View style={styles.avatarSection}>
+                        <View
+                            style={[
+                                styles.avatarWrapper,
+                                {
+                                    backgroundColor: colors.primary50,
+                                    borderColor: colors.surfaces,
+                                },
+                            ]}
+                        >
+                            {imageUri ? (
+                                <Image
+                                    source={{ uri: imageUri }}
+                                    style={styles.avatarImage}
+                                    resizeMode="cover"
+                                />
+                            ) : (
+                                <Text
+                                    style={[
+                                        styles.initialsText,
+                                        { color: colors.primary },
+                                    ]}
+                                >
+                                    {getInitials(user?.name)}
+                                </Text>
+                            )}
+
+                            {uploadingImage && (
+                                <View style={styles.imageLoaderOverlay}>
+                                    <ActivityIndicator size="small" color={colors.white} />
+                                </View>
+                            )}
+                        </View>
+
+                        <TouchableOpacity
+                            onPress={handlePickPhoto}
+                            disabled={uploadingImage}
+                            style={[styles.changePhotoButton, { borderColor: colors.primary }]}
+                        >
+                            <Image
+                                source={imagePath.camera}
+                                style={{
+                                    width: responsiveWidth(4),
+                                    height: responsiveWidth(4),
+                                    tintColor: colors.primary,
+                                    marginRight: responsiveWidth(1.5),
+                                    resizeMode: 'contain',
+                                }}
+                            />
+                            <Text
+                                style={{
+                                    fontSize: responsiveFontSize(1.7),
+                                    fontWeight: '700',
+                                    color: colors.primary,
+                                }}
+                            >
+                                {uploadingImage ? 'Uploading...' : 'Change Photo'}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    {/* Inputs */}
+                    <View style={styles.formContainer}>
+                        {/* First Name */}
+                        <InPutWithLabel
+                            label="First Name"
+                            isRequired={true}
+                            placeholder="Enter first name"
+                            value={formData.firstName}
+                            onChangeText={text => handleChange('firstName', text)}
+                            mainColor={colors.primary}
+                            secondaryColor={colors.primary2}
+                            inputContainerStyle={{ marginBottom: responsiveHeight(1) }}
+                        />
+
+                        {/* Middle Name */}
+                        <InPutWithLabel
+                            label="Middle Name (Optional)"
+                            placeholder="Enter middle name"
+                            value={formData.middleName}
+                            onChangeText={text => handleChange('middleName', text)}
+                            mainColor={colors.primary}
+                            secondaryColor={colors.primary2}
+                            inputContainerStyle={{ marginBottom: responsiveHeight(1) }}
+                        />
+
+                        {/* Last Name */}
+                        <InPutWithLabel
+                            label="Last Name (Optional)"
+                            placeholder="Enter last name"
+                            value={formData.lastName}
+                            onChangeText={text => handleChange('lastName', text)}
+                            mainColor={colors.primary}
+                            secondaryColor={colors.primary2}
+                            inputContainerStyle={{ marginBottom: responsiveHeight(1) }}
+                        />
+
+                        {/* Phone Number */}
+                        <InPutWithLabel
+                            label="Phone Number (Optional)"
+                            placeholder="e.g. +61 412 345 678"
+                            keyboardType="phone-pad"
+                            value={formData.phone}
+                            onChangeText={text => handleChange('phone', text)}
+                            mainColor={colors.primary}
+                            secondaryColor={colors.primary2}
+                            inputContainerStyle={{ marginBottom: responsiveHeight(1) }}
+                        />
+
+                        {/* Email */}
+                        <InPutWithLabel
+                            label="Email Address"
+                            placeholder="Enter email address"
+                            editable={false}
+                            keyboardType="email-address"
+                            value={formData.email}
+                            onChangeText={text => handleChange('email', text)}
+                            mainColor={colors.primary}
+                            secondaryColor={colors.primary2}
+                            inputContainerStyle={{ marginBottom: responsiveHeight(1) }}
+                        />
+
+                        {/* National ID */}
+                        <InPutWithLabel
+                            label="National ID Card Number (Optional)"
+                            placeholder="Enter national ID card number"
+                            value={formData.nationalId}
+                            onChangeText={text => handleChange('nationalId', text)}
+                            mainColor={colors.primary}
+                            secondaryColor={colors.primary2}
+                            inputContainerStyle={{ marginBottom: responsiveHeight(1) }}
+                        />
+
+                        {/* Gender */}
+                        <CustomDropdown
+                            label="Gender (Optional)"
+                            placeholder="Select Gender"
+                            data={genderOptions}
+                            selectedValue={formData.genderId}
+                            onSelect={val => handleChange('genderId', val)}
+                            labelKey="gender"
+                            valueKey="id"
+                        />
+
+                        {/* Nationality */}
+                        <CustomDropdown
+                            label="Nationality (Optional)"
+                            placeholder="Select Nationality"
+                            data={nationalities}
+                            selectedValue={formData.nationalityId}
+                            onSelect={val => handleChange('nationalityId', val)}
+                            labelKey="name"
+                            valueKey="id"
+                        />
+
+                        {/* Country */}
+                        <CustomDropdown
+                            label="Country (Optional)"
+                            placeholder="Select Country"
+                            data={countries}
+                            selectedValue={formData.countryId}
+                            onSelect={handleCountryChange}
+                            labelKey="name"
+                            valueKey="id"
+                        />
+
+                        {/* State */}
+                        <CustomDropdown
+                            label="State (Optional)"
+                            placeholder="Select State"
+                            data={states}
+                            selectedValue={formData.stateId}
+                            onSelect={handleStateChange}
+                            labelKey="name"
+                            valueKey="id"
+                        />
+
+                        {/* City */}
+                        <CustomDropdown
+                            label="City (Optional)"
+                            placeholder="Select City"
+                            data={cities}
+                            selectedValue={formData.cityId}
+                            onSelect={val => handleChange('cityId', val)}
+                            labelKey="name"
+                            valueKey="id"
+                        />
+
+                        {/* Street Address */}
+                        <InPutWithLabel
+                            label="Street Address (Optional)"
+                            placeholder="e.g. 123 Collins Street, Melbourne"
+                            value={formData.streetAddress}
+                            onChangeText={text => handleChange('streetAddress', text)}
+                            mainColor={colors.primary}
+                            secondaryColor={colors.primary2}
+                            inputContainerStyle={{ marginTop: responsiveHeight(1), marginBottom: responsiveHeight(1) }}
+                        />
+
+                        {/* Bio * */}
+                        <View style={{ marginTop: responsiveHeight(1), marginBottom: responsiveHeight(1.5), width: '100%' }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: responsiveHeight(0.5) }}>
+                                <Text style={{ fontSize: responsiveFontSize(1.8), fontWeight: '700', color: colors.primary2 }}>
+                                    Bio
+                                </Text>
+                                <Text style={{ fontSize: responsiveFontSize(1.8), color: colors.red, marginLeft: 4 }}>*</Text>
+                            </View>
+                            <TextInput
+                                style={{
+                                    borderWidth: 1.5,
+                                    borderColor: colors.surfaces,
+                                    borderRadius: 15,
+                                    paddingHorizontal: responsiveWidth(4),
+                                    paddingVertical: responsiveHeight(1.5),
+                                    fontSize: responsiveFontSize(1.8),
+                                    color: colors.textPrimary,
+                                    minHeight: responsiveHeight(12),
+                                    textAlignVertical: 'top',
+                                }}
+                                multiline
+                                numberOfLines={4}
+                                placeholder="Tell recruiters about yourself, experience, and what roles you are looking for..."
+                                placeholderTextColor={colors.placeholder || colors.gray}
+                                value={formData.bio}
+                                onChangeText={text => handleChange('bio', text)}
+                            />
+                        </View>
+
+                        {/* Job Experience */}
+                        <CustomDropdown
+                            label="Job Experience (Optional)"
+                            placeholder="Select Job Experience"
+                            data={experiences}
+                            selectedValue={formData.jobExperienceId}
+                            onSelect={val => handleChange('jobExperienceId', val)}
+                            labelKey="name"
+                            valueKey="id"
+                        />
+
+                        {/* Career Level */}
+                        <CustomDropdown
+                            label="Career Level (Optional)"
+                            placeholder="Select Career Level"
+                            data={careerLevels}
+                            selectedValue={formData.careerLevelId}
+                            onSelect={val => handleChange('careerLevelId', val)}
+                            labelKey="name"
+                            valueKey="id"
+                        />
+
+                        {/* Functional Area */}
+                        <CustomDropdown
+                            label="Functional Area (Optional)"
+                            placeholder="Select Functional Area"
+                            data={functionalAreas}
+                            selectedValue={formData.functionalAreaId}
+                            onSelect={val => handleChange('functionalAreaId', val)}
+                            labelKey="name"
+                            valueKey="id"
+                        />
+
+                        {/* Right to work in Australia */}
+                        <CustomDropdown
+                            label="Right to work in Australia (Optional)"
+                            placeholder="Select Work Rights"
+                            data={workRights}
+                            selectedValue={formData.workRightId}
+                            onSelect={val => handleChange('workRightId', val)}
+                            labelKey="name"
+                            valueKey="id"
+                        />
+
+                        {/* Industries */}
+                        <CustomDropdown
+                            label="Industries (Optional)"
+                            placeholder="Select Industry"
+                            data={industryOptions}
+                            selectedValue={formData.industryId}
+                            onSelect={val => handleChange('industryId', val)}
+                            labelKey="name"
+                            valueKey="id"
+                        />
+
+                        {/* Salary Currency */}
+                        <CustomDropdown
+                            label="Salary Currency (Optional)"
+                            placeholder="Select Currency"
+                            data={currencies}
+                            selectedValue={formData.salaryCurrency}
+                            onSelect={val => handleChange('salaryCurrency', val)}
+                            labelKey="name"
+                            valueKey="id"
+                        />
+
+                        {/* Current Salary */}
+                        <InPutWithLabel
+                            label="Current Salary (Optional)"
+                            placeholder="e.g. 75000"
+                            keyboardType="numeric"
+                            value={formData.currentSalary}
+                            onChangeText={text => handleChange('currentSalary', text)}
+                            mainColor={colors.primary}
+                            secondaryColor={colors.primary2}
+                            inputContainerStyle={{ marginTop: responsiveHeight(1), marginBottom: responsiveHeight(1) }}
+                        />
+
+                        {/* Expected Salary */}
+                        <InPutWithLabel
+                            label="Expected Salary (Optional)"
+                            placeholder="e.g. 90000"
+                            keyboardType="numeric"
+                            value={formData.expectedSalary}
+                            onChangeText={text => handleChange('expectedSalary', text)}
+                            mainColor={colors.primary}
+                            secondaryColor={colors.primary2}
+                            inputContainerStyle={{ marginBottom: responsiveHeight(2) }}
+                        />
+                    </View>
+                </ScrollView>
+
+                {/* Save Button */}
+                <View style={styles.footerContainer}>
+                    <Button
+                        label="Save Changes"
+                        loading={saving}
+                        backgroundColor={colors.primary}
+                        onPress={handleSave}
+                    />
+                </View>
+            </KeyboardAvoidingView>
+        </NavigationBar>
+    );
 };
 
 export default EditProfileScreen;
 
 const styles = StyleSheet.create({
-  scroll: {
-    padding: responsiveScreenHeight(1.5),
-    flexGrow: 1
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: responsiveScreenHeight(2.2),
-  },
-  title: {
-    fontSize: responsiveScreenFontSize(2),
-    fontFamily: fonts.poppinsM,
-  },
-  icon: {
-    width: responsiveScreenWidth(6),
-    height: responsiveScreenHeight(3),
-    resizeMode: 'contain',
-  },
-  profileImageContainer: {
-    alignSelf: 'center',
-    width: moderateScale(90),
-    height: verticalScale(70),
-    overflow: 'hidden',
-    borderRadius: moderateScale(16),
-    backgroundColor: colors.lightGray
-  },
-  profileImage: {
-    height: '100%',
-    width: '100%',
-    resizeMode: "contain"
-  },
-  form: {
-    gap: 6,
-  },
-  label: {
-    fontSize: responsiveScreenFontSize(1.8),
-    fontFamily: fonts.poppinsM,
-    color: colors.secondaryText,
-  },
-  required: {
-    fontSize: responsiveScreenFontSize(1.6),
-    fontFamily: fonts.poppinsM,
-    color: colors.red,
-    marginTop: responsiveScreenHeight(1),
-  },
+    scrollContainer: {
+        paddingBottom: responsiveHeight(4),
+    },
+    avatarSection: {
+        alignItems: 'center',
+        marginTop: responsiveHeight(2),
+        marginBottom: responsiveHeight(1),
+    },
+    avatarWrapper: {
+        width: responsiveWidth(26),
+        height: responsiveWidth(26),
+        borderRadius: responsiveWidth(13),
+        borderWidth: 2,
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+    },
+    avatarImage: {
+        width: '100%',
+        height: '100%',
+    },
+    initialsText: {
+        fontSize: responsiveFontSize(3.5),
+        fontWeight: '800',
+    },
+    imageLoaderOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.4)',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    changePhotoButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: responsiveHeight(1.2),
+        paddingHorizontal: responsiveWidth(4),
+        paddingVertical: responsiveHeight(0.8),
+        borderRadius: 20,
+        borderWidth: 1,
+    },
+    formContainer: {
+        width: responsiveWidth(90),
+        alignSelf: 'center',
+        marginTop: responsiveHeight(1),
+    },
+    footerContainer: {
+        paddingHorizontal: responsiveWidth(5),
+        paddingVertical: responsiveHeight(2),
+        alignItems: 'center',
+    },
 });
